@@ -75,14 +75,25 @@ async function checkHealth() {
 
 // Show status message
 function showStatus(message, type = 'warning') {
-    statusBar.className = `status-bar ${type}`;
-    document.getElementById('statusText').textContent = message;
-    statusBar.classList.remove('hidden');
+    const statusBadge = document.getElementById('statusBadge');
+    if (!statusBadge) return; // Skip if element doesn't exist
+    
+    const colors = {
+        'success': 'bg-green-100 text-green-800',
+        'error': 'bg-red-100 text-red-800',
+        'warning': 'bg-yellow-100 text-yellow-800'
+    };
+    
+    statusBadge.className = `inline-flex items-center mt-6 px-4 py-2 rounded-full text-sm font-medium ${colors[type] || colors.warning}`;
+    statusBadge.textContent = message;
 }
 
 // Hide status message
 function hideStatus() {
-    statusBar.classList.add('hidden');
+    const statusBadge = document.getElementById('statusBadge');
+    if (!statusBadge) return;
+    statusBadge.className = 'inline-flex items-center mt-6 px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium';
+    statusBadge.innerHTML = '<svg class="w-4 h-4 ml-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>النظام جاهز';
 }
 
 // Show loading

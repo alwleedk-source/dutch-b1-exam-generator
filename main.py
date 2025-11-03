@@ -482,7 +482,7 @@ async def root(request: Request):
 @app.get("/login", response_class=HTMLResponse)
 async def login_page():
     """Serve login page"""
-    with open("static/login.html", "r", encoding="utf-8") as f:
+    with open("static/login_v2.html", "r", encoding="utf-8") as f:
         return HTMLResponse(content=f.read())
 
 
