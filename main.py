@@ -13,6 +13,7 @@ import uvicorn
 
 from agent import DutchB1ExamAgent
 from translator import DutchToArabicTranslator
+from text_formatter import DutchTextFormatter
 
 
 # Initialize FastAPI app
@@ -46,6 +47,14 @@ try:
 except Exception as e:
     print(f"❌ Failed to initialize translator: {e}")
     translator = None
+
+# Initialize text formatter
+try:
+    formatter = DutchTextFormatter()
+    print("✅ Text formatter initialized successfully")
+except Exception as e:
+    print(f"❌ Failed to initialize formatter: {e}")
+    formatter = None
 
 
 # Request models
@@ -122,17 +131,30 @@ async def generate_exam(request: ExamRequest):
                 detail="Text is too short. Please provide at least 50 characters."
             )
         
-        # Generate exam
+        # Format text first (if formatter available)
+        formatted_text = request.text
+        if formatter is not None:
+            try:
+                format_result = formatter.format_text(request.text)
+                formatted_text = format_result.get("formatted_text", request.text)
+            except Exception as e:
+                print(f"Text formatting failed: {e}, using original text")
+                formatted_text = request.text
+        
+        # Generate exam with formatted text
         if request.verify_quality:
             exam = agent.generate_exam_with_verification(
-                text=request.text,
+                text=formatted_text,
                 num_questions=request.num_questions
             )
         else:
             exam = agent.generate_questions(
-                text=request.text,
+                text=formatted_text,
                 num_questions=request.num_questions
             )
+        
+        # Add formatted text to response
+        exam["text"] = formatted_text
         
         return JSONResponse(content=exam)
         

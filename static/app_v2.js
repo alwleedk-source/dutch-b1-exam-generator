@@ -6,9 +6,9 @@ const textInput = document.getElementById('textInput');
 const numQuestionsSelect = document.getElementById('numQuestions');
 const verifyQualityCheckbox = document.getElementById('verifyQuality');
 const generateBtn = document.getElementById('generateBtn');
-const analyzeBtn = document.getElementById('analyzeBtn');
+
 const loadingIndicator = document.getElementById('loadingIndicator');
-const analysisSection = document.getElementById('analysisSection');
+
 const resultsSection = document.getElementById('resultsSection');
 const statusBar = document.getElementById('statusBar');
 const charCount = document.getElementById('charCount');
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function setupEventListeners() {
     textInput.addEventListener('input', updateCharCount);
     generateBtn.addEventListener('click', generateExam);
-    analyzeBtn.addEventListener('click', analyzeText);
+
     copyBtn.addEventListener('click', copyResults);
     printBtn.addEventListener('click', printResults);
     newExamBtn.addEventListener('click', resetForm);
@@ -94,8 +94,8 @@ function updateCharCount() {
     charCount.textContent = count;
     
     const isValid = count >= 50;
-    generateBtn.disabled = !isValid;
-    analyzeBtn.disabled = count < 20;
+;
+
 }
 
 // Check API health
@@ -131,14 +131,14 @@ function hideStatus() {
 function showLoading() {
     loadingIndicator.classList.remove('hidden');
     generateBtn.disabled = true;
-    analyzeBtn.disabled = true;
+
 }
 
 // Hide loading
 function hideLoading() {
     loadingIndicator.classList.add('hidden');
     generateBtn.disabled = false;
-    analyzeBtn.disabled = false;
+
 }
 
 // Analyze text
@@ -193,7 +193,6 @@ async function generateExam() {
     showLoading();
     hideStatus();
     resultsSection.classList.add('hidden');
-    analysisSection.classList.add('hidden');
     
     try {
         const response = await fetch('/api/generate-exam', {
@@ -377,13 +376,16 @@ function displayQuestions(questions) {
                 
                 <div class="options">
                     ${q.options.map(opt => {
+                        // In test mode: NEVER show correct answer
+                        // In study mode: show correct answer
                         const showCorrect = !isTestMode && opt.correct;
                         const optionClass = showCorrect ? 'correct' : '';
                         const checkmark = showCorrect ? ' ✅' : '';
                         
                         return `
                             <div class="option ${optionClass}" 
-                                 data-option-id="${opt.id}" 
+                                 data-option-id="${opt.id}"
+                                 data-correct="${opt.correct ? 'true' : 'false'}"
                                  ${isTestMode ? 'onclick="selectOption(this)"' : ''}>
                                 <span class="option-label">${opt.id})</span>
                                 ${opt.text}${checkmark}
@@ -603,7 +605,6 @@ function resetForm() {
     testModeBtn.classList.remove('active');
     
     resultsSection.classList.add('hidden');
-    analysisSection.classList.add('hidden');
     hideStatus();
     updateCharCount();
     
