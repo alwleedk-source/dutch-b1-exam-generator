@@ -528,6 +528,17 @@ async def exams_page(request: Request):
         return HTMLResponse(content=f.read())
 
 
+@app.get("/exam_view.html", response_class=HTMLResponse)
+async def exam_view_page(request: Request):
+    """Serve exam view page (requires authentication)"""
+    user = auth_manager.get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login")
+    
+    with open("static/exam_view.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read())
+
+
 @app.get("/vocabulary", response_class=HTMLResponse)
 async def vocabulary_page(request: Request):
     """Serve vocabulary list page (requires authentication)"""
