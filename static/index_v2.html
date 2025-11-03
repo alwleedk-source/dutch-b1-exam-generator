@@ -6,7 +6,138 @@
     <title>Dutch B1 Exam Generator | مولد امتحانات القراءة الهولندية B1</title>
     <link rel="stylesheet" href="/style.css">
     <style>
-        /* Tooltip for word translation */
+        /* Navigation Bar */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-gradient));
+            padding: 15px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .navbar-brand {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        
+        .navbar-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .navbar-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .navbar-links a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+        }
+        
+        .navbar-user img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        
+        .btn-logout {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid white;
+            padding: 6px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .btn-logout:hover {
+            background: white;
+            color: var(--primary-color);
+        }
+        
+        /* File Upload Section */
+        .file-upload-section {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .file-upload-area {
+            border: 2px dashed var(--primary-color);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .file-upload-area:hover {
+            background: rgba(102, 126, 234, 0.05);
+            border-color: var(--secondary-color);
+        }
+        
+        .file-upload-area.dragover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: var(--success-color);
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        
+        /* Save Exam Button */
+        .btn-save-exam {
+            background: var(--success-gradient);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-left: 10px;
+        }
+        
+        .btn-save-exam:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        /* Word Tooltip with Save Button */
         .word-tooltip {
             position: relative;
             cursor: help;
@@ -25,8 +156,8 @@
             background-color: #2C3E50;
             color: white;
             text-align: center;
-            padding: 8px 12px;
-            border-radius: 6px;
+            padding: 12px 15px;
+            border-radius: 8px;
             position: absolute;
             z-index: 1000;
             bottom: 125%;
@@ -34,9 +165,9 @@
             transform: translateX(-50%);
             white-space: nowrap;
             font-size: 0.9rem;
-            font-weight: bold;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             transition: opacity 0.3s, visibility 0.3s;
+            min-width: 200px;
         }
         
         .word-tooltip .tooltip-text::after {
@@ -53,6 +184,34 @@
         .word-tooltip:hover .tooltip-text {
             visibility: visible;
             opacity: 1;
+        }
+        
+        .tooltip-translation {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .btn-save-word {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all 0.2s;
+        }
+        
+        .btn-save-word:hover {
+            background: #27AE60;
+            transform: scale(1.05);
+        }
+        
+        .btn-save-word.saved {
+            background: #95A5A6;
+            cursor: not-allowed;
         }
         
         /* Test mode styles */
@@ -174,9 +333,43 @@
             padding: 20px;
             color: #7F8C8D;
         }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .navbar-links {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .navbar-links a {
+                width: 100%;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="/" class="navbar-brand">🇳🇱 مولد امتحانات B1</a>
+            <div class="navbar-links">
+                <a href="/">🏠 الرئيسية</a>
+                <a href="/exams">📚 امتحاناتي</a>
+                <a href="/vocabulary">📝 قائمة كلماتي</a>
+            </div>
+            <div class="navbar-user" id="userInfo">
+                <span id="userName">جاري التحميل...</span>
+                <button class="btn-logout" onclick="logout()">🚪 خروج</button>
+            </div>
+        </div>
+    </nav>
+
     <div class="container">
         <!-- Header -->
         <header class="header">
@@ -192,6 +385,18 @@
             <span id="statusIcon">⚠️</span>
             <span id="statusText">جاري التحميل...</span>
         </div>
+
+        <!-- File Upload Section -->
+        <section class="file-upload-section">
+            <h2>📤 رفع ملف (صورة أو PDF)</h2>
+            <p class="hint">ارفع صورة أو ملف PDF يحتوي على نص هولندي لاستخراج النص تلقائياً</p>
+            <div class="file-upload-area" id="fileUploadArea">
+                <div class="upload-icon">📄</div>
+                <p><strong>اسحب الملف هنا أو انقر للاختيار</strong></p>
+                <p style="font-size: 0.9rem; color: #7F8C8D;">الصيغ المدعومة: JPG, PNG, PDF</p>
+            </div>
+            <input type="file" id="fileInput" accept="image/*,.pdf">
+        </section>
 
         <!-- Input Section -->
         <section class="input-section">
@@ -232,8 +437,6 @@ De cursus begint op 1 september 2024 en duurt 3 maanden..."
                 <button id="generateBtn" class="btn-primary">
                     🚀 توليد الامتحان
                 </button>
-
-
             </div>
 
             <div class="char-counter">
@@ -247,13 +450,12 @@ De cursus begint op 1 september 2024 en duurt 3 maanden..."
             <p>جاري التوليد... قد يستغرق 10-30 ثانية</p>
         </div>
 
-
-
         <!-- Results Section -->
         <section id="resultsSection" class="results-section hidden">
             <div class="results-header">
                 <h2>✅ الامتحان المولّد</h2>
                 <div class="action-buttons">
+                    <button id="saveExamBtn" class="btn-save-exam">💾 حفظ الامتحان</button>
                     <button id="copyBtn" class="btn-action">📋 نسخ</button>
                     <button id="printBtn" class="btn-action">🖨️ طباعة</button>
                     <button id="newExamBtn" class="btn-action">🔄 امتحان جديد</button>
@@ -316,10 +518,39 @@ De cursus begint op 1 september 2024 en duurt 3 maanden..."
                 مصمم حسب معايير <strong>CEFR B1</strong> | 
                 متوافق مع امتحانات <strong>Inburgering & Staatsexamen NT2</strong>
             </p>
-            <p class="version">v2.0.0 - مع وضع الاختبار والترجمة التفاعلية</p>
+            <p class="version">v3.0.0 - مع حفظ الامتحانات والكلمات ورفع الملفات</p>
         </footer>
     </div>
 
     <script src="/app.js"></script>
+    <script>
+        // Logout function
+        function logout() {
+            window.location.href = '/auth/logout';
+        }
+        
+        // Load user info
+        async function loadUserInfo() {
+            try {
+                const response = await fetch('/api/user');
+                if (response.ok) {
+                    const user = await response.json();
+                    document.getElementById('userName').textContent = user.name || user.email;
+                    if (user.picture) {
+                        const userInfoDiv = document.getElementById('userInfo');
+                        const img = document.createElement('img');
+                        img.src = user.picture;
+                        img.alt = user.name;
+                        userInfoDiv.insertBefore(img, userInfoDiv.firstChild);
+                    }
+                }
+            } catch (error) {
+                console.log('User info not available');
+            }
+        }
+        
+        // Load user info on page load
+        loadUserInfo();
+    </script>
 </body>
 </html>

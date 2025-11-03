@@ -726,3 +726,152 @@ async function saveWord(word, translation, event) {
         }, 1500);
     }
 }
+
+
+// ===== FILE UPLOAD FUNCTIONALITY =====
+
+const fileUploadArea = document.getElementById('fileUploadArea');
+const fileInput = document.getElementById('fileInput');
+const saveExamBtn = document.getElementById('saveExamBtn');
+
+// Setup file upload listeners
+if (fileUploadArea && fileInput) {
+    fileUploadArea.addEventListener('click', () => fileInput.click());
+    
+    fileInput.addEventListener('change', handleFileSelect);
+    
+    // Drag and drop
+    fileUploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.add('dragover');
+    });
+    
+    fileUploadArea.addEventListener('dragleave', () => {
+        fileUploadArea.classList.remove('dragover');
+    });
+    
+    fileUploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            handleFileSelect({ target: { files } });
+        }
+    });
+}
+
+// Handle file selection
+async function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Check file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+    if (!validTypes.includes(file.type)) {
+        showStatus('❌ نوع الملف غير مدعوم. استخدم JPG, PNG, أو PDF', 'error');
+        return;
+    }
+    
+    // Check file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+        showStatus('❌ حجم الملف كبير جداً. الحد الأقصى 10MB', 'error');
+        return;
+    }
+    
+    try {
+        showStatus('📤 جاري رفع الملف واستخراج النص...', 'warning');
+        showLoading();
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const response = await fetch('/api/upload-file', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            throw new Error('فشل رفع الملف');
+        }
+        
+        const data = await response.json();
+        
+        if (data.success && data.text) {
+            textInput.value = data.text;
+            updateCharCount();
+            showStatus(`✅ تم استخراج النص من ${data.filename}`, 'success');
+            setTimeout(() => hideStatus(), 3000);
+        } else {
+            throw new Error('لم يتم العثور على نص في الملف');
+        }
+        
+    } catch (error) {
+        console.error('File upload error:', error);
+        showStatus('❌ فشل رفع الملف أو استخراج النص', 'error');
+    } finally {
+        hideLoading();
+        fileInput.value = ''; // Reset file input
+    }
+}
+
+// ===== SAVE EXAM FUNCTIONALITY =====
+
+if (saveExamBtn) {
+    saveExamBtn.addEventListener('click', saveCurrentExam);
+}
+
+async function saveCurrentExam() {
+    if (!currentExam) {
+        showStatus('❌ لا يوجد امتحان لحفظه', 'error');
+        return;
+    }
+    
+    try {
+        saveExamBtn.disabled = true;
+        saveExamBtn.textContent = '💾 جاري الحفظ...';
+        
+        const response = await fetch('/api/save-exam', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                original_text: currentExam.original_text,
+                formatted_text: currentExam.formatted_text,
+                questions: currentExam.questions,
+                word_translations: wordTranslations,
+                num_questions: currentExam.questions.length
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('فشل حفظ الامتحان');
+        }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            saveExamBtn.textContent = '✅ تم الحفظ!';
+            saveExamBtn.style.background = '#27AE60';
+            showStatus(`✅ تم حفظ الامتحان: ${data.title}`, 'success');
+            
+            setTimeout(() => {
+                saveExamBtn.textContent = '💾 حفظ الامتحان';
+                saveExamBtn.style.background = '';
+                saveExamBtn.disabled = false;
+            }, 2000);
+        }
+        
+    } catch (error) {
+        console.error('Save exam error:', error);
+        saveExamBtn.textContent = '❌ فشل الحفظ';
+        showStatus('❌ فشل حفظ الامتحان. تأكد من تسجيل دخولك', 'error');
+        
+        setTimeout(() => {
+            saveExamBtn.textContent = '💾 حفظ الامتحان';
+            saveExamBtn.disabled = false;
+        }, 2000);
+    }
+}
