@@ -51,32 +51,39 @@ Originele tekst:
 
 Instructies:
 1. **Identificeer de structuur** (brief, artikel, advertentie, kennisgeving, etc.)
-2. **Voeg passende opmaak toe**:
-   - Paragrafen (scheiding met dubbele nieuwe regel)
-   - Koppen indien nodig (markeer met ## voor hoofdkop, ### voor subkop)
-   - Opsommingen indien aanwezig (gebruik - of •)
-   - Aanhef en afsluiting voor brieven
-   - Datum en locatie indien relevant
+2. **Voeg passende HTML-opmaak toe**:
+   - Hoofdkop: <h2>Titel</h2>
+   - Subkop: <h3>Subtitel</h3>
+   - Paragrafen: <p>Tekst</p>
+   - Belangrijke tekst: <strong>Tekst</strong>
+   - Datum/locatie: <p class="meta">Datum</p>
+   - Aanhef: <p class="greeting">Beste...</p>
+   - Afsluiting: <p class="closing">Met vriendelijke groet,</p>
+   - Opsommingen: <ul><li>Item</li></ul>
 
 3. **Behoud de originele inhoud** - verander GEEN woorden of betekenis
 4. **Maak het leesbaar** - voeg witruimte toe waar nodig
 5. **Natuurlijke presentatie** - alsof het een echt document is
+6. **Gebruik ALLEEN HTML-tags** - geen Markdown
 
 Retourneer het resultaat in JSON formaat:
 {{
-  "formatted_text": "De geformatteerde tekst met opmaak",
+  "formatted_text": "<h2>Titel</h2><p>Paragraaf 1</p><p>Paragraaf 2</p>...",
   "structure_type": "Type document (brief/artikel/advertentie/etc)",
   "has_title": true/false,
   "has_paragraphs": true/false,
   "formatting_notes": "Korte uitleg van toegepaste opmaak"
 }}
 
-**BELANGRIJK**: 
-- Gebruik \\n\\n voor paragraafscheiding
-- Gebruik ## voor hoofdkoppen
-- Gebruik ### voor subkoppen
-- Gebruik - voor opsommingen
+**ZEER BELANGRIJK**: 
+- Gebruik ALLEEN HTML-tags
+- <h2> voor hoofdtitel
+- <h3> voor subtitels
+- <p> voor elke paragraaf
+- <strong> voor belangrijke woorden
+- <ul><li> voor lijsten
 - Behoud alle originele tekst!
+- GEEN Markdown, ALLEEN HTML!
 """
         
         try:

@@ -303,27 +303,82 @@ async function loadTranslations(text) {
 // Display text with word translations on hover
 function displayTextWithTranslations(text) {
     if (Object.keys(wordTranslations).length === 0) {
-        originalText.textContent = text;
+        console.warn('No translations available');
+        // Check if text contains HTML tags
+        if (text.includes('<')) {
+            originalText.innerHTML = text;
+        } else {
+            originalText.textContent = text;
+        }
         return;
     }
     
-    // Split text into words
-    const words = text.split(/(\s+|[.,!?;:])/);
+    console.log('Displaying text with translations. Total translations:', Object.keys(wordTranslations).length);
     
-    let html = '';
-    words.forEach(word => {
-        const cleanWord = word.toLowerCase().replace(/[.,!?;:]/g, '');
+    // Function to add translations to text node
+    function addTranslationsToText(textContent) {
+        const words = textContent.split(/(\s+|[.,!?;:\n])/);
+        let html = '';
+        let translatedCount = 0;
         
-        if (wordTranslations[cleanWord]) {
-            // Word has translation - make it hoverable
-            html += `<span class="word-tooltip">${word}<span class="tooltip-text">${wordTranslations[cleanWord]}</span></span>`;
-        } else {
-            // No translation - display as is
-            html += word;
-        }
-    });
+        words.forEach(word => {
+            if (!word || word.trim() === '') {
+                html += word;
+                return;
+            }
+            
+            const cleanWord = word.toLowerCase().replace(/[.,!?;:\n]/g, '').trim();
+            const variations = [cleanWord, cleanWord.toLowerCase(), word.toLowerCase().trim()];
+            
+            let translation = null;
+            for (const variant of variations) {
+                if (wordTranslations[variant]) {
+                    translation = wordTranslations[variant];
+                    break;
+                }
+            }
+            
+            if (translation) {
+                html += `<span class="word-tooltip" data-translation="${translation}">${word}<span class="tooltip-text">${translation}</span></span>`;
+                translatedCount++;
+            } else {
+                html += word;
+            }
+        });
+        
+        return { html, translatedCount };
+    }
     
-    originalText.innerHTML = html;
+    // Check if text contains HTML
+    if (text.includes('<h2>') || text.includes('<p>') || text.includes('<h3>')) {
+        // Parse HTML and add translations to text nodes only
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<div>${text}</div>`, 'text/html');
+        const container = doc.body.firstChild;
+        
+        let totalTranslated = 0;
+        
+        function processNode(node) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                const { html, translatedCount } = addTranslationsToText(node.textContent);
+                totalTranslated += translatedCount;
+                const span = document.createElement('span');
+                span.innerHTML = html;
+                node.parentNode.replaceChild(span, node);
+            } else if (node.nodeType === Node.ELEMENT_NODE) {
+                Array.from(node.childNodes).forEach(processNode);
+            }
+        }
+        
+        processNode(container);
+        console.log(`Translated ${totalTranslated} words in formatted HTML`);
+        originalText.innerHTML = container.innerHTML;
+    } else {
+        // Plain text - original logic
+        const { html, translatedCount } = addTranslationsToText(text);
+        console.log(`Translated ${translatedCount} words in plain text`);
+        originalText.innerHTML = html;
+    }
 }
 
 
