@@ -192,9 +192,16 @@ class Database:
             exam = cursor.fetchone()
             
             if exam:
-                # Parse JSON fields
-                exam['questions'] = json.loads(exam['questions']) if exam['questions'] else []
-                exam['word_translations'] = json.loads(exam['word_translations']) if exam['word_translations'] else {}
+                # Parse JSON fields if they are strings
+                if isinstance(exam['questions'], str):
+                    exam['questions'] = json.loads(exam['questions'])
+                elif exam['questions'] is None:
+                    exam['questions'] = []
+                
+                if isinstance(exam['word_translations'], str):
+                    exam['word_translations'] = json.loads(exam['word_translations'])
+                elif exam['word_translations'] is None:
+                    exam['word_translations'] = {}
             
             return exam
     
