@@ -124,7 +124,10 @@ class AuthManager:
     
     def logout(self, request: Request):
         """Logout user"""
-        request.session.clear()
+        try:
+            request.session.clear()
+        except:
+            pass  # Session might not exist in dev mode
         return RedirectResponse(url='/login')
 
 
