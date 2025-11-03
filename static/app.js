@@ -33,7 +33,7 @@ const translationLoading = document.getElementById('translationLoading');
 
 // State
 let currentExam = null;
-let currentMode = 'study';
+let currentMode = 'test';
 let userAnswers = {};
 let wordTranslations = {};
 
@@ -195,7 +195,7 @@ async function loadTranslations(text) {
     translationLoading.classList.remove('hidden');
     
     try {
-        const response = await fetch('/api/translate-text', {
+        const response = await fetch('/api/translate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -290,23 +290,46 @@ function displayExam(exam) {
     }
     
     resultsSection.classList.remove('hidden');
+    
+    // Set test mode as default
+    switchMode('test');
 }
 
 // Display original text with formatting
 function displayOriginalText(text) {
-    // Split text into paragraphs
-    const paragraphs = text.split('\n\n').filter(p => p.trim());
+    // Split text into lines first
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l);
     
-    let html = '<div dir="ltr" style="text-align: left; font-family: Arial, sans-serif; line-height: 1.8;">';
+    let html = '<div dir="ltr" style="text-align: left; font-family: Arial, sans-serif; line-height: 1.8; padding: 1rem;">';
     
-    paragraphs.forEach(para => {
-        para = para.trim();
+    let currentParagraph = [];
+    
+    lines.forEach((line, index) => {
+        // Check if it's a title
+        const isTitle = (
+            line.length < 80 && 
+            (line.endsWith(':') || 
+             line.split(' ').length < 8 || 
+             /^[A-Z]/.test(line) && line.split(' ').every(w => w[0] === w[0].toUpperCase()))
+        );
         
-        // Check if it's a title (short line, possibly ending with :)
-        if (para.length < 100 && (para.endsWith(':') || para.split(' ').length < 10)) {
-            html += `<h3 style="font-size: 1.5rem; font-weight: bold; margin: 1.5rem 0 1rem 0; color: #2C3E50;">${para}</h3>`;
+        if (isTitle) {
+            // Flush current paragraph
+            if (currentParagraph.length > 0) {
+                html += `<p style="margin: 1rem 0; color: #34495E; text-align: justify;">${currentParagraph.join(' ')}</p>`;
+                currentParagraph = [];
+            }
+            // Add title
+            html += `<h3 style="font-size: 1.5rem; font-weight: bold; margin: 1.5rem 0 1rem 0; color: #2C3E50;">${line}</h3>`;
         } else {
-            html += `<p style="margin: 1rem 0; color: #34495E;">${para}</p>`;
+            // Add to current paragraph
+            currentParagraph.push(line);
+            
+            // If this is the last line or next line is empty, flush paragraph
+            if (index === lines.length - 1 && currentParagraph.length > 0) {
+                html += `<p style="margin: 1rem 0; color: #34495E; text-align: justify;">${currentParagraph.join(' ')}</p>`;
+                currentParagraph = [];
+            }
         }
     });
     
@@ -329,7 +352,7 @@ function displayQuestions(questions) {
                     <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">${q.type || 'اختيار من متعدد'}</span>
                 </div>
                 
-                <div dir="ltr" class="text-left mb-4 text-gray-700 font-medium">
+                <div dir="ltr" class="text-left mb-4 text-gray-800 font-bold text-lg">
                     ${q.question_nl}
                 </div>
                 
