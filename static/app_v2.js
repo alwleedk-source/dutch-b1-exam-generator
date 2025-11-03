@@ -339,7 +339,7 @@ function displayTextWithTranslations(text) {
             }
             
             if (translation) {
-                html += `<span class="word-tooltip" data-translation="${translation}">${word}<span class="tooltip-text">${translation}</span></span>`;
+                html += `<span class="word-tooltip" data-translation="${translation}" data-word="${cleanWord}">${word}<span class="tooltip-text">${translation}<button class="save-word-btn" onclick="saveWord('${cleanWord}', '${translation}', event)">⭐</button></span></span>`;
                 translatedCount++;
             } else {
                 html += word;
@@ -663,4 +663,66 @@ function resetForm() {
     
     textInput.focus();
     window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+
+// Save word to vocabulary
+async function saveWord(word, translation, event) {
+    event.stopPropagation(); // Prevent tooltip from closing
+    
+    const button = event.target;
+    const originalText = button.textContent;
+    
+    try {
+        button.textContent = '⏳';
+        button.disabled = true;
+        
+        const response = await fetch('/api/vocabulary', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                word: word,
+                translation: translation,
+                context: currentExam ? currentExam.original_text.substring(0, 200) : null,
+                exam_id: currentExam ? currentExam.id : null
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to save word');
+        }
+        
+        const data = await response.json();
+        
+        // Success feedback
+        button.textContent = '✅';
+        button.style.color = '#27AE60';
+        
+        // Show success message
+        showStatus(`✅ تم حفظ الكلمة "${word}" في قائمتك`, 'success');
+        setTimeout(() => hideStatus(), 2000);
+        
+        // Reset button after 1 second
+        setTimeout(() => {
+            button.textContent = originalText;
+            button.disabled = false;
+            button.style.color = '';
+        }, 1000);
+        
+    } catch (error) {
+        console.error('Error saving word:', error);
+        button.textContent = '❌';
+        button.style.color = '#E74C3C';
+        
+        showStatus('❌ فشل حفظ الكلمة', 'error');
+        
+        // Reset button
+        setTimeout(() => {
+            button.textContent = originalText;
+            button.disabled = false;
+            button.style.color = '';
+        }, 1500);
+    }
 }

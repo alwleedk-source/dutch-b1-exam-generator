@@ -70,6 +70,19 @@ class Database:
                 )
             """)
             
+            # Vocabulary table
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS vocabulary (
+                    id SERIAL PRIMARY KEY,
+                    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+                    word VARCHAR(255) NOT NULL,
+                    translation TEXT NOT NULL,
+                    context TEXT,
+                    exam_id INTEGER REFERENCES exams(id) ON DELETE SET NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            
             # Create indexes for better performance
             cursor.execute("""
                 CREATE INDEX IF NOT EXISTS idx_users_google_id ON users(google_id)
@@ -79,6 +92,12 @@ class Database:
             """)
             cursor.execute("""
                 CREATE INDEX IF NOT EXISTS idx_exams_created_at ON exams(created_at DESC)
+            """)
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS idx_vocabulary_user_id ON vocabulary(user_id)
+            """)
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS idx_vocabulary_created_at ON vocabulary(created_at DESC)
             """)
             
             print("✅ Database tables initialized successfully")
@@ -231,6 +250,87 @@ class Database:
             """, (user_id,))
             
             return cursor.fetchone()[0]
+    
+    # Vocabulary operations
+    def save_word(self, user_id: int, word: str, translation: str, context: str = None, exam_id: int = None) -> int:
+        """Save a word to vocabulary and return word_id"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            # Check if word already exists for this user
+            cursor.execute("""
+                SELECT id FROM vocabulary 
+                WHERE user_id = %s AND LOWER(word) = LOWER(%s)
+            """, (user_id, word))
+            
+            existing = cursor.fetchone()
+            if existing:
+                # Word already exists, don't add duplicate
+                return existing[0]
+            
+            cursor.execute("""
+                INSERT INTO vocabulary (user_id, word, translation, context, exam_id)
+                VALUES (%s, %s, %s, %s, %s)
+                RETURNING id
+            """, (user_id, word, translation, context, exam_id))
+            
+            word_id = cursor.fetchone()[0]
+            return word_id
+    
+    def get_user_vocabulary(self, user_id: int, limit: int = 100, offset: int = 0) -> List[Dict]:
+        """Get all vocabulary words for a user"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
+            
+            cursor.execute("""
+                SELECT v.*, e.title as exam_title
+                FROM vocabulary v
+                LEFT JOIN exams e ON v.exam_id = e.id
+                WHERE v.user_id = %s
+                ORDER BY v.created_at DESC
+                LIMIT %s OFFSET %s
+            """, (user_id, limit, offset))
+            
+            return cursor.fetchall()
+    
+    def delete_word(self, word_id: int, user_id: int) -> bool:
+        """Delete a word (only if it belongs to the user)"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                DELETE FROM vocabulary 
+                WHERE id = %s AND user_id = %s
+            """, (word_id, user_id))
+            
+            return cursor.rowcount > 0
+    
+    def get_user_vocabulary_count(self, user_id: int) -> int:
+        """Get total number of vocabulary words for a user"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                SELECT COUNT(*) FROM vocabulary WHERE user_id = %s
+            """, (user_id,))
+            
+            return cursor.fetchone()[0]
+    
+    def search_vocabulary(self, user_id: int, search_term: str) -> List[Dict]:
+        """Search vocabulary by word or translation"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
+            
+            cursor.execute("""
+                SELECT v.*, e.title as exam_title
+                FROM vocabulary v
+                LEFT JOIN exams e ON v.exam_id = e.id
+                WHERE v.user_id = %s 
+                AND (LOWER(v.word) LIKE LOWER(%s) OR LOWER(v.translation) LIKE LOWER(%s))
+                ORDER BY v.created_at DESC
+            """, (user_id, f'%{search_term}%', f'%{search_term}%'))
+            
+            return cursor.fetchall()
 
 
 # Singleton instance

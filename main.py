@@ -99,11 +99,22 @@ class GenerateExamRequest(BaseModel):
 
 
 class SaveExamRequest(BaseModel):
+    title: Optional[str] = None
     original_text: str
     formatted_text: str
     questions: List[dict]
     word_translations: dict
     num_questions: int
+
+
+class SaveWordRequest(BaseModel):
+    word: str = Field(..., min_length=1, description="Dutch word")
+    translation: str = Field(..., min_length=1, description="Arabic translation")
+    context: Optional[str] = Field(None, description="Context sentence")
+    exam_id: Optional[int] = Field(None, description="Related exam ID")
+
+
+class UpdateExamTitleRequest(BaseModel):
     custom_title: Optional[str] = None
 
 
@@ -332,6 +343,94 @@ async def delete_exam(request: Request, exam_id: int):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# Vocabulary routes
+@app.post("/api/vocabulary")
+async def save_word(request: Request, word_request: SaveWordRequest):
+    """Save a word to vocabulary"""
+    # Require authentication
+    user = auth_manager.require_auth(request)
+    
+    if not db:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    try:
+        word_id = db.save_word(
+            user_id=user['id'],
+            word=word_request.word,
+            translation=word_request.translation,
+            context=word_request.context,
+            exam_id=word_request.exam_id
+        )
+        
+        return {"success": True, "word_id": word_id}
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/vocabulary")
+async def get_vocabulary(request: Request, limit: int = 100, offset: int = 0):
+    """Get user's vocabulary list"""
+    # Require authentication
+    user = auth_manager.require_auth(request)
+    
+    if not db:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    try:
+        words = db.get_user_vocabulary(user['id'], limit, offset)
+        count = db.get_user_vocabulary_count(user['id'])
+        
+        return {
+            "words": words,
+            "total": count,
+            "limit": limit,
+            "offset": offset
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.delete("/api/vocabulary/{word_id}")
+async def delete_word(request: Request, word_id: int):
+    """Delete a word from vocabulary"""
+    # Require authentication
+    user = auth_manager.require_auth(request)
+    
+    if not db:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    try:
+        success = db.delete_word(word_id, user['id'])
+        if not success:
+            raise HTTPException(status_code=404, detail="Word not found")
+        
+        return {"success": True}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/vocabulary/search")
+async def search_vocabulary(request: Request, q: str):
+    """Search vocabulary"""
+    # Require authentication
+    user = auth_manager.require_auth(request)
+    
+    if not db:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    try:
+        words = db.search_vocabulary(user['id'], q)
+        return {"words": words}
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # Translation route (kept for backward compatibility)
 @app.post("/api/translate")
 async def translate_text(request: Request, translate_request: TranslateRequest):
@@ -395,6 +494,17 @@ async def exams_page(request: Request):
         return RedirectResponse(url="/login")
     
     with open("static/exams.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read())
+
+
+@app.get("/vocabulary", response_class=HTMLResponse)
+async def vocabulary_page(request: Request):
+    """Serve vocabulary list page (requires authentication)"""
+    user = auth_manager.get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login")
+    
+    with open("static/vocabulary.html", "r", encoding="utf-8") as f:
         return HTMLResponse(content=f.read())
 
 

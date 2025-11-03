@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قائمة كلماتي - Dutch B1 Exam Generator</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .vocabulary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .vocabulary-stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+            padding: 15px 25px;
+            border-radius: var(--border-radius-sm);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid transparent;
+            border-radius: var(--border-radius-sm);
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .vocabulary-list {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .word-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+        
+        .word-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: #667eea;
+        }
+        
+        .word-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .word-main {
+            flex: 1;
+        }
+        
+        .word-dutch {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .word-arabic {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .word-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        
+        .icon-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: scale(1.1);
+        }
+        
+        .delete-btn:hover {
+            background: rgba(231, 76, 60, 0.1);
+        }
+        
+        .word-context {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+            padding: 15px;
+            border-radius: var(--border-radius-sm);
+            margin-top: 15px;
+            border-right: 4px solid #667eea;
+        }
+        
+        .word-context-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .word-context-text {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-style: italic;
+        }
+        
+        .word-meta {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+        
+        .word-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state-title {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        
+        .empty-state-text {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        
+        .loading-spinner {
+            text-align: center;
+            padding: 40px;
+            font-size: 2rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .nav-link {
+            padding: 10px 20px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius-sm);
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+        
+        .nav-link:hover {
+            background: var(--primary-gradient);
+            color: white;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-links">
+            <a href="/" class="nav-link">🏠 الصفحة الرئيسية</a>
+            <a href="/exams" class="nav-link">📚 امتحاناتي</a>
+            <a href="/vocabulary" class="nav-link" style="background: var(--primary-gradient); color: white;">📖 كلماتي</a>
+            <a href="/auth/logout" class="nav-link">🚪 تسجيل الخروج</a>
+        </div>
+        
+        <div class="card">
+            <div class="vocabulary-header">
+                <div>
+                    <h1 style="font-size: 2.5rem; margin-bottom: 10px;">📖 قائمة كلماتي</h1>
+                    <p style="color: var(--text-secondary);">الكلمات التي حفظتها للمراجعة</p>
+                </div>
+                
+                <div class="vocabulary-stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalWords">0</div>
+                        <div class="stat-label">كلمة محفوظة</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 ابحث عن كلمة..." />
+            </div>
+            
+            <div id="loadingIndicator" class="loading-spinner hidden">
+                ⏳ جاري التحميل...
+            </div>
+            
+            <div id="vocabularyList" class="vocabulary-list" style="margin-top: 30px;">
+                <!-- Words will be loaded here -->
+            </div>
+            
+            <div id="emptyState" class="empty-state hidden">
+                <div class="empty-state-icon">📚</div>
+                <div class="empty-state-title">لا توجد كلمات محفوظة بعد</div>
+                <div class="empty-state-text">ابدأ بحفظ الكلمات من الامتحانات لتظهر هنا</div>
+                <a href="/" class="btn btn-primary">توليد امتحان جديد</a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let allWords = [];
+        
+        // Load vocabulary on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadVocabulary();
+            setupSearch();
+        });
+        
+        // Load vocabulary from API
+        async function loadVocabulary() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const vocabularyList = document.getElementById('vocabularyList');
+            const emptyState = document.getElementById('emptyState');
+            const totalWordsEl = document.getElementById('totalWords');
+            
+            try {
+                loadingIndicator.classList.remove('hidden');
+                vocabularyList.innerHTML = '';
+                emptyState.classList.add('hidden');
+                
+                const response = await fetch('/api/vocabulary');
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load vocabulary');
+                }
+                
+                const data = await response.json();
+                allWords = data.words || [];
+                
+                loadingIndicator.classList.add('hidden');
+                
+                if (allWords.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    totalWordsEl.textContent = '0';
+                } else {
+                    totalWordsEl.textContent = data.total || allWords.length;
+                    displayWords(allWords);
+                }
+                
+            } catch (error) {
+                console.error('Error loading vocabulary:', error);
+                loadingIndicator.classList.add('hidden');
+                vocabularyList.innerHTML = '<div style="text-align: center; color: #E74C3C; padding: 40px;">❌ فشل تحميل الكلمات</div>';
+            }
+        }
+        
+        // Display words
+        function displayWords(words) {
+            const vocabularyList = document.getElementById('vocabularyList');
+            
+            if (words.length === 0) {
+                vocabularyList.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 40px;">لا توجد نتائج</div>';
+                return;
+            }
+            
+            vocabularyList.innerHTML = words.map(word => {
+                const createdDate = new Date(word.created_at).toLocaleDateString('ar-SA');
+                
+                return `
+                    <div class="word-card" data-word-id="${word.id}">
+                        <div class="word-header">
+                            <div class="word-main">
+                                <div class="word-dutch">${word.word}</div>
+                                <div class="word-arabic">${word.translation}</div>
+                            </div>
+                            <div class="word-actions">
+                                <button class="icon-btn delete-btn" onclick="deleteWord(${word.id})" title="حذف">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                        
+                        ${word.context ? `
+                        <div class="word-context">
+                            <div class="word-context-label">📝 السياق:</div>
+                            <div class="word-context-text">${word.context}</div>
+                        </div>
+                        ` : ''}
+                        
+                        <div class="word-meta">
+                            <span>📅 ${createdDate}</span>
+                            ${word.exam_title ? `<span>📚 من: ${word.exam_title}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Delete word
+        async function deleteWord(wordId) {
+            if (!confirm('هل أنت متأكد من حذف هذه الكلمة؟')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/vocabulary/${wordId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to delete word');
+                }
+                
+                // Remove from UI
+                const wordCard = document.querySelector(`[data-word-id="${wordId}"]`);
+                if (wordCard) {
+                    wordCard.style.opacity = '0';
+                    wordCard.style.transform = 'scale(0.8)';
+                    setTimeout(() => {
+                        wordCard.remove();
+                        
+                        // Update count
+                        allWords = allWords.filter(w => w.id !== wordId);
+                        document.getElementById('totalWords').textContent = allWords.length;
+                        
+                        // Show empty state if no words left
+                        if (allWords.length === 0) {
+                            document.getElementById('emptyState').classList.remove('hidden');
+                        }
+                    }, 300);
+                }
+                
+            } catch (error) {
+                console.error('Error deleting word:', error);
+                alert('فشل حذف الكلمة');
+            }
+        }
+        
+        // Setup search
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            let searchTimeout;
+            
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                const query = e.target.value.trim();
+                
+                if (query === '') {
+                    displayWords(allWords);
+                    return;
+                }
+                
+                searchTimeout = setTimeout(() => {
+                    searchVocabulary(query);
+                }, 300);
+            });
+        }
+        
+        // Search vocabulary
+        async function searchVocabulary(query) {
+            try {
+                const response = await fetch(`/api/vocabulary/search?q=${encodeURIComponent(query)}`);
+                
+                if (!response.ok) {
+                    throw new Error('Search failed');
+                }
+                
+                const data = await response.json();
+                displayWords(data.words || []);
+                
+            } catch (error) {
+                console.error('Error searching:', error);
+                // Fallback to local search
+                const filtered = allWords.filter(word => 
+                    word.word.toLowerCase().includes(query.toLowerCase()) ||
+                    word.translation.includes(query)
+                );
+                displayWords(filtered);
+            }
+        }
+    </script>
+</body>
+</html>
