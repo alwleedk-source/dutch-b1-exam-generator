@@ -1,26 +1,31 @@
 """
 FastAPI Backend for Dutch B1 Exam Generator
+Complete platform with authentication, database, and file upload
 """
 
 import os
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, UploadFile, File, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 import uvicorn
 
 from agent import DutchB1ExamAgent
 from translator import DutchToArabicTranslator
 from text_formatter import DutchTextFormatter
+from database import get_db, Database
+from auth import init_auth, get_auth, AuthManager
+from file_processor import get_file_processor, FileProcessor
+from title_generator import get_title_generator, TitleGenerator
 
 
 # Initialize FastAPI app
 app = FastAPI(
     title="Dutch B1 Exam Generator",
     description="AI-powered Dutch reading comprehension exam generator for B1 level",
-    version="1.0.0"
+    version="2.0.0"
 )
 
 # CORS middleware
@@ -31,6 +36,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Initialize authentication
+auth_manager = init_auth(app)
+
+# Initialize database
+try:
+    db = get_db()
+    print("✅ Database initialized successfully")
+except Exception as e:
+    print(f"❌ Failed to initialize database: {e}")
+    db = None
 
 # Initialize agent
 try:
@@ -56,242 +72,345 @@ except Exception as e:
     print(f"❌ Failed to initialize formatter: {e}")
     formatter = None
 
+# Initialize file processor
+try:
+    file_processor = get_file_processor()
+    print("✅ File processor initialized successfully")
+except Exception as e:
+    print(f"❌ Failed to initialize file processor: {e}")
+    file_processor = None
+
+# Initialize title generator
+try:
+    title_generator = get_title_generator()
+    print("✅ Title generator initialized successfully")
+except Exception as e:
+    print(f"❌ Failed to initialize title generator: {e}")
+    title_generator = None
+
 
 # Request models
-class ExamRequest(BaseModel):
-    text: str = Field(..., description="Dutch text to generate exam from", min_length=50)
-    num_questions: int = Field(7, description="Number of questions to generate", ge=3, le=15)
-    verify_quality: bool = Field(True, description="Enable quality verification")
+class GenerateExamRequest(BaseModel):
+    text: str = Field(..., min_length=50, description="Dutch text for exam generation")
+    num_questions: int = Field(default=7, ge=5, le=15, description="Number of questions")
+    enable_verification: bool = Field(default=False, description="Enable quality verification")
+    enable_formatting: bool = Field(default=True, description="Enable text formatting")
+    enable_translation: bool = Field(default=True, description="Enable word translation")
 
 
-class HealthResponse(BaseModel):
-    status: str
-    agent_ready: bool
-    gemini_configured: bool
+class SaveExamRequest(BaseModel):
+    original_text: str
+    formatted_text: str
+    questions: List[dict]
+    word_translations: dict
+    num_questions: int
+    custom_title: Optional[str] = None
 
 
-# Routes
-@app.get("/", response_class=HTMLResponse)
-async def root():
-    """Serve the main HTML page"""
+class TranslateRequest(BaseModel):
+    text: str = Field(..., description="Dutch text to translate")
+
+
+# Authentication routes
+@app.get("/auth/login")
+async def login(request: Request):
+    """Initiate Google OAuth login"""
+    return await auth_manager.login(request)
+
+
+@app.get("/auth/callback")
+async def auth_callback(request: Request):
+    """Handle OAuth callback"""
+    if not db:
+        raise HTTPException(status_code=500, detail="Database not available")
+    return await auth_manager.callback(request, db)
+
+
+@app.get("/auth/logout")
+async def logout(request: Request):
+    """Logout user"""
+    return auth_manager.logout(request)
+
+
+@app.get("/api/user")
+async def get_current_user(request: Request):
+    """Get current logged-in user"""
+    user = auth_manager.get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    return user
+
+
+# File upload routes
+@app.post("/api/upload-file")
+async def upload_file(request: Request, file: UploadFile = File(...)):
+    """Upload image or PDF and extract text"""
+    # Require authentication
+    user = auth_manager.require_auth(request)
+    
+    if not file_processor:
+        raise HTTPException(status_code=500, detail="File processor not available")
+    
     try:
-        with open("static/index_v2.html", "r", encoding="utf-8") as f:
-            return HTMLResponse(content=f.read())
-    except FileNotFoundError:
-        return HTMLResponse(content="""
-        <!DOCTYPE html>
-        <html dir="rtl" lang="ar">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Dutch B1 Exam Generator</title>
-        </head>
-        <body>
-            <h1>🚀 Dutch B1 Exam Generator</h1>
-            <p>Backend is running! Please add the frontend files.</p>
-            <p>API Documentation: <a href="/docs">/docs</a></p>
-        </body>
-        </html>
-        """)
+        # Read file content
+        content = await file.read()
+        
+        # Detect file type
+        file_type = file_processor.detect_file_type(file.filename)
+        
+        # Save temporarily
+        temp_path = file_processor.save_uploaded_file(content, file.filename)
+        
+        # Process and extract text
+        extracted_text = file_processor.process_file(temp_path, file_type)
+        
+        return {
+            "success": True,
+            "text": extracted_text,
+            "filename": file.filename,
+            "file_type": file_type
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to process file: {str(e)}")
 
 
-@app.get("/health", response_model=HealthResponse)
+# Exam generation routes
+@app.post("/api/generate-exam")
+async def generate_exam(request: Request, exam_request: GenerateExamRequest):
+    """Generate exam from text"""
+    # Require authentication
+    user = auth_manager.require_auth(request)
+    
+    if not agent:
+        raise HTTPException(status_code=500, detail="Agent not initialized. Check GEMINI_API_KEY.")
+    
+    try:
+        # Format text if enabled
+        formatted_text = exam_request.text
+        if exam_request.enable_formatting and formatter:
+            try:
+                formatted_text = formatter.format_text(exam_request.text)
+            except Exception as e:
+                print(f"Warning: Text formatting failed: {e}")
+                formatted_text = exam_request.text
+        
+        # Generate questions
+        result = agent.generate_exam(
+            text=exam_request.text,
+            num_questions=exam_request.num_questions,
+            enable_verification=exam_request.enable_verification
+        )
+        
+        # Add formatted text to result
+        result['formatted_text'] = formatted_text
+        
+        # Translate words if enabled
+        if exam_request.enable_translation and translator:
+            try:
+                word_translations = translator.translate_text(exam_request.text)
+                result['word_translations'] = word_translations
+            except Exception as e:
+                print(f"Warning: Translation failed: {e}")
+                result['word_translations'] = {}
+        else:
+            result['word_translations'] = {}
+        
+        return result
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/save-exam")
+async def save_exam(request: Request, save_request: SaveExamRequest):
+    """Save exam to database"""
+    # Require authentication
+    user = auth_manager.require_auth(request)
+    
+    if not db:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    try:
+        # Generate title if not provided
+        title = save_request.custom_title
+        if not title and title_generator:
+            try:
+                title = title_generator.generate_title(save_request.original_text)
+            except Exception as e:
+                print(f"Warning: Title generation failed: {e}")
+                title = save_request.original_text[:50] + "..."
+        elif not title:
+            title = save_request.original_text[:50] + "..."
+        
+        # Save to database
+        exam_id = db.save_exam(
+            user_id=user['id'],
+            title=title,
+            original_text=save_request.original_text,
+            formatted_text=save_request.formatted_text,
+            questions=save_request.questions,
+            word_translations=save_request.word_translations,
+            num_questions=save_request.num_questions
+        )
+        
+        return {
+            "success": True,
+            "exam_id": exam_id,
+            "title": title
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/exams")
+async def get_exams(request: Request, limit: int = 50, offset: int = 0):
+    """Get user's exams"""
+    # Require authentication
+    user = auth_manager.require_auth(request)
+    
+    if not db:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    try:
+        exams = db.get_user_exams(user['id'], limit=limit, offset=offset)
+        total = db.get_user_exam_count(user['id'])
+        
+        return {
+            "exams": exams,
+            "total": total,
+            "limit": limit,
+            "offset": offset
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/exams/{exam_id}")
+async def get_exam(request: Request, exam_id: int):
+    """Get specific exam"""
+    # Require authentication
+    user = auth_manager.require_auth(request)
+    
+    if not db:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    try:
+        exam = db.get_exam(exam_id, user['id'])
+        if not exam:
+            raise HTTPException(status_code=404, detail="Exam not found")
+        
+        return exam
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.delete("/api/exams/{exam_id}")
+async def delete_exam(request: Request, exam_id: int):
+    """Delete exam"""
+    # Require authentication
+    user = auth_manager.require_auth(request)
+    
+    if not db:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    try:
+        success = db.delete_exam(exam_id, user['id'])
+        if not success:
+            raise HTTPException(status_code=404, detail="Exam not found")
+        
+        return {"success": True}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Translation route (kept for backward compatibility)
+@app.post("/api/translate")
+async def translate_text(request: Request, translate_request: TranslateRequest):
+    """Translate Dutch text to Arabic"""
+    # Require authentication
+    user = auth_manager.require_auth(request)
+    
+    if not translator:
+        raise HTTPException(status_code=500, detail="Translator not initialized")
+    
+    try:
+        translations = translator.translate_text(translate_request.text)
+        return {"translations": translations}
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Health check
+@app.get("/health")
 async def health_check():
     """Health check endpoint"""
-    gemini_key = os.getenv("GEMINI_API_KEY")
     return {
         "status": "healthy",
         "agent_ready": agent is not None,
-        "gemini_configured": gemini_key is not None and len(gemini_key) > 0
+        "translator_ready": translator is not None,
+        "formatter_ready": formatter is not None,
+        "database_ready": db is not None,
+        "file_processor_ready": file_processor is not None,
+        "gemini_configured": os.getenv("GEMINI_API_KEY") is not None
     }
 
 
-@app.post("/api/generate-exam")
-async def generate_exam(request: ExamRequest):
-    """
-    Generate a Dutch B1 reading comprehension exam
+# Static files and HTML routes
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+@app.get("/", response_class=HTMLResponse)
+async def root(request: Request):
+    """Serve main page (requires authentication)"""
+    user = auth_manager.get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login")
     
-    Args:
-        request: ExamRequest containing text and parameters
-        
-    Returns:
-        Generated exam with questions
-    """
-    if agent is None:
-        raise HTTPException(
-            status_code=503,
-            detail="Agent not initialized. Please check GEMINI_API_KEY environment variable."
-        )
+    with open("static/index_v2.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read())
+
+
+@app.get("/login", response_class=HTMLResponse)
+async def login_page():
+    """Serve login page"""
+    with open("static/login.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read())
+
+
+@app.get("/exams", response_class=HTMLResponse)
+async def exams_page(request: Request):
+    """Serve exams list page (requires authentication)"""
+    user = auth_manager.get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login")
     
-    try:
-        # Validate text length
-        if len(request.text.strip()) < 50:
-            raise HTTPException(
-                status_code=400,
-                detail="Text is too short. Please provide at least 50 characters."
-            )
-        
-        # Format text first (if formatter available)
-        formatted_text = request.text
-        if formatter is not None:
-            try:
-                format_result = formatter.format_text(request.text)
-                formatted_text = format_result.get("formatted_text", request.text)
-            except Exception as e:
-                print(f"Text formatting failed: {e}, using original text")
-                formatted_text = request.text
-        
-        # Generate exam with formatted text
-        if request.verify_quality:
-            exam = agent.generate_exam_with_verification(
-                text=formatted_text,
-                num_questions=request.num_questions
-            )
-        else:
-            exam = agent.generate_questions(
-                text=formatted_text,
-                num_questions=request.num_questions
-            )
-        
-        # Add formatted text to response
-        exam["text"] = formatted_text
-        
-        return JSONResponse(content=exam)
-        
-    except Exception as e:
-        print(f"Error generating exam: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to generate exam: {str(e)}"
-        )
+    with open("static/exams.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read())
 
 
-@app.post("/api/analyze-text")
-async def analyze_text(request: dict):
-    """
-    Analyze Dutch text to determine its characteristics
-    
-    Args:
-        request: Dictionary with 'text' key
-        
-    Returns:
-        Text analysis
-    """
-    if agent is None:
-        raise HTTPException(
-            status_code=503,
-            detail="Agent not initialized. Please check GEMINI_API_KEY environment variable."
-        )
-    
-    text = request.get("text", "")
-    if not text or len(text.strip()) < 20:
-        raise HTTPException(
-            status_code=400,
-            detail="Text is too short for analysis."
-        )
-    
-    try:
-        analysis = agent.analyze_text(text)
-        return JSONResponse(content=analysis)
-    except Exception as e:
-        print(f"Error analyzing text: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to analyze text: {str(e)}"
-        )
+# Serve CSS and JS with correct content type
+@app.get("/style.css")
+async def serve_css():
+    with open("static/style_v3.css", "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read(), media_type="text/css")
 
 
-@app.post("/api/translate-text")
-async def translate_text(request: dict):
-    """
-    Translate Dutch text to Arabic with word-by-word translations
-    
-    Args:
-        request: Dictionary with 'text' key
-        
-    Returns:
-        Full translation and word translations
-    """
-    if translator is None:
-        raise HTTPException(
-            status_code=503,
-            detail="Translator not initialized. Please check GEMINI_API_KEY environment variable."
-        )
-    
-    text = request.get("text", "")
-    if not text or len(text.strip()) < 5:
-        raise HTTPException(
-            status_code=400,
-            detail="Text is too short for translation."
-        )
-    
-    try:
-        result = translator.translate_text_with_words(text)
-        return JSONResponse(content=result)
-    except Exception as e:
-        print(f"Error translating text: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to translate text: {str(e)}"
-        )
+@app.get("/app.js")
+async def serve_js():
+    with open("static/app_v2.js", "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read(), media_type="application/javascript")
 
 
-@app.get("/api/info")
-async def get_info():
-    """Get information about the exam generator"""
-    return {
-        "name": "Dutch B1 Exam Generator",
-        "version": "1.0.0",
-        "description": "AI-powered tool for generating Dutch reading comprehension exams at B1 level",
-        "exam_types": [
-            {
-                "type": "Globalverstehen",
-                "description": "General understanding questions",
-                "difficulty": "easy"
-            },
-            {
-                "type": "Detailverstehen",
-                "description": "Detail comprehension questions",
-                "difficulty": "medium"
-            },
-            {
-                "type": "Woordbetekenis",
-                "description": "Word meaning questions",
-                "difficulty": "medium"
-            },
-            {
-                "type": "Tekstdoel",
-                "description": "Text purpose questions",
-                "difficulty": "hard"
-            },
-            {
-                "type": "Inferentie",
-                "description": "Inference questions",
-                "difficulty": "hard"
-            }
-        ],
-        "supported_text_types": [
-            "Formal letters (gemeente)",
-            "Advertisements",
-            "Workplace notices",
-            "Informational texts"
-        ]
-    }
-
-
-# Mount static files (if directory exists)
-try:
-    app.mount("/static", StaticFiles(directory="static"), name="static")
-except RuntimeError:
-    print("⚠️ Static directory not found. Serving basic HTML only.")
-
-
-# Run server
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=port,
-        reload=False
-    )
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
