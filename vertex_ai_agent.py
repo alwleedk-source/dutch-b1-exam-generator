@@ -23,7 +23,7 @@ class VertexAIAgent:
             from vertexai.generative_models import GenerativeModel
             
             vertexai.init(project=project_id, location=location)
-            self.model = GenerativeModel('gemini-1.5-flash')
+            self.model = GenerativeModel('gemini-2.0-flash-exp')
             self.enabled = True
             
             print(f"✅ Vertex AI initialized (Project: {project_id}, Location: {location})")
