@@ -131,8 +131,13 @@
             displayQuestions(currentExam.questions);
             displayAnswerKey(currentExam.questions);
             
+            // Load translations
             wordTranslations = currentExam.word_translations || {};
-            applyTranslations();
+            if (Object.keys(wordTranslations).length === 0) {
+                loadTranslations(currentExam.original_text);
+            } else {
+                applyTranslations();
+            }
             
             switchMode('test');
         }
@@ -248,6 +253,28 @@
             answerKey.innerHTML = html;
         }
 
+        // Load translations from API
+        async function loadTranslations(text) {
+            try {
+                const response = await fetch('/api/translate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text })
+                });
+                
+                if (response.ok) {
+                    wordTranslations = await response.json();
+                    applyTranslations();
+                } else {
+                    console.error('Translation failed:', response.status);
+                }
+            } catch (error) {
+                console.error('Translation error:', error);
+            }
+        }
+
         // Apply translations
         function applyTranslations() {
             if (!originalText || !wordTranslations || Object.keys(wordTranslations).length === 0) return;
@@ -257,7 +284,7 @@
             
             words.forEach(word => {
                 const translation = wordTranslations[word];
-                const regex = new RegExp(`\\\\b(${word})\\\\b`, 'gi');
+                const regex = new RegExp(`\\b(${word})\\b`, 'gi');
                 html = html.replace(regex, `<span class="translatable-word" data-translation="${translation}">$1</span>`);
             });
             
