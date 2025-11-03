@@ -289,14 +289,10 @@ async def get_exam(request: Request, exam_id: int):
         raise HTTPException(status_code=500, detail="Database not available")
     
     try:
-        exam = db.get_exam(exam_id)
+        exam = db.get_exam(exam_id, user['id'])
         
         if not exam:
             raise HTTPException(status_code=404, detail="Exam not found")
-        
-        # Check if user owns this exam
-        if exam['user_id'] != user['id']:
-            raise HTTPException(status_code=403, detail="Access denied")
         
         return exam
     
