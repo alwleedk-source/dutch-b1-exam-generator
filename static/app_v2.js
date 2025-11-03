@@ -24,7 +24,6 @@ const testModeBtn = document.getElementById('testModeBtn');
 const submitTestBtn = document.getElementById('submitTestBtn');
 
 // Content areas
-const analysisContent = document.getElementById('analysisContent');
 const originalText = document.getElementById('originalText');
 const questionsContent = document.getElementById('questionsContent');
 const answerKey = document.getElementById('answerKey');
@@ -208,8 +207,23 @@ async function generateExam() {
         });
         
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.detail || 'فشل توليد الامتحان');
+            let errorMessage = 'فشل توليد الامتحان';
+            
+            try {
+                const error = await response.json();
+                errorMessage = error.detail || errorMessage;
+            } catch (e) {
+                // If can't parse JSON, use status-based messages
+                if (response.status === 502 || response.status === 503) {
+                    errorMessage = '⚠️ مشكلة في الخادم. قد يكون هناك مشكلة في GEMINI_API_KEY أو نفاذ الحد المجاني.';
+                } else if (response.status === 429) {
+                    errorMessage = '⚠️ تم تجاوز الحد المسموح للطلبات. يرجى الانتظار قليلاً.';
+                } else if (response.status === 401 || response.status === 403) {
+                    errorMessage = '❌ مفتاح Gemini API غير صحيح أو غير مفعّل. يرجى التحقق من Railway Variables.';
+                }
+            }
+            
+            throw new Error(errorMessage);
         }
         
         const exam = await response.json();
@@ -227,7 +241,23 @@ async function generateExam() {
         
     } catch (error) {
         console.error('Error:', error);
-        showStatus(`❌ ${error.message}`, 'error');
+        
+        // Enhanced error message
+        let displayMessage = error.message;
+        
+        // Check if it's a network error
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+            displayMessage = '❌ فشل الاتصال بالخادم. يرجى التحقق من الاتصال بالإنترنت.';
+        }
+        
+        showStatus(displayMessage, 'error');
+        
+        // Show additional help message after 2 seconds
+        setTimeout(() => {
+            if (displayMessage.includes('GEMINI_API_KEY') || displayMessage.includes('نفاذ')) {
+                showStatus('💡 نصيحة: تحقق من إعدادات Railway Variables وأن مفتاح Gemini صحيح', 'warning');
+            }
+        }, 2000);
     } finally {
         hideLoading();
     }
@@ -247,7 +277,10 @@ async function loadTranslations(text) {
         });
         
         if (!response.ok) {
-            throw new Error('فشل تحميل الترجمات');
+            console.warn('Translation failed with status:', response.status);
+            // Don't throw error, just skip translations
+            originalText.textContent = text;
+            return;
         }
         
         const data = await response.json();
@@ -258,8 +291,10 @@ async function loadTranslations(text) {
         
     } catch (error) {
         console.error('Translation error:', error);
-        // Display text without translations
+        // Display text without translations (silently fail)
         originalText.textContent = text;
+        // Optionally show a subtle warning
+        console.warn('⚠️ لم يتم تحميل الترجمات. سيظهر النص بدون ترجمة.');
     } finally {
         translationLoading.classList.add('hidden');
     }
@@ -291,48 +326,11 @@ function displayTextWithTranslations(text) {
     originalText.innerHTML = html;
 }
 
-// Display analysis
-function displayAnalysis(analysis) {
-    analysisContent.innerHTML = `
-        <div class="analysis-item">
-            <strong>نوع النص:</strong> ${analysis.text_type || 'غير محدد'}
-        </div>
-        <div class="analysis-item">
-            <strong>الموضوع الرئيسي:</strong> ${analysis.main_topic || 'غير محدد'}
-        </div>
-        <div class="analysis-item">
-            <strong>مستوى الصعوبة:</strong> ${analysis.difficulty_level || 'B1'}
-        </div>
-        <div class="analysis-item">
-            <strong>الطابع:</strong> ${analysis.tone || 'محايد'}
-        </div>
-        ${analysis.key_ideas && analysis.key_ideas.length > 0 ? `
-        <div class="analysis-item">
-            <strong>الأفكار الرئيسية:</strong>
-            <ul>
-                ${analysis.key_ideas.map(idea => `<li>${idea}</li>`).join('')}
-            </ul>
-        </div>
-        ` : ''}
-        ${analysis.key_words && analysis.key_words.length > 0 ? `
-        <div class="analysis-item">
-            <strong>الكلمات المفتاحية:</strong> ${analysis.key_words.join(', ')}
-        </div>
-        ` : ''}
-    `;
-    
-    analysisSection.classList.remove('hidden');
-}
 
 // Display exam
 function displayExam(exam) {
     // Display original text (will be updated with translations)
     originalText.textContent = exam.text || textInput.value;
-    
-    // Display analysis if available
-    if (exam.analysis) {
-        displayAnalysis(exam.analysis);
-    }
     
     // Display questions
     displayQuestions(exam.questions || []);
