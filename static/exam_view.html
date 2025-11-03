@@ -33,17 +33,12 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Mode Switcher -->
         <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-            <div class="flex items-center justify-between">
-                <div class="flex gap-4">
-                    <button id="studyModeBtn" class="px-6 py-3 rounded-lg font-medium transition">
-                        وضع الدراسة
-                    </button>
-                    <button id="testModeBtn" class="px-6 py-3 rounded-lg font-medium transition active">
-                        وضع الاختبار
-                    </button>
-                </div>
-                <button id="submitTestBtn" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-                    عرض النتيجة
+            <div class="flex gap-4">
+                <button id="studyModeBtn" class="px-6 py-3 rounded-lg font-medium transition">
+                    وضع الدراسة
+                </button>
+                <button id="testModeBtn" class="px-6 py-3 rounded-lg font-medium transition active">
+                    وضع الاختبار
                 </button>
             </div>
         </div>
@@ -61,6 +56,13 @@
         <div class="bg-white rounded-xl shadow-sm p-8 mb-6">
             <h2 class="text-xl font-bold text-gray-900 mb-6">الأسئلة</h2>
             <div id="questionsContent"></div>
+            
+            <!-- Submit Test Button -->
+            <div class="mt-8 text-center">
+                <button id="submitTestBtn" class="px-8 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-lg font-medium">
+                    عرض النتيجة
+                </button>
+            </div>
         </div>
 
         <!-- Answer Key (Study Mode Only) -->
@@ -137,7 +139,7 @@
 
         // Display original text
         function displayOriginalText(text) {
-            const lines = text.split('\\n').map(l => l.trim()).filter(l => l);
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l);
             
             let html = `
                 <div dir="ltr" style="

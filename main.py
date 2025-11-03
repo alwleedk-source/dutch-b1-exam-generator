@@ -223,7 +223,7 @@ async def generate_exam(request: Request, exam_request: GenerateExamRequest):
         # Translate words if enabled
         if exam_request.enable_translation and translator:
             try:
-                word_translations = translator.translate_text(exam_request.text)
+                word_translations = translator.translate_text_with_words(exam_request.text)['word_translations']
                 result['word_translations'] = word_translations
             except Exception as e:
                 print(f"Warning: Translation failed: {e}")
@@ -469,7 +469,7 @@ async def translate_text(request: Request, translate_request: TranslateRequest):
         raise HTTPException(status_code=500, detail="Translator not initialized")
     
     try:
-        translations = translator.translate_text(translate_request.text)
+        translations = translator.translate_text_with_words(translate_request.text)['word_translations']
         return translations
     
     except Exception as e:

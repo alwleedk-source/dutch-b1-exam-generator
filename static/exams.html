@@ -300,17 +300,8 @@
 
         // Open exam
         async function openExam(examId) {
-            try {
-                const response = await fetch(`/api/exams/${examId}`);
-                const exam = await response.json();
-                
-                // Store in sessionStorage and redirect to main page
-                sessionStorage.setItem('loadedExam', JSON.stringify(exam));
-                window.location.href = '/';
-                
-            } catch (error) {
-                alert('فشل فتح الامتحان: ' + error.message);
-            }
+            // Redirect to exam view page
+            window.location.href = `/exam_view.html?id=${examId}`;
         }
 
         // Delete exam
