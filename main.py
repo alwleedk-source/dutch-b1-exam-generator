@@ -100,11 +100,10 @@ class GenerateExamRequest(BaseModel):
 
 class SaveExamRequest(BaseModel):
     title: Optional[str] = None
-    original_text: str
-    formatted_text: str
+    text: str  # Original text
     questions: List[dict]
-    word_translations: dict
-    num_questions: int
+    word_translations: Optional[dict] = {}
+    verification: Optional[dict] = None
 
 
 class SaveWordRequest(BaseModel):
@@ -249,25 +248,25 @@ async def save_exam(request: Request, save_request: SaveExamRequest):
     
     try:
         # Generate title if not provided
-        title = save_request.custom_title
+        title = save_request.title
         if not title and title_generator:
             try:
-                title = title_generator.generate_title(save_request.original_text)
+                title = title_generator.generate_title(save_request.text)
             except Exception as e:
                 print(f"Warning: Title generation failed: {e}")
-                title = save_request.original_text[:50] + "..."
+                title = save_request.text[:50] + "..."
         elif not title:
-            title = save_request.original_text[:50] + "..."
+            title = save_request.text[:50] + "..."
         
         # Save to database
         exam_id = db.save_exam(
             user_id=user['id'],
             title=title,
-            original_text=save_request.original_text,
-            formatted_text=save_request.formatted_text,
+            original_text=save_request.text,
+            formatted_text=save_request.text,  # Same as original for now
             questions=save_request.questions,
-            word_translations=save_request.word_translations,
-            num_questions=save_request.num_questions
+            word_translations=save_request.word_translations or {},
+            num_questions=len(save_request.questions)
         )
         
         return {
@@ -276,6 +275,33 @@ async def save_exam(request: Request, save_request: SaveExamRequest):
             "title": title
         }
     
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/exam/{exam_id}")
+async def get_exam(request: Request, exam_id: int):
+    """Get a specific exam by ID"""
+    # Require authentication
+    user = auth_manager.require_auth(request)
+    
+    if not db:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    try:
+        exam = db.get_exam(exam_id)
+        
+        if not exam:
+            raise HTTPException(status_code=404, detail="Exam not found")
+        
+        # Check if user owns this exam
+        if exam['user_id'] != user['id']:
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        return exam
+    
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

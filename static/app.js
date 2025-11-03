@@ -172,16 +172,18 @@ async function generateExam() {
         const exam = await response.json();
         currentExam = exam;
         
-        displayExam(exam);
-        await loadTranslations(exam.text || text);
-        
         // Auto-save exam
-        await saveExam(exam, text);
+        const examId = await saveExam(exam, text);
         
-        showStatus('✅ تم توليد وحفظ الامتحان بنجاح!', 'success');
-        setTimeout(() => hideStatus(), 3000);
-        
-        resultsSection.scrollIntoView({ behavior: 'smooth' });
+        if (examId) {
+            // Redirect to exam view page
+            window.location.href = `/exam_view.html?id=${examId}`;
+        } else {
+            showStatus('✅ تم توليد الامتحان لكن فشل الحفظ!', 'error');
+            displayExam(exam);
+            await loadTranslations(exam.text || text);
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
         
     } catch (error) {
         console.error('Error:', error);
@@ -560,8 +562,13 @@ async function saveExam(exam, originalText) {
         
         if (!response.ok) {
             console.error('Failed to save exam');
+            return null;
         }
+        
+        const result = await response.json();
+        return result.exam_id;
     } catch (error) {
         console.error('Error saving exam:', error);
+        return null;
     }
 }

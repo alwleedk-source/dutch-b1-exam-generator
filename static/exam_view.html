@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>امتحان القراءة - B1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .translatable-word {
+            cursor: help;
+            border-bottom: 1px dotted #3498db;
+            transition: color 0.2s;
+        }
+        .translatable-word:hover {
+            color: #3498db;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-purple-50 to-green-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between">
+                <h1 id="examTitle" class="text-2xl font-bold text-gray-900">جاري التحميل...</h1>
+                <a href="/" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">
+                    العودة للرئيسية
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Mode Switcher -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+            <div class="flex items-center justify-between">
+                <div class="flex gap-4">
+                    <button id="studyModeBtn" class="px-6 py-3 rounded-lg font-medium transition">
+                        وضع الدراسة
+                    </button>
+                    <button id="testModeBtn" class="px-6 py-3 rounded-lg font-medium transition active">
+                        وضع الاختبار
+                    </button>
+                </div>
+                <button id="submitTestBtn" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                    عرض النتيجة
+                </button>
+            </div>
+        </div>
+
+        <!-- Test Result -->
+        <div id="testResult" class="hidden mb-6"></div>
+
+        <!-- Original Text -->
+        <div class="bg-white rounded-xl shadow-sm p-8 mb-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">النص الأصلي</h2>
+            <div id="originalText" class="prose max-w-none"></div>
+        </div>
+
+        <!-- Questions -->
+        <div class="bg-white rounded-xl shadow-sm p-8 mb-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">الأسئلة</h2>
+            <div id="questionsContent"></div>
+        </div>
+
+        <!-- Answer Key (Study Mode Only) -->
+        <div id="answerKeySection" class="bg-white rounded-xl shadow-sm p-8 hidden">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">الإجابات الصحيحة</h2>
+            <div id="answerKey"></div>
+        </div>
+    </main>
+
+    <script>
+        // Get exam ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const examId = urlParams.get('id');
+
+        // State
+        let currentExam = null;
+        let currentMode = 'test';
+        let wordTranslations = {};
+
+        // DOM Elements
+        const examTitle = document.getElementById('examTitle');
+        const originalText = document.getElementById('originalText');
+        const questionsContent = document.getElementById('questionsContent');
+        const answerKey = document.getElementById('answerKey');
+        const answerKeySection = document.getElementById('answerKeySection');
+        const studyModeBtn = document.getElementById('studyModeBtn');
+        const testModeBtn = document.getElementById('testModeBtn');
+        const submitTestBtn = document.getElementById('submitTestBtn');
+        const testResult = document.getElementById('testResult');
+
+        // Load exam
+        async function loadExam() {
+            if (!examId) {
+                alert('معرف الامتحان غير موجود');
+                window.location.href = '/';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/exam/${examId}`);
+                if (!response.ok) throw new Error('فشل تحميل الامتحان');
+
+                currentExam = await response.json();
+                displayExam();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('فشل تحميل الامتحان');
+                window.location.href = '/';
+            }
+        }
+
+        // Display exam
+        function displayExam() {
+            if (!currentExam) return;
+
+            examTitle.textContent = currentExam.title || 'امتحان القراءة';
+            displayOriginalText(currentExam.original_text);
+            displayQuestions(currentExam.questions);
+            displayAnswerKey(currentExam.questions);
+            
+            wordTranslations = currentExam.word_translations || {};
+            applyTranslations();
+            
+            switchMode('test');
+        }
+
+        // Display original text
+        function displayOriginalText(text) {
+            const lines = text.split('\\n').map(l => l.trim()).filter(l => l);
+            
+            let html = `
+                <div dir="ltr" style="
+                    text-align: left;
+                    font-family: 'Georgia', 'Times New Roman', serif;
+                    line-height: 1.9;
+                    padding: 2rem;
+                    background: white;
+                    max-width: 800px;
+                    margin: 0 auto;
+                ">
+            `;
+            
+            let currentParagraph = [];
+            
+            lines.forEach((line, index) => {
+                const isTitle = (
+                    line.length < 80 && 
+                    (line.endsWith(':') || 
+                     line.split(' ').length < 8 || 
+                     /^[A-Z][a-z]/.test(line))
+                );
+                
+                if (isTitle) {
+                    if (currentParagraph.length > 0) {
+                        html += `<p style="margin: 1.5rem 0; color: #2C3E50; text-align: justify; font-size: 1.1rem; text-indent: 2em; line-height: 1.9;">${currentParagraph.join(' ')}</p>`;
+                        currentParagraph = [];
+                    }
+                    html += `<h3 style="font-size: 1.8rem; font-weight: bold; margin: 2rem 0 1rem 0; color: #1a1a1a; border-bottom: 2px solid #3498db; padding-bottom: 0.5rem;">${line}</h3>`;
+                } else {
+                    currentParagraph.push(line);
+                    
+                    const nextLine = lines[index + 1];
+                    const shouldFlush = !nextLine || index === lines.length - 1;
+                    
+                    if (shouldFlush && currentParagraph.length > 0) {
+                        html += `<p style="margin: 1.5rem 0; color: #2C3E50; text-align: justify; font-size: 1.1rem; text-indent: 2em; line-height: 1.9;">${currentParagraph.join(' ')}</p>`;
+                        currentParagraph = [];
+                    }
+                }
+            });
+            
+            html += '</div>';
+            originalText.innerHTML = html;
+        }
+
+        // Display questions
+        function displayQuestions(questions) {
+            const isTestMode = currentMode === 'test';
+            
+            let html = '<div dir="rtl" style="text-align: right;">';
+            
+            questions.forEach((q, index) => {
+                html += `
+                    <div class="bg-white rounded-xl p-6 mb-6 shadow-sm border border-gray-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-lg font-bold text-gray-800">السؤال ${index + 1}</span>
+                            <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">${q.type || 'اختيار من متعدد'}</span>
+                        </div>
+                        
+                        <div dir="ltr" class="text-left mb-4 text-gray-800 font-bold text-lg">
+                            ${q.question_nl}
+                        </div>
+                        
+                        <div class="space-y-3">
+                            ${q.options.map((opt, optIndex) => {
+                                const isCorrect = opt.correct;
+                                const showAnswer = !isTestMode && isCorrect;
+                                
+                                return `
+                                    <label class="flex items-center p-4 rounded-lg border-2 cursor-pointer transition-all hover:bg-gray-50 ${showAnswer ? 'border-green-500 bg-green-50' : 'border-gray-200'}">
+                                        <input type="radio" name="question_${index}" value="${optIndex}" class="w-5 h-5 text-blue-600" ${isTestMode ? '' : 'disabled'}>
+                                        <span dir="ltr" class="mr-3 text-left flex-1">${opt.text}</span>
+                                        ${showAnswer ? '<span class="text-green-600 font-bold">✓</span>' : ''}
+                                    </label>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            questionsContent.innerHTML = html;
+        }
+
+        // Display answer key
+        function displayAnswerKey(questions) {
+            let html = '<div class="space-y-2">';
+            
+            questions.forEach((q, index) => {
+                const correctOption = q.options.find(opt => opt.correct);
+                const correctIndex = q.options.indexOf(correctOption);
+                
+                html += `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <span class="font-medium">السؤال ${index + 1}</span>
+                        <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold">
+                            الخيار ${correctIndex + 1}
+                        </span>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            answerKey.innerHTML = html;
+        }
+
+        // Apply translations
+        function applyTranslations() {
+            if (!originalText || !wordTranslations || Object.keys(wordTranslations).length === 0) return;
+            
+            let html = originalText.innerHTML;
+            const words = Object.keys(wordTranslations).sort((a, b) => b.length - a.length);
+            
+            words.forEach(word => {
+                const translation = wordTranslations[word];
+                const regex = new RegExp(`\\\\b(${word})\\\\b`, 'gi');
+                html = html.replace(regex, `<span class="translatable-word" data-translation="${translation}">$1</span>`);
+            });
+            
+            originalText.innerHTML = html;
+            
+            document.querySelectorAll('.translatable-word').forEach(el => {
+                el.addEventListener('mouseenter', showTooltip);
+                el.addEventListener('mouseleave', hideTooltip);
+            });
+        }
+
+        // Show tooltip
+        function showTooltip(e) {
+            const translation = e.target.dataset.translation;
+            if (!translation) return;
+            
+            const tooltip = document.createElement('div');
+            tooltip.className = 'translation-tooltip';
+            tooltip.textContent = translation;
+            tooltip.style.cssText = 'position: absolute; background: #2C3E50; color: white; padding: 8px 12px; border-radius: 6px; font-size: 14px; z-index: 1000; pointer-events: none;';
+            
+            const rect = e.target.getBoundingClientRect();
+            tooltip.style.left = rect.left + 'px';
+            tooltip.style.top = (rect.top - 40) + 'px';
+            
+            document.body.appendChild(tooltip);
+            e.target._tooltip = tooltip;
+        }
+
+        // Hide tooltip
+        function hideTooltip(e) {
+            if (e.target._tooltip) {
+                e.target._tooltip.remove();
+                delete e.target._tooltip;
+            }
+        }
+
+        // Switch mode
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            if (mode === 'study') {
+                studyModeBtn.classList.add('bg-blue-600', 'text-white');
+                studyModeBtn.classList.remove('bg-gray-100', 'text-gray-700');
+                testModeBtn.classList.remove('bg-blue-600', 'text-white');
+                testModeBtn.classList.add('bg-gray-100', 'text-gray-700');
+                answerKeySection.classList.remove('hidden');
+                submitTestBtn.classList.add('hidden');
+                testResult.classList.add('hidden');
+            } else {
+                testModeBtn.classList.add('bg-blue-600', 'text-white');
+                testModeBtn.classList.remove('bg-gray-100', 'text-gray-700');
+                studyModeBtn.classList.remove('bg-blue-600', 'text-white');
+                studyModeBtn.classList.add('bg-gray-100', 'text-gray-700');
+                answerKeySection.classList.add('hidden');
+                submitTestBtn.classList.remove('hidden');
+                testResult.classList.add('hidden');
+            }
+            
+            if (currentExam) {
+                displayQuestions(currentExam.questions);
+            }
+        }
+
+        // Submit test
+        function submitTest() {
+            if (!currentExam || !currentExam.questions) return;
+            
+            let correctCount = 0;
+            
+            currentExam.questions.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="question_${index}"]:checked`);
+                const selectedIndex = selected ? parseInt(selected.value) : -1;
+                const correctIndex = q.options.findIndex(opt => opt.correct);
+                
+                if (selectedIndex === correctIndex) correctCount++;
+            });
+            
+            const totalQuestions = currentExam.questions.length;
+            const scorePercentage = Math.round((correctCount / totalQuestions) * 100);
+            const scoreClass = scorePercentage >= 70 ? 'text-green-600' : scorePercentage >= 50 ? 'text-yellow-600' : 'text-red-600';
+            
+            testResult.innerHTML = `
+                <div class="bg-white rounded-xl p-8 text-center">
+                    <div class="text-6xl font-bold ${scoreClass} mb-4">${scorePercentage}%</div>
+                    <div class="text-2xl font-bold mb-2">النتيجة: ${correctCount} من ${totalQuestions}</div>
+                    <div class="text-gray-600 mb-6">
+                        ${scorePercentage >= 70 ? '🎉 ممتاز!' : scorePercentage >= 50 ? '👍 جيد' : '📚 يحتاج لمزيد من الدراسة'}
+                    </div>
+                    <button onclick="switchMode('study')" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        عرض الإجابات الصحيحة
+                    </button>
+                </div>
+            `;
+            
+            testResult.classList.remove('hidden');
+            submitTestBtn.classList.add('hidden');
+            testResult.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Event listeners
+        studyModeBtn.addEventListener('click', () => switchMode('study'));
+        testModeBtn.addEventListener('click', () => switchMode('test'));
+        submitTestBtn.addEventListener('click', submitTest);
+
+        // Load exam on page load
+        loadExam();
+    </script>
+</body>
+</html>
