@@ -206,12 +206,17 @@ async def generate_exam(request: Request, exam_request: GenerateExamRequest):
                 print(f"Warning: Text formatting failed: {e}")
                 formatted_text = exam_request.text
         
-        # Generate questions
-        result = agent.generate_exam(
-            text=exam_request.text,
-            num_questions=exam_request.num_questions,
-            enable_verification=exam_request.enable_verification
-        )
+        # Generate exam with or without verification
+        if exam_request.enable_verification:
+            result = agent.generate_exam_with_verification(
+                text=exam_request.text,
+                num_questions=exam_request.num_questions
+            )
+        else:
+            result = agent.generate_questions(
+                text=exam_request.text,
+                num_questions=exam_request.num_questions
+            )
         
         # Add formatted text to result
         result['formatted_text'] = formatted_text
