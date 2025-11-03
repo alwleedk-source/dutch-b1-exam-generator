@@ -101,13 +101,21 @@
 
             try {
                 const response = await fetch(`/api/exam/${examId}`);
-                if (!response.ok) throw new Error('فشل تحميل الامتحان');
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error('API Error:', response.status, errorData);
+                    alert(`فشل تحميل الامتحان: ${errorData.detail || response.statusText}`);
+                    window.location.href = '/';
+                    return;
+                }
 
                 currentExam = await response.json();
+                console.log('Exam loaded:', currentExam);
                 displayExam();
             } catch (error) {
-                console.error('Error:', error);
-                alert('فشل تحميل الامتحان');
+                console.error('Error loading exam:', error);
+                alert(`خطأ: ${error.message}`);
                 window.location.href = '/';
             }
         }
