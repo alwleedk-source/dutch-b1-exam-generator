@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dutch B1 Exam Generator | مولد امتحانات القراءة الهولندية B1</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🇳🇱 مولد امتحانات القراءة الهولندية B1</h1>
+            <p class="subtitle">Dutch B1 Reading Exam Generator</p>
+            <p class="description">
+                أداة ذكية لتوليد امتحانات قراءة احترافية بمستوى B1 باستخدام الذكاء الاصطناعي
+            </p>
+        </header>
+
+        <!-- Status Bar -->
+        <div id="statusBar" class="status-bar hidden">
+            <span id="statusIcon">⚠️</span>
+            <span id="statusText">جاري التحميل...</span>
+        </div>
+
+        <!-- Input Section -->
+        <section class="input-section">
+            <h2>📝 أدخل النص الهولندي</h2>
+            <p class="hint">
+                الصق نصاً هولندياً (رسالة، إعلان، مقال، إلخ) لتوليد امتحان قراءة احترافي
+            </p>
+            
+            <textarea 
+                id="textInput" 
+                placeholder="Plak hier uw Nederlandse tekst... (minimaal 50 tekens)
+
+مثال:
+Beste bewoner,
+
+De gemeente Amsterdam organiseert een gratis cursus Nederlands voor nieuwe inwoners. 
+De cursus begint op 1 september 2024 en duurt 3 maanden..."
+                rows="12"
+            ></textarea>
+
+            <div class="controls">
+                <div class="control-group">
+                    <label for="numQuestions">عدد الأسئلة:</label>
+                    <select id="numQuestions">
+                        <option value="5">5 أسئلة</option>
+                        <option value="7" selected>7 أسئلة (موصى به)</option>
+                        <option value="10">10 أسئلة</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="verifyQuality" checked>
+                        التحقق من الجودة
+                    </label>
+                </div>
+
+                <button id="generateBtn" class="btn-primary">
+                    🚀 توليد الامتحان
+                </button>
+
+                <button id="analyzeBtn" class="btn-secondary">
+                    🔍 تحليل النص فقط
+                </button>
+            </div>
+
+            <div class="char-counter">
+                <span id="charCount">0</span> حرف
+            </div>
+        </section>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="loading hidden">
+            <div class="spinner"></div>
+            <p>جاري التوليد... قد يستغرق 10-30 ثانية</p>
+        </div>
+
+        <!-- Analysis Section -->
+        <section id="analysisSection" class="analysis-section hidden">
+            <h2>📊 تحليل النص</h2>
+            <div id="analysisContent"></div>
+        </section>
+
+        <!-- Results Section -->
+        <section id="resultsSection" class="results-section hidden">
+            <div class="results-header">
+                <h2>✅ الامتحان المولّد</h2>
+                <div class="action-buttons">
+                    <button id="copyBtn" class="btn-action">📋 نسخ</button>
+                    <button id="printBtn" class="btn-action">🖨️ طباعة</button>
+                    <button id="newExamBtn" class="btn-action">🔄 امتحان جديد</button>
+                </div>
+            </div>
+
+            <!-- Original Text -->
+            <div class="text-display">
+                <h3>📖 النص الأصلي</h3>
+                <div id="originalText" class="text-content"></div>
+            </div>
+
+            <!-- Questions -->
+            <div class="questions-display">
+                <h3>❓ الأسئلة</h3>
+                <div id="questionsContent"></div>
+            </div>
+
+            <!-- Answer Key -->
+            <div class="answer-key">
+                <h3>🔑 مفتاح الإجابات</h3>
+                <div id="answerKey"></div>
+            </div>
+
+            <!-- Quality Score -->
+            <div id="qualityScore" class="quality-score hidden">
+                <h3>⭐ تقييم الجودة</h3>
+                <div id="qualityContent"></div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                مدعوم بـ <strong>Gemini AI</strong> | 
+                مصمم حسب معايير <strong>CEFR B1</strong> | 
+                متوافق مع امتحانات <strong>Inburgering & Staatsexamen NT2</strong>
+            </p>
+            <p class="version">v1.0.0</p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
