@@ -448,7 +448,7 @@ async def translate_text(request: Request, translate_request: TranslateRequest):
     
     try:
         translations = translator.translate_text(translate_request.text)
-        return {"translations": translations}
+        return translations
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
