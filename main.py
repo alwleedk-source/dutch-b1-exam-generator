@@ -12,6 +12,7 @@ from typing import Optional
 import uvicorn
 
 from agent import DutchB1ExamAgent
+from translator import DutchToArabicTranslator
 
 
 # Initialize FastAPI app
@@ -38,6 +39,14 @@ except Exception as e:
     print(f"❌ Failed to initialize agent: {e}")
     agent = None
 
+# Initialize translator
+try:
+    translator = DutchToArabicTranslator()
+    print("✅ Translator initialized successfully")
+except Exception as e:
+    print(f"❌ Failed to initialize translator: {e}")
+    translator = None
+
 
 # Request models
 class ExamRequest(BaseModel):
@@ -57,7 +66,7 @@ class HealthResponse(BaseModel):
 async def root():
     """Serve the main HTML page"""
     try:
-        with open("static/index.html", "r", encoding="utf-8") as f:
+        with open("static/index_v2.html", "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
     except FileNotFoundError:
         return HTMLResponse(content="""
@@ -167,6 +176,41 @@ async def analyze_text(request: dict):
         raise HTTPException(
             status_code=500,
             detail=f"Failed to analyze text: {str(e)}"
+        )
+
+
+@app.post("/api/translate-text")
+async def translate_text(request: dict):
+    """
+    Translate Dutch text to Arabic with word-by-word translations
+    
+    Args:
+        request: Dictionary with 'text' key
+        
+    Returns:
+        Full translation and word translations
+    """
+    if translator is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Translator not initialized. Please check GEMINI_API_KEY environment variable."
+        )
+    
+    text = request.get("text", "")
+    if not text or len(text.strip()) < 5:
+        raise HTTPException(
+            status_code=400,
+            detail="Text is too short for translation."
+        )
+    
+    try:
+        result = translator.translate_text_with_words(text)
+        return JSONResponse(content=result)
+    except Exception as e:
+        print(f"Error translating text: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to translate text: {str(e)}"
         )
 
 
