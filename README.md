@@ -1,220 +1,217 @@
-# 🇳🇱 Dutch B1 Exam Generator | مولد امتحانات القراءة الهولندية B1
+# 📚 منصة امتحانات B1 الهولندية - Dutch B1 Exam Generator
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
-![Python](https://img.shields.io/badge/python-3.11-green)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.104-teal)
-![Gemini](https://img.shields.io/badge/Gemini-AI-orange)
+<div align="center">
 
-أداة ذكية مدعومة بالذكاء الاصطناعي لتوليد امتحانات قراءة احترافية للغة الهولندية بمستوى B1 حسب معايير CEFR الأوروبية.
+![Version](https://img.shields.io/badge/version-4.0.0-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Python](https://img.shields.io/badge/python-3.11-blue.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.104-green.svg)
 
-An AI-powered tool for generating professional Dutch reading comprehension exams at B1 level according to CEFR standards.
+**منصة ذكية متكاملة لتوليد امتحانات القراءة الهولندية مستوى B1 بالذكاء الاصطناعي**
 
-## ✨ المميزات | Features
+[🚀 Demo](https://dutch-b1-exam-generator-production.up.railway.app) | [📖 دليل الإعداد](SETUP_GUIDE.md) | [🐛 الإبلاغ عن مشكلة](https://github.com/alwleedk-source/dutch-b1-exam-generator/issues)
 
-- 🤖 **توليد ذكي**: استخدام Gemini AI لإنشاء أسئلة احترافية
-- 📊 **تحليل النصوص**: تحليل تلقائي لنوع النص ومستوى الصعوبة
-- 🎯 **أنواع متعددة من الأسئلة**: 
-  - Globalverstehen (فهم عام)
-  - Detailverstehen (فهم التفاصيل)
-  - Woordbetekenis (معنى الكلمات)
-  - Tekstdoel (هدف النص)
-  - Inferentie (استنتاج)
-- ✅ **التحقق من الجودة**: تحقق تلقائي من جودة الأسئلة
-- 🎨 **واجهة عربية جميلة**: تصميم عصري وسهل الاستخدام
-- 📱 **متجاوب**: يعمل على جميع الأجهزة
-- 🖨️ **طباعة ونسخ**: إمكانية طباعة ونسخ النتائج
-
-## 🚀 النشر على Railway
-
-### الخطوة 1: إعداد المشروع
-
-1. قم بإنشاء حساب على [Railway](https://railway.app)
-2. قم بإنشاء مشروع جديد: **New Project** → **Deploy from GitHub repo**
-3. اختر هذا المستودع
-
-### الخطوة 2: إضافة متغيرات البيئة
-
-في لوحة تحكم Railway، اذهب إلى **Variables** وأضف:
-
-```
-GEMINI_API_KEY=your_gemini_api_key_here
-```
-
-**كيفية الحصول على مفتاح Gemini:**
-1. اذهب إلى [Google AI Studio](https://aistudio.google.com/)
-2. سجل الدخول بحساب Google
-3. اضغط على "Get API key"
-4. انسخ المفتاح وضعه في Railway
-
-### الخطوة 3: النشر
-
-- Railway سينشر التطبيق تلقائياً!
-- ستحصل على رابط مثل: `https://your-app.railway.app`
-
-## 💻 التشغيل المحلي | Local Development
-
-### المتطلبات
-
-- Python 3.11+
-- مفتاح Gemini API
-
-### التثبيت
-
-```bash
-# Clone the repository
-git clone https://github.com/YOUR_USERNAME/dutch-b1-exam-generator.git
-cd dutch-b1-exam-generator
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Set environment variable
-export GEMINI_API_KEY="your_api_key_here"
-
-# Run the app
-python main.py
-```
-
-افتح المتصفح على: `http://localhost:8000`
-
-## 📖 كيفية الاستخدام | How to Use
-
-1. **أدخل النص الهولندي**: الصق نصاً هولندياً (رسالة، إعلان، مقال، إلخ)
-2. **اختر عدد الأسئلة**: من 3 إلى 15 سؤال (الافتراضي: 7)
-3. **فعّل التحقق من الجودة**: للحصول على أسئلة عالية الجودة
-4. **اضغط "توليد الامتحان"**: انتظر 10-30 ثانية
-5. **استمتع بالنتائج**: اطبع، انسخ، أو ابدأ امتحاناً جديداً
-
-## 🏗️ البنية التقنية | Architecture
-
-```
-dutch-b1-exam-generator/
-├── main.py              # FastAPI backend
-├── agent.py             # AI agent logic
-├── prompts.py           # Prompt templates
-├── requirements.txt     # Python dependencies
-├── Procfile            # Railway deployment
-├── runtime.txt         # Python version
-├── static/
-│   ├── index.html      # Frontend HTML
-│   ├── style.css       # Styling
-│   └── app.js          # Frontend JavaScript
-└── README.md           # Documentation
-```
-
-## 🔧 API Endpoints
-
-### `GET /`
-الصفحة الرئيسية
-
-### `GET /health`
-فحص صحة النظام
-
-### `POST /api/generate-exam`
-توليد امتحان كامل
-
-**Request:**
-```json
-{
-  "text": "النص الهولندي...",
-  "num_questions": 7,
-  "verify_quality": true
-}
-```
-
-**Response:**
-```json
-{
-  "exam_title": "Leesexamen B1",
-  "total_questions": 7,
-  "text": "النص الأصلي...",
-  "analysis": {...},
-  "questions": [...],
-  "verification": {...}
-}
-```
-
-### `POST /api/analyze-text`
-تحليل النص فقط
-
-### `GET /api/info`
-معلومات عن التطبيق
-
-## 🎓 معايير B1
-
-التطبيق يتبع معايير CEFR للمستوى B1:
-- **المفردات**: 2000-2500 كلمة
-- **القواعد**: جمل متوسطة التعقيد
-- **المحتوى**: نصوص الحياة اليومية والعمل
-- **الفهم**: الأفكار الرئيسية والتفاصيل المهمة
-
-متوافق مع:
-- ✅ امتحان Inburgering
-- ✅ Staatsexamen NT2 Programma I
-- ✅ معايير CEFR الأوروبية
-
-## 🛠️ التقنيات المستخدمة | Technologies
-
-- **Backend**: FastAPI, Python 3.11
-- **AI**: Google Gemini 2.0 Flash
-- **Frontend**: HTML5, CSS3, Vanilla JavaScript
-- **Deployment**: Railway
-- **Version Control**: Git, GitHub
-
-## 📝 أمثلة على الأسئلة | Question Examples
-
-### Globalverstehen (سهل)
-```
-Waar gaat deze tekst over?
-a) Een nieuwe cursus
-b) Een verandering in de planning ✅
-c) Een klacht
-```
-
-### Detailverstehen (متوسط)
-```
-Wanneer begint de cursus?
-a) Op 1 augustus
-b) Op 1 september ✅
-c) Op 1 oktober
-```
-
-### Woordbetekenis (متوسط)
-```
-Wat betekent "aanbod" in deze tekst?
-a) Vraag
-b) Korting ✅
-c) Probleem
-```
-
-## 🤝 المساهمة | Contributing
-
-المساهمات مرحب بها! يرجى:
-1. Fork المشروع
-2. إنشاء branch جديد (`git checkout -b feature/amazing-feature`)
-3. Commit التغييرات (`git commit -m 'Add amazing feature'`)
-4. Push إلى Branch (`git push origin feature/amazing-feature`)
-5. فتح Pull Request
-
-## 📄 الترخيص | License
-
-هذا المشروع مفتوح المصدر ومتاح للاستخدام الحر.
-
-## 🙏 شكر وتقدير | Acknowledgments
-
-- **Google Gemini AI** - للذكاء الاصطناعي القوي
-- **CEFR Standards** - لمعايير اللغة الأوروبية
-- **Inburgering & Staatsexamen NT2** - للإلهام في تصميم الامتحانات
-
-## 📞 الدعم | Support
-
-إذا واجهت أي مشاكل أو لديك اقتراحات:
-- افتح Issue على GitHub
-- أو تواصل عبر البريد الإلكتروني
+</div>
 
 ---
 
-صُنع بـ ❤️ للمتعلمين الهولندية | Made with ❤️ for Dutch learners
+## ✨ المميزات الرئيسية
 
-**النسخة**: 1.0.0  
-**آخر تحديث**: نوفمبر 2025
+### 🤖 توليد ذكي بالذكاء الاصطناعي
+- توليد امتحانات احترافية تلقائياً باستخدام **Gemini AI**
+- 5 أنواع من الأسئلة حسب معايير **CEFR B1**
+- توزيع متوازن للصعوبة (سهل، متوسط، صعب)
+- تحقق تلقائي من الجودة
+
+### 🔐 نظام مستخدمين كامل
+- تسجيل دخول آمن بـ **Google OAuth 2.0**
+- حفظ جميع امتحاناتك في قاعدة بيانات
+- تسمية تلقائية ذكية للامتحانات
+- إدارة كاملة: عرض، حذف، تعديل
+
+### 📸 رفع الملفات
+- رفع صور (JPG, PNG, etc.)
+- رفع مستندات PDF (متعدد الصفحات)
+- استخراج النص تلقائياً بـ **OCR**
+- حذف تلقائي للملفات بعد المعالجة
+
+### 🌐 ترجمة تفاعلية
+- ترجمة عربية لكل كلمة هولندية
+- تظهر عند التمرير بالماوس
+- ترجمة سياقية (ليست حرفية)
+- تغطية 85%+ من الكلمات
+
+### 📝 تنسيق احترافي
+- تنسيق تلقائي للنصوص بالذكاء الاصطناعي
+- عناوين، فقرات، قوائم
+- يظهر النص كمستند حقيقي
+
+### ✏️ وضع اختبار تفاعلي
+- اختبر نفسك بشكل حقيقي
+- اختر الإجابات ثم صحّح
+- عرض النتيجة والدرجة
+
+### 🎨 تصميم عصري
+- واجهة عربية جميلة
+- تصميم متجاوب (موبايل + ديسكتوب)
+- ألوان واضحة ومريحة للعين
+
+---
+
+## 🚀 البدء السريع
+
+### النشر على Railway
+
+1. **Fork المشروع** على GitHub
+2. **ربطه بـ Railway**: New Project → Deploy from GitHub repo
+3. **إضافة متغيرات البيئة** (انظر أدناه)
+4. **النشر!**
+
+راجع [دليل الإعداد الكامل](SETUP_GUIDE.md) للتعليمات التفصيلية.
+
+### متغيرات البيئة الإلزامية
+
+```bash
+GEMINI_API_KEY=your_key_here
+DATABASE_URL=postgresql://...
+GOOGLE_CLIENT_ID=your_client_id
+GOOGLE_CLIENT_SECRET=your_secret
+GOOGLE_REDIRECT_URI=https://your-app/auth/callback
+SESSION_SECRET_KEY=random_secret_key
+```
+
+---
+
+## 📖 الوثائق
+
+- [📘 دليل الإعداد الكامل](SETUP_GUIDE.md) - خطوة بخطوة
+- [🔧 دليل النشر على Railway](DEPLOYMENT_GUIDE.md)
+- [📝 التحديثات v3.0](UPDATES_v3.0.md)
+- [🐛 الإصلاحات v3.0.2](FIXES_v3.0.2.md)
+
+---
+
+## 🎯 أنواع الأسئلة
+
+حسب معايير **CEFR B1** و **Staatsexamen NT2**:
+
+| النوع | الهدف | الصعوبة | النسبة |
+|:-----|:------|:--------|:-------|
+| **Globalverstehen** | الفكرة الرئيسية | 🟢 سهلة | 30% |
+| **Detailverstehen** | التفاصيل المحددة | 🟡 متوسطة | 30% |
+| **Woordbetekenis** | معنى الكلمات | 🟡 متوسطة | 20% |
+| **Tekstdoel** | هدف النص | 🔴 صعبة | 10% |
+| **Inferentie** | الاستنتاج | 🔴 صعبة | 10% |
+
+---
+
+## 🏗️ البنية التقنية
+
+### Backend
+- **FastAPI** - إطار عمل Python حديث
+- **PostgreSQL (Neon)** - قاعدة بيانات سحابية
+- **Google Generative AI (Gemini)** - ذكاء اصطناعي
+- **Tesseract OCR** - استخراج النص من الصور
+
+### Frontend
+- **HTML5 + CSS3** - واجهة عصرية
+- **Vanilla JavaScript** - بدون مكتبات ثقيلة
+
+### Authentication
+- **Google OAuth 2.0** - تسجيل دخول آمن
+
+---
+
+## 💡 أمثلة الاستخدام
+
+### 1. توليد امتحان من نص
+```
+1. الصق نصاً هولندياً (100-500 كلمة)
+2. اختر عدد الأسئلة (5-15)
+3. اضغط "توليد الامتحان"
+4. انتظر 10-30 ثانية
+```
+
+### 2. رفع صورة
+```
+1. اضغط "رفع ملف"
+2. اختر صورة بنص هولندي
+3. يُستخرج النص تلقائياً
+```
+
+### 3. حفظ ومراجعة
+```
+1. بعد توليد امتحان، اضغط "حفظ"
+2. اذهب إلى "امتحاناتي"
+3. افتح أي امتحان قديم
+```
+
+---
+
+## 📊 الأداء والحدود
+
+### Gemini AI Studio (مجاني)
+- ⚡ 60 طلب/دقيقة
+- 📅 1,500 طلب/يوم
+- 💰 مجاني تماماً
+
+### Vertex AI (مدفوع)
+- ⚡ 60 طلب/دقيقة
+- 📅 بدون حد يومي
+- 💰 ~$0.25 لكل 1M حرف
+
+---
+
+## 🤝 المساهمة
+
+المساهمات مرحب بها! إذا كان لديك اقتراح:
+
+1. Fork المشروع
+2. أنشئ branch جديد
+3. Commit تغييراتك
+4. Push إلى branch
+5. افتح Pull Request
+
+---
+
+## 🐛 الإبلاغ عن مشاكل
+
+إذا واجهت مشكلة:
+
+1. تحقق من [دليل استكشاف الأخطاء](SETUP_GUIDE.md#استكشاف-الأخطاء)
+2. ابحث في [Issues الموجودة](https://github.com/alwleedk-source/dutch-b1-exam-generator/issues)
+3. افتح [Issue جديد](https://github.com/alwleedk-source/dutch-b1-exam-generator/issues/new)
+
+---
+
+## 📜 الترخيص
+
+هذا المشروع مرخص تحت **MIT License**.
+
+---
+
+## 🙏 شكر وتقدير
+
+- **Google Gemini** - الذكاء الاصطناعي المتقدم
+- **FastAPI** - إطار العمل الرائع
+- **Neon** - قاعدة البيانات السحابية
+- **Railway** - منصة النشر السهلة
+- **Tesseract** - OCR مفتوح المصدر
+
+---
+
+## 📞 التواصل
+
+- **GitHub**: [@alwleedk-source](https://github.com/alwleedk-source)
+- **المشروع**: [dutch-b1-exam-generator](https://github.com/alwleedk-source/dutch-b1-exam-generator)
+- **Issues**: [الإبلاغ عن مشكلة](https://github.com/alwleedk-source/dutch-b1-exam-generator/issues)
+
+---
+
+<div align="center">
+
+**صُنع بـ ❤️ للمتعلمين الهولندية**
+
+[⬆ العودة للأعلى](#-منصة-امتحانات-b1-الهولندية---dutch-b1-exam-generator)
+
+</div>
