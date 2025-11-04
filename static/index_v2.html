@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dutch B1 Exam Generator | مولد امتحانات القراءة الهولندية B1</title>
+    <title>Dutch Exam Generator | مولد امتحانات القراءة الهولندية</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="/static/style_v3.css">
     <style>
         /* Tooltip for word translation */
@@ -180,10 +181,10 @@
     <div class="container">
         <!-- Header -->
         <header class="header">
-            <h1>🇳🇱 مولد امتحانات القراءة الهولندية B1</h1>
-            <p class="subtitle">Dutch B1 Reading Exam Generator</p>
+            <h1>مولد امتحانات القراءة الهولندية</h1>
+            <p class="subtitle">Dutch Reading Exam Generator</p>
             <p class="description">
-                أداة ذكية لتوليد امتحانات قراءة احترافية بمستوى B1 باستخدام الذكاء الاصطناعي
+                أداة ذكية لتوليد امتحانات قراءة احترافية باستخدام نظامنا الذكي
             </p>
         </header>
 
@@ -195,7 +196,10 @@
 
         <!-- Input Section -->
         <section class="input-section">
-            <h2>📝 أدخل النص الهولندي</h2>
+            <h2 style="display: flex; align-items: center; gap: 10px;">
+                <i data-lucide="file-text" style="width: 24px; height: 24px;"></i>
+                أدخل النص الهولندي
+            </h2>
             <p class="hint">
                 الصق نصاً هولندياً (رسالة، إعلان، مقال، إلخ) لتوليد امتحان قراءة احترافي
             </p>
@@ -229,8 +233,9 @@ De cursus begint op 1 september 2024 en duurt 3 maanden..."
                     </label>
                 </div>
 
-                <button id="generateBtn" class="btn-primary">
-                    🚀 توليد الامتحان
+                <button id="generateBtn" class="btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+                    <i data-lucide="sparkles" style="width: 20px; height: 20px;"></i>
+                    توليد الامتحان
                 </button>
 
 
@@ -252,11 +257,23 @@ De cursus begint op 1 september 2024 en duurt 3 maanden..."
         <!-- Results Section -->
         <section id="resultsSection" class="results-section hidden">
             <div class="results-header">
-                <h2>✅ الامتحان المولّد</h2>
+                <h2 style="display: flex; align-items: center; gap: 10px;">
+                    <i data-lucide="check-circle" style="width: 24px; height: 24px; color: #10B981;"></i>
+                    الامتحان المولّد
+                </h2>
                 <div class="action-buttons">
-                    <button id="copyBtn" class="btn-action">📋 نسخ</button>
-                    <button id="printBtn" class="btn-action">🖨️ طباعة</button>
-                    <button id="newExamBtn" class="btn-action">🔄 امتحان جديد</button>
+                    <button id="copyBtn" class="btn-action" style="display: inline-flex; align-items: center; gap: 6px;">
+                        <i data-lucide="copy" style="width: 16px; height: 16px;"></i>
+                        نسخ
+                    </button>
+                    <button id="printBtn" class="btn-action" style="display: inline-flex; align-items: center; gap: 6px;">
+                        <i data-lucide="printer" style="width: 16px; height: 16px;"></i>
+                        طباعة
+                    </button>
+                    <button id="newExamBtn" class="btn-action" style="display: inline-flex; align-items: center; gap: 6px;">
+                        <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
+                        امتحان جديد
+                    </button>
                 </div>
             </div>
 
@@ -264,18 +281,23 @@ De cursus begint op 1 september 2024 en duurt 3 maanden..."
             <div class="test-mode-controls">
                 <h3 style="margin-bottom: 15px;">اختر الوضع:</h3>
                 <div class="mode-switch">
-                    <button id="studyModeBtn" class="mode-btn active">
-                        📖 وضع الدراسة (الإجابات ظاهرة)
+                    <button id="studyModeBtn" class="mode-btn active" style="display: inline-flex; align-items: center; gap: 8px;">
+                        <i data-lucide="book-open" style="width: 18px; height: 18px;"></i>
+                        وضع الدراسة (الإجابات ظاهرة)
                     </button>
-                    <button id="testModeBtn" class="mode-btn">
-                        ✏️ وضع الاختبار (اختبر نفسك)
+                    <button id="testModeBtn" class="mode-btn" style="display: inline-flex; align-items: center; gap: 8px;">
+                        <i data-lucide="pen-tool" style="width: 18px; height: 18px;"></i>
+                        وضع الاختبار (اختبر نفسك)
                     </button>
                 </div>
             </div>
 
             <!-- Original Text -->
             <div class="text-display">
-                <h3>📖 النص الأصلي</h3>
+                <h3 style="display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="file-text" style="width: 20px; height: 20px;"></i>
+                    النص الأصلي
+                </h3>
                 <div id="translationLoading" class="translation-loading hidden">
                     جاري تحميل الترجمات... ⏳
                 </div>
@@ -286,25 +308,35 @@ De cursus begint op 1 september 2024 en duurt 3 maanden..."
             <div id="testResult" class="test-result hidden"></div>
 
             <!-- Submit Test Button (hidden initially) -->
-            <button id="submitTestBtn" class="submit-test-btn hidden">
-                ✅ تصحيح الاختبار
+            <button id="submitTestBtn" class="submit-test-btn hidden" style="display: inline-flex; align-items: center; gap: 10px; justify-content: center;">
+                <i data-lucide="check-circle" style="width: 22px; height: 22px;"></i>
+                تصحيح الاختبار
             </button>
 
             <!-- Questions -->
             <div class="questions-display">
-                <h3>❓ الأسئلة</h3>
+                <h3 style="display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="help-circle" style="width: 20px; height: 20px;"></i>
+                    الأسئلة
+                </h3>
                 <div id="questionsContent"></div>
             </div>
 
             <!-- Answer Key (only in study mode) -->
             <div id="answerKeySection" class="answer-key">
-                <h3>🔑 مفتاح الإجابات</h3>
+                <h3 style="display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="key" style="width: 20px; height: 20px;"></i>
+                    مفتاح الإجابات
+                </h3>
                 <div id="answerKey"></div>
             </div>
 
             <!-- Quality Score -->
             <div id="qualityScore" class="quality-score hidden">
-                <h3>⭐ تقييم الجودة</h3>
+                <h3 style="display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="star" style="width: 20px; height: 20px;"></i>
+                    تقييم الجودة
+                </h3>
                 <div id="qualityContent"></div>
             </div>
         </section>
@@ -312,8 +344,7 @@ De cursus begint op 1 september 2024 en duurt 3 maanden..."
         <!-- Footer -->
         <footer class="footer">
             <p>
-                مدعوم بـ <strong>Gemini AI</strong> | 
-                مصمم حسب معايير <strong>CEFR B1</strong> | 
+                مدعوم بـ <strong>نظامنا الذكي</strong> | 
                 متوافق مع امتحانات <strong>Inburgering & Staatsexamen NT2</strong>
             </p>
             <p class="version">v2.0.0 - مع وضع الاختبار والترجمة التفاعلية</p>
@@ -321,5 +352,9 @@ De cursus begint op 1 september 2024 en duurt 3 maanden..."
     </div>
 
     <script src="/static/app_v2.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
 </body>
 </html>
