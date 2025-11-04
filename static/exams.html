@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>امتحاناتي - منصة امتحانات B1 الهولندية</title>
     <link rel="stylesheet" href="/style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         .exams-page {
             max-width: 1200px;
@@ -209,7 +210,10 @@
 <body>
     <div class="exams-page">
         <div class="page-header">
-            <h1>📚 امتحاناتي</h1>
+            <h1 class="flex items-center gap-3">
+                <i data-lucide="file-text" class="w-8 h-8"></i>
+                <span>امتحاناتي</span>
+            </h1>
             <div class="header-actions">
                 <div class="user-info" id="userInfo"></div>
                 <a href="/" class="btn btn-primary">+ امتحان جديد</a>
@@ -250,7 +254,9 @@
                 if (data.exams.length === 0) {
                     container.innerHTML = `
                         <div class="empty-state">
-                            <div class="empty-state-icon">📝</div>
+                            <div class="empty-state-icon">
+                                <i data-lucide="file-plus" class="w-16 h-16"></i>
+                            </div>
                             <h2>لا توجد امتحانات بعد</h2>
                             <p>ابدأ بإنشاء أول امتحان لك!</p>
                             <a href="/" class="btn btn-primary">إنشاء امتحان جديد</a>
@@ -263,10 +269,16 @@
                     <div class="exam-card">
                         <div class="exam-title">${exam.title}</div>
                         <div class="exam-meta">
-                            <span>📊 ${exam.num_questions} سؤال</span>
+                            <span class="flex items-center gap-1">
+                                <i data-lucide="list" class="w-4 h-4"></i>
+                                ${exam.num_questions} سؤال
+                            </span>
                         </div>
                         <div class="exam-date">
-                            📅 ${new Date(exam.created_at).toLocaleDateString('ar-SA', {
+                            <span class="flex items-center gap-1">
+                                <i data-lucide="calendar" class="w-4 h-4"></i>
+                                ${new Date(exam.created_at).toLocaleDateString('ar-SA', {
+                            </span>
                                 year: 'numeric',
                                 month: 'long',
                                 day: 'numeric'
@@ -285,6 +297,8 @@
                 
                 container.innerHTML = `<div class="exams-grid">${examsHTML}</div>`;
                 
+                // Re-initialize icons after rendering
+                lucide.createIcons();
             } catch (error) {
                 console.error('Failed to load exams:', error);
                 document.getElementById('examsContainer').innerHTML = `
@@ -330,6 +344,9 @@
         // Initialize
         loadUserInfo();
         loadExams();
+        
+        // Initialize Lucide icons
+        lucide.createIcons();
     </script>
 </body>
 </html>

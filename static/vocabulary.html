@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>قائمة كلماتي - Dutch B1 Exam Generator</title>
     <link rel="stylesheet" href="/style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         .vocabulary-header {
             display: flex;
@@ -226,16 +227,31 @@
 <body>
     <div class="container">
         <div class="nav-links">
-            <a href="/" class="nav-link">🏠 الصفحة الرئيسية</a>
-            <a href="/exams" class="nav-link">📚 امتحاناتي</a>
-            <a href="/vocabulary" class="nav-link" style="background: var(--primary-gradient); color: white;">📖 كلماتي</a>
-            <a href="/auth/logout" class="nav-link">🚪 تسجيل الخروج</a>
+            <a href="/" class="nav-link flex items-center gap-2">
+                <i data-lucide="home" class="w-5 h-5"></i>
+                <span>الصفحة الرئيسية</span>
+            </a>
+            <a href="/exams" class="nav-link flex items-center gap-2">
+                <i data-lucide="file-text" class="w-5 h-5"></i>
+                <span>امتحاناتي</span>
+            </a>
+            <a href="/vocabulary" class="nav-link flex items-center gap-2" style="background: var(--primary-gradient); color: white;">
+                <i data-lucide="book-open" class="w-5 h-5"></i>
+                <span>كلماتي</span>
+            </a>
+            <a href="/auth/logout" class="nav-link flex items-center gap-2">
+                <i data-lucide="log-out" class="w-5 h-5"></i>
+                <span>تسجيل الخروج</span>
+            </a>
         </div>
         
         <div class="card">
             <div class="vocabulary-header">
                 <div>
-                    <h1 style="font-size: 2.5rem; margin-bottom: 10px;">📖 قائمة كلماتي</h1>
+                    <h1 style="font-size: 2.5rem; margin-bottom: 10px; display: flex; align-items: center; gap: 15px;">
+                        <i data-lucide="book-open" class="w-10 h-10"></i>
+                        <span>قائمة كلماتي</span>
+                    </h1>
                     <p style="color: var(--text-secondary);">الكلمات التي حفظتها للمراجعة</p>
                 </div>
                 
@@ -248,7 +264,7 @@
             </div>
             
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 ابحث عن كلمة..." />
+                <input type="text" id="searchInput" placeholder="ابحث عن كلمة..." style="padding-right: 45px; background-image: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"gray\" stroke-width=\"2\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.35-4.35\"/></svg>'); background-repeat: no-repeat; background-position: right 15px center;" />
             </div>
             
             <div id="loadingIndicator" class="loading-spinner hidden">
@@ -260,7 +276,9 @@
             </div>
             
             <div id="emptyState" class="empty-state hidden">
-                <div class="empty-state-icon">📚</div>
+                <div class="empty-state-icon">
+                    <i data-lucide="book-open" style="width: 64px; height: 64px;"></i>
+                </div>
                 <div class="empty-state-title">لا توجد كلمات محفوظة بعد</div>
                 <div class="empty-state-text">ابدأ بحفظ الكلمات من الامتحانات لتظهر هنا</div>
                 <a href="/" class="btn btn-primary">توليد امتحان جديد</a>
@@ -311,7 +329,8 @@
             } catch (error) {
                 console.error('Error loading vocabulary:', error);
                 loadingIndicator.classList.add('hidden');
-                vocabularyList.innerHTML = '<div style="text-align: center; color: #E74C3C; padding: 40px;">❌ فشل تحميل الكلمات</div>';
+                vocabularyList.innerHTML = '<div style="text-align: center; color: #E74C3C; padding: 40px;"><i data-lucide="alert-circle" class="w-8 h-8 inline"></i> فشل تحميل الكلمات</div>';
+                lucide.createIcons();
             }
         }
         
@@ -336,25 +355,34 @@
                             </div>
                             <div class="word-actions">
                                 <button class="icon-btn delete-btn" onclick="deleteWord(${word.id})" title="حذف">
-                                    🗑️
+                                    <i data-lucide="trash-2" class="w-5 h-5"></i>
                                 </button>
                             </div>
                         </div>
                         
                         ${word.context ? `
                         <div class="word-context">
-                            <div class="word-context-label">📝 السياق:</div>
+                            <div class="word-context-label flex items-center gap-1">
+                                <i data-lucide="file-text" class="w-4 h-4"></i>
+                                <span>السياق:</span>
+                            </div>
                             <div class="word-context-text">${word.context}</div>
                         </div>
                         ` : ''}
                         
                         <div class="word-meta">
-                            <span>📅 ${createdDate}</span>
-                            ${word.exam_title ? `<span>📚 من: ${word.exam_title}</span>` : ''}
+                            <span class="flex items-center gap-1">
+                                <i data-lucide="calendar" class="w-4 h-4"></i>
+                                ${createdDate}
+                            </span>
+                            ${word.exam_title ? `<span class="flex items-center gap-1"><i data-lucide="book-open" class="w-4 h-4"></i> من: ${word.exam_title}</span>` : ''}
                         </div>
                     </div>
                 `;
             }).join('');
+            
+            // Re-initialize icons after rendering
+            setTimeout(() => lucide.createIcons(), 100);
         }
         
         // Delete word
@@ -439,6 +467,9 @@
                 displayWords(filtered);
             }
         }
+        
+        // Initialize Lucide icons on page load
+        lucide.createIcons();
     </script>
 </body>
 </html>

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>امتحان القراءة - B1</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         .translatable-word {
             cursor: help;
@@ -34,6 +35,33 @@
                 opacity: 0;
             }
         }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        .hover-scale {
+            transition: transform 0.3s ease;
+        }
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-purple-50 to-green-50 min-h-screen">
@@ -43,11 +71,13 @@
             <div class="flex items-center justify-between">
                 <h1 id="examTitle" class="text-2xl font-bold text-gray-900">جاري التحميل...</h1>
                 <div class="flex gap-3">
-                    <a href="/vocabulary" class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium">
-                        📚 كلماتي
+                    <a href="/vocabulary" class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium flex items-center gap-2">
+                        <i data-lucide="book-open" class="w-5 h-5"></i>
+                        <span>كلماتي</span>
                     </a>
-                    <a href="/exams" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition font-medium">
-                        📝 امتحاناتي
+                    <a href="/exams" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition font-medium flex items-center gap-2">
+                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                        <span>امتحاناتي</span>
                     </a>
                     <a href="/" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">
                         العودة للرئيسية
@@ -60,7 +90,7 @@
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Mode Switcher -->
-        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6 fade-in-up hover-scale">
             <div class="flex gap-4">
                 <button id="studyModeBtn" class="px-6 py-3 rounded-lg font-medium transition">
                     وضع الدراسة
@@ -75,13 +105,13 @@
         <div id="testResult" class="hidden mb-6"></div>
 
         <!-- Original Text -->
-        <div class="bg-white rounded-xl shadow-sm p-8 mb-6">
+        <div class="bg-white rounded-xl shadow-sm p-8 mb-6 fade-in-up hover-scale">
             <h2 class="text-xl font-bold text-gray-900 mb-4">النص الأصلي</h2>
             <div id="originalText" class="prose max-w-none"></div>
         </div>
 
         <!-- Questions -->
-        <div class="bg-white rounded-xl shadow-sm p-8 mb-6">
+        <div class="bg-white rounded-xl shadow-sm p-8 mb-6 fade-in-up hover-scale">
             <h2 class="text-xl font-bold text-gray-900 mb-6">الأسئلة</h2>
             <div id="questionsContent"></div>
             
@@ -320,7 +350,7 @@
             
             document.querySelectorAll('.translatable-word').forEach(el => {
                 el.addEventListener('mouseenter', showTooltip);
-                el.addEventListener('mouseleave', hideTooltip);
+                el.addEventListener('mouseleave', scheduleHideTooltip);
             });
         }
 
@@ -351,15 +381,48 @@
             tooltip.style.left = rect.left + 'px';
             tooltip.style.top = (rect.top - 50) + 'px';
             
+            // Prevent tooltip from hiding when mouse enters it
+            tooltip.addEventListener('mouseenter', () => {
+                tooltip._isHovered = true;
+                if (e.target._hideTimeout) {
+                    clearTimeout(e.target._hideTimeout);
+                }
+            });
+            
+            tooltip.addEventListener('mouseleave', () => {
+                tooltip._isHovered = false;
+                setTimeout(() => {
+                    if (!tooltip._isHovered) {
+                        hideTooltip(tooltip, e.target);
+                    }
+                }, 200);
+            });
+            
             document.body.appendChild(tooltip);
             e.target._tooltip = tooltip;
         }
 
-        // Hide tooltip
-        function hideTooltip(e) {
-            if (e.target._tooltip) {
-                e.target._tooltip.remove();
-                delete e.target._tooltip;
+        // Schedule hide tooltip with delay
+        function scheduleHideTooltip(e) {
+            const tooltip = e.target._tooltip;
+            if (!tooltip) return;
+            
+            // Add delay before hiding
+            e.target._hideTimeout = setTimeout(() => {
+                if (tooltip && !tooltip._isHovered) {
+                    tooltip.remove();
+                    delete e.target._tooltip;
+                }
+            }, 200);
+        }
+        
+        // Hide tooltip immediately
+        function hideTooltip(tooltip, element) {
+            if (tooltip) {
+                tooltip.remove();
+                if (element && element._tooltip) {
+                    delete element._tooltip;
+                }
             }
         }
 
@@ -413,7 +476,7 @@
                     <div class="text-6xl font-bold ${scoreClass} mb-4">${scorePercentage}%</div>
                     <div class="text-2xl font-bold mb-2">النتيجة: ${correctCount} من ${totalQuestions}</div>
                     <div class="text-gray-600 mb-6">
-                        ${scorePercentage >= 70 ? '🎉 ممتاز!' : scorePercentage >= 50 ? '👍 جيد' : '📚 يحتاج لمزيد من الدراسة'}
+                        ${scorePercentage >= 70 ? '<i data-lucide="trophy" class="w-5 h-5 inline"></i> ممتاز!' : scorePercentage >= 50 ? '<i data-lucide="thumbs-up" class="w-5 h-5 inline"></i> جيد' : '<i data-lucide="book-open" class="w-5 h-5 inline"></i> يحتاج لمزيد من الدراسة'}
                     </div>
                     <button onclick="switchMode('study')" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                         عرض الإجابات الصحيحة
@@ -424,6 +487,9 @@
             testResult.classList.remove('hidden');
             submitTestBtn.classList.add('hidden');
             testResult.scrollIntoView({ behavior: 'smooth' });
+            
+            // Re-initialize icons
+            setTimeout(() => lucide.createIcons(), 100);
         }
 
         // Save word to vocabulary
@@ -448,11 +514,12 @@
                     toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #10B981; color: white; padding: 16px 24px; border-radius: 8px; font-size: 14px; z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: slideIn 0.3s ease-out;';
                     toast.innerHTML = `
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <span>✅</span>
+                            <i data-lucide="check-circle" class="w-5 h-5"></i>
                             <span>تم حفظ الكلمة "${word}" في قائمة المفردات</span>
                         </div>
                     `;
                     document.body.appendChild(toast);
+                    lucide.createIcons();
                     
                     setTimeout(() => {
                         toast.style.animation = 'slideOut 0.3s ease-in';
@@ -475,6 +542,9 @@
 
         // Load exam on page load
         loadExam();
+        
+        // Initialize Lucide icons
+        lucide.createIcons();
     </script>
 </body>
 </html>
