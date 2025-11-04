@@ -765,3 +765,63 @@ body: JSON.stringify({
 - ✅ يتم التحويل إلى صفحة الامتحان
 - ✅ العداد اليومي يتحدث
 - ✅ الامتحان يظهر في "امتحاناتي"
+
+
+
+---
+
+## [Fix] 2025-11-04 - إصلاح خطأ duplicate key في Development User
+
+### المشكلة
+
+عند إعادة تشغيل التطبيق مع DISABLE_AUTH=true:
+```
+❌ Failed to initialize database: duplicate key value violates unique constraint "users_pkey"
+DETAIL: Key (id)=(1) already exists.
+```
+
+**النتيجة:**
+- فشل تهيئة قاعدة البيانات
+- خطأ 500 عند حفظ الامتحانات
+- التطبيق لا يعمل بشكل صحيح
+
+### السبب
+
+**ON CONFLICT (google_id) DO NOTHING غير كافٍ!**
+
+عند إعادة التشغيل:
+1. user_id=1 موجود بالفعل
+2. الكود يحاول INSERT مع id=1
+3. **Conflict على primary key (id)!**
+4. `ON CONFLICT (google_id)` لا يحل المشكلة لأن الـ conflict على `id` وليس `google_id`
+
+### الحل
+
+**استخدام ON CONFLICT (id) بدلاً من (google_id):**
+
+```python
+INSERT INTO users (id, google_id, email, name, picture, daily_exam_count, last_exam_date)
+VALUES (1, 'dev_user', 'dev@example.com', 'Development User', '', 0, NULL)
+ON CONFLICT (id) DO UPDATE SET
+    google_id = EXCLUDED.google_id,
+    email = EXCLUDED.email,
+    name = EXCLUDED.name
+```
+
+**الآن:**
+- إذا كان id=1 غير موجود → يتم إنشاؤه ✅
+- إذا كان id=1 موجود → يتم تحديثه ✅
+- لا أخطاء duplicate key! ✅
+
+### التغييرات
+
+1. **ملف: database.py**
+   - تغيير `ON CONFLICT (google_id) DO NOTHING`
+   - إلى `ON CONFLICT (id) DO UPDATE SET ...`
+
+### النتيجة المتوقعة
+
+- ✅ لا أخطاء عند إعادة التشغيل
+- ✅ Development User يعمل دائماً
+- ✅ حفظ الامتحانات يعمل
+- ✅ التطبيق يعمل بشكل صحيح

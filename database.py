@@ -68,7 +68,10 @@ class Database:
                 cursor.execute("""
                     INSERT INTO users (id, google_id, email, name, picture, daily_exam_count, last_exam_date)
                     VALUES (1, 'dev_user', 'dev@example.com', 'Development User', '', 0, NULL)
-                    ON CONFLICT (google_id) DO NOTHING
+                    ON CONFLICT (id) DO UPDATE SET
+                        google_id = EXCLUDED.google_id,
+                        email = EXCLUDED.email,
+                        name = EXCLUDED.name
                 """)
                 print("✅ Development user (id=1) created/verified for DISABLE_AUTH mode")
             
