@@ -185,7 +185,11 @@
             if (!currentExam) return;
 
             examTitle.textContent = currentExam.title || 'امتحان القراءة';
-            displayOriginalText(currentExam.original_text);
+            
+            // Use formatted_text if available, otherwise use original_text
+            const textToDisplay = currentExam.formatted_text || currentExam.original_text;
+            displayOriginalText(textToDisplay);
+            
             displayQuestions(currentExam.questions);
             displayAnswerKey(currentExam.questions);
             
@@ -202,7 +206,30 @@
 
         // Display original text with smart formatting
         function displayOriginalText(text) {
-            // Split by newlines first, then by sentences if needed
+            // Check if text contains HTML tags (formatted by AI)
+            const hasHTML = /<[a-z][\s\S]*>/i.test(text);
+            
+            if (hasHTML) {
+                // Text is already formatted with HTML, just wrap it
+                originalText.innerHTML = `
+                    <div dir="ltr" style="
+                        text-align: left;
+                        font-family: 'Georgia', 'Times New Roman', serif;
+                        line-height: 1.8;
+                        padding: 2.5rem;
+                        background: white;
+                        max-width: 850px;
+                        margin: 0 auto;
+                        border-radius: 12px;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+                    ">
+                        ${text}
+                    </div>
+                `;
+                return;
+            }
+            
+            // Fallback: manual formatting for plain text
             let lines = text.split('\n').map(l => l.trim()).filter(l => l);
             
             // If text is one long paragraph, try to split by sentences

@@ -42,48 +42,53 @@ class DutchTextFormatter:
         Returns:
             Dictionary with formatted text and metadata
         """
-        prompt = f"""Je bent een expert in het formatteren van Nederlandse teksten.
+        prompt = f"""Je bent een expert in het formatteren van Nederlandse teksten voor leesbaarheid.
 
-Taak: Analyseer en formatteer de volgende Nederlandse tekst zodat deze er natuurlijk en professioneel uitziet.
+Taak: Formatteer de volgende Nederlandse tekst met duidelijke HTML-structuur.
 
 Originele tekst:
 {text}
 
 Instructies:
-1. **Identificeer de structuur** (brief, artikel, advertentie, kennisgeving, etc.)
-2. **Voeg passende HTML-opmaak toe**:
-   - Hoofdkop: <h2>Titel</h2>
-   - Subkop: <h3>Subtitel</h3>
-   - Paragrafen: <p>Tekst</p>
-   - Belangrijke tekst: <strong>Tekst</strong>
-   - Datum/locatie: <p class="meta">Datum</p>
-   - Aanhef: <p class="greeting">Beste...</p>
-   - Afsluiting: <p class="closing">Met vriendelijke groet,</p>
-   - Opsommingen: <ul><li>Item</li></ul>
+1. **Identificeer de structuur** (brief, artikel, advertentie, kennisgeving, verhaal, etc.)
 
-3. **Behoud de originele inhoud** - verander GEEN woorden of betekenis
-4. **Maak het leesbaar** - voeg witruimte toe waar nodig
-5. **Natuurlijke presentatie** - alsof het een echt document is
-6. **Gebruik ALLEEN HTML-tags** - geen Markdown
+2. **Voeg HTML-opmaak toe volgens deze regels**:
+   - Hoofdtitel: `<h2 style="font-size: 1.8rem; font-weight: bold; margin: 0 0 1.5rem 0; color: #1a1a1a;">Titel</h2>`
+   - Subtitels: `<h3 style="font-size: 1.3rem; font-weight: 600; margin: 2rem 0 1rem 0; color: #2c3e50;">Subtitel</h3>`
+   - Paragrafen: `<p style="margin-bottom: 1.2rem; line-height: 1.8;">Tekst van paragraaf.</p>`
+   - Belangrijke tekst: `<strong>Tekst</strong>`
+   - Datum/locatie: `<p style="color: #666; font-style: italic; margin-bottom: 1rem;">Datum</p>`
+   - Aanhef (brief): `<p style="margin-bottom: 1rem;">Beste...</p>`
+   - Afsluiting (brief): `<p style="margin-top: 2rem;">Met vriendelijke groet,<br>Naam</p>`
+   - Lijsten: `<ul style="margin: 1rem 0; padding-left: 2rem;"><li style="margin-bottom: 0.5rem;">Item</li></ul>`
+
+3. **Splits lange teksten in logische paragrafen**:
+   - Elke 3-5 zinnen = nieuwe paragraaf
+   - Bij onderwerpwisseling = nieuwe paragraaf
+   - Bij dialoog = nieuwe paragraaf per spreker
+
+4. **Behoud ALLE originele woorden** - verander NIETS aan de inhoud
+
+5. **Maak het visueel aantrekkelijk**:
+   - Duidelijke witruimte tussen paragrafen
+   - Logische structuur met koppen
+   - Gemakkelijk te scannen
 
 Retourneer het resultaat in JSON formaat:
 {{
-  "formatted_text": "<h2>Titel</h2><p>Paragraaf 1</p><p>Paragraaf 2</p>...",
-  "structure_type": "Type document (brief/artikel/advertentie/etc)",
+  "formatted_text": "<h2 style=\"...\">Titel</h2><p style=\"...\">Paragraaf 1</p><p style=\"...\">Paragraaf 2</p>...",
+  "structure_type": "brief/artikel/advertentie/verhaal/kennisgeving/etc",
   "has_title": true/false,
   "has_paragraphs": true/false,
-  "formatting_notes": "Korte uitleg van toegepaste opmaak"
+  "formatting_notes": "Korte uitleg"
 }}
 
-**ZEER BELANGRIJK**: 
-- Gebruik ALLEEN HTML-tags
-- <h2> voor hoofdtitel
-- <h3> voor subtitels
-- <p> voor elke paragraaf
-- <strong> voor belangrijke woorden
-- <ul><li> voor lijsten
-- Behoud alle originele tekst!
-- GEEN Markdown, ALLEEN HTML!
+**KRITISCH BELANGRIJK**:
+- Gebruik ALLEEN HTML met inline styles
+- ELKE paragraaf moet in eigen `<p>` tag
+- Splits lange teksten in meerdere paragrafen
+- Behoud ALLE originele woorden en zinnen
+- GEEN Markdown - ALLEEN HTML!
 """
         
         try:
