@@ -228,7 +228,7 @@ async def generate_exam(request: Request, exam_request: GenerateExamRequest):
                 )
             else:
                 print(f"✅ Using normal processing")
-                result = agent.generate_questions(
+                result = agent.generate_questions_with_fallback(
                     text=exam_request.text,
                     num_questions=exam_request.num_questions
                 )

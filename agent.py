@@ -8,6 +8,7 @@ import json
 import re
 from typing import Dict, List, Optional
 import google.generativeai as genai
+from google import genai as genai_new  # New SDK for structured output
 from prompts import (
     SYSTEM_PROMPT,
     ANALYSIS_PROMPT,
@@ -15,6 +16,7 @@ from prompts import (
     VERIFICATION_PROMPT,
     FEW_SHOT_EXAMPLES
 )
+from schemas import Exam, Question, Option
 
 
 class DutchB1ExamAgent:
@@ -34,8 +36,11 @@ class DutchB1ExamAgent:
         if not self.api_key:
             raise ValueError("GEMINI_API_KEY not found in environment variables")
         
-        # Configure Gemini
+        # Configure Gemini (old SDK)
         genai.configure(api_key=self.api_key)
+        
+        # Initialize new SDK client for structured output
+        self.client = genai_new.Client(api_key=self.api_key)
         
         # Model configuration for quality output
         self.generation_config = {
@@ -45,7 +50,7 @@ class DutchB1ExamAgent:
             "max_output_tokens": 8192,  # Increased to ensure complete questions array
         }
         
-        # Initialize model
+        # Initialize model (old SDK - for backward compatibility)
         self.model = genai.GenerativeModel(
             model_name="gemini-2.0-flash-exp",
             generation_config=self.generation_config,
@@ -82,6 +87,61 @@ class DutchB1ExamAgent:
                 "tone": "Neutraal"
             }
     
+    def generate_questions_with_fallback(
+        self,
+        text: str,
+        num_questions: int = 7,
+        analysis: Optional[Dict] = None
+    ) -> Dict:
+        """
+        Generate questions with fallback strategy
+        
+        Args:
+            text: Dutch text to generate questions from
+            num_questions: Number of questions to generate
+            analysis: Optional text analysis
+            
+        Returns:
+            Dictionary containing exam data
+        """
+        # Step 1: Try full generation
+        try:
+            print(f"🎯 Attempting to generate {num_questions} questions...")
+            result = self.generate_questions(text, num_questions, analysis)
+            if result.get('questions') and len(result['questions']) >= num_questions:
+                print(f"✅ Successfully generated {len(result['questions'])} questions")
+                return result
+            else:
+                print(f"⚠️ Generated only {len(result.get('questions', []))} questions, expected {num_questions}")
+        except Exception as e:
+            print(f"⚠️ Full generation failed: {e}")
+        
+        # Step 2: Try generating fewer questions
+        reduced_num = max(3, num_questions // 2)
+        if reduced_num < num_questions:
+            try:
+                print(f"🔄 Retrying with {reduced_num} questions...")
+                result = self.generate_questions(text, reduced_num, analysis)
+                if result.get('questions') and len(result['questions']) >= reduced_num:
+                    print(f"✅ Successfully generated {len(result['questions'])} questions (reduced)")
+                    return result
+            except Exception as e:
+                print(f"⚠️ Reduced generation failed: {e}")
+        
+        # Step 3: Try generating minimum questions (3)
+        if num_questions > 3:
+            try:
+                print(f"🔄 Retrying with 3 questions (minimum)...")
+                result = self.generate_questions(text, 3, analysis)
+                if result.get('questions') and len(result['questions']) >= 3:
+                    print(f"✅ Successfully generated {len(result['questions'])} questions (minimum)")
+                    return result
+            except Exception as e:
+                print(f"⚠️ Minimum generation failed: {e}")
+        
+        # Step 4: Last resort - return error
+        raise ValueError(f"Failed to generate any questions after multiple attempts")
+    
     def generate_questions(
         self, 
         text: str, 
@@ -112,19 +172,44 @@ class DutchB1ExamAgent:
                 num_questions=num_questions
             )
             
-            response = self.model.generate_content(prompt)
-            
-            # Extract JSON from response
-            exam = self._extract_json(response.text)
-            
-            # Validate questions field
-            if "questions" not in exam or not isinstance(exam["questions"], list):
-                print(f"Warning: Invalid or missing questions in response. Raw response: {response.text[:500]}")
-                raise ValueError("AI response does not contain valid 'questions' array")
-            
-            if len(exam["questions"]) == 0:
-                print(f"Warning: Empty questions array in response")
-                raise ValueError("AI response contains empty 'questions' array")
+            # Use structured output with new SDK
+            try:
+                response = self.client.models.generate_content(
+                    model="gemini-2.0-flash-exp",
+                    contents=prompt,
+                    config={
+                        "response_mime_type": "application/json",
+                        "response_schema": Exam,
+                        "temperature": 0.7,
+                    },
+                )
+                
+                # Get parsed result (Pydantic object)
+                exam_obj = response.parsed
+                
+                # Convert to dict
+                exam = exam_obj.model_dump()
+                
+                print(f"✅ Structured output: Generated {len(exam['questions'])} questions")
+                
+            except Exception as e:
+                print(f"⚠️ Structured output failed: {e}")
+                print(f"🔄 Falling back to old method...")
+                
+                # Fallback to old method
+                response = self.model.generate_content(prompt)
+                
+                # Extract JSON from response
+                exam = self._extract_json(response.text)
+                
+                # Validate questions field
+                if "questions" not in exam or not isinstance(exam["questions"], list):
+                    print(f"Warning: Invalid or missing questions in response. Raw response: {response.text[:500]}")
+                    raise ValueError("AI response does not contain valid 'questions' array")
+                
+                if len(exam["questions"]) == 0:
+                    print(f"Warning: Empty questions array in response")
+                    raise ValueError("AI response contains empty 'questions' array")
             
             # Randomize options order for each question
             self._randomize_options(exam["questions"])
@@ -443,9 +528,34 @@ class DutchB1ExamAgent:
         Returns:
             Fixed JSON string
         """
-        # This is a simple fix - just return as is
-        # The real issue is that AI returns incomplete JSON
-        # We'll handle this differently
+        import re
+        
+        # Fix 1: Remove any leading/trailing whitespace
+        json_str = json_str.strip()
+        
+        # Fix 2: Fix unescaped newlines in string values
+        # This is tricky - we only want to escape newlines inside strings
+        # For now, let's try a simple approach
+        try:
+            # Try to parse as-is first
+            json.loads(json_str)
+            return json_str
+        except json.JSONDecodeError:
+            pass
+        
+        # Fix 3: Try to fix common issues
+        # Remove any markdown code block markers
+        json_str = re.sub(r'```json\s*', '', json_str)
+        json_str = re.sub(r'```\s*$', '', json_str)
+        
+        # Fix 4: Try to complete incomplete JSON
+        # If JSON ends with incomplete array or object, try to close it
+        if json_str.count('{') > json_str.count('}'):
+            json_str += '}' * (json_str.count('{') - json_str.count('}'))
+        
+        if json_str.count('[') > json_str.count(']'):
+            json_str += ']' * (json_str.count('[') - json_str.count(']'))
+        
         return json_str
     
     def format_exam_for_display(self, exam: Dict) -> str:
