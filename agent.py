@@ -123,6 +123,9 @@ class DutchB1ExamAgent:
                 print(f"Warning: Empty questions array in response")
                 raise ValueError("AI response contains empty 'questions' array")
             
+            # Randomize options order for each question
+            self._randomize_options(exam["questions"])
+            
             # Add metadata
             # Use formatted_text from AI if available, otherwise use original text
             exam["text"] = exam.get("formatted_text", text)
@@ -203,6 +206,29 @@ class DutchB1ExamAgent:
         exam["verification"] = verification
         
         return exam
+    
+    def _randomize_options(self, questions: List[Dict]) -> None:
+        """
+        Randomize the order of options for each question
+        to prevent the correct answer from always being in the same position
+        
+        Args:
+            questions: List of question dictionaries
+        """
+        import random
+        
+        for question in questions:
+            if "options" not in question or not isinstance(question["options"], list):
+                continue
+            
+            # Shuffle options
+            random.shuffle(question["options"])
+            
+            # Update option IDs to match new positions (a, b, c)
+            option_ids = ['a', 'b', 'c', 'd', 'e', 'f']
+            for i, option in enumerate(question["options"]):
+                if i < len(option_ids):
+                    option["id"] = option_ids[i]
     
     def _extract_json(self, text: str) -> Dict:
         """
