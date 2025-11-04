@@ -294,34 +294,54 @@ class DutchB1ExamAgent:
         chunk: str,
         num_questions: int,
         chunk_index: int,
-        total_chunks: int
+        total_chunks: int,
+        max_retries: int = 2
     ) -> List[Dict]:
         """
-        Generate questions for a single text chunk
+        Generate questions for a single text chunk with retry mechanism
         
         Args:
             chunk: Text chunk
             num_questions: Number of questions to generate
             chunk_index: Index of current chunk (0-based)
             total_chunks: Total number of chunks
+            max_retries: Maximum number of retry attempts
             
         Returns:
             List of questions
         """
         print(f"📝 Processing chunk {chunk_index + 1}/{total_chunks} ({len(chunk.split())} words)...")
         
-        try:
-            # Analyze chunk
-            analysis = self.analyze_text(chunk)
-            
-            # Generate questions
-            result = self.generate_questions(chunk, num_questions, analysis)
-            
-            return result.get('questions', [])
-            
-        except Exception as e:
-            print(f"⚠️ Warning: Failed to process chunk {chunk_index + 1}: {e}")
-            return []
+        for attempt in range(max_retries + 1):
+            try:
+                # Analyze chunk
+                analysis = self.analyze_text(chunk)
+                
+                # Generate questions
+                result = self.generate_questions(chunk, num_questions, analysis)
+                
+                questions = result.get('questions', [])
+                
+                if questions:
+                    print(f"✅ Chunk {chunk_index + 1}: Generated {len(questions)} questions")
+                    return questions
+                else:
+                    print(f"⚠️ Chunk {chunk_index + 1}: No questions returned")
+                    if attempt < max_retries:
+                        print(f"🔄 Retrying chunk {chunk_index + 1} (attempt {attempt + 2}/{max_retries + 1})...")
+                        continue
+                    return []
+                    
+            except Exception as e:
+                print(f"⚠️ Chunk {chunk_index + 1} attempt {attempt + 1} failed: {e}")
+                if attempt < max_retries:
+                    print(f"🔄 Retrying chunk {chunk_index + 1} (attempt {attempt + 2}/{max_retries + 1})...")
+                    import time
+                    time.sleep(2)  # Wait before retry
+                    continue
+                else:
+                    print(f"❌ Chunk {chunk_index + 1}: All retry attempts failed")
+                    return []
     
     def generate_exam_for_long_text(
         self,
@@ -364,6 +384,10 @@ class DutchB1ExamAgent:
                 )
                 
                 all_questions.extend(chunk_questions)
+            
+            # Check if we got enough questions
+            if len(all_questions) == 0:
+                raise ValueError(f"Failed to generate any questions from {len(chunks)} chunks")
             
             # Adjust question IDs to be sequential
             for i, q in enumerate(all_questions, 1):
