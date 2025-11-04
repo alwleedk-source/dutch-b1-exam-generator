@@ -703,3 +703,65 @@ Uncaught TypeError: Cannot read properties of null (reading 'checked')
 - ✅ العداد اليومي يتحدث
 - ✅ يتم إنشاء امتحانات بنجاح
 - ✅ التحويل إلى صفحة الامتحان
+
+
+
+---
+
+## [Fix] 2025-11-04 - إصلاح خطأ 422 في حفظ الامتحان
+
+### المشكلة
+
+بعد توليد الامتحان بنجاح، يظهر خطأ:
+```
+POST /api/save-exam 422 (Unprocessable Content)
+✅ تم توليد الامتحان لكن فشل الحفظ!
+```
+
+### السبب
+
+**أسماء الحقول في الطلب غير متطابقة مع SaveExamRequest!**
+
+#### ما كان يُرسل:
+```javascript
+{
+    exam_data: exam,           // ❌ خطأ
+    original_text: originalText // ❌ خطأ
+}
+```
+
+#### ما يتوقعه Backend:
+```python
+class SaveExamRequest(BaseModel):
+    text: str                  # ✅ يجب "text"
+    questions: List[dict]      # ✅ يجب "questions"
+    word_translations: Optional[dict]
+    verification: Optional[dict]
+```
+
+### الحل
+
+تعديل دالة saveExam() في app_v3_simplified.js:
+
+```javascript
+body: JSON.stringify({
+    text: originalText,                    // ✅ صحيح
+    questions: exam.questions || [],       // ✅ صحيح
+    word_translations: exam.word_translations || {},
+    verification: exam.verification || null
+})
+```
+
+### التغييرات
+
+1. **ملف: static/app_v3_simplified.js**
+   - تغيير `exam_data` إلى `questions`
+   - تغيير `original_text` إلى `text`
+   - إضافة `word_translations` و `verification`
+
+### النتيجة المتوقعة
+
+- ✅ يتم حفظ الامتحان بنجاح
+- ✅ يتم التحويل إلى صفحة الامتحان
+- ✅ العداد اليومي يتحدث
+- ✅ الامتحان يظهر في "امتحاناتي"

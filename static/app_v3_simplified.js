@@ -138,8 +138,10 @@ async function saveExam(exam, originalText) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                exam_data: exam,
-                original_text: originalText
+                text: originalText,
+                questions: exam.questions || [],
+                word_translations: exam.word_translations || {},
+                verification: exam.verification || null
             })
         });
         
