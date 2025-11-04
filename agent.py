@@ -42,7 +42,7 @@ class DutchB1ExamAgent:
             "temperature": 0.7,  # Balance between creativity and accuracy
             "top_p": 0.9,
             "top_k": 40,
-            "max_output_tokens": 4096,
+            "max_output_tokens": 8192,  # Increased to ensure complete questions array
         }
         
         # Initialize model
