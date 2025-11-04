@@ -365,10 +365,12 @@
             tooltip.style.cssText = 'position: absolute; background: #2C3E50; color: white; padding: 10px 14px; border-radius: 8px; font-size: 14px; z-index: 1000; pointer-events: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.3);';
             
             // Create tooltip content with translation and save button
+            const escapedWord = word.replace(/'/g, "\\'");
+            const escapedTranslation = translation.replace(/'/g, "\\'");
             tooltip.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <span style="flex: 1;">${translation}</span>
-                    <button onclick="saveWord('${word.replace(/'/g, "\\'")}, '${translation.replace(/'/g, "\\'")}')" 
+                    <button onclick="saveWord('${escapedWord}', '${escapedTranslation}')" 
                             style="background: #10B981; color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px; border: none; cursor: pointer; white-space: nowrap; transition: background 0.2s;"
                             onmouseover="this.style.background='#059669'"
                             onmouseout="this.style.background='#10B981'">
