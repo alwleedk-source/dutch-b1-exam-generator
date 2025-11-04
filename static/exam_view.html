@@ -410,6 +410,7 @@
             document.querySelectorAll('.translatable-word').forEach(el => {
                 el.addEventListener('mouseenter', showTooltip);
                 el.addEventListener('mouseleave', scheduleHideTooltip);
+                el.addEventListener('dblclick', handleDoubleClick);
             });
         }
 
@@ -423,29 +424,18 @@
             tooltip.className = 'translation-tooltip';
             tooltip.style.cssText = 'position: absolute; background: #2C3E50; color: white; padding: 10px 14px; border-radius: 8px; font-size: 14px; z-index: 1000; pointer-events: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.3);';
             
-            // Create tooltip content with translation and save button
-            const escapedWord = word.replace(/'/g, "\\'");
-            const escapedTranslation = translation.replace(/'/g, "\\'");
-            tooltip.innerHTML = `
-                <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <span style="flex: 1; font-weight: 500;">${translation}</span>
-                        <button onclick="saveWord('${escapedWord}', '${escapedTranslation}')" 
-                                style="background: #10B981; color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px; border: none; cursor: pointer; white-space: nowrap; transition: background 0.2s;"
-                                onmouseover="this.style.background='#059669'"
-                                onmouseout="this.style.background='#10B981'">
-                            + حفظ
-                        </button>
-                    </div>
-                    <div style="font-size: 10px; color: #6B7280; text-align: center; border-top: 1px solid #E5E7EB; padding-top: 6px;">
-                        💡 نقرتين للحفظ في قائمة كلماتي
-                    </div>
-                </div>
-            `;
+            // Create simple tooltip with translation only
+            tooltip.innerHTML = `<span style="font-weight: 500;">${translation}</span>`;
             
+            // Position tooltip above the word
             const rect = e.target.getBoundingClientRect();
-            tooltip.style.left = rect.left + 'px';
-            tooltip.style.top = (rect.top - 50) + 'px';
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+            
+            // Center tooltip horizontally above the word
+            tooltip.style.left = (rect.left + scrollLeft + (rect.width / 2)) + 'px';
+            tooltip.style.top = (rect.top + scrollTop - 10) + 'px';
+            tooltip.style.transform = 'translate(-50%, -100%)';
             
             // Prevent tooltip from hiding when mouse enters it
             tooltip.addEventListener('mouseenter', () => {
@@ -556,6 +546,15 @@
             
             // Re-initialize icons
             setTimeout(() => lucide.createIcons(), 100);
+        }
+
+        // Handle double-click to save word
+        function handleDoubleClick(e) {
+            const word = e.target.textContent;
+            const translation = e.target.dataset.translation;
+            if (word && translation) {
+                saveWord(word, translation);
+            }
         }
 
         // Save word to vocabulary
