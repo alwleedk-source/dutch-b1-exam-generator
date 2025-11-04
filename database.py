@@ -194,12 +194,25 @@ class Database:
             if exam:
                 # Parse JSON fields if they are strings
                 if isinstance(exam['questions'], str):
-                    exam['questions'] = json.loads(exam['questions'])
+                    try:
+                        exam['questions'] = json.loads(exam['questions'])
+                    except json.JSONDecodeError:
+                        print(f"Warning: Failed to parse questions JSON for exam {exam_id}")
+                        exam['questions'] = []
                 elif exam['questions'] is None:
                     exam['questions'] = []
                 
+                # Ensure questions is always a list
+                if not isinstance(exam['questions'], list):
+                    print(f"Warning: questions is not a list for exam {exam_id}, converting to empty list")
+                    exam['questions'] = []
+                
                 if isinstance(exam['word_translations'], str):
-                    exam['word_translations'] = json.loads(exam['word_translations'])
+                    try:
+                        exam['word_translations'] = json.loads(exam['word_translations'])
+                    except json.JSONDecodeError:
+                        print(f"Warning: Failed to parse word_translations JSON for exam {exam_id}")
+                        exam['word_translations'] = {}
                 elif exam['word_translations'] is None:
                     exam['word_translations'] = {}
             

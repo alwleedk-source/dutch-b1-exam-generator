@@ -301,6 +301,20 @@
             const textToDisplay = currentExam.formatted_text || currentExam.original_text;
             displayOriginalText(textToDisplay);
             
+            // Ensure questions is an array
+            if (!currentExam.questions || !Array.isArray(currentExam.questions)) {
+                console.error('Invalid questions data:', currentExam.questions);
+                alert('خطأ: بيانات الأسئلة غير صحيحة. يرجى المحاولة مرة أخرى.');
+                window.location.href = '/';
+                return;
+            }
+            
+            if (currentExam.questions.length === 0) {
+                alert('تحذير: لا توجد أسئلة في هذا الامتحان.');
+                window.location.href = '/';
+                return;
+            }
+            
             displayQuestions(currentExam.questions);
             displayAnswerKey(currentExam.questions);
             

@@ -114,6 +114,15 @@ class DutchB1ExamAgent:
             # Extract JSON from response
             exam = self._extract_json(response.text)
             
+            # Validate questions field
+            if "questions" not in exam or not isinstance(exam["questions"], list):
+                print(f"Warning: Invalid or missing questions in response. Raw response: {response.text[:500]}")
+                raise ValueError("AI response does not contain valid 'questions' array")
+            
+            if len(exam["questions"]) == 0:
+                print(f"Warning: Empty questions array in response")
+                raise ValueError("AI response contains empty 'questions' array")
+            
             # Add metadata
             # Use formatted_text from AI if available, otherwise use original text
             exam["text"] = exam.get("formatted_text", text)
