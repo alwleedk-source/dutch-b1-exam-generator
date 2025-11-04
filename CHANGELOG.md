@@ -302,3 +302,26 @@ SESSION_SECRET_KEY=your_very_long_random_secret_key_here
 - ✅ تسجيل الدخول عبر Google يعمل بشكل صحيح
 - ✅ Session تُحفظ بين الطلبات
 - ✅ لا يوجد خطأ CSRF
+
+
+---
+
+## [Debug] 2025-11-04 - إضافة logging لتشخيص OAuth CSRF
+
+### الهدف
+- إضافة logging مفصل لفهم سبب فشل OAuth state matching
+- تشخيص مشكلة Session storage
+
+### التغييرات
+- إضافة debug prints في callback() قبل authorize_access_token
+- عرض state من URL و session
+- عرض session keys و cookies
+
+### المعلومات المطلوبة
+بعد النشر، تحقق من Logs في Railway للحصول على:
+- State from URL
+- State from session
+- Session keys
+- Cookies
+
+هذا سيساعد في تحديد السبب الدقيق للمشكلة.
