@@ -243,23 +243,41 @@ class DutchB1ExamAgent:
         Returns:
             Parsed JSON dictionary
         """
-        # Try to find JSON block
-        json_match = re.search(r'\{.*\}', text, re.DOTALL)
+        # Try to extract from markdown code block first
+        code_block_match = re.search(r'```(?:json)?\s*({.*?})\s*```', text, re.DOTALL)
+        if code_block_match:
+            json_str = code_block_match.group(1)
+            try:
+                result = json.loads(json_str)
+                print(f"✅ Extracted JSON from markdown code block")
+                return result
+            except json.JSONDecodeError as e:
+                print(f"⚠️ Failed to parse JSON from code block: {e}")
+        
+        # Try to find JSON object (greedy match for complete object)
+        # Use a more robust regex that handles nested braces
+        json_match = re.search(r'\{(?:[^{}]|\{[^{}]*\})*\}', text, re.DOTALL)
         if json_match:
             json_str = json_match.group(0)
             try:
-                return json.loads(json_str)
-            except json.JSONDecodeError:
-                pass
+                result = json.loads(json_str)
+                print(f"✅ Extracted JSON from text")
+                return result
+            except json.JSONDecodeError as e:
+                print(f"⚠️ Failed to parse JSON from regex match: {e}")
         
         # If no JSON found, try to parse entire text
         try:
-            return json.loads(text)
-        except json.JSONDecodeError:
+            result = json.loads(text)
+            print(f"✅ Parsed entire text as JSON")
+            return result
+        except json.JSONDecodeError as e:
+            print(f"❌ Failed to parse JSON: {e}")
+            print(f"📝 Raw response (first 500 chars): {text[:500]}")
             # Return error structure
             return {
                 "error": "Failed to parse JSON",
-                "raw_response": text
+                "raw_response": text[:1000]  # Limit to avoid huge logs
             }
     
     def _split_long_text(self, text: str) -> List[str]:
