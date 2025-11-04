@@ -3,34 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قائمة كلماتي - Dutch B1 Exam Generator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>قائمة كلماتي - مولد امتحانات القراءة الهولندية</title>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="/style.css">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#10B981',
+                        secondary: '#6366F1',
+                        dark: '#0F172A',
+                        light: '#F8FAFC',
+                    },
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        * {
+            font-family: 'Cairo', sans-serif;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #0F172A;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 2px solid #E2E8F0;
+            cursor: pointer;
+        }
+        
+        .btn-secondary:hover {
+            border-color: #10B981;
+            color: #10B981;
+            transform: scale(1.02);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 via-purple-50 to-green-50 min-h-screen">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Header -->
-        <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
-            <div class="flex items-center justify-between flex-wrap gap-4">
-                <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                    <i data-lucide="book-marked" class="w-8 h-8 text-purple-600"></i>
-                    <span>قائمة كلماتي</span>
-                </h1>
-                <div class="flex gap-3">
-                    <a href="/" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium flex items-center gap-2">
-                        <i data-lucide="home" class="w-4 h-4"></i>
-                        الرئيسية
-                    </a>
-                    <a href="/exams" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition font-medium flex items-center gap-2">
-                        <i data-lucide="file-text" class="w-4 h-4"></i>
-                        امتحاناتي
-                    </a>
-                    <a href="/auth/logout" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium">
-                        تسجيل الخروج
-                    </a>
+<body class="bg-gradient-to-br from-slate-50 via-white to-green-50 min-h-screen">
+    
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <a href="/" class="flex items-center space-x-3 space-x-reverse">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
+                        <i data-lucide="book-open" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <span class="text-xl font-bold text-dark">مولد امتحانات القراءة</span>
+                </a>
+                
+                <!-- Navigation Links -->
+                <div class="hidden md:flex items-center space-x-8 space-x-reverse">
+                    <a href="/" class="text-gray-700 hover:text-primary transition-colors font-medium">الرئيسية</a>
+                    <a href="/exams" class="text-gray-700 hover:text-primary transition-colors font-medium">امتحاناتي</a>
+                    <a href="/vocabulary" class="text-primary font-semibold">قائمة كلماتي</a>
+                </div>
+                
+                <!-- User Info -->
+                <div class="flex items-center space-x-4 space-x-reverse">
+                    <span id="userName" class="text-sm text-gray-600 hidden md:block">جاري التحميل...</span>
+                    <button onclick="logout()" class="btn-secondary text-sm py-2 px-4 inline-flex items-center gap-2">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                        خروج
+                    </button>
                 </div>
             </div>
+        </div>
+    </nav>
+    
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <!-- Page Header -->
+        <div class="text-center mb-12 fade-in">
+            <h1 class="text-4xl md:text-5xl font-black text-dark mb-4 flex items-center justify-center gap-3">
+                <i data-lucide="book-marked" class="w-10 h-10 text-primary"></i>
+                قائمة كلماتي
+            </h1>
+            <p class="text-lg text-gray-600">جميع الكلمات التي قمت بحفظها</p>
         </div>
 
         <!-- Stats and Search -->
@@ -209,8 +285,28 @@
             return context.replace(regex, '<span style="background: linear-gradient(135deg, #10B981 0%, #6366F1 100%); color: white; padding: 2px 8px; border-radius: 6px; font-weight: 700; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);">$1</span>');
         }
         
+        // Load user info
+        async function loadUserInfo() {
+            try {
+                const response = await fetch('/api/user');
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('userName').textContent = data.name || 'مستخدم';
+                }
+            } catch (error) {
+                console.error('Error loading user info:', error);
+                document.getElementById('userName').textContent = 'مستخدم';
+            }
+        }
+        
+        // Logout function
+        function logout() {
+            window.location.href = '/auth/logout';
+        }
+        
         // Load vocabulary on page load
         document.addEventListener('DOMContentLoaded', async () => {
+            await loadUserInfo();
             await loadVocabulary();
             setupSearch();
             lucide.createIcons();
