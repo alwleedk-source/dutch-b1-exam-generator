@@ -44,163 +44,45 @@ ANALYSIS_PROMPT = """حلل النص الهولندي التالي بدقة:
 }}
 """
 
-QUESTION_GENERATION_PROMPT = """بناءً على التحليل السابق، ولّد امتحان قراءة احترافي لمستوى B1.
+QUESTION_GENERATION_PROMPT = """Generate a professional B1 Dutch reading exam.
 
-⚠️ **مهم جداً: يجب أن ترجع JSON يحتوي على `questions` array!**
-
-النص:
+Text:
 {text}
 
-التحليل:
+Analysis:
 {analysis}
 
-⚠️ **قواعد ذهبية - إلزامية (من امتحانات B1 الرسمية):**
+⚠️ CRITICAL RULES:
+1. **Paraphrasing**: Use different words than the text
+2. **All options from text**: Only one correct
+3. **3 options only**: a, b, c (NO option d)
+4. **Medium/hard difficulty**: No easy questions
 
-1. **Paraphrasing (إعادة الصياغة) - إلزامي 100%:**
-   - ✅ السؤال يجب أن يستخدم كلمات مختلفة عن النص
-   - ✅ الإجابة الصحيحة يجب أن تكون بصياغة مختلفة
-   - ❌ لا تنسخ نفس الكلمات من النص
-   
-   مثال من امتحان رسمي:
-   النص: "De centrale bakkerij werkt op een industriële manier met machines"
-   ❌ سؤال سيء: "Waar werkt men met machines?"
-   ✅ سؤال جيد: "Karl houdt van techniek. Welke werkplek past bij hem?"
+Generate {num_questions} questions.
 
-2. **Sophisticated Distractors (خيارات مربكة متطورة):**
-   - ✅ جميع الخيارات يجب أن تكون مذكورة في النص
-   - ✅ واحد فقط يجيب على السؤال بشكل صحيح
-   - ✅ الخيارات الخاطئة منطقية لكن لسياق مختلف
-   
-   مثال من امتحان رسمي:
-   السؤال: "Joshua wil in de decentrale bakkerij werken. Hoe laat moet hij beginnen?"
-   a) tussen 2.00 en 4.00 uur ← مذكور في النص (لكن للسائقين)
-   b) om 7.00 uur ← ✅ الإجابة الصحيحة (للمخبز اللامركزي)
-   c) om 17.00 uur ← مذكور في النص (لكن وقت الإغلاق)
-
-3. **3 خيارات فقط (A, B, C):**
-   - ✅ دائماً 3 خيارات فقط
-   - ❌ لا تضع خيار D أبداً
-   - هذا هو المعيار في امتحانات B1 الرسمية
-
-4. **يتطلب فهم عميق:**
-   - ✅ لا يمكن الإجابة بمجرد البحث عن كلمة
-   - ✅ يتطلب فهم السياق والعلاقات
-   - ✅ يتطلب ربط معلومات من أجزاء مختلفة
-   - ❌ لا أسئلة سهلة يمكن الإجابة عليها بالتخمين
-
----
-
-**المتطلبات:**
-
-1. ولّد {num_questions} أسئلة متنوعة
-
-2. **أنواع الأسئلة (حسب الامتحانات الرسمية):**
-   - **Detail questions (40%):** عن تفاصيل محددة (لكن بإعادة صياغة)
-     مثال: "Hoe laat moet hij beginnen?", "Waar vindt de vergadering plaats?"
-   
-   - **Inference questions (40%):** تتطلب استنتاج وربط معلومات
-     مثال: "Welke werkplek past bij hem?", "Wat heeft [naam] nodig om...?"
-   
-   - **Main idea questions (20%):** عن الهدف العام للنص
-     مثال: "Wat is het doel van deze tekst?"
-
-3. **مستوى الصعوبة:**
-   - Medium: 50-60% من الأسئلة
-   - Hard: 40-50% من الأسئلة
-   - ❌ لا أسئلة سهلة (easy)
-
-4. **أمثلة من امتحانات B1 الرسمية:**
-
-   **مثال 1 - Detail Question (Medium):**
-   ```
-   النص: "In de centrale bakkerij wordt van 5.00 uur tot 23.00 uur gewerkt.
-           In de decentrale bakkerij start je om 7.00 uur.
-           Chauffeurs leveren tussen 2.00 en 4.00 uur."
-   
-   السؤال: "Joshua wil in de decentrale bakkerij werken. Hoe laat moet hij beginnen?"
-   a) tussen 2.00 en 4.00 uur ← مذكور (السائقون)
-   b) om 7.00 uur ← ✅ الإجابة الصحيحة
-   c) om 17.00 uur ← مذكور (وقت الإغلاق)
-   ```
-
-   **مثال 2 - Inference Question (Hard):**
-   ```
-   النص: "De centrale bakkerij werkt op een industriële manier. Door techniek kunnen we 
-           per uur wel 1500 appeltaarten maken. Heb je gevoel voor techniek en machines..."
-   
-   السؤال: "Karl houdt van techniek. Welke werkplek past bij hem?"
-   a) de centrale bakkerij ← ✅ الإجابة الصحيحة (تستخدم machines)
-   b) de decentrale bakkerij ← مذكور (لكن لا تركز على techniek)
-   c) de proefbakkerij ← مذكور (لكن للتطوير)
-   ```
-
-   **مثال 3 - Main Idea Question (Hard):**
-   ```
-   النص: [نص عن وظائف في Marké bakkerij]
-   
-   السؤال: "Wat is het doel van deze tekst?"
-   a) de lezer informeren over de werkprocessen ← جزئياً صحيح
-   b) de lezer overhalen om te solliciteren ← ✅ الإجابة الصحيحة
-   c) de lezer uitleggen hoe professioneel de afdelingen zijn ← جزئياً صحيح
-   ```
-
-5. **تنسيق النص المطلوب:**
-   - قم بإعادة صياغة النص الأصلي بشكل منظم ومنسق
-   - أضف عنوان رئيسي واضح في السطر الأول
-   - قسّم النص إلى فقرات منطقية (كل فقرة في سطر منفصل)
-   - أضف عناوين فرعية إذا كان النص يحتوي على أقسام مختلفة
-   - استخدم سطر جديد (\n) بين كل فقرة
-   - احتفظ بنفس المحتوى والمعنى، فقط حسّن التنسيق
-
----
-
-**⚠️ مهم جداً - أرجع النتيجة بصيغة JSON فقط:**
-
-يجب أن يحتوي JSON على هذه الحقول بالضبط:
-
-```json
+Return JSON with this EXACT structure:
 {{
-  "exam_title": "عنوان الامتحان",
-  "formatted_text": "النص المنسق",
+  "exam_title": "Exam title",
+  "formatted_text": "Formatted text with \\n for paragraphs",
   "total_questions": {num_questions},
   "questions": [
     {{
       "id": 1,
       "type": "detail",
       "difficulty": "medium",
-      "question_nl": "Hoe laat moet Joshua beginnen?",
-      "question_ar": "متى يجب على Joshua أن يبدأ؟",
+      "question_nl": "Question in Dutch",
+      "question_ar": "Question in Arabic",
       "options": [
-        {{"id": "a", "text": "tussen 2.00 en 4.00 uur", "correct": false}},
-        {{"id": "b", "text": "om 7.00 uur", "correct": true}},
-        {{"id": "c", "text": "om 17.00 uur", "correct": false}}
+        {{"id": "a", "text": "Option from text", "correct": false}},
+        {{"id": "b", "text": "Correct answer", "correct": true}},
+        {{"id": "c", "text": "Option from text", "correct": false}}
       ],
-      "explanation": "النص يقول..."
-    }},
-    {{
-      "id": 2,
-      "type": "inference",
-      "difficulty": "hard",
-      "question_nl": "...",
-      "options": [...]
+      "explanation": "Why this is correct"
     }}
-    ... (بقية الأسئلة)
   ]
 }}
-```
 
-⚠️ **ملاحظات مهمة:**
-1. يجب أن يحتوي JSON على `"questions"` array بـ {num_questions} سؤال
-2. كل سؤال يجب أن يحتوي على `"options"` array بـ 3 خيارات (a, b, c)
-3. واحد فقط من الخيارات `"correct": true`
-4. لا تنسى `"exam_title"` و `"formatted_text"` و `"total_questions"`
-
-⚠️ **قواعد الجودة (إلزامية):**
-- Paraphrasing: استخدم كلمات مختلفة عن النص
-- Distractors: جميع الخيارات من النص
-- 3 خيارات فقط (A, B, C)
-- فهم عميق (ليس بحث عن كلمة)
-- medium/hard فقط (لا easy)
+⚠️ IMPORTANT: JSON MUST contain "questions" array with {num_questions} questions!
 """
 
 VERIFICATION_PROMPT = """راجع الأسئلة التالية وتحقق من جودتها:
