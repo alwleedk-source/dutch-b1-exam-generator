@@ -682,9 +682,36 @@
             }
         }
 
+        // Extract context around a word
+        function extractContext(text, word, contextLength = 150) {
+            // Find the word in the text (case insensitive)
+            const regex = new RegExp(`\\b${word}\\b`, 'i');
+            const match = text.match(regex);
+            
+            if (!match) {
+                // If word not found, return beginning of text
+                return text.substring(0, 200);
+            }
+            
+            const wordPosition = match.index;
+            const start = Math.max(0, wordPosition - contextLength);
+            const end = Math.min(text.length, wordPosition + word.length + contextLength);
+            
+            let context = text.substring(start, end);
+            
+            // Add ellipsis if needed
+            if (start > 0) context = '...' + context;
+            if (end < text.length) context = context + '...';
+            
+            return context;
+        }
+        
         // Save word to vocabulary
         async function saveWord(word, translation) {
             try {
+                // Extract context that contains the word
+                const context = extractContext(currentExam.original_text, word);
+                
                 const response = await fetch('/api/vocabulary', {
                     method: 'POST',
                     headers: {
@@ -693,7 +720,7 @@
                     body: JSON.stringify({
                         word: word,
                         translation: translation,
-                        context: currentExam.original_text.substring(0, 200),
+                        context: context,
                         exam_id: examId
                     })
                 });
