@@ -462,6 +462,10 @@
                                     <i data-lucide="eye" class="w-4 h-4"></i>
                                     فتح الامتحان
                                 </a>
+                                <button onclick="togglePublic(${exam.id}, ${exam.is_public || false})" class="btn-secondary inline-flex items-center gap-2 ${exam.is_public ? '!text-green-600 !border-green-200 hover:!border-green-400' : '!text-blue-600 !border-blue-200 hover:!border-blue-400'}">
+                                    <i data-lucide="${exam.is_public ? 'lock' : 'globe'}" class="w-4 h-4"></i>
+                                    ${exam.is_public ? 'جعله خاص' : 'مشاركة'}
+                                </button>
                                 <button onclick="deleteExam(${exam.id})" class="btn-secondary inline-flex items-center gap-2 !text-red-600 !border-red-200 hover:!border-red-400">
                                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                                     حذف
@@ -511,6 +515,45 @@
             } catch (error) {
                 console.error('Error deleting exam:', error);
                 alert('فشل حذف الامتحان: ' + error.message);
+            }
+        }
+        
+        // Toggle exam public status
+        async function togglePublic(examId, currentStatus) {
+            const action = currentStatus ? 'جعل الامتحان خاصاً' : 'مشاركة الامتحان مع العامة';
+            
+            if (!confirm(`هل أنت متأكد من ${action}؟`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/exam/${examId}/toggle-public`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to toggle exam status');
+                }
+                
+                const result = await response.json();
+                
+                // Show success message
+                if (result.is_public) {
+                    alert('✅ تم مشاركة الامتحان بنجاح! يمكن للجميع رؤيته في صفحة الامتحانات العامة.');
+                } else {
+                    alert('✅ تم جعل الامتحان خاصاً بنجاح!');
+                }
+                
+                // Reload exams to update UI
+                await loadExams();
+                
+            } catch (error) {
+                console.error('Error toggling exam status:', error);
+                alert('❗ فشل تغيير حالة الامتحان: ' + error.message);
             }
         }
         
