@@ -641,3 +641,65 @@ document.addEventListener('DOMContentLoaded', () => {
 
 هذا كان السبب الرئيسي لعدم عمل توليد الامتحانات!
 الآن التطبيق يعمل بشكل كامل! 🎉
+
+
+
+---
+
+## [Fix] 2025-11-04 - إنشاء app_v3_simplified.js لـ index_v3.html
+
+### المشكلة
+
+بعد إضافة app.js إلى index_v3.html، ظهرت أخطاء JavaScript:
+```
+Uncaught TypeError: Cannot read properties of null (reading 'addEventListener')
+Uncaught TypeError: Cannot read properties of null (reading 'checked')
+```
+
+**السبب:**
+- app.js يبحث عن عناصر غير موجودة في index_v3.html
+- مثل: `verifyQualityCheckbox`, `copyBtn`, `printBtn`, `resultsSection`, إلخ
+- index_v3.html له بنية مختلفة عن الصفحة الأصلية
+
+### الحل
+
+إنشاء نسخة مبسطة من app.js خاصة بـ index_v3.html:
+
+**app_v3_simplified.js يحتوي على:**
+- ✅ فقط العناصر الموجودة في index_v3.html
+- ✅ دالة generateExam() مبسطة
+- ✅ دالة loadDailyLimit()
+- ✅ دالة saveExam()
+- ✅ لا أخطاء JavaScript!
+
+### ما تم إزالته:
+- ❌ verifyQualityCheckbox (غير موجود)
+- ❌ copyBtn, printBtn, newExamBtn (غير موجودة)
+- ❌ studyModeBtn, testModeBtn (غير موجودة)
+- ❌ resultsSection, answerKey (غير موجودة)
+- ❌ جميع الوظائف المرتبطة بعناصر غير موجودة
+
+### ما تم الاحتفاظ به:
+- ✅ textInput
+- ✅ numQuestionsSelect
+- ✅ generateBtn
+- ✅ charCount, wordCount
+- ✅ remainingExams (العداد اليومي)
+
+### التغييرات
+
+1. **ملف جديد: static/app_v3_simplified.js**
+   - نسخة مبسطة من app.js
+   - تعمل فقط مع العناصر الموجودة
+
+2. **ملف: static/index_v3.html**
+   - تغيير من `<script src="/static/app.js">`
+   - إلى `<script src="/static/app_v3_simplified.js">`
+
+### النتيجة المتوقعة
+
+- ✅ لا أخطاء JavaScript
+- ✅ زر "توليد الامتحان" يعمل
+- ✅ العداد اليومي يتحدث
+- ✅ يتم إنشاء امتحانات بنجاح
+- ✅ التحويل إلى صفحة الامتحان
