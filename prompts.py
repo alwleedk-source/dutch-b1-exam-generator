@@ -44,7 +44,9 @@ ANALYSIS_PROMPT = """حلل النص الهولندي التالي بدقة:
 }}
 """
 
-QUESTION_GENERATION_PROMPT = """بناءً على التحليل السابق، ولّد امتحان قراءة احترافي لمستوى B1 يحاكي الامتحانات الرسمية الهولندية.
+QUESTION_GENERATION_PROMPT = """بناءً على التحليل السابق، ولّد امتحان قراءة احترافي لمستوى B1.
+
+⚠️ **مهم جداً: يجب أن ترجع JSON يحتوي على `questions` array!**
 
 النص:
 {text}
@@ -152,34 +154,53 @@ QUESTION_GENERATION_PROMPT = """بناءً على التحليل السابق، 
 
 ---
 
-**أرجع النتيجة بصيغة JSON:**
+**⚠️ مهم جداً - أرجع النتيجة بصيغة JSON فقط:**
+
+يجب أن يحتوي JSON على هذه الحقول بالضبط:
+
+```json
 {{
   "exam_title": "عنوان الامتحان",
-  "formatted_text": "النص المنسق مع عناوين وفقرات (استخدم \n للفصل)",
+  "formatted_text": "النص المنسق",
   "total_questions": {num_questions},
   "questions": [
     {{
       "id": 1,
-      "type": "detail/inference/main_idea",
-      "difficulty": "medium/hard",
-      "question_nl": "السؤال بالهولندية (بإعادة صياغة - ليس نفس كلمات النص)",
-      "question_ar": "السؤال بالعربية (اختياري)",
+      "type": "detail",
+      "difficulty": "medium",
+      "question_nl": "Hoe laat moet Joshua beginnen?",
+      "question_ar": "متى يجب على Joshua أن يبدأ؟",
       "options": [
-        {{"id": "a", "text": "خيار من النص - سياق مختلف", "correct": false}},
-        {{"id": "b", "text": "الإجابة الصحيحة - بإعادة صياغة", "correct": true}},
-        {{"id": "c", "text": "خيار من النص - سياق مختلف", "correct": false}}
+        {{"id": "a", "text": "tussen 2.00 en 4.00 uur", "correct": false}},
+        {{"id": "b", "text": "om 7.00 uur", "correct": true}},
+        {{"id": "c", "text": "om 17.00 uur", "correct": false}}
       ],
-      "explanation": "شرح مختصر لماذا هذه الإجابة صحيحة"
+      "explanation": "النص يقول..."
+    }},
+    {{
+      "id": 2,
+      "type": "inference",
+      "difficulty": "hard",
+      "question_nl": "...",
+      "options": [...]
     }}
+    ... (بقية الأسئلة)
   ]
 }}
+```
 
-⚠️ **تذكر - هذه قواعد إلزامية:**
-- Paraphrasing إلزامي في كل سؤال (استخدم كلمات مختلفة)
-- جميع الخيارات من النص (لكن واحد فقط يجيب على السؤال)
-- 3 خيارات فقط (A, B, C) - لا تضع D
-- يتطلب فهم عميق (ليس بحث عن كلمة)
-- لا أسئلة سهلة - فقط medium و hard
+⚠️ **ملاحظات مهمة:**
+1. يجب أن يحتوي JSON على `"questions"` array بـ {num_questions} سؤال
+2. كل سؤال يجب أن يحتوي على `"options"` array بـ 3 خيارات (a, b, c)
+3. واحد فقط من الخيارات `"correct": true`
+4. لا تنسى `"exam_title"` و `"formatted_text"` و `"total_questions"`
+
+⚠️ **قواعد الجودة (إلزامية):**
+- Paraphrasing: استخدم كلمات مختلفة عن النص
+- Distractors: جميع الخيارات من النص
+- 3 خيارات فقط (A, B, C)
+- فهم عميق (ليس بحث عن كلمة)
+- medium/hard فقط (لا easy)
 """
 
 VERIFICATION_PROMPT = """راجع الأسئلة التالية وتحقق من جودتها:
