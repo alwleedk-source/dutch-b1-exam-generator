@@ -14,6 +14,26 @@
         .translatable-word:hover {
             color: #3498db;
         }
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-purple-50 to-green-50 min-h-screen">
@@ -22,9 +42,17 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex items-center justify-between">
                 <h1 id="examTitle" class="text-2xl font-bold text-gray-900">جاري التحميل...</h1>
-                <a href="/" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">
-                    العودة للرئيسية
-                </a>
+                <div class="flex gap-3">
+                    <a href="/vocabulary" class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium">
+                        📚 كلماتي
+                    </a>
+                    <a href="/exams" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition font-medium">
+                        📝 امتحاناتي
+                    </a>
+                    <a href="/" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">
+                        العودة للرئيسية
+                    </a>
+                </div>
             </div>
         </div>
     </header>
@@ -299,16 +327,29 @@
         // Show tooltip
         function showTooltip(e) {
             const translation = e.target.dataset.translation;
+            const word = e.target.textContent;
             if (!translation) return;
             
             const tooltip = document.createElement('div');
             tooltip.className = 'translation-tooltip';
-            tooltip.textContent = translation;
-            tooltip.style.cssText = 'position: absolute; background: #2C3E50; color: white; padding: 8px 12px; border-radius: 6px; font-size: 14px; z-index: 1000; pointer-events: none;';
+            tooltip.style.cssText = 'position: absolute; background: #2C3E50; color: white; padding: 10px 14px; border-radius: 8px; font-size: 14px; z-index: 1000; pointer-events: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.3);';
+            
+            // Create tooltip content with translation and save button
+            tooltip.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="flex: 1;">${translation}</span>
+                    <button onclick="saveWord('${word.replace(/'/g, "\\'")}, '${translation.replace(/'/g, "\\'")}')" 
+                            style="background: #10B981; color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px; border: none; cursor: pointer; white-space: nowrap; transition: background 0.2s;"
+                            onmouseover="this.style.background='#059669'"
+                            onmouseout="this.style.background='#10B981'">
+                        + حفظ
+                    </button>
+                </div>
+            `;
             
             const rect = e.target.getBoundingClientRect();
             tooltip.style.left = rect.left + 'px';
-            tooltip.style.top = (rect.top - 40) + 'px';
+            tooltip.style.top = (rect.top - 50) + 'px';
             
             document.body.appendChild(tooltip);
             e.target._tooltip = tooltip;
@@ -383,6 +424,48 @@
             testResult.classList.remove('hidden');
             submitTestBtn.classList.add('hidden');
             testResult.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Save word to vocabulary
+        async function saveWord(word, translation) {
+            try {
+                const response = await fetch('/api/vocabulary', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        word: word,
+                        translation: translation,
+                        context: currentExam.original_text.substring(0, 200),
+                        exam_id: examId
+                    })
+                });
+                
+                if (response.ok) {
+                    // Show success message
+                    const toast = document.createElement('div');
+                    toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #10B981; color: white; padding: 16px 24px; border-radius: 8px; font-size: 14px; z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: slideIn 0.3s ease-out;';
+                    toast.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span>✅</span>
+                            <span>تم حفظ الكلمة "${word}" في قائمة المفردات</span>
+                        </div>
+                    `;
+                    document.body.appendChild(toast);
+                    
+                    setTimeout(() => {
+                        toast.style.animation = 'slideOut 0.3s ease-in';
+                        setTimeout(() => toast.remove(), 300);
+                    }, 3000);
+                } else {
+                    const error = await response.json();
+                    alert('فشل حفظ الكلمة: ' + (error.detail || 'خطأ غير معروف'));
+                }
+            } catch (error) {
+                console.error('Error saving word:', error);
+                alert('خطأ في حفظ الكلمة');
+            }
         }
 
         // Event listeners
