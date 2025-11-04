@@ -211,3 +211,48 @@ if exam.get('created_at'):
 - ✅ API يرجع JSON صحيح بدون أخطاء
 - ✅ صفحة الامتحانات العامة تعمل
 - ✅ التواريخ تظهر بصيغة ISO 8601
+
+
+---
+
+## [Fix] 2025-11-04 - إصلاح فتح الامتحانات العامة
+
+### المشكلة
+- عند النقر على "ابدأ الامتحان" في صفحة الامتحانات العامة
+- رسالة خطأ: "معرف الامتحان غير موجود"
+- يتم التحويل إلى الصفحة الرئيسية
+
+### السبب
+- exam_view.html كان مصمماً فقط للامتحانات الخاصة
+- لا يدعم public_id من URL
+- يستدعي /api/exam/{id} فقط (امتحانات المستخدم)
+
+### الحل
+- إضافة دعم public_id في exam_view.html
+- التحقق من نوع الامتحان (عام أم خاص)
+- استدعاء API المناسب حسب النوع
+
+### التغييرات التقنية
+1. **ملف: static/exam_view.html**
+   - إضافة قراءة public_id من URL
+   - إضافة متغير isPublicExam
+   - تعديل loadExam() لاستخدام API المناسب
+
+### الكود المعدل:
+```javascript
+// Get exam ID from URL
+const examId = urlParams.get('id');
+const publicExamId = urlParams.get('public_id');
+const isPublicExam = !!publicExamId;
+
+// In loadExam()
+const currentExamId = isPublicExam ? publicExamId : examId;
+const apiUrl = isPublicExam 
+    ? `/api/public-exam/${currentExamId}` 
+    : `/api/exam/${currentExamId}`;
+```
+
+### النتيجة المتوقعة
+- ✅ الامتحانات العامة تفتح بشكل صحيح
+- ✅ المستخدمون يمكنهم حل الامتحانات المشاركة
+- ✅ نفس الصفحة تعمل للامتحانات العامة والخاصة

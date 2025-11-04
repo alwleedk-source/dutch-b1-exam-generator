@@ -245,6 +245,8 @@
         // Get exam ID from URL
         const urlParams = new URLSearchParams(window.location.search);
         const examId = urlParams.get('id');
+        const publicExamId = urlParams.get('public_id');
+        const isPublicExam = !!publicExamId;
 
         // State
         let currentExam = null;
@@ -264,14 +266,22 @@
 
         // Load exam
         async function loadExam() {
-            if (!examId) {
+            // Determine which exam ID to use
+            const currentExamId = isPublicExam ? publicExamId : examId;
+            
+            if (!currentExamId) {
                 alert('معرف الامتحان غير موجود');
                 window.location.href = '/';
                 return;
             }
 
             try {
-                const response = await fetch(`/api/exam/${examId}`);
+                // Use different API endpoint for public exams
+                const apiUrl = isPublicExam 
+                    ? `/api/public-exam/${currentExamId}` 
+                    : `/api/exam/${currentExamId}`;
+                
+                const response = await fetch(apiUrl);
                 
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({}));
