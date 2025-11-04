@@ -505,7 +505,7 @@ async def root(request: Request):
     if not user:
         return RedirectResponse(url="/login")
     
-    with open("static/index_v3.html", "r", encoding="utf-8") as f:
+    with open("static/app.html", "r", encoding="utf-8") as f:
         return HTMLResponse(content=f.read())
 
 
