@@ -200,7 +200,10 @@ async def generate_exam(request: Request, exam_request: GenerateExamRequest):
         formatted_text = exam_request.text
         if exam_request.enable_formatting and formatter:
             try:
-                formatted_text = formatter.format_text(exam_request.text)
+                formatting_result = formatter.format_text(exam_request.text)
+                # Extract the formatted_text from the result dictionary
+                formatted_text = formatting_result.get('formatted_text', exam_request.text)
+                print(f"✅ Text formatted successfully: {formatting_result.get('structure_type', 'unknown')}")
             except Exception as e:
                 print(f"Warning: Text formatting failed: {e}")
                 formatted_text = exam_request.text
