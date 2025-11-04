@@ -349,7 +349,6 @@
         </div>
     </footer>
 
-    <script src="/static/app_v3.js"></script>
     <script>
         // SPA Navigation
         let currentPage = 'home';
@@ -610,9 +609,36 @@
             }
         }
         
+        // Load daily limit info
+        async function loadDailyLimit() {
+            try {
+                const response = await fetch('/api/daily-limit');
+                if (!response.ok) {
+                    console.warn('Failed to load daily limit');
+                    return;
+                }
+                
+                const data = await response.json();
+                const remainingEl = document.getElementById('remainingExams');
+                
+                if (remainingEl) {
+                    remainingEl.textContent = data.remaining;
+                }
+                
+                // Show warning and disable button if limit reached
+                if (data.remaining === 0) {
+                    console.log('Daily limit reached');
+                    // The app_v3.js will handle disabling the generate button
+                }
+            } catch (error) {
+                console.error('Error loading daily limit:', error);
+            }
+        }
+        
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', async () => {
             await loadUserInfo();
+            await loadDailyLimit();
             lucide.createIcons();
         });
     </script>
