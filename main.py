@@ -208,6 +208,10 @@ async def generate_exam(request: Request, exam_request: GenerateExamRequest):
                 print(f"Warning: Text formatting failed: {e}")
                 formatted_text = exam_request.text
         
+        # Check text length and use appropriate method
+        word_count = len(exam_request.text.split())
+        print(f"📊 Text length: {word_count} words")
+        
         # Generate exam with or without verification
         if exam_request.enable_verification:
             result = agent.generate_exam_with_verification(
@@ -215,10 +219,19 @@ async def generate_exam(request: Request, exam_request: GenerateExamRequest):
                 num_questions=exam_request.num_questions
             )
         else:
-            result = agent.generate_questions(
-                text=exam_request.text,
-                num_questions=exam_request.num_questions
-            )
+            # Use long text processing for texts > 1500 words
+            if word_count > 1500:
+                print(f"📚 Using long text processing (chunking)")
+                result = agent.generate_exam_for_long_text(
+                    text=exam_request.text,
+                    num_questions=exam_request.num_questions
+                )
+            else:
+                print(f"✅ Using normal processing")
+                result = agent.generate_questions(
+                    text=exam_request.text,
+                    num_questions=exam_request.num_questions
+                )
         
         # Add formatted text to result
         result['formatted_text'] = formatted_text

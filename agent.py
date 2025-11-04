@@ -20,6 +20,9 @@ from prompts import (
 class DutchB1ExamAgent:
     """Agent for generating Dutch B1 reading comprehension exams"""
     
+    # Maximum words per chunk for long texts
+    MAX_WORDS_PER_CHUNK = 1500
+    
     def __init__(self, api_key: Optional[str] = None):
         """
         Initialize the agent with Gemini API
@@ -258,6 +261,133 @@ class DutchB1ExamAgent:
                 "error": "Failed to parse JSON",
                 "raw_response": text
             }
+    
+    def _split_long_text(self, text: str) -> List[str]:
+        """
+        Split long text into manageable chunks
+        
+        Args:
+            text: Dutch text to split
+            
+        Returns:
+            List of text chunks
+        """
+        words = text.split()
+        word_count = len(words)
+        
+        # If text is short enough, return as is
+        if word_count <= self.MAX_WORDS_PER_CHUNK:
+            return [text]
+        
+        # Split into chunks
+        chunks = []
+        for i in range(0, word_count, self.MAX_WORDS_PER_CHUNK):
+            chunk_words = words[i:i + self.MAX_WORDS_PER_CHUNK]
+            chunk = ' '.join(chunk_words)
+            chunks.append(chunk)
+        
+        print(f"📊 Text split into {len(chunks)} chunks ({word_count} words total)")
+        return chunks
+    
+    def _generate_questions_for_chunk(
+        self,
+        chunk: str,
+        num_questions: int,
+        chunk_index: int,
+        total_chunks: int
+    ) -> List[Dict]:
+        """
+        Generate questions for a single text chunk
+        
+        Args:
+            chunk: Text chunk
+            num_questions: Number of questions to generate
+            chunk_index: Index of current chunk (0-based)
+            total_chunks: Total number of chunks
+            
+        Returns:
+            List of questions
+        """
+        print(f"📝 Processing chunk {chunk_index + 1}/{total_chunks} ({len(chunk.split())} words)...")
+        
+        try:
+            # Analyze chunk
+            analysis = self.analyze_text(chunk)
+            
+            # Generate questions
+            result = self.generate_questions(chunk, num_questions, analysis)
+            
+            return result.get('questions', [])
+            
+        except Exception as e:
+            print(f"⚠️ Warning: Failed to process chunk {chunk_index + 1}: {e}")
+            return []
+    
+    def generate_exam_for_long_text(
+        self,
+        text: str,
+        num_questions: int = 7
+    ) -> Dict:
+        """
+        Generate exam for potentially long text by splitting into chunks
+        
+        Args:
+            text: Dutch text (can be very long)
+            num_questions: Total number of questions to generate
+            
+        Returns:
+            Dictionary containing the complete exam
+        """
+        try:
+            # Split text into chunks
+            chunks = self._split_long_text(text)
+            
+            # If only one chunk, use normal processing
+            if len(chunks) == 1:
+                print("✅ Text is short enough, using normal processing")
+                return self.generate_questions(text, num_questions)
+            
+            # Process multiple chunks
+            print(f"📚 Processing long text with {len(chunks)} chunks...")
+            
+            # Distribute questions across chunks
+            questions_per_chunk = max(1, num_questions // len(chunks))
+            all_questions = []
+            
+            for i, chunk in enumerate(chunks):
+                # Generate questions for this chunk
+                chunk_questions = self._generate_questions_for_chunk(
+                    chunk=chunk,
+                    num_questions=questions_per_chunk,
+                    chunk_index=i,
+                    total_chunks=len(chunks)
+                )
+                
+                all_questions.extend(chunk_questions)
+            
+            # Adjust question IDs to be sequential
+            for i, q in enumerate(all_questions, 1):
+                q['id'] = i
+            
+            # Limit to requested number of questions
+            all_questions = all_questions[:num_questions]
+            
+            print(f"✅ Generated {len(all_questions)} questions from {len(chunks)} chunks")
+            
+            # Randomize options
+            self._randomize_options(all_questions)
+            
+            return {
+                'questions': all_questions,
+                'text': text,
+                'formatted_text': text,
+                'total_questions': len(all_questions),
+                'chunks_processed': len(chunks)
+            }
+            
+        except Exception as e:
+            print(f"❌ Error in long text processing: {e}")
+            raise
     
     def format_exam_for_display(self, exam: Dict) -> str:
         """

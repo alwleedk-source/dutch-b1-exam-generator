@@ -329,11 +329,109 @@
             lucide.createIcons();
         }
         
+        // ========================================
+        // Text-to-Speech for Dutch words
+        // ========================================
+        class DutchTTS {
+            constructor() {
+                this.synth = window.speechSynthesis;
+                this.voices = [];
+                this.selectedVoice = null;
+                this.rate = 0.85; // Slower for learning
+                
+                // Load voices
+                this.loadVoices();
+                
+                // Voices may load async
+                if (this.synth && this.synth.onvoiceschanged !== undefined) {
+                    this.synth.onvoiceschanged = () => this.loadVoices();
+                }
+            }
+            
+            loadVoices() {
+                if (!this.synth) return;
+                
+                this.voices = this.synth.getVoices();
+                
+                // Find best Dutch voice (prefer Microsoft Natural voices)
+                this.selectedVoice = this.voices.find(voice => 
+                    voice.lang === 'nl-NL' && 
+                    (voice.name.includes('Colette') || 
+                     voice.name.includes('Fenna') ||
+                     voice.name.includes('Microsoft'))
+                ) || this.voices.find(voice => voice.lang.startsWith('nl'));
+                
+                if (this.selectedVoice) {
+                    console.log('✅ Selected Dutch voice:', this.selectedVoice.name);
+                } else {
+                    console.warn('⚠️ No Dutch voice found');
+                }
+            }
+            
+            speak(text, options = {}) {
+                if (!this.synth) {
+                    console.error('Speech synthesis not supported');
+                    alert('متصفحك لا يدعم Text-to-Speech');
+                    return;
+                }
+                
+                // Cancel any ongoing speech
+                this.synth.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'nl-NL';
+                utterance.rate = options.rate || this.rate;
+                utterance.pitch = options.pitch || 1.0;
+                utterance.volume = options.volume || 1.0;
+                
+                if (this.selectedVoice) {
+                    utterance.voice = this.selectedVoice;
+                }
+                
+                // Events
+                utterance.onstart = () => console.log('🔊 Speaking:', text);
+                utterance.onend = () => console.log('✅ Finished speaking');
+                utterance.onerror = (e) => {
+                    console.error('❌ Speech error:', e);
+                    if (e.error === 'not-allowed') {
+                        alert('يرجى السماح للمتصفح باستخدام Text-to-Speech');
+                    }
+                };
+                
+                this.synth.speak(utterance);
+            }
+            
+            stop() {
+                if (this.synth) {
+                    this.synth.cancel();
+                }
+            }
+            
+            getDutchVoices() {
+                return this.voices.filter(voice => voice.lang.startsWith('nl'));
+            }
+        }
+        
+        // Initialize TTS
+        let tts = null;
+        
+        // Speak word function (called from UI)
+        function speakWord(word) {
+            if (!tts) {
+                tts = new DutchTTS();
+            }
+            tts.speak(word);
+        }
+        
         // Load vocabulary on page load
         document.addEventListener('DOMContentLoaded', async () => {
             await loadUserInfo();
             await loadVocabulary();
             setupSearch();
+            
+            // Initialize TTS
+            tts = new DutchTTS();
+            
             lucide.createIcons();
         });
 
@@ -401,6 +499,12 @@
                             <div class="flex-1">
                                 <div class="flex items-center gap-3 mb-2">
                                     <span class="font-bold text-xl text-gray-900" dir="ltr">${word.word}</span>
+                                    <button 
+                                        onclick="speakWord('${word.word.replace(/'/g, "\\'")}')"
+                                        class="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition"
+                                        title="استمع للنطق">
+                                        <i data-lucide="volume-2" class="w-4 h-4"></i>
+                                    </button>
                                     <span class="text-gray-400">—</span>
                                     <span class="text-lg text-gray-700">${word.translation}</span>
                                 </div>
