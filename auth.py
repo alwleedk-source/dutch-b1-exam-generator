@@ -90,8 +90,27 @@ class AuthManager:
         if not self.oauth_enabled:
             return RedirectResponse(url='/')
         
+        # Debug logging - BEFORE redirect
+        print(f"\n{'='*60}")
+        print(f"🔵 LOGIN - Before authorize_redirect")
+        print(f"  Session ID before: {id(request.session)}")
+        print(f"  Session keys before: {list(request.session.keys())}")
+        print(f"  Cookie header: {request.headers.get('cookie', 'NO COOKIE')}")
+        print(f"  Redirect URI: {self.redirect_uri}")
+        print(f"{'='*60}\n")
+        
         redirect_uri = self.redirect_uri
-        return await self.oauth.google.authorize_redirect(request, redirect_uri)
+        response = await self.oauth.google.authorize_redirect(request, redirect_uri)
+        
+        # Debug logging - AFTER redirect
+        print(f"\n{'='*60}")
+        print(f"🔵 LOGIN - After authorize_redirect")
+        print(f"  Session ID after: {id(request.session)}")
+        print(f"  Session keys after: {list(request.session.keys())}")
+        print(f"  Response headers: {dict(response.headers)}")
+        print(f"{'='*60}\n")
+        
+        return response
     
     async def callback(self, request: Request, db):
         """Handle OAuth callback"""
@@ -99,6 +118,28 @@ class AuthManager:
             return RedirectResponse(url='/')
         
         try:
+            # Debug logging - BEFORE authorize_access_token
+            state_from_url = request.query_params.get('state')
+            print(f"\n{'='*60}")
+            print(f"🔴 CALLBACK - Before authorize_access_token")
+            print(f"  State from URL: {state_from_url}")
+            print(f"  Session ID: {id(request.session)}")
+            print(f"  Session keys: {list(request.session.keys())}")
+            print(f"  Session contents:")
+            for key in request.session.keys():
+                value = request.session.get(key)
+                if isinstance(value, str) and len(value) > 50:
+                    print(f"    {key}: {value[:50]}...")
+                else:
+                    print(f"    {key}: {value}")
+            print(f"  Cookie header: {request.headers.get('cookie', 'NO COOKIE')}")
+            print(f"  Looking for key: _state_google_{state_from_url}")
+            expected_key = f"_state_google_{state_from_url}"
+            print(f"  Key exists in session: {expected_key in request.session}")
+            if expected_key in request.session:
+                print(f"  Value in session: {request.session.get(expected_key)}")
+            print(f"{'='*60}\n")
+            
             # Authlib automatically verifies state from session
             # No manual verification needed - it's handled internally
             token = await self.oauth.google.authorize_access_token(request)
