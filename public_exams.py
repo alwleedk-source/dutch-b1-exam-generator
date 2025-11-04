@@ -50,8 +50,17 @@ class PublicExamsManager:
             """, (limit, offset))
             
             rows = cursor.fetchall()
-            # Convert RealDictRow to regular dict for JSON serialization
-            return [dict(row) for row in rows]
+            
+            # Convert RealDictRow to regular dict and handle datetime
+            result = []
+            for row in rows:
+                exam = dict(row)
+                # Convert datetime to ISO string for JSON serialization
+                if exam.get('created_at'):
+                    exam['created_at'] = exam['created_at'].isoformat()
+                result.append(exam)
+            
+            return result
     
     def get_public_exam_by_id(self, exam_id: int) -> Optional[Dict]:
         """Get a specific public exam (anyone can access)"""
@@ -74,6 +83,12 @@ class PublicExamsManager:
             if row:
                 # Convert RealDictRow to regular dict
                 exam = dict(row)
+                
+                # Convert datetime to ISO string for JSON serialization
+                if exam.get('created_at'):
+                    exam['created_at'] = exam['created_at'].isoformat()
+                if exam.get('updated_at'):
+                    exam['updated_at'] = exam['updated_at'].isoformat()
                 
                 # Parse JSON fields
                 if isinstance(exam['questions'], str):

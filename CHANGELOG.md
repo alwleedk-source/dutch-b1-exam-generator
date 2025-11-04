@@ -180,3 +180,34 @@ return [dict(row) for row in rows]  # Convert to regular dict
 - ✅ زر المشاركة يظهر في صفحة /exams
 - ✅ جميع المستخدمين يمكنهم مشاركة امتحاناتهم
 - ✅ تجربة متسقة بين الصفحتين
+
+
+---
+
+## [Fix] 2025-11-04 - إصلاح مشكلة datetime في API الامتحانات العامة
+
+### المشكلة
+- خطأ 500 مستمر في /api/public-exams
+- السبب: datetime objects غير قابلة للتحويل إلى JSON مباشرة
+- حقل created_at يسبب الخطأ
+
+### الحل
+- تحويل datetime إلى ISO string قبل الإرجاع
+- استخدام .isoformat() لتحويل التاريخ
+
+### التغييرات التقنية
+1. **ملف: public_exams.py**
+   - get_public_exams(): إضافة تحويل created_at إلى ISO string
+   - get_public_exam_by_id(): إضافة تحويل created_at و updated_at
+
+### الكود المعدل:
+```python
+# Convert datetime to ISO string
+if exam.get('created_at'):
+    exam['created_at'] = exam['created_at'].isoformat()
+```
+
+### النتيجة المتوقعة
+- ✅ API يرجع JSON صحيح بدون أخطاء
+- ✅ صفحة الامتحانات العامة تعمل
+- ✅ التواريخ تظهر بصيغة ISO 8601
