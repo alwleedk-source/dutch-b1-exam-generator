@@ -427,14 +427,19 @@
             const escapedWord = word.replace(/'/g, "\\'");
             const escapedTranslation = translation.replace(/'/g, "\\'");
             tooltip.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <span style="flex: 1;">${translation}</span>
-                    <button onclick="saveWord('${escapedWord}', '${escapedTranslation}')" 
-                            style="background: #10B981; color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px; border: none; cursor: pointer; white-space: nowrap; transition: background 0.2s;"
-                            onmouseover="this.style.background='#059669'"
-                            onmouseout="this.style.background='#10B981'">
-                        + حفظ
-                    </button>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="flex: 1; font-weight: 500;">${translation}</span>
+                        <button onclick="saveWord('${escapedWord}', '${escapedTranslation}')" 
+                                style="background: #10B981; color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px; border: none; cursor: pointer; white-space: nowrap; transition: background 0.2s;"
+                                onmouseover="this.style.background='#059669'"
+                                onmouseout="this.style.background='#10B981'">
+                            + حفظ
+                        </button>
+                    </div>
+                    <div style="font-size: 10px; color: #6B7280; text-align: center; border-top: 1px solid #E5E7EB; padding-top: 6px;">
+                        💡 نقرتين للحفظ في قائمة كلماتي
+                    </div>
                 </div>
             `;
             
