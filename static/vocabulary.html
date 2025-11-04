@@ -5,297 +5,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>قائمة كلماتي - Dutch B1 Exam Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/style.css">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        .vocabulary-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        
-        .vocabulary-stats {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .stat-card {
-            background: var(--bg-glass);
-            backdrop-filter: blur(10px);
-            padding: 15px 25px;
-            border-radius: var(--border-radius-sm);
-            box-shadow: var(--shadow-sm);
-            text-align: center;
-        }
-        
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .stat-label {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-top: 5px;
-        }
-        
-        .search-box {
-            flex: 1;
-            min-width: 300px;
-            max-width: 500px;
-        }
-        
-        .search-box input {
-            width: 100%;
-            padding: 12px 20px;
-            border: 2px solid transparent;
-            border-radius: var(--border-radius-sm);
-            background: var(--bg-glass);
-            backdrop-filter: blur(10px);
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-        
-        .search-box input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .vocabulary-list {
-            display: grid;
-            gap: 20px;
-        }
-        
-        .word-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(10px);
-            padding: 25px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-md);
-            transition: var(--transition);
-            border: 2px solid transparent;
-        }
-        
-        .word-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-lg);
-            border-color: #667eea;
-        }
-        
-        .word-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-        }
-        
-        .word-main {
-            flex: 1;
-        }
-        
-        .word-dutch {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-        }
-        
-        .word-arabic {
-            font-size: 1.3rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-        
-        .word-actions {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .icon-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 8px;
-            transition: var(--transition);
-        }
-        
-        .icon-btn:hover {
-            background: rgba(102, 126, 234, 0.1);
-            transform: scale(1.1);
-        }
-        
-        .delete-btn:hover {
-            background: rgba(231, 76, 60, 0.1);
-        }
-        
-        .word-context {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
-            padding: 15px;
-            border-radius: var(--border-radius-sm);
-            margin-top: 15px;
-            border-right: 4px solid #667eea;
-        }
-        
-        .word-context-label {
-            font-size: 0.85rem;
-            color: var(--text-light);
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-        
-        .word-context-text {
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            font-style: italic;
-        }
-        
-        .word-meta {
-            display: flex;
-            gap: 15px;
-            margin-top: 15px;
-            font-size: 0.85rem;
-            color: var(--text-light);
-        }
-        
-        .word-meta span {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-        }
-        
-        .empty-state-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-        }
-        
-        .empty-state-title {
-            font-size: 1.5rem;
-            color: var(--text-primary);
-            margin-bottom: 10px;
-        }
-        
-        .empty-state-text {
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-        }
-        
-        .loading-spinner {
-            text-align: center;
-            padding: 40px;
-            font-size: 2rem;
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .nav-link {
-            padding: 10px 20px;
-            background: var(--bg-glass);
-            backdrop-filter: blur(10px);
-            border-radius: var(--border-radius-sm);
-            text-decoration: none;
-            color: var(--text-primary);
-            transition: var(--transition);
-        }
-        
-        .nav-link:hover {
-            background: var(--primary-gradient);
-            color: white;
-            transform: translateY(-2px);
-        }
-    </style>
+    <link rel="stylesheet" href="/style.css">
 </head>
-<body>
-    <div class="container">
-        <div class="nav-links">
-            <a href="/" class="nav-link flex items-center gap-2">
-                <i data-lucide="home" class="w-5 h-5"></i>
-                <span>الصفحة الرئيسية</span>
-            </a>
-            <a href="/exams" class="nav-link flex items-center gap-2">
-                <i data-lucide="file-text" class="w-5 h-5"></i>
-                <span>امتحاناتي</span>
-            </a>
-            <a href="/vocabulary" class="nav-link flex items-center gap-2" style="background: var(--primary-gradient); color: white;">
-                <i data-lucide="book-open" class="w-5 h-5"></i>
-                <span>كلماتي</span>
-            </a>
-            <a href="/auth/logout" class="nav-link flex items-center gap-2">
-                <i data-lucide="log-out" class="w-5 h-5"></i>
-                <span>تسجيل الخروج</span>
-            </a>
-        </div>
-        
-        <div class="card">
-            <div class="vocabulary-header">
-                <div>
-                    <h1 style="font-size: 2.5rem; margin-bottom: 10px; display: flex; align-items: center; gap: 15px;">
-                        <i data-lucide="book-open" class="w-10 h-10"></i>
-                        <span>قائمة كلماتي</span>
-                    </h1>
-                    <p style="color: var(--text-secondary);">الكلمات التي حفظتها للمراجعة</p>
+<body class="bg-gradient-to-br from-blue-50 via-purple-50 to-green-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                    <i data-lucide="book-marked" class="w-8 h-8 text-purple-600"></i>
+                    <span>قائمة كلماتي</span>
+                </h1>
+                <div class="flex gap-3">
+                    <a href="/" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium flex items-center gap-2">
+                        <i data-lucide="home" class="w-4 h-4"></i>
+                        الرئيسية
+                    </a>
+                    <a href="/exams" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition font-medium flex items-center gap-2">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                        امتحاناتي
+                    </a>
+                    <a href="/auth/logout" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium">
+                        تسجيل الخروج
+                    </a>
                 </div>
-                
-                <div class="vocabulary-stats">
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalWords">0</div>
-                        <div class="stat-label">كلمة محفوظة</div>
+            </div>
+        </div>
+
+        <!-- Stats and Search -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div class="bg-purple-50 rounded-lg p-4">
+                    <div class="text-3xl font-bold text-purple-600" id="totalWords">0</div>
+                    <div class="text-sm text-gray-600">كلمة محفوظة</div>
+                </div>
+                <div class="flex-1 max-w-md">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            placeholder="ابحث عن كلمة..."
+                            class="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition"
+                        />
+                        <i data-lucide="search" class="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="ابحث عن كلمة..." style="padding-right: 45px; background-image: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"gray\" stroke-width=\"2\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.35-4.35\"/></svg>'); background-repeat: no-repeat; background-position: right 15px center;" />
-            </div>
-            
-            <div id="loadingIndicator" class="loading-spinner hidden">
-                ⏳ جاري التحميل...
-            </div>
-            
-            <div id="vocabularyList" class="vocabulary-list" style="margin-top: 30px;">
-                <!-- Words will be loaded here -->
-            </div>
-            
-            <div id="emptyState" class="empty-state hidden">
-                <div class="empty-state-icon">
-                    <i data-lucide="book-open" style="width: 64px; height: 64px;"></i>
-                </div>
-                <div class="empty-state-title">لا توجد كلمات محفوظة بعد</div>
-                <div class="empty-state-text">ابدأ بحفظ الكلمات من الامتحانات لتظهر هنا</div>
-                <a href="/" class="btn btn-primary">توليد امتحان جديد</a>
-            </div>
         </div>
+
+        <!-- Loading -->
+        <div id="loadingIndicator" class="hidden text-center py-12">
+            <div class="animate-spin inline-block w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full mb-4"></div>
+            <p class="text-gray-600">جاري التحميل...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden bg-white rounded-xl shadow-sm p-12 text-center">
+            <i data-lucide="book-open" class="w-16 h-16 mx-auto mb-4 text-gray-400"></i>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">لا توجد كلمات محفوظة بعد</h2>
+            <p class="text-gray-600 mb-6">ابدأ بحفظ الكلمات من الامتحانات لتظهر هنا</p>
+            <a href="/" class="inline-block px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-medium">
+                توليد امتحان جديد
+            </a>
+        </div>
+
+        <!-- Vocabulary List -->
+        <div id="vocabularyList" class="space-y-3"></div>
     </div>
-    
+
     <script>
         let allWords = [];
-        
+
         // Load vocabulary on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            loadVocabulary();
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadVocabulary();
             setupSearch();
+            lucide.createIcons();
         });
-        
+
         // Load vocabulary from API
         async function loadVocabulary() {
             const loadingIndicator = document.getElementById('loadingIndicator');
@@ -330,62 +118,120 @@
             } catch (error) {
                 console.error('Error loading vocabulary:', error);
                 loadingIndicator.classList.add('hidden');
-                vocabularyList.innerHTML = '<div style="text-align: center; color: #E74C3C; padding: 40px;"><i data-lucide="alert-circle" class="w-8 h-8 inline"></i> فشل تحميل الكلمات</div>';
+                vocabularyList.innerHTML = `
+                    <div class="bg-white rounded-xl shadow-sm p-12 text-center">
+                        <i data-lucide="alert-circle" class="w-16 h-16 mx-auto mb-4 text-red-500"></i>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2">فشل تحميل الكلمات</h2>
+                        <p class="text-gray-600 mb-6">${error.message}</p>
+                        <button onclick="loadVocabulary()" class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-medium">
+                            إعادة المحاولة
+                        </button>
+                    </div>
+                `;
                 lucide.createIcons();
             }
         }
-        
-        // Display words
+
+        // Display words in compact format
         function displayWords(words) {
             const vocabularyList = document.getElementById('vocabularyList');
             
             if (words.length === 0) {
-                vocabularyList.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 40px;">لا توجد نتائج</div>';
+                vocabularyList.innerHTML = '<div class="text-center text-gray-500 py-8">لا توجد نتائج</div>';
                 return;
             }
             
             vocabularyList.innerHTML = words.map(word => {
-                const createdDate = new Date(word.created_at).toLocaleDateString('ar-SA');
+                const createdDate = new Date(word.created_at).toLocaleDateString('ar-SA', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
                 
                 return `
-                    <div class="word-card" data-word-id="${word.id}">
-                        <div class="word-header">
-                            <div class="word-main">
-                                <div class="word-dutch">${word.word}</div>
-                                <div class="word-arabic">${word.translation}</div>
+                    <div class="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition" data-word-id="${word.id}">
+                        <div class="flex items-center justify-between gap-4">
+                            <div class="flex-1 flex items-center gap-4">
+                                <div class="flex-1">
+                                    <div class="font-bold text-lg text-gray-900" dir="ltr" style="text-align: left;">${word.word}</div>
+                                    <div class="text-gray-600">${word.translation}</div>
+                                </div>
+                                ${word.context ? `
+                                <button 
+                                    onclick="toggleContext(${word.id})" 
+                                    class="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-md hover:bg-blue-100 transition text-sm font-medium flex items-center gap-1"
+                                    id="contextBtn${word.id}">
+                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                    <span>عرض السياق</span>
+                                </button>
+                                ` : ''}
                             </div>
-                            <div class="word-actions">
-                                <button class="icon-btn delete-btn" onclick="deleteWord(${word.id})" title="حذف">
-                                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                            <div class="flex items-center gap-3 text-sm text-gray-500">
+                                <span class="flex items-center gap-1">
+                                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                                    ${createdDate}
+                                </span>
+                                ${word.exam_title ? `
+                                <span class="flex items-center gap-1">
+                                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                                    ${word.exam_title}
+                                </span>
+                                ` : ''}
+                                <button 
+                                    onclick="deleteWord(${word.id})" 
+                                    class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                                    title="حذف">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
                                 </button>
                             </div>
                         </div>
-                        
                         ${word.context ? `
-                        <div class="word-context">
-                            <div class="word-context-label flex items-center gap-1">
-                                <i data-lucide="file-text" class="w-4 h-4"></i>
-                                <span>السياق:</span>
+                        <div id="context${word.id}" class="hidden mt-3 pt-3 border-t border-gray-200">
+                            <div class="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg" dir="ltr" style="text-align: left;">
+                                ${word.context}
                             </div>
-                            <div class="word-context-text">${word.context}</div>
                         </div>
                         ` : ''}
-                        
-                        <div class="word-meta">
-                            <span class="flex items-center gap-1">
-                                <i data-lucide="calendar" class="w-4 h-4"></i>
-                                ${createdDate}
-                            </span>
-                            ${word.exam_title ? `<span class="flex items-center gap-1"><i data-lucide="book-open" class="w-4 h-4"></i> من: ${word.exam_title}</span>` : ''}
-                        </div>
                     </div>
                 `;
             }).join('');
             
-            // Re-initialize icons after rendering
             setTimeout(() => lucide.createIcons(), 100);
         }
-        
+
+        // Toggle context visibility
+        function toggleContext(wordId) {
+            const contextDiv = document.getElementById(`context${wordId}`);
+            const btn = document.getElementById(`contextBtn${wordId}`);
+            
+            if (contextDiv.classList.contains('hidden')) {
+                contextDiv.classList.remove('hidden');
+                btn.innerHTML = '<i data-lucide="eye-off" class="w-4 h-4"></i><span>إخفاء السياق</span>';
+            } else {
+                contextDiv.classList.add('hidden');
+                btn.innerHTML = '<i data-lucide="eye" class="w-4 h-4"></i><span>عرض السياق</span>';
+            }
+            lucide.createIcons();
+        }
+
+        // Setup search
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                
+                if (query === '') {
+                    displayWords(allWords);
+                } else {
+                    const filtered = allWords.filter(word => 
+                        word.word.toLowerCase().includes(query) || 
+                        word.translation.toLowerCase().includes(query)
+                    );
+                    displayWords(filtered);
+                }
+            });
+        }
+
         // Delete word
         async function deleteWord(wordId) {
             if (!confirm('هل أنت متأكد من حذف هذه الكلمة؟')) {
@@ -401,76 +247,14 @@
                     throw new Error('Failed to delete word');
                 }
                 
-                // Remove from UI
-                const wordCard = document.querySelector(`[data-word-id="${wordId}"]`);
-                if (wordCard) {
-                    wordCard.style.opacity = '0';
-                    wordCard.style.transform = 'scale(0.8)';
-                    setTimeout(() => {
-                        wordCard.remove();
-                        
-                        // Update count
-                        allWords = allWords.filter(w => w.id !== wordId);
-                        document.getElementById('totalWords').textContent = allWords.length;
-                        
-                        // Show empty state if no words left
-                        if (allWords.length === 0) {
-                            document.getElementById('emptyState').classList.remove('hidden');
-                        }
-                    }, 300);
-                }
+                // Reload vocabulary
+                await loadVocabulary();
                 
             } catch (error) {
                 console.error('Error deleting word:', error);
-                alert('فشل حذف الكلمة');
+                alert('فشل حذف الكلمة: ' + error.message);
             }
         }
-        
-        // Setup search
-        function setupSearch() {
-            const searchInput = document.getElementById('searchInput');
-            let searchTimeout;
-            
-            searchInput.addEventListener('input', (e) => {
-                clearTimeout(searchTimeout);
-                const query = e.target.value.trim();
-                
-                if (query === '') {
-                    displayWords(allWords);
-                    return;
-                }
-                
-                searchTimeout = setTimeout(() => {
-                    searchVocabulary(query);
-                }, 300);
-            });
-        }
-        
-        // Search vocabulary
-        async function searchVocabulary(query) {
-            try {
-                const response = await fetch(`/api/vocabulary/search?q=${encodeURIComponent(query)}`);
-                
-                if (!response.ok) {
-                    throw new Error('Search failed');
-                }
-                
-                const data = await response.json();
-                displayWords(data.words || []);
-                
-            } catch (error) {
-                console.error('Error searching:', error);
-                // Fallback to local search
-                const filtered = allWords.filter(word => 
-                    word.word.toLowerCase().includes(query.toLowerCase()) ||
-                    word.translation.includes(query)
-                );
-                displayWords(filtered);
-            }
-        }
-        
-        // Initialize Lucide icons on page load
-        lucide.createIcons();
     </script>
 </body>
 </html>
