@@ -198,6 +198,17 @@
     <script>
         let allWords = [];
 
+        // Highlight word in context
+        function highlightWordInContext(context, word) {
+            if (!context || !word) return context || '';
+            
+            // Create a case-insensitive regex to find the word
+            const regex = new RegExp(`\\b(${word})\\b`, 'gi');
+            
+            // Replace the word with highlighted version
+            return context.replace(regex, '<span style="background: linear-gradient(135deg, #10B981 0%, #6366F1 100%); color: white; padding: 2px 8px; border-radius: 6px; font-weight: 700; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);">$1</span>');
+        }
+        
         // Load vocabulary on page load
         document.addEventListener('DOMContentLoaded', async () => {
             await loadVocabulary();
@@ -300,8 +311,9 @@
                         </div>
                         ${word.context ? `
                         <div id="context${word.id}" class="hidden mt-3 pt-3 border-t border-gray-200">
-                            <div class="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg" dir="ltr" style="text-align: left;">
-                                ${word.context}
+                            <div class="text-sm text-gray-700 bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg border border-blue-100" dir="ltr" style="text-align: left; line-height: 1.8;">
+                                <div class="text-xs text-gray-500 mb-2 font-semibold">السياق:</div>
+                                ${highlightWordInContext(word.context, word.word)}
                             </div>
                         </div>
                         ` : ''}
