@@ -200,53 +200,112 @@
             switchMode('test');
         }
 
-        // Display original text
+        // Display original text with smart formatting
         function displayOriginalText(text) {
-            const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+            // Split by newlines first, then by sentences if needed
+            let lines = text.split('\n').map(l => l.trim()).filter(l => l);
+            
+            // If text is one long paragraph, try to split by sentences
+            if (lines.length === 1) {
+                const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+                lines = sentences.map(s => s.trim()).filter(s => s);
+            }
             
             let html = `
                 <div dir="ltr" style="
                     text-align: left;
                     font-family: 'Georgia', 'Times New Roman', serif;
-                    line-height: 1.9;
-                    padding: 2rem;
+                    line-height: 2;
+                    padding: 2.5rem;
                     background: white;
-                    max-width: 800px;
+                    max-width: 850px;
                     margin: 0 auto;
+                    border-radius: 12px;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
                 ">
             `;
             
+            // Try to detect title (usually first line or short lines)
+            let titleDetected = false;
             let currentParagraph = [];
             
             lines.forEach((line, index) => {
-                const isTitle = (
-                    line.length < 80 && 
-                    (line.endsWith(':') || 
-                     line.split(' ').length < 8 || 
-                     /^[A-Z][a-z]/.test(line))
+                // Title detection logic
+                const isLikelyTitle = (
+                    !titleDetected && 
+                    index === 0 && 
+                    line.length < 100 && 
+                    line.split(' ').length <= 10 &&
+                    !line.endsWith('.')
                 );
                 
-                if (isTitle) {
+                const isSubheading = (
+                    line.length < 80 && 
+                    (line.endsWith(':') || 
+                     (line.split(' ').length < 8 && /^[A-Z]/.test(line)))
+                );
+                
+                if (isLikelyTitle && !titleDetected) {
+                    html += `
+                        <h2 style="
+                            font-size: 2.2rem; 
+                            font-weight: bold; 
+                            margin: 0 0 2rem 0; 
+                            color: #1a1a1a; 
+                            text-align: center;
+                            border-bottom: 3px solid #3498db; 
+                            padding-bottom: 1rem;
+                        ">${line}</h2>
+                    `;
+                    titleDetected = true;
+                } else if (isSubheading) {
                     if (currentParagraph.length > 0) {
-                        html += `<p style="margin: 1.5rem 0; color: #2C3E50; text-align: justify; font-size: 1.1rem; text-indent: 2em; line-height: 1.9;">${currentParagraph.join(' ')}</p>`;
+                        html += formatParagraph(currentParagraph.join(' '));
                         currentParagraph = [];
                     }
-                    html += `<h3 style="font-size: 1.8rem; font-weight: bold; margin: 2rem 0 1rem 0; color: #1a1a1a; border-bottom: 2px solid #3498db; padding-bottom: 0.5rem;">${line}</h3>`;
+                    html += `
+                        <h3 style="
+                            font-size: 1.6rem; 
+                            font-weight: 600; 
+                            margin: 2.5rem 0 1.2rem 0; 
+                            color: #2c3e50;
+                            border-left: 4px solid #3498db;
+                            padding-left: 1rem;
+                        ">${line}</h3>
+                    `;
                 } else {
                     currentParagraph.push(line);
                     
-                    const nextLine = lines[index + 1];
-                    const shouldFlush = !nextLine || index === lines.length - 1;
-                    
-                    if (shouldFlush && currentParagraph.length > 0) {
-                        html += `<p style="margin: 1.5rem 0; color: #2C3E50; text-align: justify; font-size: 1.1rem; text-indent: 2em; line-height: 1.9;">${currentParagraph.join(' ')}</p>`;
+                    // Flush paragraph every 3-5 sentences or at end
+                    if (currentParagraph.length >= 4 || index === lines.length - 1) {
+                        html += formatParagraph(currentParagraph.join(' '));
                         currentParagraph = [];
                     }
                 }
             });
             
+            // Flush any remaining content
+            if (currentParagraph.length > 0) {
+                html += formatParagraph(currentParagraph.join(' '));
+            }
+            
             html += '</div>';
             originalText.innerHTML = html;
+        }
+        
+        // Format a paragraph with proper styling
+        function formatParagraph(text) {
+            return `
+                <p style="
+                    margin: 1.8rem 0; 
+                    color: #34495e; 
+                    text-align: justify; 
+                    font-size: 1.15rem; 
+                    text-indent: 2.5em; 
+                    line-height: 2;
+                    letter-spacing: 0.3px;
+                ">${text}</p>
+            `;
         }
 
         // Display questions
