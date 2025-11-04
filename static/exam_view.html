@@ -424,8 +424,13 @@
             tooltip.className = 'translation-tooltip';
             tooltip.style.cssText = 'position: absolute; background: #2C3E50; color: white; padding: 10px 14px; border-radius: 8px; font-size: 14px; z-index: 1000; pointer-events: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.3);';
             
-            // Create simple tooltip with translation only
-            tooltip.innerHTML = `<span style="font-weight: 500;">${translation}</span>`;
+            // Create tooltip with translation and hint
+            tooltip.innerHTML = `
+                <div style="text-align: center;">
+                    <div style="font-weight: 500; margin-bottom: 4px;">${translation}</div>
+                    <div style="font-size: 11px; color: #BDC3C7; font-style: italic;">انقر مرتين للحفظ</div>
+                </div>
+            `;
             
             // Position tooltip above the word
             const rect = e.target.getBoundingClientRect();
