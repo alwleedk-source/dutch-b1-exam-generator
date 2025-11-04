@@ -49,9 +49,18 @@ class Database:
                     email VARCHAR(255) NOT NULL,
                     name VARCHAR(255),
                     picture VARCHAR(500),
+                    daily_exam_count INTEGER DEFAULT 0,
+                    last_exam_date DATE,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
+            """)
+            
+            # Add columns if they don't exist (for existing databases)
+            cursor.execute("""
+                ALTER TABLE users 
+                ADD COLUMN IF NOT EXISTS daily_exam_count INTEGER DEFAULT 0,
+                ADD COLUMN IF NOT EXISTS last_exam_date DATE
             """)
             
             # Exams table
@@ -65,9 +74,16 @@ class Database:
                     questions JSONB NOT NULL,
                     word_translations JSONB,
                     num_questions INTEGER,
+                    is_public BOOLEAN DEFAULT FALSE,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
+            """)
+            
+            # Add is_public column if it doesn't exist (for existing databases)
+            cursor.execute("""
+                ALTER TABLE exams 
+                ADD COLUMN IF NOT EXISTS is_public BOOLEAN DEFAULT FALSE
             """)
             
             # Vocabulary table

@@ -19,6 +19,8 @@ from database import get_db, Database
 from auth import init_auth, get_auth, AuthManager
 from file_processor import get_file_processor, FileProcessor
 from title_generator import get_title_generator, TitleGenerator
+from daily_limit import DailyLimitManager
+from public_exams import PublicExamsManager
 
 
 # Initialize FastAPI app
@@ -71,6 +73,24 @@ try:
 except Exception as e:
     print(f"❌ Failed to initialize formatter: {e}")
     formatter = None
+
+# Initialize daily limit manager
+try:
+    daily_limit_manager = DailyLimitManager(db) if db else None
+    if daily_limit_manager:
+        print("✅ Daily limit manager initialized successfully")
+except Exception as e:
+    print(f"❌ Failed to initialize daily limit manager: {e}")
+    daily_limit_manager = None
+
+# Initialize public exams manager
+try:
+    public_exams_manager = PublicExamsManager(db) if db else None
+    if public_exams_manager:
+        print("✅ Public exams manager initialized successfully")
+except Exception as e:
+    print(f"❌ Failed to initialize public exams manager: {e}")
+    public_exams_manager = None
 
 # Initialize file processor
 try:
@@ -194,6 +214,23 @@ async def generate_exam(request: Request, exam_request: GenerateExamRequest):
     
     if not agent:
         raise HTTPException(status_code=500, detail="Agent not initialized. Check GEMINI_API_KEY.")
+    
+    # Check daily limit
+    if daily_limit_manager:
+        limit_check = daily_limit_manager.check_and_update_limit(user['id'])
+        if not limit_check['can_generate']:
+            raise HTTPException(
+                status_code=429,
+                detail=limit_check['message']
+            )
+        print(f"✅ Daily limit check passed: {limit_check['current']}/{limit_check['limit']}")
+    
+    # Check character limit (5000 chars)
+    if len(exam_request.text) > 5000:
+        raise HTTPException(
+            status_code=400,
+            detail="النص طويل جداً! الحد الأقصى هو 5000 حرف."
+        )
     
     try:
         # Format text if enabled
@@ -560,6 +597,123 @@ async def vocabulary_page(request: Request):
     
     with open("static/vocabulary.html", "r", encoding="utf-8") as f:
         return HTMLResponse(content=f.read())
+
+
+@app.get("/public-exams", response_class=HTMLResponse)
+async def public_exams_page(request: Request):
+    """Serve public exams page (requires authentication)"""
+    user = auth_manager.get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login")
+    
+    with open("static/public_exams.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read())
+
+
+@app.get("/api/daily-limit")
+async def get_daily_limit(request: Request):
+    """الحصول على الحد اليومي المتبقي"""
+    # Require authentication
+    user = auth_manager.require_auth(request)
+    
+    if not daily_limit_manager:
+        return JSONResponse({
+            "remaining": 5,
+            "current": 0,
+            "limit": 5
+        })
+    
+    try:
+        limit_info = daily_limit_manager.get_remaining_exams(user['id'])
+        return JSONResponse(limit_info)
+    except Exception as e:
+        print(f"Error getting daily limit: {e}")
+        return JSONResponse({
+            "remaining": 5,
+            "current": 0,
+            "limit": 5
+        })
+
+
+# Public Exams API
+@app.post("/api/exam/{exam_id}/toggle-public")
+async def toggle_exam_public(request: Request, exam_id: int):
+    """تغيير حالة الامتحان (عام/خاص)"""
+    user = auth_manager.require_auth(request)
+    
+    if not public_exams_manager or not db:
+        raise HTTPException(status_code=500, detail="Service not available")
+    
+    try:
+        # Get current exam to check ownership and current status
+        exam = db.get_exam(exam_id, user['id'])
+        if not exam:
+            raise HTTPException(status_code=404, detail="Exam not found or access denied")
+        
+        # Toggle status
+        new_status = not exam.get('is_public', False)
+        success = public_exams_manager.toggle_exam_public(exam_id, user['id'], new_status)
+        
+        if success:
+            return JSONResponse({
+                "success": True,
+                "is_public": new_status,
+                "message": "تم تغيير حالة الامتحان بنجاح"
+            })
+        else:
+            raise HTTPException(status_code=400, detail="Failed to update exam")
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error toggling exam public status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/public-exams")
+async def get_public_exams(request: Request, limit: int = 50, offset: int = 0):
+    """الحصول على قائمة الامتحانات العامة"""
+    # Authentication optional - anyone can view public exams
+    user = auth_manager.get_current_user(request)
+    
+    if not public_exams_manager:
+        raise HTTPException(status_code=500, detail="Service not available")
+    
+    try:
+        exams = public_exams_manager.get_public_exams(limit, offset)
+        total = public_exams_manager.get_public_exam_count()
+        
+        return JSONResponse({
+            "exams": exams,
+            "total": total,
+            "limit": limit,
+            "offset": offset
+        })
+    except Exception as e:
+        print(f"Error getting public exams: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/public-exam/{exam_id}")
+async def get_public_exam(request: Request, exam_id: int):
+    """الحصول على امتحان عام محدد"""
+    # Authentication optional - anyone can view public exams
+    user = auth_manager.get_current_user(request)
+    
+    if not public_exams_manager:
+        raise HTTPException(status_code=500, detail="Service not available")
+    
+    try:
+        exam = public_exams_manager.get_public_exam_by_id(exam_id)
+        if not exam:
+            raise HTTPException(status_code=404, detail="Public exam not found")
+        
+        return JSONResponse(exam)
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error getting public exam: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # Serve CSS and JS with correct content type

@@ -230,8 +230,43 @@
                         </div>
                     </div>
                     
+                    <!-- Text Stats -->
+                    <div class="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="flex items-center justify-between flex-wrap gap-3">
+                            <div class="flex items-center gap-4">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="type" class="w-4 h-4 text-gray-500"></i>
+                                    <span class="text-sm text-gray-600">الأحرف: <span id="charCount" class="font-semibold text-dark">0</span> / 5000</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="file-text" class="w-4 h-4 text-gray-500"></i>
+                                    <span class="text-sm text-gray-600">الكلمات: <span id="wordCount" class="font-semibold text-dark">0</span></span>
+                                </div>
+                            </div>
+                            <div id="dailyLimitInfo" class="flex items-center gap-2">
+                                <i data-lucide="calendar-check" class="w-4 h-4 text-primary"></i>
+                                <span class="text-sm text-gray-600">المتبقي اليوم: <span id="remainingExams" class="font-semibold text-primary">5</span> / 5</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Warning Messages -->
+                        <div id="textWarnings" class="mt-3 space-y-2 hidden">
+                            <div id="charLimitWarning" class="hidden flex items-start gap-2 text-sm text-amber-600 bg-amber-50 p-3 rounded-lg border border-amber-200">
+                                <i data-lucide="alert-triangle" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
+                                <span>تحذير: النص طويل جداً! الحد الأقصى هو 5000 حرف. يرجى تقصير النص.</span>
+                            </div>
+                            <div id="charMinWarning" class="hidden flex items-start gap-2 text-sm text-blue-600 bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                <i data-lucide="info" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
+                                <span>النص قصير. يُنصح بـ 150+ كلمة للحصول على أفضل النتائج.</span>
+                            </div>
+                            <div id="dailyLimitWarning" class="hidden flex items-start gap-2 text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-200">
+                                <i data-lucide="x-circle" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
+                                <span>لقد وصلت للحد اليومي (5 امتحانات). يرجى المحاولة غداً.</span>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="flex items-center space-x-4 space-x-reverse mt-6">
-                        <span class="text-sm text-gray-500"><span id="charCount">0</span> حرف</span>
                         <button id="generateBtn" class="btn-primary inline-flex items-center gap-2">
                             <i data-lucide="sparkles" class="w-5 h-5"></i>
                             توليد الامتحان

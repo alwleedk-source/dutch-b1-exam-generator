@@ -42,7 +42,40 @@ document.addEventListener('DOMContentLoaded', () => {
     checkHealth();
     setupEventListeners();
     updateCharCount();
+    loadDailyLimit();
 });
+
+// Load daily limit info
+async function loadDailyLimit() {
+    try {
+        const response = await fetch('/api/daily-limit');
+        if (!response.ok) {
+            console.warn('Failed to load daily limit');
+            return;
+        }
+        
+        const data = await response.json();
+        const remainingEl = document.getElementById('remainingExams');
+        const dailyLimitWarning = document.getElementById('dailyLimitWarning');
+        const textWarnings = document.getElementById('textWarnings');
+        const generateBtn = document.getElementById('generateBtn');
+        
+        if (remainingEl) {
+            remainingEl.textContent = data.remaining;
+        }
+        
+        // Show warning if limit reached
+        if (data.remaining === 0 && dailyLimitWarning) {
+            dailyLimitWarning.classList.remove('hidden');
+            dailyLimitWarning.classList.add('flex');
+            textWarnings.classList.remove('hidden');
+            generateBtn.disabled = true;
+            generateBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+    } catch (error) {
+        console.error('Error loading daily limit:', error);
+    }
+}
 
 // Setup Event Listeners
 function setupEventListeners() {
@@ -80,10 +113,56 @@ function switchMode(mode) {
     }
 }
 
-// Update character count
+// Update character count and show warnings
 function updateCharCount() {
-    const count = textInput.value.length;
-    charCount.textContent = count;
+    const text = textInput.value;
+    const charCountNum = text.length;
+    const wordCountNum = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+    
+    // Update counts
+    const charCountEl = document.getElementById('charCount');
+    const wordCountEl = document.getElementById('wordCount');
+    if (charCountEl) charCountEl.textContent = charCountNum;
+    if (wordCountEl) wordCountEl.textContent = wordCountNum;
+    
+    // Show/hide warnings
+    const textWarnings = document.getElementById('textWarnings');
+    const charLimitWarning = document.getElementById('charLimitWarning');
+    const charMinWarning = document.getElementById('charMinWarning');
+    const generateBtn = document.getElementById('generateBtn');
+    
+    let hasWarning = false;
+    
+    // Character limit warning (5000 chars)
+    if (charCountNum > 5000) {
+        charLimitWarning.classList.remove('hidden');
+        charLimitWarning.classList.add('flex');
+        generateBtn.disabled = true;
+        generateBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        hasWarning = true;
+    } else {
+        charLimitWarning.classList.add('hidden');
+        charLimitWarning.classList.remove('flex');
+        generateBtn.disabled = false;
+        generateBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+    
+    // Minimum words warning (150 words recommended)
+    if (wordCountNum > 0 && wordCountNum < 150) {
+        charMinWarning.classList.remove('hidden');
+        charMinWarning.classList.add('flex');
+        hasWarning = true;
+    } else {
+        charMinWarning.classList.add('hidden');
+        charMinWarning.classList.remove('flex');
+    }
+    
+    // Show/hide warnings container
+    if (hasWarning) {
+        textWarnings.classList.remove('hidden');
+    } else {
+        textWarnings.classList.add('hidden');
+    }
 }
 
 // Check API health
@@ -174,6 +253,9 @@ async function generateExam() {
         
         // Auto-save exam
         const examId = await saveExam(exam, text);
+        
+        // Reload daily limit
+        await loadDailyLimit();
         
         if (examId) {
             // Redirect to exam view page
