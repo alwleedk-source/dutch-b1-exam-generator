@@ -44,7 +44,9 @@ class AuthManager:
         app.add_middleware(
             SessionMiddleware,
             secret_key=self.secret_key,
-            max_age=30 * 24 * 60 * 60  # 30 days
+            max_age=30 * 24 * 60 * 60,  # 30 days
+            same_site='lax',             # Allow OAuth redirects
+            https_only=True              # Important for production security
         )
         
         # Configure OAuth

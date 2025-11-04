@@ -256,3 +256,49 @@ const apiUrl = isPublicExam
 - ✅ الامتحانات العامة تفتح بشكل صحيح
 - ✅ المستخدمون يمكنهم حل الامتحانات المشاركة
 - ✅ نفس الصفحة تعمل للامتحانات العامة والخاصة
+
+
+---
+
+## [Fix] 2025-11-04 - إصلاح مشكلة OAuth CSRF state mismatch
+
+### المشكلة
+- خطأ عند تسجيل الدخول: "mismatching_state: CSRF Warning! State not equal in request and response"
+- Session state لا يُحفظ بين طلب login وطلب callback
+
+### السبب
+- إعدادات SessionMiddleware غير كافية للـ production
+- نقص `same_site` و `https_only` يسبب مشاكل في حفظ cookies
+
+### الحل
+- إضافة `same_site='lax'` للسماح بـ OAuth redirects
+- إضافة `https_only=True` للأمان في production
+
+### التغييرات التقنية
+1. **ملف: auth.py**
+   - تحسين SessionMiddleware configuration
+   - إضافة same_site و https_only parameters
+
+### الكود المعدل:
+```python
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=self.secret_key,
+    max_age=30 * 24 * 60 * 60,  # 30 days
+    same_site='lax',             # Allow OAuth redirects
+    https_only=True              # Important for production security
+)
+```
+
+### متطلبات إضافية
+**يجب إضافة في Railway Variables:**
+```
+SESSION_SECRET_KEY=your_very_long_random_secret_key_here
+```
+
+**مهم:** يجب أن يكون طويل (32+ حرف) وثابت!
+
+### النتيجة المتوقعة
+- ✅ تسجيل الدخول عبر Google يعمل بشكل صحيح
+- ✅ Session تُحفظ بين الطلبات
+- ✅ لا يوجد خطأ CSRF
