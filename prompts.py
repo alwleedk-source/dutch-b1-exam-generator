@@ -44,7 +44,7 @@ ANALYSIS_PROMPT = """حلل النص الهولندي التالي بدقة:
 }}
 """
 
-QUESTION_GENERATION_PROMPT = """بناءً على التحليل السابق، ولّد امتحان قراءة احترافي لمستوى B1.
+QUESTION_GENERATION_PROMPT = """بناءً على التحليل السابق، ولّد امتحان قراءة احترافي لمستوى B1 يحاكي الامتحانات الرسمية الهولندية.
 
 النص:
 {text}
@@ -52,35 +52,95 @@ QUESTION_GENERATION_PROMPT = """بناءً على التحليل السابق، 
 التحليل:
 {analysis}
 
-المتطلبات:
-1. ولّد {num_questions} أسئلة متنوعة
-2. التوزيع المطلوب:
-   - 30% Globalverstehen (فهم عام) - سهلة
-   - 30% Detailverstehen (فهم التفاصيل) - متوسطة
-   - 20% Woordbetekenis (معنى الكلمات) - متوسطة
-   - 10% Tekstdoel (هدف النص) - صعبة
-   - 10% Inferentie (استنتاج) - صعبة
+⚠️ **قواعد ذهبية - إلزامية (من امتحانات B1 الرسمية):**
 
-3. قواعد مهمة:
-   ✅ كل سؤال يجب أن يكون قابل للإجابة من النص فقط
-   ✅ الخيارات الخاطئة يجب أن تكون معقولة ومنطقية (ليست سخيفة)
-   ✅ استخدم اللغة الهولندية في صياغة الأسئلة
-   ✅ لا تكرر نفس المعلومة في أكثر من سؤال
-   ✅ الخيارات يجب أن تكون متقاربة في الطول
-   ✅ رتب الأسئلة من السهل إلى الصعب
+1. **Paraphrasing (إعادة الصياغة) - إلزامي 100%:**
+   - ✅ السؤال يجب أن يستخدم كلمات مختلفة عن النص
+   - ✅ الإجابة الصحيحة يجب أن تكون بصياغة مختلفة
+   - ❌ لا تنسخ نفس الكلمات من النص
    
-   ⚠️ **قاعدة ذهبية - الأسئلة يجب أن تختبر الفهم الحقيقي:**
-   - الطالب يجب أن يفهم النص جيداً ليجيب صحيحاً
-   - الخيارات الخاطئة يجب أن تكون قريبة من الصحيحة (لكن مختلفة في تفصيل مهم)
-   - لا يمكن الإجابة بالتخمين أو المنطق العام
-   - كل سؤال يختبر فهم جزء محدد من النص
+   مثال من امتحان رسمي:
+   النص: "De centrale bakkerij werkt op een industriële manier met machines"
+   ❌ سؤال سيء: "Waar werkt men met machines?"
+   ✅ سؤال جيد: "Karl houdt van techniek. Welke werkplek past bij hem?"
 
-4. صيغ الأسئلة المفضلة:
-   - Globalverstehen: "Waar gaat deze tekst over?", "Wat is het hoofdonderwerp?"
-   - Detailverstehen: "Wanneer...?", "Waar...?", "Hoeveel...?", "Wie...?"
-   - Woordbetekenis: "Wat betekent het woord '...' in de tekst?"
-   - Tekstdoel: "Waarom heeft de schrijver deze tekst geschreven?"
-   - Inferentie: "Wat kun je concluderen uit deze tekst?"
+2. **Sophisticated Distractors (خيارات مربكة متطورة):**
+   - ✅ جميع الخيارات يجب أن تكون مذكورة في النص
+   - ✅ واحد فقط يجيب على السؤال بشكل صحيح
+   - ✅ الخيارات الخاطئة منطقية لكن لسياق مختلف
+   
+   مثال من امتحان رسمي:
+   السؤال: "Joshua wil in de decentrale bakkerij werken. Hoe laat moet hij beginnen?"
+   a) tussen 2.00 en 4.00 uur ← مذكور في النص (لكن للسائقين)
+   b) om 7.00 uur ← ✅ الإجابة الصحيحة (للمخبز اللامركزي)
+   c) om 17.00 uur ← مذكور في النص (لكن وقت الإغلاق)
+
+3. **3 خيارات فقط (A, B, C):**
+   - ✅ دائماً 3 خيارات فقط
+   - ❌ لا تضع خيار D أبداً
+   - هذا هو المعيار في امتحانات B1 الرسمية
+
+4. **يتطلب فهم عميق:**
+   - ✅ لا يمكن الإجابة بمجرد البحث عن كلمة
+   - ✅ يتطلب فهم السياق والعلاقات
+   - ✅ يتطلب ربط معلومات من أجزاء مختلفة
+   - ❌ لا أسئلة سهلة يمكن الإجابة عليها بالتخمين
+
+---
+
+**المتطلبات:**
+
+1. ولّد {num_questions} أسئلة متنوعة
+
+2. **أنواع الأسئلة (حسب الامتحانات الرسمية):**
+   - **Detail questions (40%):** عن تفاصيل محددة (لكن بإعادة صياغة)
+     مثال: "Hoe laat moet hij beginnen?", "Waar vindt de vergadering plaats?"
+   
+   - **Inference questions (40%):** تتطلب استنتاج وربط معلومات
+     مثال: "Welke werkplek past bij hem?", "Wat heeft [naam] nodig om...?"
+   
+   - **Main idea questions (20%):** عن الهدف العام للنص
+     مثال: "Wat is het doel van deze tekst?"
+
+3. **مستوى الصعوبة:**
+   - Medium: 50-60% من الأسئلة
+   - Hard: 40-50% من الأسئلة
+   - ❌ لا أسئلة سهلة (easy)
+
+4. **أمثلة من امتحانات B1 الرسمية:**
+
+   **مثال 1 - Detail Question (Medium):**
+   ```
+   النص: "In de centrale bakkerij wordt van 5.00 uur tot 23.00 uur gewerkt.
+           In de decentrale bakkerij start je om 7.00 uur.
+           Chauffeurs leveren tussen 2.00 en 4.00 uur."
+   
+   السؤال: "Joshua wil in de decentrale bakkerij werken. Hoe laat moet hij beginnen?"
+   a) tussen 2.00 en 4.00 uur ← مذكور (السائقون)
+   b) om 7.00 uur ← ✅ الإجابة الصحيحة
+   c) om 17.00 uur ← مذكور (وقت الإغلاق)
+   ```
+
+   **مثال 2 - Inference Question (Hard):**
+   ```
+   النص: "De centrale bakkerij werkt op een industriële manier. Door techniek kunnen we 
+           per uur wel 1500 appeltaarten maken. Heb je gevoel voor techniek en machines..."
+   
+   السؤال: "Karl houdt van techniek. Welke werkplek past bij hem?"
+   a) de centrale bakkerij ← ✅ الإجابة الصحيحة (تستخدم machines)
+   b) de decentrale bakkerij ← مذكور (لكن لا تركز على techniek)
+   c) de proefbakkerij ← مذكور (لكن للتطوير)
+   ```
+
+   **مثال 3 - Main Idea Question (Hard):**
+   ```
+   النص: [نص عن وظائف في Marké bakkerij]
+   
+   السؤال: "Wat is het doel van deze tekst?"
+   a) de lezer informeren over de werkprocessen ← جزئياً صحيح
+   b) de lezer overhalen om te solliciteren ← ✅ الإجابة الصحيحة
+   c) de lezer uitleggen hoe professioneel de afdelingen zijn ← جزئياً صحيح
+   ```
 
 5. **تنسيق النص المطلوب:**
    - قم بإعادة صياغة النص الأصلي بشكل منظم ومنسق
@@ -89,41 +149,37 @@ QUESTION_GENERATION_PROMPT = """بناءً على التحليل السابق، 
    - أضف عناوين فرعية إذا كان النص يحتوي على أقسام مختلفة
    - استخدم سطر جديد (\n) بين كل فقرة
    - احتفظ بنفس المحتوى والمعنى، فقط حسّن التنسيق
-   - مثال للتنسيق:
-     ```
-     العنوان الرئيسي
-     
-     الفقرة الأولى هنا...
-     
-     العنوان الفرعي (إذا وجد)
-     
-     الفقرة الثانية هنا...
-     ```
 
-أرجع النتيجة بصيغة JSON:
+---
+
+**أرجع النتيجة بصيغة JSON:**
 {{
   "exam_title": "عنوان الامتحان",
-  "formatted_text": "النص المنسق مع عناوين وفقرات (استخدم \\n للفصل)",
+  "formatted_text": "النص المنسق مع عناوين وفقرات (استخدم \n للفصل)",
   "total_questions": {num_questions},
   "questions": [
     {{
       "id": 1,
-      "type": "نوع السؤال",
-      "difficulty": "easy/medium/hard",
-      "question_nl": "السؤال بالهولندية",
+      "type": "detail/inference/main_idea",
+      "difficulty": "medium/hard",
+      "question_nl": "السؤال بالهولندية (بإعادة صياغة - ليس نفس كلمات النص)",
       "question_ar": "السؤال بالعربية (اختياري)",
       "options": [
-        {{"id": "a", "text": "الخيار الأول", "correct": false}},
-        {{"id": "b", "text": "الخيار الثاني", "correct": true}},
-        {{"id": "c", "text": "الخيار الثالث", "correct": false}},
-        {{"id": "d", "text": "الخيار الرابع (اختياري)", "correct": false}}
+        {{"id": "a", "text": "خيار من النص - سياق مختلف", "correct": false}},
+        {{"id": "b", "text": "الإجابة الصحيحة - بإعادة صياغة", "correct": true}},
+        {{"id": "c", "text": "خيار من النص - سياق مختلف", "correct": false}}
       ],
       "explanation": "شرح مختصر لماذا هذه الإجابة صحيحة"
     }}
   ]
 }}
 
-مهم جداً: تأكد من أن كل سؤال يختبر فهماً حقيقياً وليس مجرد نسخ من النص.
+⚠️ **تذكر - هذه قواعد إلزامية:**
+- Paraphrasing إلزامي في كل سؤال (استخدم كلمات مختلفة)
+- جميع الخيارات من النص (لكن واحد فقط يجيب على السؤال)
+- 3 خيارات فقط (A, B, C) - لا تضع D
+- يتطلب فهم عميق (ليس بحث عن كلمة)
+- لا أسئلة سهلة - فقط medium و hard
 """
 
 VERIFICATION_PROMPT = """راجع الأسئلة التالية وتحقق من جودتها:
