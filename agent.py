@@ -8,7 +8,6 @@ import json
 import re
 from typing import Dict, List, Optional
 import google.generativeai as genai
-from google import genai as genai_new  # New SDK for structured output
 from prompts import (
     SYSTEM_PROMPT,
     ANALYSIS_PROMPT,
@@ -16,7 +15,6 @@ from prompts import (
     VERIFICATION_PROMPT,
     FEW_SHOT_EXAMPLES
 )
-from schemas import Exam, Question, Option
 
 
 class DutchB1ExamAgent:
@@ -36,11 +34,8 @@ class DutchB1ExamAgent:
         if not self.api_key:
             raise ValueError("GEMINI_API_KEY not found in environment variables")
         
-        # Configure Gemini (old SDK)
+        # Configure Gemini
         genai.configure(api_key=self.api_key)
-        
-        # Initialize new SDK client for structured output
-        self.client = genai_new.Client(api_key=self.api_key)
         
         # Model configuration for quality output
         self.generation_config = {
@@ -50,7 +45,7 @@ class DutchB1ExamAgent:
             "max_output_tokens": 8192,  # Increased to ensure complete questions array
         }
         
-        # Initialize model (old SDK - for backward compatibility)
+        # Initialize model
         self.model = genai.GenerativeModel(
             model_name="gemini-2.0-flash-exp",
             generation_config=self.generation_config,
@@ -172,44 +167,20 @@ class DutchB1ExamAgent:
                 num_questions=num_questions
             )
             
-            # Use structured output with new SDK
-            try:
-                response = self.client.models.generate_content(
-                    model="gemini-2.0-flash-exp",
-                    contents=prompt,
-                    config={
-                        "response_mime_type": "application/json",
-                        "response_schema": Exam,
-                        "temperature": 0.7,
-                    },
-                )
-                
-                # Get parsed result (Pydantic object)
-                exam_obj = response.parsed
-                
-                # Convert to dict
-                exam = exam_obj.model_dump()
-                
-                print(f"✅ Structured output: Generated {len(exam['questions'])} questions")
-                
-            except Exception as e:
-                print(f"⚠️ Structured output failed: {e}")
-                print(f"🔄 Falling back to old method...")
-                
-                # Fallback to old method
-                response = self.model.generate_content(prompt)
-                
-                # Extract JSON from response
-                exam = self._extract_json(response.text)
-                
-                # Validate questions field
-                if "questions" not in exam or not isinstance(exam["questions"], list):
-                    print(f"Warning: Invalid or missing questions in response. Raw response: {response.text[:500]}")
-                    raise ValueError("AI response does not contain valid 'questions' array")
-                
-                if len(exam["questions"]) == 0:
-                    print(f"Warning: Empty questions array in response")
-                    raise ValueError("AI response contains empty 'questions' array")
+            # Generate content
+            response = self.model.generate_content(prompt)
+            
+            # Extract JSON from response
+            exam = self._extract_json(response.text)
+            
+            # Validate questions field
+            if "questions" not in exam or not isinstance(exam["questions"], list):
+                print(f"Warning: Invalid or missing questions in response. Raw response: {response.text[:500]}")
+                raise ValueError("AI response does not contain valid 'questions' array")
+            
+            if len(exam["questions"]) == 0:
+                print(f"Warning: Empty questions array in response")
+                raise ValueError("AI response contains empty 'questions' array")
             
             # Randomize options order for each question
             self._randomize_options(exam["questions"])
