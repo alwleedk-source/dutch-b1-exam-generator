@@ -325,3 +325,51 @@ SESSION_SECRET_KEY=your_very_long_random_secret_key_here
 - Cookies
 
 هذا سيساعد في تحديد السبب الدقيق للمشكلة.
+
+
+---
+
+## [Fix] 2025-11-04 - الحل النهائي لمشكلة OAuth CSRF
+
+### السبب الحقيقي
+بعد إضافة logging مفصل، اكتشفنا أن:
+- State **موجود** في session ✅
+- لكن بمفتاح مختلف: `_state_google_{value}` ❌
+- الكود كان يبحث عن `oauth_state` بدلاً من المفتاح الصحيح
+
+### كيف تعمل Authlib
+- Authlib تحفظ state في session بمفتاح: `_state_google_{state_value}`
+- Authlib تتحقق تلقائياً من state عند استدعاء `authorize_access_token()`
+- لا نحتاج للتحقق اليدوي!
+
+### الحل
+- إزالة debug logging
+- الاعتماد على Authlib للتحقق التلقائي من state
+- Session settings (same_site, https_only) التي أضفناها سابقاً صحيحة
+
+### التغييرات
+1. **ملف: auth.py**
+   - إزالة debug logging
+   - إضافة تعليق توضيحي: Authlib تتحقق تلقائياً
+
+### الكود النهائي:
+```python
+async def callback(self, request: Request, db):
+    if not self.oauth_enabled:
+        return RedirectResponse(url='/')
+    
+    try:
+        # Authlib automatically verifies state from session
+        # No manual verification needed - it's handled internally
+        token = await self.oauth.google.authorize_access_token(request)
+        # ... rest of code
+```
+
+### النتيجة المتوقعة
+- ✅ OAuth يعمل بشكل صحيح
+- ✅ State يُتحقق منه تلقائياً بواسطة Authlib
+- ✅ لا يوجد CSRF warning
+- ✅ تسجيل الدخول يعمل بسلاسة
+
+### ملاحظة
+يجب التأكد من وجود `SESSION_SECRET_KEY` في Railway Variables!

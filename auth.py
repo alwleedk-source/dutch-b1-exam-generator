@@ -99,16 +99,8 @@ class AuthManager:
             return RedirectResponse(url='/')
         
         try:
-            # Debug logging
-            state_from_url = request.query_params.get('state')
-            state_from_session = request.session.get('oauth_state') if hasattr(request, 'session') else None
-            print(f"🔍 OAuth Callback Debug:")
-            print(f"  State from URL: {state_from_url}")
-            print(f"  State from session: {state_from_session}")
-            print(f"  Session keys: {list(request.session.keys()) if hasattr(request, 'session') else 'NO SESSION'}")
-            print(f"  Cookies: {list(request.cookies.keys())}")
-            
-            # Get access token
+            # Authlib automatically verifies state from session
+            # No manual verification needed - it's handled internally
             token = await self.oauth.google.authorize_access_token(request)
             
             # Get user info
