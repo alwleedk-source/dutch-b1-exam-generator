@@ -178,9 +178,7 @@
                 <!-- Logo -->
                 <a href="/" class="flex items-center space-x-3 space-x-reverse">
                     <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                        </svg>
+                        <i data-lucide="book-open" class="w-6 h-6 text-white"></i>
                     </div>
                     <span class="text-xl font-bold text-dark">مولد امتحانات القراءة</span>
                 </a>
@@ -195,10 +193,8 @@
                 <!-- User Info -->
                 <div class="flex items-center space-x-4 space-x-reverse">
                     <span id="userName" class="text-sm text-gray-600 hidden md:block">جاري التحميل...</span>
-                    <button onclick="logout()" class="btn-secondary text-sm py-2 px-4">
-                        <svg class="w-4 h-4 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                        </svg>
+                    <button onclick="logout()" class="btn-secondary text-sm py-2 px-4 inline-flex items-center gap-2">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
                         خروج
                     </button>
                 </div>
@@ -220,11 +216,9 @@
             </p>
             
             <!-- Status Badge -->
-            <div id="statusBadge" class="inline-flex items-center mt-6 px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-                <svg class="w-4 h-4 ml-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                </svg>
-                النظام جاهز
+            <div id="statusBadge" class="inline-flex items-center mt-6 px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium gap-2">
+                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                <span id="statusText">النظام جاهز</span>
             </div>
         </div>
         
@@ -235,9 +229,7 @@
                 <p class="text-gray-600 mb-6">ارفع صورة أو ملف PDF يحتوي على نص هولندي لاستخراج النص تلقائياً</p>
                 
                 <div id="fileUploadArea" class="border-2 border-dashed border-gray-300 rounded-xl p-12 text-center cursor-pointer transition-all hover:border-primary hover:bg-green-50">
-                    <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                    </svg>
+                    <i data-lucide="upload-cloud" class="w-16 h-16 mx-auto text-gray-400 mb-4"></i>
                     <p class="text-lg font-semibold text-dark mb-2">اسحب الملف هنا أو انقر للاختيار</p>
                     <p class="text-sm text-gray-500">الصيغ المدعومة: JPG, PNG, PDF (حتى 10MB)</p>
                 </div>
@@ -282,10 +274,8 @@ De gemeente Amsterdam organiseert een gratis cursus Nederlands voor nieuwe inwon
                     
                     <div class="flex items-center space-x-4 space-x-reverse">
                         <span class="text-sm text-gray-500"><span id="charCount">0</span> حرف</span>
-                        <button id="generateBtn" class="btn-primary">
-                            <svg class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                            </svg>
+                        <button id="generateBtn" class="btn-primary inline-flex items-center gap-2">
+                            <i data-lucide="sparkles" class="w-5 h-5"></i>
                             توليد الامتحان
                         </button>
                     </div>
@@ -305,28 +295,20 @@ De gemeente Amsterdam organiseert een gratis cursus Nederlands voor nieuwe inwon
             <div class="glass-card rounded-2xl p-6 mb-8 flex flex-wrap items-center justify-between gap-4">
                 <h2 class="text-2xl font-bold text-dark">الامتحان المولّد</h2>
                 <div class="flex flex-wrap gap-3">
-                    <button id="saveExamBtn" class="btn-primary">
-                        <svg class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
-                        </svg>
+                    <button id="saveExamBtn" class="btn-primary inline-flex items-center gap-2">
+                        <i data-lucide="save" class="w-5 h-5"></i>
                         حفظ الامتحان
                     </button>
-                    <button id="copyBtn" class="btn-secondary">
-                        <svg class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                        </svg>
+                    <button id="copyBtn" class="btn-secondary inline-flex items-center gap-2">
+                        <i data-lucide="copy" class="w-5 h-5"></i>
                         نسخ
                     </button>
-                    <button id="printBtn" class="btn-secondary">
-                        <svg class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
-                        </svg>
+                    <button id="printBtn" class="btn-secondary inline-flex items-center gap-2">
+                        <i data-lucide="printer" class="w-5 h-5"></i>
                         طباعة
                     </button>
-                    <button id="newExamBtn" class="btn-secondary">
-                        <svg class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                        </svg>
+                    <button id="newExamBtn" class="btn-secondary inline-flex items-center gap-2">
+                        <i data-lucide="refresh-cw" class="w-5 h-5"></i>
                         امتحان جديد
                     </button>
                 </div>
@@ -359,10 +341,8 @@ De gemeente Amsterdam organiseert een gratis cursus Nederlands voor nieuwe inwon
             
             <!-- Submit Test Button -->
             <div class="text-center mb-8">
-                <button id="submitTestBtn" class="hidden btn-primary text-lg px-12 py-4">
-                    <svg class="w-6 h-6 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
+                <button id="submitTestBtn" class="hidden btn-primary text-lg px-12 py-4 inline-flex items-center gap-2">
+                    <i data-lucide="check-circle" class="w-6 h-6"></i>
                     تصحيح الاختبار
                 </button>
             </div>
