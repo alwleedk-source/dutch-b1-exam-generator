@@ -1,247 +1,187 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول - مولد امتحانات القراءة الهولندية B1</title>
-    
-    <!-- Tailwind CSS CDN -->
+    <title>تسجيل الدخول - Dutch B1 Exam Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#10B981',
-                        secondary: '#6366F1',
-                        dark: '#0F172A',
-                        light: '#F8FAFC',
-                    },
-                    fontFamily: {
-                        sans: ['Cairo', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
-    
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        * {
-            font-family: 'Cairo', sans-serif;
-        }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            background-size: 200% 200%;
-            animation: gradientShift 15s ease infinite;
-        }
-        
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .highlight-box {
-            background: #10B981;
-            padding: 0 16px;
-            border-radius: 8px;
-            display: inline-block;
-        }
-        
-        .btn-google {
-            background: white;
-            color: #0F172A;
-            padding: 16px 32px;
-            border-radius: 12px;
-            font-weight: 600;
-            transition: all 0.3s;
-            border: 2px solid #E2E8F0;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 18px;
-        }
-        
-        .btn-google:hover {
-            border-color: #10B981;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-        
-        .feature-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 24px;
-            border-radius: 16px;
-            transition: all 0.3s;
-        }
-        
-        .feature-card:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-4px);
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.8s ease-in;
-        }
-        
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .float {
-            animation: float 6s ease-in-out infinite;
         }
         
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
-<body class="gradient-bg min-h-screen flex items-center justify-center p-4">
-    
-    <div class="max-w-6xl w-full">
-        <div class="grid md:grid-cols-2 gap-8 items-center">
-            
-            <!-- Left Side - Login Card -->
-            <div class="glass-card rounded-3xl p-10 shadow-2xl fade-in">
-                <!-- Logo -->
-                <div class="flex items-center justify-center mb-8">
-                    <div class="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center float">
-                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                        </svg>
-                    </div>
+<body class="bg-gradient-to-br from-blue-50 via-purple-50 to-green-50 min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-5xl w-full grid md:grid-cols-2 gap-8 items-center">
+        <!-- Left Side - Branding & Features -->
+        <div class="hidden md:block space-y-6 animate-fadeIn">
+            <div class="text-center md:text-right">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl mb-4 animate-float">
+                    <i data-lucide="book-open" class="w-10 h-10 text-white"></i>
                 </div>
-                
-                <!-- Title -->
-                <h1 class="text-4xl font-black text-dark text-center mb-3">
-                    مرحباً بك!
-                </h1>
-                <p class="text-gray-600 text-center mb-8 text-lg">
-                    سجل دخولك لبدء توليد امتحانات القراءة الهولندية
-                </p>
-                
-                <!-- Google Login Button -->
-                <a href="/auth/login" class="btn-google w-full justify-center">
-                    <svg class="w-6 h-6" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                    </svg>
-                    تسجيل الدخول بحساب Google
-                </a>
-                
-                <!-- Divider -->
-                <div class="flex items-center my-8">
-                    <div class="flex-1 border-t border-gray-300"></div>
-                    <span class="px-4 text-gray-500 text-sm">أو</span>
-                    <div class="flex-1 border-t border-gray-300"></div>
-                </div>
-                
-                <!-- Features -->
-                <div class="space-y-3">
-                    <div class="flex items-center gap-3 text-gray-700">
-                        <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                        </svg>
-                        <span>آمن ومحمي بالكامل</span>
-                    </div>
-                    <div class="flex items-center gap-3 text-gray-700">
-                        <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                        </svg>
-                        <span>لا حاجة لإنشاء حساب جديد</span>
-                    </div>
-                    <div class="flex items-center gap-3 text-gray-700">
-                        <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                        </svg>
-                        <span>ابدأ فوراً بعد تسجيل الدخول</span>
-                    </div>
-                </div>
-                
-                <!-- Footer -->
-                <p class="text-center text-sm text-gray-500 mt-8">
-                    بتسجيل الدخول، أنت توافق على
-                    <a href="#" class="text-primary hover:underline">شروط الاستخدام</a>
-                    و
-                    <a href="#" class="text-primary hover:underline">سياسة الخصوصية</a>
-                </p>
+                <h1 class="text-4xl font-bold text-gray-900 mb-2">Dutch B1 Exam Generator</h1>
+                <p class="text-lg text-gray-600">منصة ذكية لتوليد امتحانات القراءة الهولندية</p>
             </div>
             
-            <!-- Right Side - Info -->
-            <div class="text-white space-y-6 fade-in">
-                <h2 class="text-5xl font-black leading-tight">
-                    مولد <span class="highlight-box">امتحانات القراءة</span><br>
-                    الهولندية B1
-                </h2>
-                
-                <p class="text-xl text-white/90 leading-relaxed">
-                    أداة ذكية مدعومة بالذكاء الاصطناعي لتوليد امتحانات قراءة احترافية بمستوى B1 متوافقة مع معايير CEFR
-                </p>
-                
-                <!-- Features Grid -->
-                <div class="grid grid-cols-2 gap-4 mt-8">
-                    <div class="feature-card">
-                        <div class="text-3xl mb-2">⚡</div>
-                        <h3 class="font-bold text-lg mb-1">سريع وذكي</h3>
-                        <p class="text-sm text-white/80">توليد في ثوانٍ</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="text-3xl mb-2">🎯</div>
-                        <h3 class="font-bold text-lg mb-1">دقيق</h3>
-                        <p class="text-sm text-white/80">متوافق مع B1</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="text-3xl mb-2">💾</div>
-                        <h3 class="font-bold text-lg mb-1">حفظ سحابي</h3>
-                        <p class="text-sm text-white/80">امتحاناتك محفوظة</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="text-3xl mb-2">📚</div>
-                        <h3 class="font-bold text-lg mb-1">قاموس ذكي</h3>
-                        <p class="text-sm text-white/80">ترجمة فورية</p>
-                    </div>
+            <div class="space-y-3" id="featuresList">
+                <!-- Features will be loaded dynamically -->
+            </div>
+        </div>
+        
+        <!-- Right Side - Login Card -->
+        <div class="bg-white rounded-2xl shadow-2xl p-8 md:p-12 animate-fadeIn" style="animation-delay: 0.2s;">
+            <!-- Mobile Logo -->
+            <div class="md:hidden text-center mb-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl mb-3">
+                    <i data-lucide="book-open" class="w-8 h-8 text-white"></i>
                 </div>
-                
-                <!-- Stats -->
-                <div class="flex gap-8 mt-8 pt-8 border-t border-white/20">
-                    <div>
-                        <div class="text-3xl font-black">1000+</div>
-                        <div class="text-sm text-white/80">امتحان مولّد</div>
-                    </div>
-                    <div>
-                        <div class="text-3xl font-black">500+</div>
-                        <div class="text-sm text-white/80">مستخدم نشط</div>
-                    </div>
-                    <div>
-                        <div class="text-3xl font-black">4.9</div>
-                        <div class="text-sm text-white/80">تقييم المستخدمين</div>
-                    </div>
-                </div>
+                <h2 class="text-2xl font-bold text-gray-900">Dutch B1 Exam Generator</h2>
             </div>
             
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">مرحباً بك!</h2>
+                <p class="text-gray-600">سجل الدخول للوصول إلى جميع الميزات</p>
+            </div>
+            
+            <!-- Login Button -->
+            <a href="/auth/login" 
+               class="flex items-center justify-center gap-3 w-full bg-white border-2 border-gray-300 hover:border-blue-500 text-gray-700 font-semibold py-4 px-6 rounded-xl transition-all duration-300 hover:shadow-lg group">
+                <svg class="w-6 h-6" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                <span class="text-lg">تسجيل الدخول بحساب Google</span>
+            </a>
+            
+            <!-- Security Note -->
+            <div class="mt-6 flex items-center justify-center gap-2 text-sm text-gray-500">
+                <i data-lucide="shield-check" class="w-4 h-4 text-green-600"></i>
+                <span>آمن ومحمي بتقنية Google OAuth 2.0</span>
+            </div>
+            
+            <!-- Mobile Features -->
+            <div class="md:hidden mt-8 pt-8 border-t border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <i data-lucide="sparkles" class="w-5 h-5 text-purple-600"></i>
+                    <span>مميزات المنصة</span>
+                </h3>
+                <div class="space-y-2" id="mobileFeaturesList">
+                    <!-- Features will be loaded dynamically -->
+                </div>
+            </div>
         </div>
     </div>
     
+    <script>
+        // Dynamic features list
+        const features = [
+            {
+                icon: 'brain',
+                title: 'توليد امتحانات بالذكاء الاصطناعي',
+                description: 'امتحانات احترافية مخصصة لمستوى B1',
+                color: 'blue'
+            },
+            {
+                icon: 'save',
+                title: 'حفظ الامتحانات',
+                description: 'احفظ جميع امتحاناتك للمراجعة لاحقاً',
+                color: 'green'
+            },
+            {
+                icon: 'upload',
+                title: 'رفع الملفات',
+                description: 'دعم الصور ومستندات PDF',
+                color: 'purple'
+            },
+            {
+                icon: 'languages',
+                title: 'ترجمة تفاعلية',
+                description: 'ترجمة فورية للكلمات الصعبة',
+                color: 'orange'
+            },
+            {
+                icon: 'layout',
+                title: 'تنسيق تلقائي',
+                description: 'تنسيق احترافي للنصوص',
+                color: 'pink'
+            },
+            {
+                icon: 'book-marked',
+                title: 'قائمة المفردات',
+                description: 'احفظ الكلمات وتدرب عليها',
+                color: 'indigo'
+            }
+        ];
+        
+        const colorClasses = {
+            blue: 'from-blue-500 to-blue-600',
+            green: 'from-green-500 to-green-600',
+            purple: 'from-purple-500 to-purple-600',
+            orange: 'from-orange-500 to-orange-600',
+            pink: 'from-pink-500 to-pink-600',
+            indigo: 'from-indigo-500 to-indigo-600'
+        };
+        
+        // Render desktop features
+        const featuresList = document.getElementById('featuresList');
+        features.forEach((feature, index) => {
+            const delay = (index + 1) * 0.1;
+            featuresList.innerHTML += `
+                <div class="feature-card bg-white rounded-xl p-4 shadow-md animate-fadeIn" style="animation-delay: ${delay}s;">
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br ${colorClasses[feature.color]} rounded-lg flex items-center justify-center">
+                            <i data-lucide="${feature.icon}" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-gray-900 mb-1">${feature.title}</h3>
+                            <p class="text-sm text-gray-600">${feature.description}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        // Render mobile features
+        const mobileFeaturesList = document.getElementById('mobileFeaturesList');
+        features.forEach(feature => {
+            mobileFeaturesList.innerHTML += `
+                <div class="flex items-center gap-3 text-sm">
+                    <div class="flex-shrink-0 w-8 h-8 bg-gradient-to-br ${colorClasses[feature.color]} rounded-lg flex items-center justify-center">
+                        <i data-lucide="${feature.icon}" class="w-4 h-4 text-white"></i>
+                    </div>
+                    <span class="text-gray-700">${feature.title}</span>
+                </div>
+            `;
+        });
+        
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
 </body>
 </html>
