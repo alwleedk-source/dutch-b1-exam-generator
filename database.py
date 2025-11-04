@@ -63,6 +63,15 @@ class Database:
                 ADD COLUMN IF NOT EXISTS last_exam_date DATE
             """)
             
+            # Create development user if DISABLE_AUTH is enabled
+            if os.getenv('DISABLE_AUTH', '').lower() == 'true':
+                cursor.execute("""
+                    INSERT INTO users (id, google_id, email, name, picture, daily_exam_count, last_exam_date)
+                    VALUES (1, 'dev_user', 'dev@example.com', 'Development User', '', 0, NULL)
+                    ON CONFLICT (google_id) DO NOTHING
+                """)
+                print("✅ Development user (id=1) created/verified for DISABLE_AUTH mode")
+            
             # Exams table
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS exams (

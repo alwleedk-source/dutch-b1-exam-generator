@@ -439,3 +439,68 @@ async def login(self, request: Request):
 المحاولات التالية فشلت بسبب تراكم states قديمة.
 
 الآن، كل محاولة تبدأ بـ session نظيفة! 🎉
+
+
+---
+
+## [Fix] 2025-11-04 - إصلاح مشكلة العداد اليومي مع DISABLE_AUTH
+
+### المشكلة
+
+عند تفعيل `DISABLE_AUTH=true`:
+- العداد يظهر دائماً "5 / 5"
+- لا يمكن إنشاء امتحانات
+- السبب: user_id=1 (Development User) غير موجود في قاعدة البيانات!
+
+### التحليل
+
+**عند DISABLE_AUTH:**
+```python
+# auth.py
+def get_current_user(self, request):
+    if not self.oauth_enabled:
+        return {'id': 1, ...}  # يُرجع user_id=1
+```
+
+**لكن في قاعدة البيانات:**
+- لا يوجد user بـ id=1
+- `daily_limit.py` يبحث عن user_id=1 → لا يجده
+- يُرجع "User not found"
+- لا يمكن إنشاء امتحانات!
+
+### الحل
+
+**إضافة إنشاء تلقائي لـ Development User:**
+
+```python
+# database.py - في init_tables()
+if os.getenv('DISABLE_AUTH', '').lower() == 'true':
+    cursor.execute("""
+        INSERT INTO users (id, google_id, email, name, picture, daily_exam_count, last_exam_date)
+        VALUES (1, 'dev_user', 'dev@example.com', 'Development User', '', 0, NULL)
+        ON CONFLICT (google_id) DO NOTHING
+    """)
+```
+
+**الآن:**
+- عند تفعيل DISABLE_AUTH، يتم إنشاء user_id=1 تلقائياً
+- العداد اليومي يعمل بشكل صحيح
+- يمكن إنشاء امتحانات!
+
+### التغييرات
+
+1. **ملف: database.py - دالة init_tables()**
+   - إضافة إنشاء Development User عند DISABLE_AUTH=true
+   - استخدام ON CONFLICT DO NOTHING لتجنب الأخطاء
+
+### النتيجة المتوقعة
+
+- ✅ العداد يعمل: 5/5 → 4/5 → 3/5 ... → 0/5
+- ✅ يمكن إنشاء امتحانات حتى الوصول للحد
+- ✅ يتم reset كل يوم تلقائياً
+- ✅ DISABLE_AUTH يعمل بشكل كامل
+
+### ملاحظة
+
+هذا الإصلاح ضروري فقط عند استخدام DISABLE_AUTH.
+في production مع OAuth، يتم إنشاء المستخدمين تلقائياً عند تسجيل الدخول.
