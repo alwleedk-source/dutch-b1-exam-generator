@@ -504,3 +504,72 @@ if os.getenv('DISABLE_AUTH', '').lower() == 'true':
 
 هذا الإصلاح ضروري فقط عند استخدام DISABLE_AUTH.
 في production مع OAuth، يتم إنشاء المستخدمين تلقائياً عند تسجيل الدخول.
+
+
+---
+
+## [Fix] 2025-11-04 - إصلاح تحديث إحصائيات النص (الأحرف والكلمات)
+
+### المشكلة
+
+عند الكتابة في حقل النص، لا يتم تحديث:
+- عدد الأحرف (يبقى 0 / 5000)
+- عدد الكلمات (يبقى 0)
+
+### السبب
+
+**لا يوجد event listener على textarea!**
+
+```html
+<textarea id="textInput" ...></textarea>
+
+<!-- لا يوجد JavaScript يستمع للتغييرات! -->
+```
+
+### الحل
+
+**إضافة دالة updateTextStats() و event listener:**
+
+```javascript
+// Update text statistics
+function updateTextStats() {
+    const textInput = document.getElementById('textInput');
+    const charCount = document.getElementById('charCount');
+    const wordCount = document.getElementById('wordCount');
+    
+    if (textInput && charCount && wordCount) {
+        const text = textInput.value;
+        const chars = text.length;
+        const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+        
+        charCount.textContent = chars;
+        wordCount.textContent = words;
+    }
+}
+
+// Add event listener
+document.addEventListener('DOMContentLoaded', () => {
+    const textInput = document.getElementById('textInput');
+    if (textInput) {
+        textInput.addEventListener('input', updateTextStats);
+        updateTextStats(); // Initial update
+    }
+});
+```
+
+### التغييرات
+
+1. **ملف: index_v3.html**
+   - إضافة دالة `updateTextStats()`
+   - إضافة event listener على textarea
+   - تحديث تلقائي عند الكتابة
+
+### النتيجة المتوقعة
+
+**عند الكتابة:**
+```
+الأحرف: 0 / 5000  →  الأحرف: 150 / 5000  ✅
+الكلمات: 0        →  الكلمات: 25          ✅
+```
+
+**تحديث فوري مع كل حرف!**

@@ -679,11 +679,35 @@
             }
         }
         
+        // Update text statistics (character count, word count)
+        function updateTextStats() {
+            const textInput = document.getElementById('textInput');
+            const charCount = document.getElementById('charCount');
+            const wordCount = document.getElementById('wordCount');
+            
+            if (textInput && charCount && wordCount) {
+                const text = textInput.value;
+                const chars = text.length;
+                const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+                
+                charCount.textContent = chars;
+                wordCount.textContent = words;
+            }
+        }
+        
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', async () => {
             await loadUserInfo();
             await loadDailyLimit();
             lucide.createIcons();
+            
+            // Add event listener for text input
+            const textInput = document.getElementById('textInput');
+            if (textInput) {
+                textInput.addEventListener('input', updateTextStats);
+                // Initial update
+                updateTextStats();
+            }
         });
     </script>
 </body>
