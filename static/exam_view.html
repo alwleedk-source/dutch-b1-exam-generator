@@ -172,10 +172,10 @@
     </nav>
     
     <!-- Main Container -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
         
         <!-- Exam Header -->
-        <div class="bg-white rounded-xl shadow-sm p-6 mb-6 fade-in">
+        <div class="bg-white rounded-xl shadow-sm p-3 sm:p-6 mb-4 sm:mb-6 fade-in">
             <div class="flex items-center justify-between flex-wrap gap-4">
                 <h1 id="examTitle" class="text-3xl font-bold text-gray-900 flex items-center gap-3">
                     <i data-lucide="file-text" class="w-8 h-8 text-primary"></i>
@@ -199,9 +199,9 @@
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
         <!-- Mode Switcher -->
-        <div class="bg-white rounded-xl shadow-sm p-6 mb-6 fade-in-up hover-scale">
+        <div class="bg-white rounded-xl shadow-sm p-3 sm:p-6 mb-4 sm:mb-6 fade-in-up hover-scale">
             <div class="flex gap-4">
                 <button id="studyModeBtn" class="px-6 py-3 rounded-lg font-medium transition">
                     وضع الدراسة
@@ -216,15 +216,15 @@
         <div id="testResult" class="hidden mb-6"></div>
 
         <!-- Original Text -->
-        <div class="bg-white rounded-xl shadow-sm p-8 mb-6 fade-in-up hover-scale">
-            <h2 class="text-xl font-bold text-gray-900 mb-4">النص الأصلي</h2>
-            <div id="originalText" class="prose max-w-none"></div>
+        <div class="bg-white rounded-xl shadow-sm p-3 sm:p-8 mb-4 sm:mb-6 fade-in-up hover-scale">
+            <h2 class="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">النص الأصلي</h2>
+            <div id="originalText" class="prose max-w-none text-sm sm:text-base"></div>
         </div>
 
         <!-- Questions -->
-        <div class="bg-white rounded-xl shadow-sm p-8 mb-6 fade-in-up hover-scale">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">الأسئلة</h2>
-            <div id="questionsContent"></div>
+        <div class="bg-white rounded-xl shadow-sm p-3 sm:p-8 mb-4 sm:mb-6 fade-in-up hover-scale">
+            <h2 class="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">الأسئلة</h2>
+            <div id="questionsContent" class="text-sm sm:text-base"></div>
             
             <!-- Submit Test Button -->
             <div class="mt-8 text-center">
@@ -546,14 +546,52 @@
             originalText.innerHTML = html;
             
             document.querySelectorAll('.translatable-word').forEach(el => {
+                // For desktop: hover
                 el.addEventListener('mouseenter', showTooltip);
                 el.addEventListener('mouseleave', scheduleHideTooltip);
-                el.addEventListener('dblclick', handleDoubleClick);
+                
+                // For mobile: single click to show, double click to save
+                let clickCount = 0;
+                let clickTimer = null;
+                
+                el.addEventListener('click', (e) => {
+                    clickCount++;
+                    
+                    if (clickCount === 1) {
+                        // First click: show tooltip
+                        clickTimer = setTimeout(() => {
+                            showTooltip(e);
+                            clickCount = 0;
+                        }, 250);
+                    } else if (clickCount === 2) {
+                        // Double click: save word
+                        clearTimeout(clickTimer);
+                        clickCount = 0;
+                        handleDoubleClick(e);
+                    }
+                });
             });
         }
 
+        // Hide all tooltips
+        function hideAllTooltips() {
+            document.querySelectorAll('.translation-tooltip').forEach(tooltip => {
+                tooltip.remove();
+            });
+        }
+        
+        // Click outside to hide tooltip
+        document.addEventListener('click', (e) => {
+            if (!e.target.classList.contains('translatable-word') && !e.target.closest('.translation-tooltip')) {
+                hideAllTooltips();
+            }
+        });
+        
         // Show tooltip
         function showTooltip(e) {
+            // Hide any existing tooltips first
+            hideAllTooltips();
+            
             const translation = e.target.dataset.translation;
             const word = e.target.textContent;
             if (!translation) return;
