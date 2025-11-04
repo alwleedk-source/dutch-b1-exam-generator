@@ -121,3 +121,38 @@ async function togglePublic(examId, currentStatus) {
 - ✅ الامتحانات العامة تظهر في صفحة "امتحانات عامة"
 - ✅ يمكن إلغاء المشاركة في أي وقت
 - ✅ واجهة مستخدم واضحة مع رسائل تأكيد
+
+
+---
+
+## [Fix] 2025-11-04 - إصلاح خطأ 500 في صفحة الامتحانات العامة
+
+### المشكلة
+- صفحة الامتحانات العامة تعطي خطأ 500
+- رسالة الخطأ: "Failed to load public exams"
+- السبب: RealDictRow objects غير قابلة للتحويل إلى JSON مباشرة
+
+### الحل
+- تحويل RealDictRow إلى dict عادي قبل إرجاع النتائج
+- إصلاح دالتي get_public_exams() و get_public_exam_by_id()
+
+### التغييرات التقنية
+1. **ملف: public_exams.py**
+   - get_public_exams(): إضافة return [dict(row) for row in rows]
+   - get_public_exam_by_id(): إضافة exam = dict(row) قبل معالجة JSON
+
+### الكود المعدل:
+```python
+# Before (causing error)
+rows = cursor.fetchall()
+return rows  # RealDictRow objects - not JSON serializable!
+
+# After (fixed)
+rows = cursor.fetchall()
+return [dict(row) for row in rows]  # Convert to regular dict
+```
+
+### النتيجة المتوقعة
+- ✅ صفحة الامتحانات العامة تعمل بشكل صحيح
+- ✅ API يرجع JSON صحيح
+- ✅ الامتحانات العامة تظهر بشكل صحيح

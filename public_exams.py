@@ -32,8 +32,6 @@ class PublicExamsManager:
     
     def get_public_exams(self, limit: int = 50, offset: int = 0) -> List[Dict]:
         """Get all public exams"""
-        import json
-        
         with self.db.get_connection() as conn:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
             
@@ -51,7 +49,9 @@ class PublicExamsManager:
                 LIMIT %s OFFSET %s
             """, (limit, offset))
             
-            return cursor.fetchall()
+            rows = cursor.fetchall()
+            # Convert RealDictRow to regular dict for JSON serialization
+            return [dict(row) for row in rows]
     
     def get_public_exam_by_id(self, exam_id: int) -> Optional[Dict]:
         """Get a specific public exam (anyone can access)"""
@@ -69,9 +69,12 @@ class PublicExamsManager:
                 WHERE e.id = %s AND e.is_public = TRUE
             """, (exam_id,))
             
-            exam = cursor.fetchone()
+            row = cursor.fetchone()
             
-            if exam:
+            if row:
+                # Convert RealDictRow to regular dict
+                exam = dict(row)
+                
                 # Parse JSON fields
                 if isinstance(exam['questions'], str):
                     try:
@@ -88,8 +91,10 @@ class PublicExamsManager:
                         exam['word_translations'] = {}
                 elif exam['word_translations'] is None:
                     exam['word_translations'] = {}
+                
+                return exam
             
-            return exam
+            return None
     
     def get_public_exam_count(self) -> int:
         """Get total number of public exams"""
