@@ -18,6 +18,13 @@ class AuthManager:
         """Initialize OAuth"""
         self.app = app
         
+        # Check if auth is disabled via environment variable
+        disable_auth = os.getenv("DISABLE_AUTH", "false").lower() == "true"
+        if disable_auth:
+            print("⚠️ Warning: Authentication is disabled (DISABLE_AUTH=true)")
+            self.oauth_enabled = False
+            return
+        
         # Get OAuth credentials from environment
         self.client_id = os.getenv("GOOGLE_CLIENT_ID")
         self.client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
@@ -124,7 +131,10 @@ class AuthManager:
     
     def logout(self, request: Request):
         """Logout user"""
-        request.session.clear()
+        try:
+            request.session.clear()
+        except:
+            pass  # Session might not exist in dev mode
         return RedirectResponse(url='/login')
 
 

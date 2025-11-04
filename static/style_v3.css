@@ -525,6 +525,35 @@ input[type="checkbox"] {
     font-weight: 600;
     box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.save-word-btn {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border: none;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    margin-right: 6px;
+}
+
+.save-word-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+}
+
+.save-word-btn:active {
+    transform: scale(0.95);
+}
+
+.save-word-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .word-tooltip .tooltip-text::after {

@@ -99,11 +99,21 @@ class GenerateExamRequest(BaseModel):
 
 
 class SaveExamRequest(BaseModel):
-    original_text: str
-    formatted_text: str
+    title: Optional[str] = None
+    text: str  # Original text
     questions: List[dict]
-    word_translations: dict
-    num_questions: int
+    word_translations: Optional[dict] = {}
+    verification: Optional[dict] = None
+
+
+class SaveWordRequest(BaseModel):
+    word: str = Field(..., min_length=1, description="Dutch word")
+    translation: str = Field(..., min_length=1, description="Arabic translation")
+    context: Optional[str] = Field(None, description="Context sentence")
+    exam_id: Optional[int] = Field(None, description="Related exam ID")
+
+
+class UpdateExamTitleRequest(BaseModel):
     custom_title: Optional[str] = None
 
 
@@ -190,17 +200,25 @@ async def generate_exam(request: Request, exam_request: GenerateExamRequest):
         formatted_text = exam_request.text
         if exam_request.enable_formatting and formatter:
             try:
-                formatted_text = formatter.format_text(exam_request.text)
+                formatting_result = formatter.format_text(exam_request.text)
+                # Extract the formatted_text from the result dictionary
+                formatted_text = formatting_result.get('formatted_text', exam_request.text)
+                print(f"✅ Text formatted successfully: {formatting_result.get('structure_type', 'unknown')}")
             except Exception as e:
                 print(f"Warning: Text formatting failed: {e}")
                 formatted_text = exam_request.text
         
-        # Generate questions
-        result = agent.generate_exam(
-            text=exam_request.text,
-            num_questions=exam_request.num_questions,
-            enable_verification=exam_request.enable_verification
-        )
+        # Generate exam with or without verification
+        if exam_request.enable_verification:
+            result = agent.generate_exam_with_verification(
+                text=exam_request.text,
+                num_questions=exam_request.num_questions
+            )
+        else:
+            result = agent.generate_questions(
+                text=exam_request.text,
+                num_questions=exam_request.num_questions
+            )
         
         # Add formatted text to result
         result['formatted_text'] = formatted_text
@@ -208,7 +226,7 @@ async def generate_exam(request: Request, exam_request: GenerateExamRequest):
         # Translate words if enabled
         if exam_request.enable_translation and translator:
             try:
-                word_translations = translator.translate_text(exam_request.text)
+                word_translations = translator.translate_text_with_words(exam_request.text)['word_translations']
                 result['word_translations'] = word_translations
             except Exception as e:
                 print(f"Warning: Translation failed: {e}")
@@ -233,25 +251,25 @@ async def save_exam(request: Request, save_request: SaveExamRequest):
     
     try:
         # Generate title if not provided
-        title = save_request.custom_title
+        title = save_request.title
         if not title and title_generator:
             try:
-                title = title_generator.generate_title(save_request.original_text)
+                title = title_generator.generate_title(save_request.text)
             except Exception as e:
                 print(f"Warning: Title generation failed: {e}")
-                title = save_request.original_text[:50] + "..."
+                title = save_request.text[:50] + "..."
         elif not title:
-            title = save_request.original_text[:50] + "..."
+            title = save_request.text[:50] + "..."
         
         # Save to database
         exam_id = db.save_exam(
             user_id=user['id'],
             title=title,
-            original_text=save_request.original_text,
-            formatted_text=save_request.formatted_text,
+            original_text=save_request.text,
+            formatted_text=save_request.text,  # Same as original for now
             questions=save_request.questions,
-            word_translations=save_request.word_translations,
-            num_questions=save_request.num_questions
+            word_translations=save_request.word_translations or {},
+            num_questions=len(save_request.questions)
         )
         
         return {
@@ -260,6 +278,29 @@ async def save_exam(request: Request, save_request: SaveExamRequest):
             "title": title
         }
     
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/exam/{exam_id}")
+async def get_exam(request: Request, exam_id: int):
+    """Get a specific exam by ID"""
+    # Require authentication
+    user = auth_manager.require_auth(request)
+    
+    if not db:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    try:
+        exam = db.get_exam(exam_id, user['id'])
+        
+        if not exam:
+            raise HTTPException(status_code=404, detail="Exam not found")
+        
+        return exam
+    
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -332,6 +373,94 @@ async def delete_exam(request: Request, exam_id: int):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# Vocabulary routes
+@app.post("/api/vocabulary")
+async def save_word(request: Request, word_request: SaveWordRequest):
+    """Save a word to vocabulary"""
+    # Require authentication
+    user = auth_manager.require_auth(request)
+    
+    if not db:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    try:
+        word_id = db.save_word(
+            user_id=user['id'],
+            word=word_request.word,
+            translation=word_request.translation,
+            context=word_request.context,
+            exam_id=word_request.exam_id
+        )
+        
+        return {"success": True, "word_id": word_id}
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/vocabulary")
+async def get_vocabulary(request: Request, limit: int = 100, offset: int = 0):
+    """Get user's vocabulary list"""
+    # Require authentication
+    user = auth_manager.require_auth(request)
+    
+    if not db:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    try:
+        words = db.get_user_vocabulary(user['id'], limit, offset)
+        count = db.get_user_vocabulary_count(user['id'])
+        
+        return {
+            "words": words,
+            "total": count,
+            "limit": limit,
+            "offset": offset
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.delete("/api/vocabulary/{word_id}")
+async def delete_word(request: Request, word_id: int):
+    """Delete a word from vocabulary"""
+    # Require authentication
+    user = auth_manager.require_auth(request)
+    
+    if not db:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    try:
+        success = db.delete_word(word_id, user['id'])
+        if not success:
+            raise HTTPException(status_code=404, detail="Word not found")
+        
+        return {"success": True}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/vocabulary/search")
+async def search_vocabulary(request: Request, q: str):
+    """Search vocabulary"""
+    # Require authentication
+    user = auth_manager.require_auth(request)
+    
+    if not db:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    try:
+        words = db.search_vocabulary(user['id'], q)
+        return {"words": words}
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # Translation route (kept for backward compatibility)
 @app.post("/api/translate")
 async def translate_text(request: Request, translate_request: TranslateRequest):
@@ -343,8 +472,8 @@ async def translate_text(request: Request, translate_request: TranslateRequest):
         raise HTTPException(status_code=500, detail="Translator not initialized")
     
     try:
-        translations = translator.translate_text(translate_request.text)
-        return {"translations": translations}
+        translations = translator.translate_text_with_words(translate_request.text)['word_translations']
+        return translations
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -376,14 +505,14 @@ async def root(request: Request):
     if not user:
         return RedirectResponse(url="/login")
     
-    with open("static/index_v2.html", "r", encoding="utf-8") as f:
+    with open("static/index_v3.html", "r", encoding="utf-8") as f:
         return HTMLResponse(content=f.read())
 
 
 @app.get("/login", response_class=HTMLResponse)
 async def login_page():
     """Serve login page"""
-    with open("static/login.html", "r", encoding="utf-8") as f:
+    with open("static/login_v2.html", "r", encoding="utf-8") as f:
         return HTMLResponse(content=f.read())
 
 
@@ -395,6 +524,28 @@ async def exams_page(request: Request):
         return RedirectResponse(url="/login")
     
     with open("static/exams.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read())
+
+
+@app.get("/exam_view.html", response_class=HTMLResponse)
+async def exam_view_page(request: Request):
+    """Serve exam view page (requires authentication)"""
+    user = auth_manager.get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login")
+    
+    with open("static/exam_view.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read())
+
+
+@app.get("/vocabulary", response_class=HTMLResponse)
+async def vocabulary_page(request: Request):
+    """Serve vocabulary list page (requires authentication)"""
+    user = auth_manager.get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login")
+    
+    with open("static/vocabulary.html", "r", encoding="utf-8") as f:
         return HTMLResponse(content=f.read())
 
 

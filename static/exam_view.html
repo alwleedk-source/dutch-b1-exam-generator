@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>امتحان القراءة - B1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .translatable-word {
+            cursor: help;
+            border-bottom: 1px dotted #3498db;
+            transition: color 0.2s;
+        }
+        .translatable-word:hover {
+            color: #3498db;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        .hover-scale {
+            transition: transform 0.3s ease;
+        }
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-purple-50 to-green-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between">
+                <h1 id="examTitle" class="text-2xl font-bold text-gray-900">جاري التحميل...</h1>
+                <div class="flex gap-3">
+                    <a href="/vocabulary" class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium flex items-center gap-2">
+                        <i data-lucide="book-open" class="w-5 h-5"></i>
+                        <span>كلماتي</span>
+                    </a>
+                    <a href="/exams" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition font-medium flex items-center gap-2">
+                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                        <span>امتحاناتي</span>
+                    </a>
+                    <a href="/" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">
+                        العودة للرئيسية
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Mode Switcher -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6 fade-in-up hover-scale">
+            <div class="flex gap-4">
+                <button id="studyModeBtn" class="px-6 py-3 rounded-lg font-medium transition">
+                    وضع الدراسة
+                </button>
+                <button id="testModeBtn" class="px-6 py-3 rounded-lg font-medium transition active">
+                    وضع الاختبار
+                </button>
+            </div>
+        </div>
+
+        <!-- Test Result -->
+        <div id="testResult" class="hidden mb-6"></div>
+
+        <!-- Original Text -->
+        <div class="bg-white rounded-xl shadow-sm p-8 mb-6 fade-in-up hover-scale">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">النص الأصلي</h2>
+            <div id="originalText" class="prose max-w-none"></div>
+        </div>
+
+        <!-- Questions -->
+        <div class="bg-white rounded-xl shadow-sm p-8 mb-6 fade-in-up hover-scale">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">الأسئلة</h2>
+            <div id="questionsContent"></div>
+            
+            <!-- Submit Test Button -->
+            <div class="mt-8 text-center">
+                <button id="submitTestBtn" class="px-8 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-lg font-medium">
+                    عرض النتيجة
+                </button>
+            </div>
+        </div>
+
+        <!-- Answer Key (Study Mode Only) -->
+        <div id="answerKeySection" class="bg-white rounded-xl shadow-sm p-8 hidden">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">الإجابات الصحيحة</h2>
+            <div id="answerKey"></div>
+        </div>
+    </main>
+
+    <script>
+        // Get exam ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const examId = urlParams.get('id');
+
+        // State
+        let currentExam = null;
+        let currentMode = 'test';
+        let wordTranslations = {};
+
+        // DOM Elements
+        const examTitle = document.getElementById('examTitle');
+        const originalText = document.getElementById('originalText');
+        const questionsContent = document.getElementById('questionsContent');
+        const answerKey = document.getElementById('answerKey');
+        const answerKeySection = document.getElementById('answerKeySection');
+        const studyModeBtn = document.getElementById('studyModeBtn');
+        const testModeBtn = document.getElementById('testModeBtn');
+        const submitTestBtn = document.getElementById('submitTestBtn');
+        const testResult = document.getElementById('testResult');
+
+        // Load exam
+        async function loadExam() {
+            if (!examId) {
+                alert('معرف الامتحان غير موجود');
+                window.location.href = '/';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/exam/${examId}`);
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error('API Error:', response.status, errorData);
+                    alert(`فشل تحميل الامتحان: ${errorData.detail || response.statusText}`);
+                    window.location.href = '/';
+                    return;
+                }
+
+                currentExam = await response.json();
+                console.log('Exam loaded:', currentExam);
+                displayExam();
+            } catch (error) {
+                console.error('Error loading exam:', error);
+                alert(`خطأ: ${error.message}`);
+                window.location.href = '/';
+            }
+        }
+
+        // Display exam
+        function displayExam() {
+            if (!currentExam) return;
+
+            examTitle.textContent = currentExam.title || 'امتحان القراءة';
+            
+            // Use formatted_text if available, otherwise use original_text
+            const textToDisplay = currentExam.formatted_text || currentExam.original_text;
+            displayOriginalText(textToDisplay);
+            
+            displayQuestions(currentExam.questions);
+            displayAnswerKey(currentExam.questions);
+            
+            // Load translations
+            wordTranslations = currentExam.word_translations || {};
+            if (Object.keys(wordTranslations).length === 0) {
+                loadTranslations(currentExam.original_text);
+            } else {
+                applyTranslations();
+            }
+            
+            switchMode('test');
+        }
+
+        // Display original text with smart formatting
+        function displayOriginalText(text) {
+            // Check if text contains HTML tags (formatted by AI)
+            const hasHTML = /<[a-z][\s\S]*>/i.test(text);
+            
+            if (hasHTML) {
+                // Text is already formatted with HTML, just wrap it
+                originalText.innerHTML = `
+                    <div dir="ltr" style="
+                        text-align: left;
+                        font-family: 'Georgia', 'Times New Roman', serif;
+                        line-height: 1.8;
+                        padding: 2.5rem;
+                        background: white;
+                        max-width: 850px;
+                        margin: 0 auto;
+                        border-radius: 12px;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+                    ">
+                        ${text}
+                    </div>
+                `;
+                return;
+            }
+            
+            // Fallback: manual formatting for plain text
+            let lines = text.split('\n').map(l => l.trim()).filter(l => l);
+            
+            // If text is one long paragraph, try to split by sentences
+            if (lines.length === 1) {
+                const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+                lines = sentences.map(s => s.trim()).filter(s => s);
+            }
+            
+            let html = `
+                <div dir="ltr" style="
+                    text-align: left;
+                    font-family: 'Georgia', 'Times New Roman', serif;
+                    line-height: 2;
+                    padding: 2.5rem;
+                    background: white;
+                    max-width: 850px;
+                    margin: 0 auto;
+                    border-radius: 12px;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+                ">
+            `;
+            
+            // Try to detect title (usually first line or short lines)
+            let titleDetected = false;
+            let currentParagraph = [];
+            
+            lines.forEach((line, index) => {
+                // Title detection logic
+                const isLikelyTitle = (
+                    !titleDetected && 
+                    index === 0 && 
+                    line.length < 100 && 
+                    line.split(' ').length <= 10 &&
+                    !line.endsWith('.')
+                );
+                
+                const isSubheading = (
+                    line.length < 80 && 
+                    (line.endsWith(':') || 
+                     (line.split(' ').length < 8 && /^[A-Z]/.test(line)))
+                );
+                
+                if (isLikelyTitle && !titleDetected) {
+                    html += `
+                        <h2 style="
+                            font-size: 2.2rem; 
+                            font-weight: bold; 
+                            margin: 0 0 2rem 0; 
+                            color: #1a1a1a; 
+                            text-align: center;
+                            border-bottom: 3px solid #3498db; 
+                            padding-bottom: 1rem;
+                        ">${line}</h2>
+                    `;
+                    titleDetected = true;
+                } else if (isSubheading) {
+                    if (currentParagraph.length > 0) {
+                        html += formatParagraph(currentParagraph.join(' '));
+                        currentParagraph = [];
+                    }
+                    html += `
+                        <h3 style="
+                            font-size: 1.6rem; 
+                            font-weight: 600; 
+                            margin: 2.5rem 0 1.2rem 0; 
+                            color: #2c3e50;
+                            border-left: 4px solid #3498db;
+                            padding-left: 1rem;
+                        ">${line}</h3>
+                    `;
+                } else {
+                    currentParagraph.push(line);
+                    
+                    // Flush paragraph every 3-5 sentences or at end
+                    if (currentParagraph.length >= 4 || index === lines.length - 1) {
+                        html += formatParagraph(currentParagraph.join(' '));
+                        currentParagraph = [];
+                    }
+                }
+            });
+            
+            // Flush any remaining content
+            if (currentParagraph.length > 0) {
+                html += formatParagraph(currentParagraph.join(' '));
+            }
+            
+            html += '</div>';
+            originalText.innerHTML = html;
+        }
+        
+        // Format a paragraph with proper styling
+        function formatParagraph(text) {
+            return `
+                <p style="
+                    margin: 1.8rem 0; 
+                    color: #34495e; 
+                    text-align: justify; 
+                    font-size: 1.15rem; 
+                    text-indent: 2.5em; 
+                    line-height: 2;
+                    letter-spacing: 0.3px;
+                ">${text}</p>
+            `;
+        }
+
+        // Display questions
+        function displayQuestions(questions) {
+            const isTestMode = currentMode === 'test';
+            
+            let html = '<div dir="rtl" style="text-align: right;">';
+            
+            questions.forEach((q, index) => {
+                html += `
+                    <div class="bg-white rounded-xl p-6 mb-6 shadow-sm border border-gray-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-lg font-bold text-gray-800">السؤال ${index + 1}</span>
+                            <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">${q.type || 'اختيار من متعدد'}</span>
+                        </div>
+                        
+                        <div dir="ltr" class="text-left mb-4 text-gray-800 font-bold text-lg">
+                            ${q.question_nl}
+                        </div>
+                        
+                        <div class="space-y-3">
+                            ${q.options.map((opt, optIndex) => {
+                                const isCorrect = opt.correct;
+                                const showAnswer = !isTestMode && isCorrect;
+                                
+                                return `
+                                    <label class="flex items-center p-4 rounded-lg border-2 cursor-pointer transition-all hover:bg-gray-50 ${showAnswer ? 'border-green-500 bg-green-50' : 'border-gray-200'}">
+                                        <input type="radio" name="question_${index}" value="${optIndex}" class="w-5 h-5 text-blue-600" ${isTestMode ? '' : 'disabled'}>
+                                        <span dir="ltr" class="mr-3 text-left flex-1">${opt.text}</span>
+                                        ${showAnswer ? '<span class="text-green-600 font-bold">✓</span>' : ''}
+                                    </label>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            questionsContent.innerHTML = html;
+        }
+
+        // Display answer key
+        function displayAnswerKey(questions) {
+            let html = '<div class="space-y-2">';
+            
+            questions.forEach((q, index) => {
+                const correctOption = q.options.find(opt => opt.correct);
+                const correctIndex = q.options.indexOf(correctOption);
+                
+                html += `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <span class="font-medium">السؤال ${index + 1}</span>
+                        <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold">
+                            الخيار ${correctIndex + 1}
+                        </span>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            answerKey.innerHTML = html;
+        }
+
+        // Load translations from API
+        async function loadTranslations(text) {
+            try {
+                const response = await fetch('/api/translate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text })
+                });
+                
+                if (response.ok) {
+                    wordTranslations = await response.json();
+                    applyTranslations();
+                } else {
+                    console.error('Translation failed:', response.status);
+                }
+            } catch (error) {
+                console.error('Translation error:', error);
+            }
+        }
+
+        // Apply translations
+        function applyTranslations() {
+            if (!originalText || !wordTranslations || Object.keys(wordTranslations).length === 0) return;
+            
+            let html = originalText.innerHTML;
+            const words = Object.keys(wordTranslations).sort((a, b) => b.length - a.length);
+            
+            words.forEach(word => {
+                const translation = wordTranslations[word];
+                const regex = new RegExp(`\\b(${word})\\b`, 'gi');
+                html = html.replace(regex, `<span class="translatable-word" data-translation="${translation}">$1</span>`);
+            });
+            
+            originalText.innerHTML = html;
+            
+            document.querySelectorAll('.translatable-word').forEach(el => {
+                el.addEventListener('mouseenter', showTooltip);
+                el.addEventListener('mouseleave', scheduleHideTooltip);
+                el.addEventListener('dblclick', handleDoubleClick);
+            });
+        }
+
+        // Show tooltip
+        function showTooltip(e) {
+            const translation = e.target.dataset.translation;
+            const word = e.target.textContent;
+            if (!translation) return;
+            
+            const tooltip = document.createElement('div');
+            tooltip.className = 'translation-tooltip';
+            tooltip.style.cssText = 'position: absolute; background: #2C3E50; color: white; padding: 10px 14px; border-radius: 8px; font-size: 14px; z-index: 1000; pointer-events: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.3);';
+            
+            // Create tooltip with translation and hint
+            tooltip.innerHTML = `
+                <div style="text-align: center;">
+                    <div style="font-weight: 500; margin-bottom: 4px;">${translation}</div>
+                    <div style="font-size: 11px; color: #BDC3C7; font-style: italic;">انقر مرتين للحفظ</div>
+                </div>
+            `;
+            
+            // Position tooltip above the word
+            const rect = e.target.getBoundingClientRect();
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+            
+            // Center tooltip horizontally above the word
+            tooltip.style.left = (rect.left + scrollLeft + (rect.width / 2)) + 'px';
+            tooltip.style.top = (rect.top + scrollTop - 10) + 'px';
+            tooltip.style.transform = 'translate(-50%, -100%)';
+            
+            // Prevent tooltip from hiding when mouse enters it
+            tooltip.addEventListener('mouseenter', () => {
+                tooltip._isHovered = true;
+                if (e.target._hideTimeout) {
+                    clearTimeout(e.target._hideTimeout);
+                }
+            });
+            
+            tooltip.addEventListener('mouseleave', () => {
+                tooltip._isHovered = false;
+                setTimeout(() => {
+                    if (!tooltip._isHovered) {
+                        hideTooltip(tooltip, e.target);
+                    }
+                }, 200);
+            });
+            
+            document.body.appendChild(tooltip);
+            e.target._tooltip = tooltip;
+        }
+
+        // Schedule hide tooltip with delay
+        function scheduleHideTooltip(e) {
+            const tooltip = e.target._tooltip;
+            if (!tooltip) return;
+            
+            // Add delay before hiding
+            e.target._hideTimeout = setTimeout(() => {
+                if (tooltip && !tooltip._isHovered) {
+                    tooltip.remove();
+                    delete e.target._tooltip;
+                }
+            }, 200);
+        }
+        
+        // Hide tooltip immediately
+        function hideTooltip(tooltip, element) {
+            if (tooltip) {
+                tooltip.remove();
+                if (element && element._tooltip) {
+                    delete element._tooltip;
+                }
+            }
+        }
+
+        // Switch mode
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            if (mode === 'study') {
+                studyModeBtn.classList.add('bg-blue-600', 'text-white');
+                studyModeBtn.classList.remove('bg-gray-100', 'text-gray-700');
+                testModeBtn.classList.remove('bg-blue-600', 'text-white');
+                testModeBtn.classList.add('bg-gray-100', 'text-gray-700');
+                answerKeySection.classList.remove('hidden');
+                submitTestBtn.classList.add('hidden');
+                testResult.classList.add('hidden');
+            } else {
+                testModeBtn.classList.add('bg-blue-600', 'text-white');
+                testModeBtn.classList.remove('bg-gray-100', 'text-gray-700');
+                studyModeBtn.classList.remove('bg-blue-600', 'text-white');
+                studyModeBtn.classList.add('bg-gray-100', 'text-gray-700');
+                answerKeySection.classList.add('hidden');
+                submitTestBtn.classList.remove('hidden');
+                testResult.classList.add('hidden');
+            }
+            
+            if (currentExam) {
+                displayQuestions(currentExam.questions);
+            }
+        }
+
+        // Submit test
+        function submitTest() {
+            if (!currentExam || !currentExam.questions) return;
+            
+            let correctCount = 0;
+            
+            currentExam.questions.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="question_${index}"]:checked`);
+                const selectedIndex = selected ? parseInt(selected.value) : -1;
+                const correctIndex = q.options.findIndex(opt => opt.correct);
+                
+                if (selectedIndex === correctIndex) correctCount++;
+            });
+            
+            const totalQuestions = currentExam.questions.length;
+            const scorePercentage = Math.round((correctCount / totalQuestions) * 100);
+            const scoreClass = scorePercentage >= 70 ? 'text-green-600' : scorePercentage >= 50 ? 'text-yellow-600' : 'text-red-600';
+            
+            testResult.innerHTML = `
+                <div class="bg-white rounded-xl p-8 text-center">
+                    <div class="text-6xl font-bold ${scoreClass} mb-4">${scorePercentage}%</div>
+                    <div class="text-2xl font-bold mb-2">النتيجة: ${correctCount} من ${totalQuestions}</div>
+                    <div class="text-gray-600 mb-6">
+                        ${scorePercentage >= 70 ? '<i data-lucide="trophy" class="w-5 h-5 inline"></i> ممتاز!' : scorePercentage >= 50 ? '<i data-lucide="thumbs-up" class="w-5 h-5 inline"></i> جيد' : '<i data-lucide="book-open" class="w-5 h-5 inline"></i> يحتاج لمزيد من الدراسة'}
+                    </div>
+                    <button onclick="switchMode('study')" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        عرض الإجابات الصحيحة
+                    </button>
+                </div>
+            `;
+            
+            testResult.classList.remove('hidden');
+            submitTestBtn.classList.add('hidden');
+            testResult.scrollIntoView({ behavior: 'smooth' });
+            
+            // Re-initialize icons
+            setTimeout(() => lucide.createIcons(), 100);
+        }
+
+        // Handle double-click to save word
+        function handleDoubleClick(e) {
+            const word = e.target.textContent;
+            const translation = e.target.dataset.translation;
+            if (word && translation) {
+                saveWord(word, translation);
+            }
+        }
+
+        // Save word to vocabulary
+        async function saveWord(word, translation) {
+            try {
+                const response = await fetch('/api/vocabulary', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        word: word,
+                        translation: translation,
+                        context: currentExam.original_text.substring(0, 200),
+                        exam_id: examId
+                    })
+                });
+                
+                if (response.ok) {
+                    // Show success message
+                    const toast = document.createElement('div');
+                    toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #10B981; color: white; padding: 16px 24px; border-radius: 8px; font-size: 14px; z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: slideIn 0.3s ease-out;';
+                    toast.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i data-lucide="check-circle" class="w-5 h-5"></i>
+                            <span>تم حفظ الكلمة "${word}" في قائمة المفردات</span>
+                        </div>
+                    `;
+                    document.body.appendChild(toast);
+                    lucide.createIcons();
+                    
+                    setTimeout(() => {
+                        toast.style.animation = 'slideOut 0.3s ease-in';
+                        setTimeout(() => toast.remove(), 300);
+                    }, 3000);
+                } else {
+                    const error = await response.json();
+                    alert('فشل حفظ الكلمة: ' + (error.detail || 'خطأ غير معروف'));
+                }
+            } catch (error) {
+                console.error('Error saving word:', error);
+                alert('خطأ في حفظ الكلمة');
+            }
+        }
+
+        // Event listeners
+        studyModeBtn.addEventListener('click', () => switchMode('study'));
+        testModeBtn.addEventListener('click', () => switchMode('test'));
+        submitTestBtn.addEventListener('click', submitTest);
+
+        // Load exam on page load
+        loadExam();
+        
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>

@@ -115,7 +115,8 @@ class DutchB1ExamAgent:
             exam = self._extract_json(response.text)
             
             # Add metadata
-            exam["text"] = text
+            # Use formatted_text from AI if available, otherwise use original text
+            exam["text"] = exam.get("formatted_text", text)
             exam["analysis"] = analysis
             
             return exam

@@ -33,7 +33,7 @@ const translationLoading = document.getElementById('translationLoading');
 
 // State
 let currentExam = null;
-let currentMode = 'test';
+let currentMode = 'study';
 let userAnswers = {};
 let wordTranslations = {};
 
@@ -172,18 +172,13 @@ async function generateExam() {
         const exam = await response.json();
         currentExam = exam;
         
-        // Auto-save exam
-        const examId = await saveExam(exam, text);
+        displayExam(exam);
+        await loadTranslations(exam.text || text);
         
-        if (examId) {
-            // Redirect to exam view page
-            window.location.href = `/exam_view.html?id=${examId}`;
-        } else {
-            showStatus('✅ تم توليد الامتحان لكن فشل الحفظ!', 'error');
-            displayExam(exam);
-            await loadTranslations(exam.text || text);
-            resultsSection.scrollIntoView({ behavior: 'smooth' });
-        }
+        showStatus('✅ تم توليد الامتحان بنجاح!', 'success');
+        setTimeout(() => hideStatus(), 3000);
+        
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
         
     } catch (error) {
         console.error('Error:', error);
@@ -200,7 +195,7 @@ async function loadTranslations(text) {
     translationLoading.classList.remove('hidden');
     
     try {
-        const response = await fetch('/api/translate', {
+        const response = await fetch('/api/translate-text', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -295,88 +290,23 @@ function displayExam(exam) {
     }
     
     resultsSection.classList.remove('hidden');
-    
-    // Set test mode as default
-    switchMode('test');
 }
 
 // Display original text with formatting
 function displayOriginalText(text) {
-    // Split text into lines
-    const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+    // Split text into paragraphs
+    const paragraphs = text.split('\n\n').filter(p => p.trim());
     
-    // Book-style formatting
-    let html = `
-        <div dir="ltr" style="
-            text-align: left;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            line-height: 1.9;
-            padding: 2rem;
-            background: white;
-            max-width: 800px;
-            margin: 0 auto;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border-radius: 8px;
-        ">
-    `;
+    let html = '<div dir="ltr" style="text-align: left; font-family: Arial, sans-serif; line-height: 1.8;">';
     
-    let currentParagraph = [];
-    
-    lines.forEach((line, index) => {
-        // Detect titles
-        const isTitle = (
-            line.length < 80 && 
-            (line.endsWith(':') || 
-             line.split(' ').length < 8 || 
-             /^[A-Z][a-z]/.test(line))
-        );
+    paragraphs.forEach(para => {
+        para = para.trim();
         
-        if (isTitle) {
-            // Flush paragraph
-            if (currentParagraph.length > 0) {
-                html += `
-                    <p style="
-                        margin: 1.5rem 0;
-                        color: #2C3E50;
-                        text-align: justify;
-                        font-size: 1.1rem;
-                        text-indent: 2em;
-                        line-height: 1.9;
-                    ">${currentParagraph.join(' ')}</p>
-                `;
-                currentParagraph = [];
-            }
-            // Add title
-            html += `
-                <h3 style="
-                    font-size: 1.8rem;
-                    font-weight: bold;
-                    margin: 2rem 0 1rem 0;
-                    color: #1a1a1a;
-                    border-bottom: 2px solid #3498db;
-                    padding-bottom: 0.5rem;
-                ">${line}</h3>
-            `;
+        // Check if it's a title (short line, possibly ending with :)
+        if (para.length < 100 && (para.endsWith(':') || para.split(' ').length < 10)) {
+            html += `<h3 style="font-size: 1.5rem; font-weight: bold; margin: 1.5rem 0 1rem 0; color: #2C3E50;">${para}</h3>`;
         } else {
-            currentParagraph.push(line);
-            
-            // Check if we should flush (empty line ahead or last line)
-            const nextLine = lines[index + 1];
-            const shouldFlush = !nextLine || index === lines.length - 1;
-            
-            if (shouldFlush && currentParagraph.length > 0) {
-                html += `
-                    <p style="
-                        margin: 1.5rem 0;
-                        color: #2C3E50;
-                        text-align: justify;
-                        font-size: 1.1rem;
-                        text-indent: 2em;
-                        line-height: 1.9;
-                    ">${currentParagraph.join(' ')}</p>
-                `;
-                currentParagraph = [];
-            }
+            html += `<p style="margin: 1rem 0; color: #34495E;">${para}</p>`;
         }
     });
     
@@ -399,7 +329,7 @@ function displayQuestions(questions) {
                     <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">${q.type || 'اختيار من متعدد'}</span>
                 </div>
                 
-                <div dir="ltr" class="text-left mb-4 text-gray-800 font-bold text-lg">
+                <div dir="ltr" class="text-left mb-4 text-gray-700 font-medium">
                     ${q.question_nl}
                 </div>
                 
@@ -477,51 +407,8 @@ function displayQualityScore(verification) {
 
 // Submit test
 function submitTest() {
-    if (!currentExam || !currentExam.questions) return;
-    
-    // Collect user answers
-    const answers = [];
-    let correctCount = 0;
-    
-    currentExam.questions.forEach((q, index) => {
-        const selected = document.querySelector(`input[name="question_${index}"]:checked`);
-        const selectedIndex = selected ? parseInt(selected.value) : -1;
-        const correctIndex = q.options.findIndex(opt => opt.correct);
-        const isCorrect = selectedIndex === correctIndex;
-        
-        if (isCorrect) correctCount++;
-        
-        answers.push({
-            questionIndex: index,
-            selectedIndex,
-            correctIndex,
-            isCorrect
-        });
-    });
-    
-    // Calculate score
-    const totalQuestions = currentExam.questions.length;
-    const scorePercentage = Math.round((correctCount / totalQuestions) * 100);
-    
-    // Display results
-    const scoreClass = scorePercentage >= 70 ? 'text-green-600' : scorePercentage >= 50 ? 'text-yellow-600' : 'text-red-600';
-    
-    testResult.innerHTML = `
-        <div class="bg-white rounded-xl p-8 text-center">
-            <div class="text-6xl font-bold ${scoreClass} mb-4">${scorePercentage}%</div>
-            <div class="text-2xl font-bold mb-2">النتيجة: ${correctCount} من ${totalQuestions}</div>
-            <div class="text-gray-600 mb-6">
-                ${scorePercentage >= 70 ? '🎉 ممتاز!' : scorePercentage >= 50 ? '👍 جيد' : '📚 يحتاج لمزيد من الدراسة'}
-            </div>
-            <button onclick="switchMode('study')" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                عرض الإجابات الصحيحة
-            </button>
-        </div>
-    `;
-    
-    testResult.classList.remove('hidden');
-    submitTestBtn.classList.add('hidden');
-    testResult.scrollIntoView({ behavior: 'smooth' });
+    // Implementation for test submission
+    alert('سيتم إضافة هذه الميزة قريباً');
 }
 
 // Copy results
@@ -541,34 +428,4 @@ function resetForm() {
     resultsSection.classList.add('hidden');
     currentExam = null;
     wordTranslations = {};
-}
-
-
-// Save exam
-async function saveExam(exam, originalText) {
-    try {
-        const response = await fetch('/api/save-exam', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                text: originalText,
-                questions: exam.questions,
-                word_translations: wordTranslations,
-                verification: exam.verification
-            })
-        });
-        
-        if (!response.ok) {
-            console.error('Failed to save exam');
-            return null;
-        }
-        
-        const result = await response.json();
-        return result.exam_id;
-    } catch (error) {
-        console.error('Error saving exam:', error);
-        return null;
-    }
 }

@@ -4,313 +4,130 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>امتحاناتي - منصة امتحانات B1 الهولندية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="/style.css">
-    <style>
-        .exams-page {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-
-        .page-header h1 {
-            color: #1a202c;
-            font-size: 2.5rem;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 15px;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-secondary {
-            background: white;
-            color: #667eea;
-            border: 2px solid #667eea;
-        }
-
-        .btn-secondary:hover {
-            background: #667eea;
-            color: white;
-        }
-
-        .exams-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 25px;
-        }
-
-        .exam-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .exam-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        .exam-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #1a202c;
-            margin-bottom: 15px;
-        }
-
-        .exam-meta {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 15px;
-            color: #718096;
-            font-size: 0.9rem;
-        }
-
-        .exam-meta span {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .exam-date {
-            color: #a0aec0;
-            font-size: 0.85rem;
-            margin-bottom: 20px;
-        }
-
-        .exam-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .action-btn {
-            flex: 1;
-            padding: 10px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .action-btn.open {
-            background: #667eea;
-            color: white;
-        }
-
-        .action-btn.open:hover {
-            background: #5568d3;
-        }
-
-        .action-btn.delete {
-            background: #f56565;
-            color: white;
-        }
-
-        .action-btn.delete:hover {
-            background: #e53e3e;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 80px 20px;
-        }
-
-        .empty-state-icon {
-            font-size: 5rem;
-            margin-bottom: 20px;
-        }
-
-        .empty-state h2 {
-            color: #2d3748;
-            margin-bottom: 15px;
-        }
-
-        .empty-state p {
-            color: #718096;
-            margin-bottom: 30px;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 60px;
-            color: #718096;
-            font-size: 1.2rem;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px 25px;
-            background: white;
-            border-radius: 50px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-        }
-
-        .user-name {
-            font-weight: 600;
-            color: #2d3748;
-        }
-
-        @media (max-width: 768px) {
-            .page-header {
-                flex-direction: column;
-                gap: 20px;
-                align-items: stretch;
-            }
-
-            .header-actions {
-                flex-direction: column;
-            }
-
-            .exams-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
 </head>
-<body>
-    <div class="exams-page">
-        <div class="page-header">
-            <h1>📚 امتحاناتي</h1>
-            <div class="header-actions">
-                <div class="user-info" id="userInfo"></div>
-                <a href="/" class="btn btn-primary">+ امتحان جديد</a>
-                <a href="/auth/logout" class="btn btn-secondary">تسجيل الخروج</a>
+<body class="bg-gradient-to-br from-blue-50 via-purple-50 to-green-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                    <i data-lucide="file-text" class="w-8 h-8 text-blue-600"></i>
+                    <span>امتحاناتي</span>
+                </h1>
+                <div class="flex gap-3">
+                    <a href="/" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+                        + امتحان جديد
+                    </a>
+                    <a href="/auth/logout" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium">
+                        تسجيل الخروج
+                    </a>
+                </div>
             </div>
         </div>
 
-        <div id="examsContainer">
-            <div class="loading">⏳ جاري تحميل امتحاناتك...</div>
+        <!-- Exams Container -->
+        <div id="examsContainer" class="grid gap-6">
+            <div class="text-center py-12">
+                <div class="animate-spin inline-block w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full mb-4"></div>
+                <p class="text-gray-600">جاري تحميل امتحاناتك...</p>
+            </div>
         </div>
     </div>
 
     <script>
-        // Load user info
-        async function loadUserInfo() {
-            try {
-                const response = await fetch('/api/user');
-                const user = await response.json();
-                
-                const userInfoDiv = document.getElementById('userInfo');
-                userInfoDiv.innerHTML = `
-                    ${user.picture ? `<img src="${user.picture}" alt="${user.name}" class="user-avatar">` : ''}
-                    <span class="user-name">${user.name || user.email}</span>
-                `;
-            } catch (error) {
-                console.error('Failed to load user info:', error);
-            }
-        }
+        // Load exams on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadExams();
+            lucide.createIcons();
+        });
 
-        // Load exams
+        // Load exams from API
         async function loadExams() {
+            const container = document.getElementById('examsContainer');
+            
             try {
                 const response = await fetch('/api/exams');
+                if (!response.ok) {
+                    throw new Error('Failed to load exams');
+                }
+                
                 const data = await response.json();
+                console.log('Loaded exams:', data);
                 
-                const container = document.getElementById('examsContainer');
-                
-                if (data.exams.length === 0) {
+                if (!data.exams || data.exams.length === 0) {
                     container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-state-icon">📝</div>
-                            <h2>لا توجد امتحانات بعد</h2>
-                            <p>ابدأ بإنشاء أول امتحان لك!</p>
-                            <a href="/" class="btn btn-primary">إنشاء امتحان جديد</a>
+                        <div class="bg-white rounded-xl shadow-sm p-12 text-center">
+                            <i data-lucide="file-plus" class="w-16 h-16 mx-auto mb-4 text-gray-400"></i>
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">لا توجد امتحانات بعد</h2>
+                            <p class="text-gray-600 mb-6">ابدأ بإنشاء أول امتحان لك!</p>
+                            <a href="/" class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+                                إنشاء امتحان جديد
+                            </a>
                         </div>
                     `;
+                    lucide.createIcons();
                     return;
                 }
                 
-                const examsHTML = data.exams.map(exam => `
-                    <div class="exam-card">
-                        <div class="exam-title">${exam.title}</div>
-                        <div class="exam-meta">
-                            <span>📊 ${exam.num_questions} سؤال</span>
+                // Render exams
+                const examsHTML = data.exams.map(exam => {
+                    const date = new Date(exam.created_at);
+                    const dateStr = date.toLocaleDateString('ar-SA', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    
+                    return `
+                        <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition">
+                            <h3 class="text-xl font-bold text-gray-900 mb-3">${exam.title}</h3>
+                            <div class="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                                <span class="flex items-center gap-1">
+                                    <i data-lucide="list" class="w-4 h-4"></i>
+                                    ${exam.num_questions} سؤال
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                                    ${dateStr}
+                                </span>
+                            </div>
+                            <div class="flex gap-3">
+                                <button onclick="openExam(${exam.id})" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+                                    فتح الامتحان
+                                </button>
+                                <button onclick="deleteExam(${exam.id})" class="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition font-medium">
+                                    حذف
+                                </button>
+                            </div>
                         </div>
-                        <div class="exam-date">
-                            📅 ${new Date(exam.created_at).toLocaleDateString('ar-SA', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                            })}
-                        </div>
-                        <div class="exam-actions">
-                            <button class="action-btn open" onclick="openExam(${exam.id})">
-                                فتح الامتحان
-                            </button>
-                            <button class="action-btn delete" onclick="deleteExam(${exam.id})">
-                                حذف
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
                 
-                container.innerHTML = `<div class="exams-grid">${examsHTML}</div>`;
+                container.innerHTML = examsHTML;
+                lucide.createIcons();
                 
             } catch (error) {
-                console.error('Failed to load exams:', error);
-                document.getElementById('examsContainer').innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">⚠️</div>
-                        <h2>فشل تحميل الامتحانات</h2>
-                        <p>${error.message}</p>
-                        <button class="btn btn-primary" onclick="loadExams()">إعادة المحاولة</button>
+                console.error('Error loading exams:', error);
+                container.innerHTML = `
+                    <div class="bg-white rounded-xl shadow-sm p-12 text-center">
+                        <i data-lucide="alert-circle" class="w-16 h-16 mx-auto mb-4 text-red-500"></i>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2">فشل تحميل الامتحانات</h2>
+                        <p class="text-gray-600 mb-6">${error.message}</p>
+                        <button onclick="loadExams()" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+                            إعادة المحاولة
+                        </button>
                     </div>
                 `;
+                lucide.createIcons();
             }
         }
 
         // Open exam
-        async function openExam(examId) {
-            try {
-                const response = await fetch(`/api/exams/${examId}`);
-                const exam = await response.json();
-                
-                // Store in sessionStorage and redirect to main page
-                sessionStorage.setItem('loadedExam', JSON.stringify(exam));
-                window.location.href = '/';
-                
-            } catch (error) {
-                alert('فشل فتح الامتحان: ' + error.message);
-            }
+        function openExam(examId) {
+            window.location.href = `/exam_view.html?id=${examId}`;
         }
 
         // Delete exam
@@ -324,21 +141,18 @@
                     method: 'DELETE'
                 });
                 
-                if (response.ok) {
-                    // Reload exams
-                    loadExams();
-                } else {
-                    alert('فشل حذف الامتحان');
+                if (!response.ok) {
+                    throw new Error('Failed to delete exam');
                 }
                 
+                // Reload exams
+                await loadExams();
+                
             } catch (error) {
+                console.error('Error deleting exam:', error);
                 alert('فشل حذف الامتحان: ' + error.message);
             }
         }
-
-        // Initialize
-        loadUserInfo();
-        loadExams();
     </script>
 </body>
 </html>
