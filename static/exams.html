@@ -279,11 +279,11 @@
                             <span class="flex items-center gap-1">
                                 <i data-lucide="calendar" class="w-4 h-4"></i>
                                 ${new Date(exam.created_at).toLocaleDateString('ar-SA', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                })}
                             </span>
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                            })}
                         </div>
                         <div class="exam-actions">
                             <button class="action-btn open" onclick="openExam(${exam.id})">
