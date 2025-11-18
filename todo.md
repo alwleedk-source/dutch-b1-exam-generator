@@ -128,3 +128,10 @@
 - [x] Build Progress page (stats, charts, achievements)
 - [x] Build Vocabulary page (word list, practice)
 - [ ] Test all pages end-to-end
+
+
+## Phase 13: Dashboard & Admin Panel ✅
+- [x] Build Dashboard page (overview, recent exams, quick stats)
+- [x] Build Admin Panel (user management, text moderation)
+- [x] Add admin-only routes protection
+- [ ] Test admin features
