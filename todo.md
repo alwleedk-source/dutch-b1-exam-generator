@@ -120,6 +120,7 @@
 ## Bug Fixes
 - [x] Fix getLoginUrl() to use Google OAuth instead of Manus OAuth
 - [x] Fix useAuth hook to handle login URL safely
+- [x] Fix MinHash CommonJS/ESM compatibility issue (replaced with custom implementation)
 
 
 ## Phase 12: Complete Core Pages ✅

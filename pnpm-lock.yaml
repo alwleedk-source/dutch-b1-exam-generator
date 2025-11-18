@@ -172,9 +172,6 @@ importers:
       lucide-react:
         specifier: ^0.453.0
         version: 0.453.0(react@19.2.0)
-      minhash:
-        specifier: ^0.0.9
-        version: 0.0.9
       mysql2:
         specifier: ^3.15.0
         version: 3.15.1
@@ -3861,9 +3858,6 @@ packages:
     resolution: {integrity: sha512-x0Vn8spI+wuJ1O6S7gnbaQg8Pxh4NNHb7KSINmEWKiPE4RKOplvijn+NkmYmmRgP68mc70j2EbeTFRsrswaQeg==}
     engines: {node: '>=4'}
     hasBin: true
-
-  minhash@0.0.9:
-    resolution: {integrity: sha512-Rs0iOE6oJwvMN2CrsNvdCMkpo0Lzh7wmTZAVH6j550n0VeqxfVhQe0lV8Ay4bmXC5ATZmihq9YbZ/n6cf6kP7A==}
 
   minimatch@9.0.5:
     resolution: {integrity: sha512-G6T0ZX48xgozx7587koeX9Ys2NYy6Gmv//P89sEte9V9whIapMNF4idKxnW2QtCcLiTWlb/wfCabAtAFWhhBow==}
@@ -9033,8 +9027,6 @@ snapshots:
       mime-db: 1.52.0
 
   mime@1.6.0: {}
-
-  minhash@0.0.9: {}
 
   minimatch@9.0.5:
     dependencies:

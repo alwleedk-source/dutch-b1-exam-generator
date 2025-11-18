@@ -1,6 +1,3 @@
-// @ts-ignore - no types available for minhash
-import { MinHash } from 'minhash';
-
 /**
  * Text Similarity Detection using MinHash Algorithm
  * 
@@ -11,6 +8,19 @@ import { MinHash } from 'minhash';
  */
 
 const NUM_PERM = 128; // Number of permutations (higher = more accurate but slower)
+const LARGE_PRIME = 2147483647; // Mersenne prime 2^31 - 1
+const MAX_HASH = 4294967295; // 2^32 - 1
+
+/**
+ * Simple hash function for strings
+ */
+function hashString(str: string, seed: number): number {
+  let hash = seed;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash) % MAX_HASH;
+}
 
 /**
  * Tokenize text into shingles (n-grams)
@@ -36,14 +46,20 @@ function getShingles(text: string, n: number = 3): string[] {
  * @returns MinHash signature as array of numbers
  */
 export function calculateMinHash(text: string): number[] {
-  const mh = new MinHash(NUM_PERM);
   const shingles = getShingles(text);
+  const signature: number[] = new Array(NUM_PERM).fill(MAX_HASH);
   
-  for (const shingle of shingles) {
-    mh.update(shingle);
+  // Generate random hash functions using different seeds
+  for (let i = 0; i < NUM_PERM; i++) {
+    const seed = i * 31 + 17; // Simple seed generation
+    
+    for (const shingle of shingles) {
+      const hash = hashString(shingle, seed);
+      signature[i] = Math.min(signature[i], hash);
+    }
   }
   
-  return Array.from(mh.digest());
+  return signature;
 }
 
 /**
