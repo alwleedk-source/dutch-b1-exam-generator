@@ -93,3 +93,38 @@
 - [ ] Export progress reports
 - [ ] Email notifications
 - [ ] Mobile app (PWA)
+
+
+## Phase 10: Google OAuth Migration ✅
+- [x] Remove Manus Auth dependency
+- [x] Install Passport.js and passport-google-oauth20
+- [x] Create Google OAuth strategy
+- [x] Update auth routes (/auth/google, /auth/callback, /auth/logout)
+- [x] Update session management
+- [x] Update frontend login/logout flow
+- [ ] Test Google OAuth flow (needs environment variables)
+
+## Phase 11: Environment Variables Setup ✅
+- [x] Add DATABASE_URL (PostgreSQL/Neon)
+- [x] Add DISABLE_AUTH flag
+- [x] Add GEMINI_API_KEY
+- [x] Add GOOGLE_CLIENT_ID
+- [x] Add GOOGLE_CLIENT_SECRET
+- [x] Add GOOGLE_REDIRECT_URI
+- [x] Add R2 credentials (ACCOUNT_ID, ACCESS_KEY_ID, SECRET_ACCESS_KEY, BUCKET_NAME, PUBLIC_URL)
+- [x] Update LLM integration to use Gemini instead of built-in
+- [x] Update storage to use Cloudflare R2
+- [ ] User needs to add secrets manually in Settings → Secrets
+
+
+## Bug Fixes
+- [x] Fix getLoginUrl() to use Google OAuth instead of Manus OAuth
+- [x] Fix useAuth hook to handle login URL safely
+
+
+## Phase 12: Complete Core Pages ✅
+- [x] Build Create Exam page (text input, validation, translation)
+- [x] Build Take Exam page (interactive quiz interface)
+- [x] Build Progress page (stats, charts, achievements)
+- [x] Build Vocabulary page (word list, practice)
+- [ ] Test all pages end-to-end

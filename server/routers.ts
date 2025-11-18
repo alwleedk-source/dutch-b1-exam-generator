@@ -5,7 +5,7 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import * as db from "./db";
-import { invokeLLM } from "./_core/llm";
+import * as gemini from "./lib/gemini";
 
 // Admin-only procedure
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -79,47 +79,8 @@ export const appRouter = router({
           throw new TRPCError({ code: "NOT_FOUND", message: "Text not found" });
         }
 
-        // Validate with AI
-        const validationPrompt = `Analyze the following text and determine:
-1. Is it in Dutch language? (yes/no)
-2. What CEFR level is it? (A1, A2, B1, B2, C1, C2)
-3. Confidence level for the CEFR assessment (0-100)
-
-Text: ${text.dutchText}
-
-Respond in JSON format:
-{
-  "isDutch": true/false,
-  "level": "B1",
-  "confidence": 85
-}`;
-
-        const response = await invokeLLM({
-          messages: [
-            { role: "system", content: "You are a Dutch language expert specializing in CEFR level assessment." },
-            { role: "user", content: validationPrompt },
-          ],
-          response_format: {
-            type: "json_schema",
-            json_schema: {
-              name: "validation_result",
-              strict: true,
-              schema: {
-                type: "object",
-                properties: {
-                  isDutch: { type: "boolean" },
-                  level: { type: "string", enum: ["A1", "A2", "B1", "B2", "C1", "C2"] },
-                  confidence: { type: "integer", minimum: 0, maximum: 100 },
-                },
-                required: ["isDutch", "level", "confidence"],
-                additionalProperties: false,
-              },
-            },
-          },
-        });
-
-        const content = response.choices[0].message.content;
-        const validation = JSON.parse(typeof content === 'string' ? content : JSON.stringify(content));
+        // Validate with Gemini AI
+        const validation = await gemini.validateDutchText(text.dutchText);
 
         // Update text validation
         await db.updateTextValidation(input.textId, {
@@ -155,44 +116,8 @@ Respond in JSON format:
           return { success: true, cached: true };
         }
 
-        // Translate to Arabic, English, and Turkish
-        const translationPrompt = `Translate the following Dutch text to Arabic, English, and Turkish.
-
-Dutch text: ${text.dutchText}
-
-Respond in JSON format:
-{
-  "arabic": "...",
-  "english": "...",
-  "turkish": "..."
-}`;
-
-        const response = await invokeLLM({
-          messages: [
-            { role: "system", content: "You are a professional translator specializing in Dutch to Arabic, English, and Turkish translations." },
-            { role: "user", content: translationPrompt },
-          ],
-          response_format: {
-            type: "json_schema",
-            json_schema: {
-              name: "translations",
-              strict: true,
-              schema: {
-                type: "object",
-                properties: {
-                  arabic: { type: "string" },
-                  english: { type: "string" },
-                  turkish: { type: "string" },
-                },
-                required: ["arabic", "english", "turkish"],
-                additionalProperties: false,
-              },
-            },
-          },
-        });
-
-        const content2 = response.choices[0].message.content;
-        const translations = JSON.parse(typeof content2 === 'string' ? content2 : JSON.stringify(content2));
+        // Translate with Gemini AI
+        const translations = await gemini.translateText(text.dutchText);
 
         // Save translations
         await db.createTranslation({
@@ -244,74 +169,8 @@ Respond in JSON format:
           throw new TRPCError({ code: "NOT_FOUND", message: "Text not found" });
         }
 
-        // Generate exam questions with AI
-        const examPrompt = `Based on the following Dutch B1 text, generate 10 multiple-choice reading comprehension questions.
-
-Text: ${text.dutchText}
-
-Requirements:
-- 10 questions total
-- Each question has 4 options (A, B, C, D)
-- Only one correct answer per question
-- Questions should test reading comprehension at B1 level
-- Mix of question types: main idea, details, inference, vocabulary
-
-Respond in JSON format:
-{
-  "questions": [
-    {
-      "question": "Question text in Dutch",
-      "options": ["A) ...", "B) ...", "C) ...", "D) ..."],
-      "correctAnswer": "A",
-      "explanation": "Why this is correct"
-    }
-  ]
-}`;
-
-        const response = await invokeLLM({
-          messages: [
-            { role: "system", content: "You are a Dutch language teacher creating B1 level reading comprehension exams." },
-            { role: "user", content: examPrompt },
-          ],
-          response_format: {
-            type: "json_schema",
-            json_schema: {
-              name: "exam_questions",
-              strict: true,
-              schema: {
-                type: "object",
-                properties: {
-                  questions: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        question: { type: "string" },
-                        options: {
-                          type: "array",
-                          items: { type: "string" },
-                          minItems: 4,
-                          maxItems: 4,
-                        },
-                        correctAnswer: { type: "string", enum: ["A", "B", "C", "D"] },
-                        explanation: { type: "string" },
-                      },
-                      required: ["question", "options", "correctAnswer", "explanation"],
-                      additionalProperties: false,
-                    },
-                    minItems: 10,
-                    maxItems: 10,
-                  },
-                },
-                required: ["questions"],
-                additionalProperties: false,
-              },
-            },
-          },
-        });
-
-        const content3 = response.choices[0].message.content;
-        const examData = JSON.parse(typeof content3 === 'string' ? content3 : JSON.stringify(content3));
+        // Generate exam questions with Gemini AI
+        const examData = await gemini.generateExamQuestions(text.dutchText);
 
         // Create exam record
         const result = await db.createExam({
@@ -436,72 +295,8 @@ Respond in JSON format:
           throw new TRPCError({ code: "NOT_FOUND", message: "Text not found" });
         }
 
-        // Extract vocabulary with AI
-        const vocabPrompt = `Extract 10-15 important B1-level Dutch words from this text that would be useful for language learners.
-
-Text: ${text.dutchText}
-
-For each word, provide:
-- The Dutch word
-- Arabic translation
-- English translation
-- Turkish translation
-- An example sentence from the text
-- Difficulty level (easy, medium, hard)
-
-Respond in JSON format:
-{
-  "vocabulary": [
-    {
-      "dutch": "word",
-      "arabic": "translation",
-      "english": "translation",
-      "turkish": "translation",
-      "example": "sentence",
-      "difficulty": "medium"
-    }
-  ]
-}`;
-
-        const response = await invokeLLM({
-          messages: [
-            { role: "system", content: "You are a Dutch language teacher helping students learn B1-level vocabulary." },
-            { role: "user", content: vocabPrompt },
-          ],
-          response_format: {
-            type: "json_schema",
-            json_schema: {
-              name: "vocabulary_extraction",
-              strict: true,
-              schema: {
-                type: "object",
-                properties: {
-                  vocabulary: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        dutch: { type: "string" },
-                        arabic: { type: "string" },
-                        english: { type: "string" },
-                        turkish: { type: "string" },
-                        example: { type: "string" },
-                        difficulty: { type: "string", enum: ["easy", "medium", "hard"] },
-                      },
-                      required: ["dutch", "arabic", "english", "turkish", "example", "difficulty"],
-                      additionalProperties: false,
-                    },
-                  },
-                },
-                required: ["vocabulary"],
-                additionalProperties: false,
-              },
-            },
-          },
-        });
-
-        const content4 = response.choices[0].message.content;
-        const vocabData = JSON.parse(typeof content4 === 'string' ? content4 : JSON.stringify(content4));
+        // Extract vocabulary with Gemini AI
+        const vocabData = await gemini.extractVocabulary(text.dutchText);
 
         // Save vocabulary
         for (const word of vocabData.vocabulary) {
