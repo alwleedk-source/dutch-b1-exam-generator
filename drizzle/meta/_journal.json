@@ -15,6 +15,13 @@
       "when": 1763504706572,
       "tag": "0001_open_killer_shrike",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1763507746299,
+      "tag": "0002_groovy_ultimatum",
+      "breakpoints": true
     }
   ]
 }

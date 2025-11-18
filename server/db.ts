@@ -611,3 +611,43 @@ export async function getLeaderboard(period: 'week' | 'month' | 'all', limit: nu
     return [];
   }
 }
+
+
+// ============================================================================
+// Spaced Repetition System (SRS) Functions
+// ============================================================================
+
+export async function getUserVocabularyById(userVocabId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db
+    .select()
+    .from(userVocabulary)
+    .where(eq(userVocabulary.id, userVocabId))
+    .limit(1);
+
+  return result[0];
+}
+
+export async function updateUserVocabularySRS(
+  userVocabId: number,
+  data: {
+    easeFactor: number;
+    interval: number;
+    repetitions: number;
+    nextReviewAt: Date;
+    lastReviewedAt: Date;
+    correctCount: number;
+    incorrectCount: number;
+    status: "new" | "learning" | "mastered";
+  }
+) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db
+    .update(userVocabulary)
+    .set(data)
+    .where(eq(userVocabulary.id, userVocabId));
+}

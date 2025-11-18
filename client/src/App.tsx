@@ -15,6 +15,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Leaderboard from "./pages/Leaderboard";
 import Achievements from "./pages/Achievements";
 import StudyMode from "./pages/StudyMode";
+import ReviewPractice from "./pages/ReviewPractice";
 
 function Router() {
   return (
@@ -29,6 +30,7 @@ function Router() {
       <Route path="/leaderboard" component={Leaderboard} />
       <Route path="/achievements" component={Achievements} />
       <Route path="/study/:id" component={StudyMode} />
+      <Route path="/review" component={ReviewPractice} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

@@ -178,9 +178,12 @@ export const userVocabulary = mysqlTable("userVocabulary", {
   correctCount: int("correctCount").default(0).notNull(),
   incorrectCount: int("incorrectCount").default(0).notNull(),
   
-  // Spaced repetition
+  // Spaced repetition (SM-2 algorithm)
   lastReviewedAt: timestamp("lastReviewedAt"),
-  nextReviewAt: timestamp("nextReviewAt"),
+  nextReviewAt: timestamp("nextReviewAt").defaultNow().notNull(),
+  easeFactor: int("easeFactor").default(2500).notNull(), // Stored as integer (2.5 * 1000)
+  interval: int("interval").default(0).notNull(), // Days until next review
+  repetitions: int("repetitions").default(0).notNull(), // Number of successful reviews
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

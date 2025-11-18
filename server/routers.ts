@@ -353,6 +353,51 @@ export const appRouter = router({
     getMyVocabularyProgress: protectedProcedure.query(async ({ ctx }) => {
       return await db.getUserVocabularyProgress(ctx.user.id);
     }),
+
+    getDueForReview: protectedProcedure.query(async ({ ctx }) => {
+      const { getDueCards } = await import("./lib/srs");
+      const allVocab = await db.getUserVocabularyProgress(ctx.user.id);
+      return getDueCards(allVocab.map((v: any) => ({
+        ...v,
+        nextReviewDate: v.nextReviewAt || new Date(),
+      })));
+    }),
+
+    submitReview: protectedProcedure
+      .input(z.object({
+        userVocabId: z.number(),
+        quality: z.number().min(0).max(5), // SM-2 quality rating
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { calculateNextReview } = await import("./lib/srs");
+        
+        const userVocab = await db.getUserVocabularyById(input.userVocabId);
+        if (!userVocab || userVocab.userId !== ctx.user.id) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Vocabulary not found" });
+        }
+
+        // Calculate next review using SM-2
+        const srsResult = calculateNextReview(input.quality, {
+          easeFactor: userVocab.easeFactor / 1000, // Convert back to float
+          interval: userVocab.interval,
+          repetitions: userVocab.repetitions,
+          nextReviewDate: userVocab.nextReviewAt || new Date(),
+        });
+
+        // Update user vocabulary
+        await db.updateUserVocabularySRS(input.userVocabId, {
+          easeFactor: Math.round(srsResult.easeFactor * 1000), // Store as integer
+          interval: srsResult.interval,
+          repetitions: srsResult.repetitions,
+          nextReviewAt: srsResult.nextReviewDate,
+          lastReviewedAt: new Date(),
+          correctCount: input.quality >= 3 ? userVocab.correctCount + 1 : userVocab.correctCount,
+          incorrectCount: input.quality < 3 ? userVocab.incorrectCount + 1 : userVocab.incorrectCount,
+          status: srsResult.repetitions >= 5 ? "mastered" : "learning",
+        });
+
+        return { success: true, ...srsResult };
+      }),
   }),
 
   // Reporting

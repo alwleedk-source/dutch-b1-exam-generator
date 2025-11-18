@@ -183,3 +183,31 @@
 - [x] Add note-taking functionality
 - [ ] Add bookmarking system (deferred)
 - [ ] Test Study Mode
+
+
+## Phase 20: Spaced Repetition System ✅
+- [x] Implement SM-2 algorithm for vocabulary review
+- [x] Add review scheduling logic
+- [x] Create review queue system
+- [x] Add practice session page
+- [x] Track review performance
+- [x] Update vocabulary mastery based on reviews
+- [ ] Test SRS functionality
+
+## Phase 21: Community Features (IN PROGRESS)
+- [ ] Create community forum/discussion board
+- [ ] Add text sharing functionality
+- [ ] Implement rating and review system
+- [ ] Add comments on shared texts
+- [ ] Create user profiles with contributions
+- [ ] Add moderation tools
+- [ ] Test community features
+
+## Phase 22: Mobile PWA Support (IN PROGRESS)
+- [ ] Create service worker for offline support
+- [ ] Add web app manifest
+- [ ] Implement push notifications
+- [ ] Add install prompt
+- [ ] Optimize for mobile screens
+- [ ] Test PWA functionality
+- [ ] Add offline data sync
