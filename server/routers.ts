@@ -37,6 +37,12 @@ export const appRouter = router({
 
   // Text management
   text: router({
+    getTextById: publicProcedure
+      .input(z.object({ textId: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getTextById(input.textId);
+      }),
+
     create: protectedProcedure
       .input(z.object({
         dutchText: z.string().min(50, "Text must be at least 50 characters"),
@@ -294,6 +300,24 @@ export const appRouter = router({
 
   // Vocabulary
   vocabulary: router({
+    generateAudio: protectedProcedure
+      .input(z.object({
+        vocabId: z.number(),
+        word: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const { generateDutchSpeech } = await import("./lib/tts");
+        const { audioUrl, audioKey } = await generateDutchSpeech(input.word);
+        await db.updateVocabularyAudio(input.vocabId, audioUrl, audioKey);
+        return { audioUrl, audioKey };
+      }),
+
+    getVocabularyByText: publicProcedure
+      .input(z.object({ textId: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getVocabularyByTextId(input.textId);
+      }),
+
     extractVocabulary: protectedProcedure
       .input(z.object({
         textId: z.number(),
@@ -324,14 +348,6 @@ export const appRouter = router({
           success: true,
           vocabularyCount: vocabData.vocabulary.length,
         };
-      }),
-
-    getVocabularyByText: publicProcedure
-      .input(z.object({
-        textId: z.number(),
-      }))
-      .query(async ({ input }) => {
-        return await db.getVocabularyByTextId(input.textId);
       }),
 
     getMyVocabularyProgress: protectedProcedure.query(async ({ ctx }) => {

@@ -158,3 +158,28 @@
 - [x] Display user rankings
 - [x] Add filters (weekly/monthly/all-time)
 - [ ] Test leaderboard
+
+
+## Phase 17: Text-to-Speech Integration ✅
+- [x] Add Google TTS API integration
+- [x] Create TTS procedure in backend
+- [x] Store audio files in Cloudflare R2
+- [x] Add audio playback UI in vocabulary page
+- [x] Add pronunciation button for each word
+- [ ] Test TTS functionality
+
+## Phase 18: Advanced Achievements System ✅
+- [x] Design achievement badges
+- [x] Create achievement unlock logic
+- [ ] Add achievement notifications (deferred)
+- [x] Display achievements in profile
+- [x] Add progress bars for achievements
+- [ ] Test achievement system
+
+## Phase 19: Study Mode ✅
+- [x] Create Study Mode page
+- [ ] Add line-by-line translation view (deferred)
+- [x] Add vocabulary highlighting
+- [x] Add note-taking functionality
+- [ ] Add bookmarking system (deferred)
+- [ ] Test Study Mode

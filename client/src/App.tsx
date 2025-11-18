@@ -13,6 +13,8 @@ import Progress from "./pages/Progress";
 import Vocabulary from "./pages/Vocabulary";
 import AdminDashboard from "./pages/AdminDashboard";
 import Leaderboard from "./pages/Leaderboard";
+import Achievements from "./pages/Achievements";
+import StudyMode from "./pages/StudyMode";
 
 function Router() {
   return (
@@ -25,6 +27,8 @@ function Router() {
       <Route path="/vocabulary" component={Vocabulary} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/leaderboard" component={Leaderboard} />
+      <Route path="/achievements" component={Achievements} />
+      <Route path="/study/:id" component={StudyMode} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
