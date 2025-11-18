@@ -123,14 +123,14 @@ export const appRouter = router({
           minHashSignature: minHashSignatureJson,
           createdBy: ctx.user.id,
           source: input.source,
-          status: "pending",
+          // status defaults to pending in schema
           isValidDutch: true, // Will be validated by AI
           isB1Level: true, // Will be validated by AI
         });
 
         return { 
           success: true, 
-          textId: result[0].insertId,
+          textId: result[0].id,
           wordCount,
           estimatedReadingMinutes,
         };
@@ -250,7 +250,7 @@ export const appRouter = router({
 
         return {
           success: true,
-          examId: result[0].insertId,
+          examId: result[0].id,
           questions: examData.questions,
         };
       }),
@@ -420,7 +420,7 @@ export const appRouter = router({
       const allVocab = await db.getUserVocabularyProgress(ctx.user.id);
       return getDueCards(allVocab.map((v: any) => ({
         ...v,
-        nextReviewDate: v.nextReviewAt || new Date(),
+        nextReviewAt: v.nextReviewAt || new Date(),
       })));
     }),
 
@@ -442,7 +442,7 @@ export const appRouter = router({
           easeFactor: userVocab.easeFactor / 1000, // Convert back to float
           interval: userVocab.interval,
           repetitions: userVocab.repetitions,
-          nextReviewDate: userVocab.nextReviewAt || new Date(),
+          nextReviewAt: userVocab.nextReviewAt || new Date(),
         });
 
         // Update user vocabulary
@@ -450,7 +450,7 @@ export const appRouter = router({
           easeFactor: Math.round(srsResult.easeFactor * 1000), // Store as integer
           interval: srsResult.interval,
           repetitions: srsResult.repetitions,
-          nextReviewAt: srsResult.nextReviewDate,
+          nextReviewAt: srsResult.nextReviewAt,
           lastReviewedAt: new Date(),
           correctCount: input.quality >= 3 ? userVocab.correctCount + 1 : userVocab.correctCount,
           incorrectCount: input.quality < 3 ? userVocab.incorrectCount + 1 : userVocab.incorrectCount,
@@ -475,11 +475,10 @@ export const appRouter = router({
         await db.createReport({
           textId: input.textId,
           reportedBy: ctx.user.id,
-          reportType: input.reportType,
+          reportType: input.reportType === "level_issue" ? "level_incorrect" : "content_issue",
           levelIssueType: input.levelIssueType,
           contentIssueType: input.contentIssueType,
           details: input.details,
-          status: "pending",
         });
 
         return { success: true };

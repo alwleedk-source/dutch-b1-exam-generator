@@ -17,14 +17,14 @@ export interface SRSCard {
   easeFactor: number;      // Difficulty multiplier (default: 2.5)
   interval: number;         // Days until next review
   repetitions: number;      // Number of successful reviews
-  nextReviewDate: Date;     // When to review next
+  nextReviewAt: Date;       // When to review next
 }
 
 export interface SRSResult {
   easeFactor: number;
   interval: number;
   repetitions: number;
-  nextReviewDate: Date;
+  nextReviewAt: Date;
 }
 
 /**
@@ -57,14 +57,14 @@ export function calculateNextReview(quality: number, card: SRSCard): SRSResult {
   }
 
   // Calculate next review date
-  const nextReviewDate = new Date();
-  nextReviewDate.setDate(nextReviewDate.getDate() + interval);
+  const nextReviewAt = new Date();
+  nextReviewAt.setDate(nextReviewAt.getDate() + interval);
 
   return {
     easeFactor,
     interval,
     repetitions,
-    nextReviewDate,
+    nextReviewAt,
   };
 }
 
@@ -76,23 +76,23 @@ export function initializeSRSCard(): SRSCard {
     easeFactor: 2.5,
     interval: 0,
     repetitions: 0,
-    nextReviewDate: new Date(),
+    nextReviewAt: new Date(),
   };
 }
 
 /**
  * Check if a card is due for review
  */
-export function isDueForReview(nextReviewDate: Date): boolean {
-  return new Date() >= nextReviewDate;
+export function isDueForReview(nextReviewAt: Date): boolean {
+  return new Date() >= nextReviewAt;
 }
 
 /**
  * Get cards due for review from a list
  */
-export function getDueCards<T extends { nextReviewDate: Date }>(cards: T[]): T[] {
+export function getDueCards<T extends { nextReviewAt: Date }>(cards: T[]): T[] {
   const now = new Date();
-  return cards.filter(card => card.nextReviewDate <= now);
+  return cards.filter(card => card.nextReviewAt <= now);
 }
 
 /**

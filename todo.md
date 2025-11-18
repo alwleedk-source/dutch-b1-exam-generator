@@ -225,3 +225,12 @@
 - [x] Add terms acceptance checkbox (all texts are public)
 - [ ] Make all texts public (remove user-specific filters) - deferred
 - [ ] Test OCR and duplicate detection
+
+
+## Phase 24: PostgreSQL Migration ✅
+- [x] Install postgres driver (replace mysql2)
+- [x] Update Drizzle config for PostgreSQL
+- [x] Convert schema from MySQL to PostgreSQL syntax
+- [x] Fix all TypeScript errors
+- [ ] Test database connection (will test on Railway)
+- [ ] Push to GitHub

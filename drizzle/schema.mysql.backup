@@ -1,29 +1,29 @@
-import { boolean, index, integer, pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, index } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
  */
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
+export const users = mysqlTable("users", {
+  id: int("id").autoincrement().primaryKey(),
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: varchar("role", { length: 50 }).default("user").notNull(),
+  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
   
   // User preferences
-  preferredLanguage: varchar("preferredLanguage", { length: 50 }).default("nl").notNull(),
+  preferredLanguage: mysqlEnum("preferredLanguage", ["nl", "ar", "en", "tr"]).default("nl").notNull(),
   
   // Statistics
-  totalExamsCompleted: integer("totalExamsCompleted").default(0).notNull(),
-  totalVocabularyLearned: integer("totalVocabularyLearned").default(0).notNull(),
-  totalTimeSpentMinutes: integer("totalTimeSpentMinutes").default(0).notNull(),
-  currentStreak: integer("currentStreak").default(0).notNull(),
-  longestStreak: integer("longestStreak").default(0).notNull(),
+  totalExamsCompleted: int("totalExamsCompleted").default(0).notNull(),
+  totalVocabularyLearned: int("totalVocabularyLearned").default(0).notNull(),
+  totalTimeSpentMinutes: int("totalTimeSpentMinutes").default(0).notNull(),
+  currentStreak: int("currentStreak").default(0).notNull(),
+  longestStreak: int("longestStreak").default(0).notNull(),
   lastActivityDate: timestamp("lastActivityDate"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
 });
 
@@ -33,38 +33,38 @@ export type InsertUser = typeof users.$inferInsert;
 /**
  * Dutch B1 texts for exam generation
  */
-export const texts = pgTable("texts", {
-  id: serial("id").primaryKey(),
+export const texts = mysqlTable("texts", {
+  id: int("id").autoincrement().primaryKey(),
   
   // Text content
   dutchText: text("dutchText").notNull(),
   title: varchar("title", { length: 255 }),
   
   // Metadata
-  wordCount: integer("wordCount").notNull(),
-  estimatedReadingMinutes: integer("estimatedReadingMinutes").notNull(),
+  wordCount: int("wordCount").notNull(),
+  estimatedReadingMinutes: int("estimatedReadingMinutes").notNull(),
   minHashSignature: text("minHashSignature"), // JSON string of MinHash signature for duplicate detection
   
   // Validation status
   isValidDutch: boolean("isValidDutch").default(true).notNull(),
-  detectedLevel: varchar("detectedLevel", { length: 50 }),
-  levelConfidence: integer("levelConfidence"), // 0-100
+  detectedLevel: mysqlEnum("detectedLevel", ["A1", "A2", "B1", "B2", "C1", "C2"]),
+  levelConfidence: int("levelConfidence"), // 0-100
   isB1Level: boolean("isB1Level").default(true).notNull(),
   
   // Status
-  status: varchar("status", { length: 50 }).default("pending").notNull(),
+  status: mysqlEnum("status", ["pending", "approved", "rejected"]).default("pending").notNull(),
   
   // Source tracking
-  createdBy: integer("createdBy").notNull(),
-  source: varchar("source", { length: 50 }).default("paste").notNull(),
+  createdBy: int("createdBy").notNull(),
+  source: mysqlEnum("source", ["paste", "upload", "scan", "admin"]).default("paste").notNull(),
   
   // Admin moderation
-  moderatedBy: integer("moderatedBy"),
+  moderatedBy: int("moderatedBy"),
   moderationNote: text("moderationNote"),
   moderatedAt: timestamp("moderatedAt"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
   createdByIdx: index("createdBy_idx").on(table.createdBy),
   statusIdx: index("status_idx").on(table.status),
@@ -76,9 +76,9 @@ export type InsertText = typeof texts.$inferInsert;
 /**
  * Cached translations for texts
  */
-export const translations = pgTable("translations", {
-  id: serial("id").primaryKey(),
-  textId: integer("textId").notNull(),
+export const translations = mysqlTable("translations", {
+  id: int("id").autoincrement().primaryKey(),
+  textId: int("textId").notNull(),
   
   // Translations (Dutch text translated to other languages)
   arabicTranslation: text("arabicTranslation"),
@@ -86,7 +86,7 @@ export const translations = pgTable("translations", {
   turkishTranslation: text("turkishTranslation"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
   textIdIdx: index("textId_idx").on(table.textId),
 }));
@@ -97,30 +97,30 @@ export type InsertTranslation = typeof translations.$inferInsert;
 /**
  * User exam attempts
  */
-export const exams = pgTable("exams", {
-  id: serial("id").primaryKey(),
-  userId: integer("userId").notNull(),
-  textId: integer("textId").notNull(),
+export const exams = mysqlTable("exams", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  textId: int("textId").notNull(),
   
   // Exam data
   questions: text("questions").notNull(), // JSON array of questions
   answers: text("answers"), // JSON array of user answers
   
   // Scoring
-  totalQuestions: integer("totalQuestions").notNull(),
-  correctAnswers: integer("correctAnswers"),
-  scorePercentage: integer("scorePercentage"),
+  totalQuestions: int("totalQuestions").notNull(),
+  correctAnswers: int("correctAnswers"),
+  scorePercentage: int("scorePercentage"),
   
   // Timing
   startedAt: timestamp("startedAt").defaultNow().notNull(),
   completedAt: timestamp("completedAt"),
-  timeSpentMinutes: integer("timeSpentMinutes"),
+  timeSpentMinutes: int("timeSpentMinutes"),
   
   // Status
-  status: varchar("status", { length: 50 }).default("in_progress").notNull(),
+  status: mysqlEnum("status", ["in_progress", "completed", "abandoned"]).default("in_progress").notNull(),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
   userIdIdx: index("userId_idx").on(table.userId),
   textIdIdx: index("textId_idx").on(table.textId),
@@ -133,9 +133,9 @@ export type InsertExam = typeof exams.$inferInsert;
 /**
  * Vocabulary extracted from texts
  */
-export const vocabulary = pgTable("vocabulary", {
-  id: serial("id").primaryKey(),
-  textId: integer("textId").notNull(),
+export const vocabulary = mysqlTable("vocabulary", {
+  id: int("id").autoincrement().primaryKey(),
+  textId: int("textId").notNull(),
   
   // Word data
   dutchWord: varchar("dutchWord", { length: 255 }).notNull(),
@@ -153,11 +153,11 @@ export const vocabulary = pgTable("vocabulary", {
   exampleSentence: text("exampleSentence"),
   
   // Metadata
-  difficulty: varchar("difficulty", { length: 50 }),
-  frequency: integer("frequency").default(1).notNull(), // How many times it appears
+  difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard"]),
+  frequency: int("frequency").default(1).notNull(), // How many times it appears
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
   textIdIdx: index("textId_idx").on(table.textId),
   dutchWordIdx: index("dutchWord_idx").on(table.dutchWord),
@@ -169,25 +169,25 @@ export type InsertVocabulary = typeof vocabulary.$inferInsert;
 /**
  * User vocabulary learning progress
  */
-export const userVocabulary = pgTable("userVocabulary", {
-  id: serial("id").primaryKey(),
-  userId: integer("userId").notNull(),
-  vocabularyId: integer("vocabularyId").notNull(),
+export const userVocabulary = mysqlTable("userVocabulary", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  vocabularyId: int("vocabularyId").notNull(),
   
   // Learning progress
-  status: varchar("status", { length: 50 }).default("new").notNull(),
-  correctCount: integer("correctCount").default(0).notNull(),
-  incorrectCount: integer("incorrectCount").default(0).notNull(),
+  status: mysqlEnum("status", ["new", "learning", "mastered"]).default("new").notNull(),
+  correctCount: int("correctCount").default(0).notNull(),
+  incorrectCount: int("incorrectCount").default(0).notNull(),
   
   // Spaced repetition (SM-2 algorithm)
   lastReviewedAt: timestamp("lastReviewedAt"),
   nextReviewAt: timestamp("nextReviewAt").defaultNow().notNull(),
-  easeFactor: integer("easeFactor").default(2500).notNull(), // Stored as integer (2.5 * 1000)
-  interval: integer("interval").default(0).notNull(), // Days until next review
-  repetitions: integer("repetitions").default(0).notNull(), // Number of successful reviews
+  easeFactor: int("easeFactor").default(2500).notNull(), // Stored as integer (2.5 * 1000)
+  interval: int("interval").default(0).notNull(), // Days until next review
+  repetitions: int("repetitions").default(0).notNull(), // Number of successful reviews
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
   userIdIdx: index("userId_idx").on(table.userId),
   vocabularyIdIdx: index("vocabularyId_idx").on(table.vocabularyId),
@@ -199,33 +199,33 @@ export type InsertUserVocabulary = typeof userVocabulary.$inferInsert;
 /**
  * User reports for texts (level issues or content issues)
  */
-export const reports = pgTable("reports", {
-  id: serial("id").primaryKey(),
-  textId: integer("textId").notNull(),
-  reportedBy: integer("reportedBy").notNull(),
+export const reports = mysqlTable("reports", {
+  id: int("id").autoincrement().primaryKey(),
+  textId: int("textId").notNull(),
+  reportedBy: int("reportedBy").notNull(),
   
   // Report type (2 simple options)
-  reportType: varchar("reportType", { length: 50 }).notNull(),
+  reportType: mysqlEnum("reportType", ["level_issue", "content_issue"]).notNull(),
   
   // Level issue details
-  levelIssueType: varchar("levelIssueType", { length: 50 }),
+  levelIssueType: mysqlEnum("levelIssueType", ["too_easy", "too_hard"]),
   
   // Content issue details
-  contentIssueType: varchar("contentIssueType", { length: 50 }),
+  contentIssueType: mysqlEnum("contentIssueType", ["inappropriate", "spam", "not_dutch", "other"]),
   
   // Additional details
   details: text("details"),
   
   // Status
-  status: varchar("status", { length: 50 }).default("pending").notNull(),
+  status: mysqlEnum("status", ["pending", "reviewed", "resolved", "dismissed"]).default("pending").notNull(),
   
   // Admin response
-  reviewedBy: integer("reviewedBy"),
+  reviewedBy: int("reviewedBy"),
   reviewNote: text("reviewNote"),
   reviewedAt: timestamp("reviewedAt"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
   textIdIdx: index("textId_idx").on(table.textId),
   reportedByIdx: index("reportedBy_idx").on(table.reportedBy),
@@ -238,9 +238,9 @@ export type InsertReport = typeof reports.$inferInsert;
 /**
  * User achievements and badges
  */
-export const achievements = pgTable("achievements", {
-  id: serial("id").primaryKey(),
-  userId: integer("userId").notNull(),
+export const achievements = mysqlTable("achievements", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
   
   // Achievement type
   achievementType: varchar("achievementType", { length: 100 }).notNull(),
@@ -251,13 +251,13 @@ export const achievements = pgTable("achievements", {
   iconUrl: text("iconUrl"),
   
   // Progress
-  currentProgress: integer("currentProgress").default(0).notNull(),
-  targetProgress: integer("targetProgress").notNull(),
+  currentProgress: int("currentProgress").default(0).notNull(),
+  targetProgress: int("targetProgress").notNull(),
   isCompleted: boolean("isCompleted").default(false).notNull(),
   
   completedAt: timestamp("completedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
   userIdIdx: index("userId_idx").on(table.userId),
 }));
