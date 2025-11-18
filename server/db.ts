@@ -1,4 +1,4 @@
-import { eq, desc, and, sql, or } from "drizzle-orm";
+import { eq, desc, and, sql, or, gte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertUser,
@@ -546,4 +546,68 @@ export async function updateAchievementProgress(
     .update(achievements)
     .set(updates)
     .where(eq(achievements.id, achievementId));
+}
+
+
+// ==================== LEADERBOARD FUNCTIONS ====================
+
+export async function getLeaderboard(period: 'week' | 'month' | 'all', limit: number = 10) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const now = new Date();
+  let dateThreshold: Date | null = null;
+  
+  if (period === 'week') {
+    dateThreshold = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  } else if (period === 'month') {
+    dateThreshold = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  }
+
+  try {
+    // Get all completed exams with user info
+    const completedExams = await db
+      .select({
+        userId: exams.userId,
+        userName: users.name,
+        scorePercentage: exams.scorePercentage,
+        completedAt: exams.completedAt,
+      })
+      .from(exams)
+      .innerJoin(users, eq(users.id, exams.userId))
+      .where(
+        and(
+          eq(exams.status, "completed"),
+          dateThreshold ? gte(exams.completedAt, dateThreshold) : undefined
+        )
+      );
+
+    // Group by user and calculate stats
+    const userStats = new Map<number, { name: string; scores: number[] }>();
+    
+    for (const exam of completedExams) {
+      if (!exam.scorePercentage) continue;
+      
+      if (!userStats.has(exam.userId)) {
+        userStats.set(exam.userId, { name: exam.userName || "Anonymous", scores: [] });
+      }
+      userStats.get(exam.userId)!.scores.push(exam.scorePercentage);
+    }
+
+    // Calculate averages and format results
+    const leaderboard = Array.from(userStats.entries())
+      .map(([userId, data]) => ({
+        userId,
+        name: data.name,
+        totalExams: data.scores.length,
+        averageScore: data.scores.reduce((a, b) => a + b, 0) / data.scores.length,
+      }))
+      .sort((a, b) => b.averageScore - a.averageScore || b.totalExams - a.totalExams)
+      .slice(0, limit);
+
+    return leaderboard;
+  } catch (error) {
+    console.error("[Database] Failed to get leaderboard:", error);
+    return [];
+  }
 }

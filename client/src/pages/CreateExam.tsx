@@ -22,6 +22,7 @@ export default function CreateExam() {
   const [step, setStep] = useState<"input" | "validating" | "validated" | "generating">("input");
   const [validation, setValidation] = useState<any>(null);
 
+
   const createTextMutation = trpc.text.create.useMutation({
     onSuccess: (data) => {
       setTextId(data.textId);
@@ -51,6 +52,8 @@ export default function CreateExam() {
       setStep("input");
     },
   });
+
+
 
   const generateExamMutation = trpc.exam.generateExam.useMutation({
     onSuccess: (data) => {

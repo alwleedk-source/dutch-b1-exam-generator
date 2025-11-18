@@ -135,3 +135,26 @@
 - [x] Build Admin Panel (user management, text moderation)
 - [x] Add admin-only routes protection
 - [ ] Test admin features
+
+
+## Phase 14: Complete Create Exam Page ✅
+- [x] Build full Create Exam form with text input
+- [x] Add AI validation (Dutch language check)
+- [x] Add CEFR level detection (B1 check)
+- [ ] Add live translation preview (4 languages) - skipped (backend not ready)
+- [x] Add exam generation button
+- [ ] Test create exam flow
+
+## Phase 15: Text-to-Speech Integration
+- [ ] Add TTS for vocabulary words (postponed)
+- [ ] Integrate Google TTS API (postponed)
+- [ ] Store audio files in Cloudflare R2 (postponed)
+- [ ] Add audio playback UI in vocabulary page (postponed)
+- [ ] Test TTS functionality (postponed)
+
+## Phase 16: Leaderboard Feature ✅
+- [x] Create leaderboard page
+- [x] Add top scores query
+- [x] Display user rankings
+- [x] Add filters (weekly/monthly/all-time)
+- [ ] Test leaderboard

@@ -12,6 +12,7 @@ import TakeExam from "./pages/TakeExam";
 import Progress from "./pages/Progress";
 import Vocabulary from "./pages/Vocabulary";
 import AdminDashboard from "./pages/AdminDashboard";
+import Leaderboard from "./pages/Leaderboard";
 
 function Router() {
   return (
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/progress" component={Progress} />
       <Route path="/vocabulary" component={Vocabulary} />
       <Route path="/admin" component={AdminDashboard} />
+      <Route path="/leaderboard" component={Leaderboard} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

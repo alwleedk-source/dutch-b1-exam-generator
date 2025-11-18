@@ -281,6 +281,15 @@ export const appRouter = router({
     getMyAchievements: protectedProcedure.query(async ({ ctx }) => {
       return await db.getUserAchievements(ctx.user.id);
     }),
+
+    getLeaderboard: publicProcedure
+      .input(z.object({
+        period: z.enum(['week', 'month', 'all']),
+        limit: z.number().default(10),
+      }))
+      .query(async ({ input }) => {
+        return await db.getLeaderboard(input.period, input.limit);
+      }),
   }),
 
   // Vocabulary
