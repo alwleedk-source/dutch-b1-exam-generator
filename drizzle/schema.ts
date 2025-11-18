@@ -43,6 +43,7 @@ export const texts = mysqlTable("texts", {
   // Metadata
   wordCount: int("wordCount").notNull(),
   estimatedReadingMinutes: int("estimatedReadingMinutes").notNull(),
+  minHashSignature: text("minHashSignature"), // JSON string of MinHash signature for duplicate detection
   
   // Validation status
   isValidDutch: boolean("isValidDutch").default(true).notNull(),

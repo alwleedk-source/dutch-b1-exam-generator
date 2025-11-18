@@ -651,3 +651,11 @@ export async function updateUserVocabularySRS(
     .set(data)
     .where(eq(userVocabulary.id, userVocabId));
 }
+
+
+export async function getAllTexts() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(texts);
+}

@@ -211,3 +211,16 @@
 - [ ] Optimize for mobile screens
 - [ ] Test PWA functionality
 - [ ] Add offline data sync
+
+
+## Phase 23: OCR & Duplicate Detection ✅
+- [x] Add OCR support for image upload (extract Dutch text)
+- [x] Implement 5000 character limit validation
+- [x] Add MinHash algorithm for text similarity detection
+- [x] Store MinHash signature in database
+- [x] Check for duplicate texts (≥80% similarity)
+- [x] Show warning with links to similar texts
+- [x] Update Create Exam UI for image upload
+- [x] Add terms acceptance checkbox (all texts are public)
+- [ ] Make all texts public (remove user-specific filters) - deferred
+- [ ] Test OCR and duplicate detection

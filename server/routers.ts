@@ -37,6 +37,60 @@ export const appRouter = router({
 
   // Text management
   text: router({
+    extractFromImage: protectedProcedure
+      .input(z.object({
+        imageBase64: z.string(), // Base64 encoded image
+      }))
+      .mutation(async ({ input }) => {
+        const { extractTextFromImage, validateExtractedText } = await import("./lib/ocr");
+        
+        // Extract text from image
+        const result = await extractTextFromImage(input.imageBase64);
+        
+        // Validate extracted text
+        const validation = validateExtractedText(result.text);
+        if (!validation.isValid) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: validation.reason });
+        }
+        
+        return {
+          text: result.text,
+          confidence: result.confidence,
+          isTruncated: result.isTruncated,
+          characterCount: result.text.length,
+        };
+      }),
+
+    checkDuplicate: protectedProcedure
+      .input(z.object({
+        text: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const { checkDuplicate } = await import("./lib/minhash");
+        
+        // Get all existing texts with their signatures
+        const allTexts = await db.getAllTexts();
+        const textsWithSignatures = allTexts
+          .filter(t => t.minHashSignature)
+          .map(t => ({
+            id: t.id,
+            title: t.title || `Text #${t.id}`,
+            signature: JSON.parse(t.minHashSignature!),
+          }));
+        
+        // Check for duplicates
+        const duplicateCheck = checkDuplicate(input.text, textsWithSignatures);
+        
+        return {
+          isDuplicate: duplicateCheck.isDuplicate,
+          similarTexts: duplicateCheck.similarTexts.map(t => ({
+            id: t.id,
+            title: t.title,
+            similarity: Math.round(t.similarity * 100), // Convert to percentage
+          })),
+        };
+      }),
+
     getTextById: publicProcedure
       .input(z.object({ textId: z.number() }))
       .query(async ({ input }) => {
@@ -50,9 +104,15 @@ export const appRouter = router({
         source: z.enum(["paste", "upload", "scan"]).default("paste"),
       }))
       .mutation(async ({ ctx, input }) => {
+        const { calculateMinHash } = await import("./lib/minhash");
+        
         // Calculate word count and reading time
         const wordCount = input.dutchText.split(/\s+/).length;
-        const estimatedReadingMinutes = Math.ceil(wordCount / 200); // Average reading speed
+        const estimatedReadingMinutes = Math.ceil(wordCount / 200);
+        
+        // Calculate MinHash signature for duplicate detection
+        const minHashSignature = calculateMinHash(input.dutchText);
+        const minHashSignatureJson = JSON.stringify(minHashSignature); // Average reading speed
 
         // Create text record
         const result = await db.createText({
@@ -60,6 +120,7 @@ export const appRouter = router({
           title: input.title,
           wordCount,
           estimatedReadingMinutes,
+          minHashSignature: minHashSignatureJson,
           createdBy: ctx.user.id,
           source: input.source,
           status: "pending",

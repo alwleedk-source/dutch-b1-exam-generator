@@ -4,11 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { BookOpen, Loader2, CheckCircle, AlertCircle, Sparkles } from "lucide-react";
+import { BookOpen, Loader2, CheckCircle, AlertCircle, Sparkles, Upload, Image as ImageIcon, AlertTriangle } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { toast } from "sonner";
 
 export default function CreateExam() {
@@ -21,7 +23,75 @@ export default function CreateExam() {
   const [textId, setTextId] = useState<number | null>(null);
   const [step, setStep] = useState<"input" | "validating" | "validated" | "generating">("input");
   const [validation, setValidation] = useState<any>(null);
+  const [agreedToPublic, setAgreedToPublic] = useState(false);
+  const [similarTexts, setSimilarTexts] = useState<Array<{ id: number; title: string; similarity: number }>>([]);
+  const [isExtracting, setIsExtracting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const extractFromImageMutation = trpc.text.extractFromImage.useMutation({
+    onSuccess: (data) => {
+      setDutchText(data.text);
+      setIsExtracting(false);
+      toast.success(`Text extracted! ${data.characterCount} characters${data.isTruncated ? ' (truncated to 5000)' : ''}`);
+      
+      // Check for duplicates after extraction
+      checkDuplicateMutation.mutate({ text: data.text });
+    },
+    onError: (error) => {
+      setIsExtracting(false);
+      toast.error("Failed to extract text: " + error.message);
+    },
+  });
+
+  const checkDuplicateMutation = trpc.text.checkDuplicate.useMutation({
+    onSuccess: (data) => {
+      if (data.isDuplicate) {
+        setSimilarTexts(data.similarTexts);
+        toast.warning(`Found ${data.similarTexts.length} similar text(s)`);
+      } else {
+        setSimilarTexts([]);
+      }
+    },
+    onError: (error) => {
+      console.error("Duplicate check failed:", error);
+    },
+  });
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      toast.error("Please upload an image file");
+      return;
+    }
+
+    // Check file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Image too large (max 10MB)");
+      return;
+    }
+
+    setIsExtracting(true);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      extractFromImageMutation.mutate({ imageBase64: base64 });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleTextChange = (text: string) => {
+    setDutchText(text);
+    
+    // Check for duplicates when text changes (debounced)
+    if (text.length > 100) {
+      checkDuplicateMutation.mutate({ text });
+    } else {
+      setSimilarTexts([]);
+    }
+  };
 
   const createTextMutation = trpc.text.create.useMutation({
     onSuccess: (data) => {
@@ -53,8 +123,6 @@ export default function CreateExam() {
     },
   });
 
-
-
   const generateExamMutation = trpc.exam.generateExam.useMutation({
     onSuccess: (data) => {
       toast.success("Exam generated successfully!");
@@ -68,18 +136,28 @@ export default function CreateExam() {
 
   const handleSubmit = () => {
     if (!dutchText.trim()) {
-      toast.error("Please enter some text");
+      toast.error("Please enter Dutch text");
       return;
     }
 
-    if (dutchText.split(/\s+/).length < 50) {
-      toast.error("Text must be at least 50 words");
+    if (dutchText.length < 100) {
+      toast.error("Text too short (minimum 100 characters)");
+      return;
+    }
+
+    if (dutchText.length > 5000) {
+      toast.error("Text too long (maximum 5000 characters)");
+      return;
+    }
+
+    if (!agreedToPublic) {
+      toast.error("Please agree to make the text public");
       return;
     }
 
     createTextMutation.mutate({
-      dutchText: dutchText.trim(),
-      title: title.trim() || undefined,
+      dutchText,
+      title: title || undefined,
       source: "paste",
     });
   };
@@ -87,7 +165,7 @@ export default function CreateExam() {
   const handleGenerateExam = () => {
     if (!textId) return;
     setStep("generating");
-    generateExamMutation.mutate({ textId });
+    generateExamMutation.mutate({ textId: textId });
   };
 
   if (!user) {
@@ -96,7 +174,7 @@ export default function CreateExam() {
         <Card>
           <CardHeader>
             <CardTitle>Not Authenticated</CardTitle>
-            <CardDescription>Please log in to create an exam</CardDescription>
+            <CardDescription>Please log in to create exams</CardDescription>
           </CardHeader>
         </Card>
       </div>
@@ -115,12 +193,9 @@ export default function CreateExam() {
                 <h1 className="text-2xl font-bold gradient-text">Dutch B1</h1>
               </div>
             </Link>
-
-            <div className="flex items-center gap-4">
-              <Link href="/dashboard">
-                <Button variant="ghost">{t.dashboard}</Button>
-              </Link>
-            </div>
+            <Link href="/dashboard">
+              <Button variant="ghost">Dashboard</Button>
+            </Link>
           </div>
         </div>
       </header>
@@ -128,87 +203,144 @@ export default function CreateExam() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          {/* Title */}
-          <div className="mb-8 animate-fade-in">
-            <h2 className="text-3xl font-bold mb-2">{t.createNewExam}</h2>
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold mb-2">Create New Exam</h2>
             <p className="text-muted-foreground">
-              Add a Dutch B1 text and generate comprehension questions
+              Add a Dutch B1 text to generate comprehension questions
             </p>
           </div>
 
-          {/* Progress Steps */}
-          <div className="flex items-center justify-center gap-4 mb-8">
-            <div className={`flex items-center gap-2 ${step === "input" ? "text-primary" : "text-muted-foreground"}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${step === "input" ? "border-primary bg-primary/10" : "border-muted"}`}>
-                1
-              </div>
-              <span className="hidden sm:inline">Add Text</span>
-            </div>
-            <div className="w-16 h-0.5 bg-border" />
-            <div className={`flex items-center gap-2 ${step === "validating" || step === "validated" || step === "generating" ? "text-primary" : "text-muted-foreground"}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${step === "validating" || step === "validated" || step === "generating" ? "border-primary bg-primary/10" : "border-muted"}`}>
-                2
-              </div>
-              <span className="hidden sm:inline">Validate</span>
-            </div>
-            <div className="w-16 h-0.5 bg-border" />
-            <div className={`flex items-center gap-2 ${step === "generating" ? "text-primary" : "text-muted-foreground"}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${step === "generating" ? "border-primary bg-primary/10" : "border-muted"}`}>
-                3
-              </div>
-              <span className="hidden sm:inline">Generate</span>
-            </div>
-          </div>
-
-          {/* Input Form */}
-          {(step === "input") && (
-            <Card className="animate-scale-in">
+          {step === "input" && (
+            <Card>
               <CardHeader>
-                <CardTitle>Enter Dutch Text</CardTitle>
+                <CardTitle>Step 1: Add Dutch Text</CardTitle>
                 <CardDescription>
-                  Paste or type a Dutch B1 level text (minimum 50 words)
+                  Paste text or upload an image (OCR). Maximum 5000 characters.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
+                {/* Title */}
                 <div className="space-y-2">
                   <Label htmlFor="title">Title (Optional)</Label>
                   <Input
                     id="title"
-                    placeholder="e.g., Het Nederlandse klimaat"
+                    placeholder="e.g., De Nederlandse cultuur"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                   />
                 </div>
 
+                {/* Image Upload */}
                 <div className="space-y-2">
-                  <Label htmlFor="text">Dutch Text *</Label>
-                  <Textarea
-                    id="text"
-                    placeholder="Paste your Dutch B1 text here..."
-                    className="min-h-[300px] font-mono"
-                    value={dutchText}
-                    onChange={(e) => setDutchText(e.target.value)}
+                  <Label>Upload Image (OCR)</Label>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
                   />
-                  <p className="text-sm text-muted-foreground">
-                    Words: {dutchText.split(/\s+/).filter(w => w).length} / 50 minimum
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isExtracting}
+                  >
+                    {isExtracting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Extracting text...
+                      </>
+                    ) : (
+                      <>
+                        <ImageIcon className="mr-2 h-4 w-4" />
+                        Upload Image to Extract Text
+                      </>
+                    )}
+                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    Supported: JPG, PNG, WebP (max 10MB)
                   </p>
                 </div>
 
+                {/* Text Input */}
+                <div className="space-y-2">
+                  <Label htmlFor="text">Dutch Text</Label>
+                  <Textarea
+                    id="text"
+                    placeholder="Paste or type Dutch text here..."
+                    value={dutchText}
+                    onChange={(e) => handleTextChange(e.target.value)}
+                    rows={12}
+                    className="font-mono"
+                  />
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span>{dutchText.length} / 5000 characters</span>
+                    <span>{dutchText.split(/\s+/).filter(w => w).length} words</span>
+                  </div>
+                </div>
+
+                {/* Similar Texts Warning */}
+                {similarTexts.length > 0 && (
+                  <Alert variant="destructive">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription>
+                      <p className="font-semibold mb-2">Similar texts found:</p>
+                      <ul className="space-y-1">
+                        {similarTexts.map((text) => (
+                          <li key={text.id}>
+                            <Link href={`/study/${text.id}`}>
+                              <a className="underline hover:text-primary">
+                                {text.title} ({text.similarity}% similar)
+                              </a>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                      <p className="mt-2 text-sm">
+                        You can still add this text, but consider using an existing one.
+                      </p>
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {/* Public Agreement */}
+                <div className="flex items-start space-x-2 p-4 border rounded-lg bg-muted/50">
+                  <Checkbox
+                    id="agree"
+                    checked={agreedToPublic}
+                    onCheckedChange={(checked) => setAgreedToPublic(checked as boolean)}
+                  />
+                  <div className="space-y-1">
+                    <Label
+                      htmlFor="agree"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      I agree to make this text public
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      All texts are shared with the community to help everyone learn Dutch.
+                      By submitting, you confirm you have the right to share this content.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Submit Button */}
                 <Button
-                  onClick={handleSubmit}
-                  disabled={createTextMutation.isPending || dutchText.split(/\s+/).filter(w => w).length < 50}
-                  className="w-full gap-2"
+                  className="w-full"
                   size="lg"
+                  onClick={handleSubmit}
+                  disabled={createTextMutation.isPending || !agreedToPublic}
                 >
                   {createTextMutation.isPending ? (
                     <>
-                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Creating...
                     </>
                   ) : (
                     <>
-                      <Sparkles className="h-5 w-5" />
-                      Validate & Continue
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Validate & Create Exam
                     </>
                   )}
                 </Button>
@@ -216,83 +348,62 @@ export default function CreateExam() {
             </Card>
           )}
 
-          {/* Validating */}
           {step === "validating" && (
-            <Card className="animate-scale-in">
+            <Card>
               <CardContent className="py-12 text-center">
                 <Loader2 className="h-16 w-16 animate-spin text-primary mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">Validating Text...</h3>
                 <p className="text-muted-foreground">
-                  AI is checking if the text is Dutch and determining the CEFR level
+                  Checking language and CEFR level with AI
                 </p>
               </CardContent>
             </Card>
           )}
 
-          {/* Validated */}
           {step === "validated" && validation && (
-            <Card className="animate-scale-in">
+            <Card>
               <CardHeader>
                 <CardTitle>Validation Results</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-start gap-3 p-4 rounded-lg bg-muted">
+                <div className="flex items-center gap-2">
                   {validation.isValidDutch ? (
-                    <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="h-5 w-5 text-green-500" />
                   ) : (
-                    <AlertCircle className="h-6 w-6 text-red-600 flex-shrink-0 mt-0.5" />
+                    <AlertCircle className="h-5 w-5 text-red-500" />
                   )}
-                  <div>
-                    <h4 className="font-semibold mb-1">
-                      {validation.isValidDutch ? "✓ Dutch Language Detected" : "✗ Not Dutch Language"}
-                    </h4>
-                    <p className="text-sm text-muted-foreground">
-                      The text appears to be {validation.isValidDutch ? "in Dutch" : "not in Dutch"}
-                    </p>
-                  </div>
+                  <span className="font-semibold">
+                    {validation.isValidDutch ? "Valid Dutch text" : "Not Dutch text"}
+                  </span>
                 </div>
 
-                {validation.isValidDutch && (
-                  <div className="flex items-start gap-3 p-4 rounded-lg bg-muted">
-                    {validation.isB1Level ? (
-                      <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0 mt-0.5" />
-                    ) : (
-                      <AlertCircle className="h-6 w-6 text-yellow-600 flex-shrink-0 mt-0.5" />
-                    )}
-                    <div>
-                      <h4 className="font-semibold mb-1">
-                        CEFR Level: {validation.detectedLevel}
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        Confidence: {validation.levelConfidence}%
-                      </p>
-                      {validation.warning && (
-                        <p className="text-sm text-yellow-600 mt-2">
-                          ⚠️ {validation.warning}
-                        </p>
-                      )}
-                    </div>
+                {validation.detectedLevel && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Detected Level:</p>
+                    <p className="text-lg font-semibold">{validation.detectedLevel}</p>
                   </div>
                 )}
 
-                <div className="flex gap-3">
+                {validation.warning && (
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{validation.warning}</AlertDescription>
+                  </Alert>
+                )}
+
+                <div className="flex gap-4">
                   <Button
                     variant="outline"
-                    onClick={() => {
-                      setStep("input");
-                      setTextId(null);
-                      setValidation(null);
-                    }}
-                    className="flex-1"
+                    onClick={() => setStep("input")}
                   >
-                    Edit Text
+                    Back
                   </Button>
                   <Button
+                    className="flex-1"
                     onClick={handleGenerateExam}
                     disabled={!validation.isValidDutch}
-                    className="flex-1 gap-2"
                   >
-                    <Sparkles className="h-5 w-5" />
+                    <Sparkles className="mr-2 h-4 w-4" />
                     Generate Exam
                   </Button>
                 </div>
@@ -300,17 +411,13 @@ export default function CreateExam() {
             </Card>
           )}
 
-          {/* Generating */}
           {step === "generating" && (
-            <Card className="animate-scale-in">
+            <Card>
               <CardContent className="py-12 text-center">
                 <Loader2 className="h-16 w-16 animate-spin text-primary mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Generating Exam Questions...</h3>
+                <h3 className="text-xl font-semibold mb-2">Generating Exam...</h3>
                 <p className="text-muted-foreground">
-                  AI is creating 10 comprehension questions based on your text
-                </p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  This may take 10-20 seconds
+                  Creating 10 comprehension questions with AI
                 </p>
               </CardContent>
             </Card>
