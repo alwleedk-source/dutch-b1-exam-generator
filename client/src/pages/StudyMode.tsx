@@ -1,273 +1,223 @@
-import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Loader2, BookmarkPlus, Languages, StickyNote, Eye, EyeOff } from "lucide-react";
-import { Link, useParams } from "wouter";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Loader2, Printer } from "lucide-react";
+import { useParams, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { AppHeader } from "@/components/AppHeader";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 export default function StudyMode() {
-  const { id } = useParams();
+  const { textId } = useParams<{ textId: string }>();
+  const [, navigate] = useLocation();
   const { user } = useAuth();
-  const [showTranslation, setShowTranslation] = useState(false);
-  const [notes, setNotes] = useState("");
-  const [selectedLanguage, setSelectedLanguage] = useState<"ar" | "en" | "tr">("en");
+  const { t, language } = useLanguage();
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string>>({});
 
-  const textId = id ? parseInt(id) : undefined;
+  const { data: text, isLoading: textLoading } = trpc.text.getTextWithTranslation.useQuery(
+    { text_id: parseInt(textId!) },
+    { enabled: !!textId }
+  );
 
-  const { data: text, isLoading } = trpc.text.getTextById.useQuery(
-    { text_id: textId! },
+  const { data: examData, isLoading: examLoading } = trpc.exam.getExamDetails.useQuery(
+    { examId: parseInt(textId!) },
     { enabled: !!textId && !!user }
   );
 
-  const { data: vocabulary } = trpc.vocabulary.getVocabularyByText.useQuery(
-    { text_id: textId! },
-    { enabled: !!textId && !!user }
-  );
+  const submitExamMutation = trpc.exam.submitExam.useMutation({
+    onSuccess: (result) => {
+      toast.success(`${t.examCompleted || "Exam completed"}! ${t.score || "Score"}: ${result.score_percentage}%`);
+      navigate(`/exam/${examData?.id}/results`);
+    },
+    onError: (error: any) => {
+      toast.error("Failed to submit exam: " + error.message);
+    },
+  });
 
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-bg">
-        <Card>
-          <CardHeader>
-            <CardTitle>Not Authenticated</CardTitle>
-            <CardDescription>Please log in to use Study Mode</CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    );
-  }
+  const handleSubmit = () => {
+    if (!examData?.id) return;
+    
+    const answers = Object.entries(selectedAnswers).map(([questionIndex, answer]) => answer);
 
-  if (isLoading) {
+    if (answers.length < questions.length) {
+      toast.error("Please answer all questions before submitting");
+      return;
+    }
+
+    submitExamMutation.mutate({
+      examId: examData.id,
+      answers,
+      time_spent_minutes: 0,
+    });
+  };
+
+  if (textLoading || examLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-bg">
-        <Loader2 className="h-16 w-16 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
   }
 
   if (!text) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-bg">
-        <Card>
-          <CardHeader>
-            <CardTitle>Text Not Found</CardTitle>
-            <CardDescription>The requested text could not be found</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link href="/dashboard">
-              <Button>Go to Dashboard</Button>
-            </Link>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen flex flex-col">
+        <AppHeader />
+        <main className="flex-1 container py-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>{t.textNotFound || "Text Not Found"}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                {t.textNotFoundDesc || "The requested text could not be found"}
+              </p>
+              <Button onClick={() => navigate("/dashboard")}>
+                {t.goToDashboard || "Go to Dashboard"}
+              </Button>
+            </CardContent>
+          </Card>
+        </main>
       </div>
     );
   }
 
-  const highlightVocabulary = (text: string) => {
-    if (!vocabulary || vocabulary.length === 0) return text;
+  if (!user) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <AppHeader />
+        <main className="flex-1 container py-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>{t.notAuthenticated || "Not Authenticated"}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                {t.pleaseLogin || "Please log in to use Study Mode"}
+              </p>
+              <Button onClick={() => window.location.href = "/api/auth/google"}>
+                {t.login || "Login"}
+              </Button>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    );
+  }
 
-    let highlightedText = text;
-    vocabulary.forEach((word: any) => {
-      const regex = new RegExp(`\\b${word.word}\\b`, "gi");
-      highlightedText = highlightedText.replace(
-        regex,
-        `<mark class="bg-yellow-200 dark:bg-yellow-900/50 px-1 rounded">${word.word}</mark>`
-      );
-    });
-
-    return highlightedText;
-  };
+  const questions = Array.isArray(examData?.questions) 
+    ? examData.questions 
+    : (typeof examData?.questions === 'string' ? JSON.parse(examData.questions) : []);
+  const wordCount = text?.text?.word_count || 0;
+  const readingTime = text?.text?.estimated_reading_minutes || Math.ceil(wordCount / 200);
 
   return (
-    <div className="min-h-screen bg-gradient-bg">
-      {/* Header */}
-      <header className="border-b border-border/50 glass sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/">
-              <div className="flex items-center gap-2 cursor-pointer">
-                <BookOpen className="h-8 w-8 text-primary" />
-                <h1 className="text-2xl font-bold gradient-text">Dutch B1</h1>
-              </div>
-            </Link>
-
-            <div className="flex items-center gap-4">
-              <Link href="/dashboard">
-                <Button variant="ghost">Dashboard</Button>
-              </Link>
-            </div>
+    <>
+      <AppHeader />
+      <main className="container py-8 max-w-5xl no-print">
+        {/* Header with Print Button */}
+        <div className="flex justify-between items-center mb-6 no-print">
+          <div>
+            <h1 className="text-3xl font-bold">{text?.text?.title}</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {wordCount} {t.words || "words"} • {readingTime} {t.minRead || "min read"}
+            </p>
           </div>
+          <Button variant="outline" onClick={() => window.print()}>
+            <Printer className="h-4 w-4 mr-2" />
+            {t.print || "Print"}
+          </Button>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          {/* Title */}
-          <div className="mb-8 animate-fade-in">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-3xl font-bold mb-2">Study Mode</h2>
-                <p className="text-muted-foreground">{text.title || `Text #${text.id}`}</p>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowTranslation(!showTranslation)}
-                >
-                  {showTranslation ? (
-                    <><EyeOff className="h-4 w-4 mr-2" />Hide Translation</>
-                  ) : (
-                    <><Eye className="h-4 w-4 mr-2" />Show Translation</>
-                  )}
-                </Button>
-              </div>
+        {/* Dutch Text */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>{t.dutchText || "Dutch Text"}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div 
+              className="prose prose-lg max-w-none leading-relaxed"
+              style={{
+                columnCount: wordCount > 400 ? 2 : 1,
+                columnGap: '2rem',
+                direction: language === 'ar' ? 'rtl' : 'ltr',
+              }}
+            >
+              <p className="text-foreground whitespace-pre-wrap">
+                {text?.text?.dutch_text}
+              </p>
             </div>
-          </div>
+          </CardContent>
+        </Card>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Main Text Area */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Dutch Text */}
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle>Dutch Text</CardTitle>
-                    <Badge variant="outline">
-                      {text.word_count} words · {text.estimated_reading_minutes} min read
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div
-                    className="prose prose-lg max-w-none leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: highlightVocabulary(text.dutch_text) }}
-                  />
-                </CardContent>
-              </Card>
-
-              {/* Translation */}
-              {showTranslation && false && (
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="flex items-center gap-2">
-                        <Languages className="h-5 w-5" />
-                        Translation
-                      </CardTitle>
-                      <Tabs value={selectedLanguage} onValueChange={(v) => setSelectedLanguage(v as any)}>
-                        <TabsList>
-                          <TabsTrigger value="ar">🇸🇦 AR</TabsTrigger>
-                          <TabsTrigger value="en">🇬🇧 EN</TabsTrigger>
-                          <TabsTrigger value="tr">🇹🇷 TR</TabsTrigger>
-                        </TabsList>
-                      </Tabs>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground leading-relaxed">
-                      Translation feature coming soon
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Notes */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <StickyNote className="h-5 w-5" />
-                    Your Notes
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Textarea
-                    placeholder="Write your notes here..."
-                    className="min-h-[150px]"
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                  />
-                  <Button
-                    className="mt-4"
-                    onClick={() => {
-                      // Save notes (implement later)
-                      toast.success("Notes saved!");
-                    }}
+        {/* Questions */}
+        {questions.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>{t.question || "Questions"} ({questions.length})</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {(questions as any[]).map((q: any, index: number) => (
+                <div key={index} className="border-b pb-6 last:border-0">
+                  <h3 className="font-semibold mb-3">
+                    {index + 1}. {q.question}
+                  </h3>
+                  <RadioGroup
+                    value={selectedAnswers[index] || ""}
+                    onValueChange={(value) => setSelectedAnswers(prev => ({ ...prev, [index]: value }))}
                   >
-                    Save Notes
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+                    {q.options.map((option: string, optIndex: number) => (
+                      <div key={optIndex} className="flex items-center space-x-2 mb-2">
+                        <RadioGroupItem value={option} id={`q${index}-opt${optIndex}`} />
+                        <Label htmlFor={`q${index}-opt${optIndex}`} className="cursor-pointer">
+                          {option}
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+              ))}
 
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Vocabulary */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BookOpen className="h-5 w-5" />
-                    Key Vocabulary
-                  </CardTitle>
-                  <CardDescription>
-                    {vocabulary?.length || 0} words highlighted
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {vocabulary && vocabulary.length > 0 ? (
-                    <div className="space-y-3">
-                      {vocabulary.slice(0, 10).map((word: any) => (
-                        <div key={word.id} className="p-3 rounded-lg bg-muted">
-                          <h4 className="font-semibold mb-1">{word.word}</h4>
-                          {word.translation && (
-                            <p className="text-sm text-muted-foreground">{word.translation}</p>
-                          )}
-                        </div>
-                      ))}
-                      {vocabulary.length > 10 && (
-                        <Link href="/vocabulary">
-                          <Button variant="outline" className="w-full">
-                            View All Vocabulary
-                          </Button>
-                        </Link>
-                      )}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      No vocabulary extracted yet
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Quick Actions */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Quick Actions</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <Link href={`/exam/${textId}`}>
-                    <Button variant="outline" className="w-full justify-start">
-                      <BookOpen className="h-4 w-4 mr-2" />
-                      Take Exam
-                    </Button>
-                  </Link>
-                  <Button variant="outline" className="w-full justify-start">
-                    <BookmarkPlus className="h-4 w-4 mr-2" />
-                    Bookmark Text
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
+              <Button 
+                onClick={handleSubmit} 
+                disabled={submitExamMutation.isPending}
+                className="w-full"
+                size="lg"
+              >
+                {submitExamMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    {t.loading || "Loading..."}
+                  </>
+                ) : (
+                  t.submitExam || "Submit Exam"
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </main>
-    </div>
+
+      {/* Print Styles */}
+      <style>{`
+        @media print {
+          .no-print {
+            display: none !important;
+          }
+          body {
+            background: white;
+            color: black;
+          }
+          * {
+            color: black !important;
+            background: white !important;
+          }
+        }
+      `}</style>
+    </>
   );
 }

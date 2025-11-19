@@ -137,6 +137,17 @@ export interface Translations {
   almostDone: string;
   examCreatedSuccessfully: string;
   failedToCreateExam: string;
+  print: string;
+  dutchText: string;
+  hoverForTranslation: string;
+  wordSaved: string;
+  notAuthenticated: string;
+  pleaseLogin: string;
+  textNotFound: string;
+  textNotFoundDesc: string;
+  goToDashboard: string;
+  words: string;
+  minRead: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -274,6 +285,17 @@ export const translations: Record<Language, Translations> = {
     almostDone: "Bijna klaar...",
     examCreatedSuccessfully: "Examen succesvol aangemaakt!",
     failedToCreateExam: "Examen maken mislukt",
+    print: "Afdrukken",
+    dutchText: "Nederlandse Tekst",
+    hoverForTranslation: "Beweeg over gemarkeerde woorden voor vertaling. Dubbelklik om op te slaan.",
+    wordSaved: "Woord opgeslagen!",
+    notAuthenticated: "Niet Ingelogd",
+    pleaseLogin: "Log in om Studiemodus te gebruiken",
+    textNotFound: "Tekst Niet Gevonden",
+    textNotFoundDesc: "De gevraagde tekst kon niet worden gevonden",
+    goToDashboard: "Naar Dashboard",
+    words: "woorden",
+    minRead: "min lezen",
   },
   
   ar: {
@@ -410,6 +432,17 @@ export const translations: Record<Language, Translations> = {
     almostDone: "انتهى تقريباً...",
     examCreatedSuccessfully: "تم إنشاء الامتحان بنجاح!",
     failedToCreateExam: "فشل إنشاء الامتحان",
+    print: "طباعة",
+    dutchText: "النص الهولندي",
+    hoverForTranslation: "مرر الماوس فوق الكلمات المميزة للترجمة. انقر مرتين للحفظ.",
+    wordSaved: "تم حفظ الكلمة!",
+    notAuthenticated: "غير مسجل الدخول",
+    pleaseLogin: "يرجى تسجيل الدخول لاستخدام وضع الدراسة",
+    textNotFound: "النص غير موجود",
+    textNotFoundDesc: "لم يتم العثور على النص المطلوب",
+    goToDashboard: "الذهاب إلى لوحة التحكم",
+    words: "كلمات",
+    minRead: "دقيقة قراءة",
   },
   
   en: {
@@ -546,6 +579,17 @@ export const translations: Record<Language, Translations> = {
     almostDone: "Almost done...",
     examCreatedSuccessfully: "Exam created successfully!",
     failedToCreateExam: "Failed to create exam",
+    print: "Print",
+    dutchText: "Dutch Text",
+    hoverForTranslation: "Hover over highlighted words for translation. Double-click to save.",
+    wordSaved: "Word saved!",
+    notAuthenticated: "Not Authenticated",
+    pleaseLogin: "Please log in to use Study Mode",
+    textNotFound: "Text Not Found",
+    textNotFoundDesc: "The requested text could not be found",
+    goToDashboard: "Go to Dashboard",
+    words: "words",
+    minRead: "min read",
   },
   
   tr: {
@@ -682,6 +726,17 @@ export const translations: Record<Language, Translations> = {
     almostDone: "Neredeyse bitti...",
     examCreatedSuccessfully: "Sınav başarıyla oluşturuldu!",
     failedToCreateExam: "Sınav oluşturulamadı",
+    print: "Yazdır",
+    dutchText: "Hollandaca Metin",
+    hoverForTranslation: "Çeviri için vurgulanan kelimelerin üzerine gelin. Kaydetmek için çift tıklayın.",
+    wordSaved: "Kelime kaydedildi!",
+    notAuthenticated: "Kimlik Doğrulanmadı",
+    pleaseLogin: "Çalışma Modunu kullanmak için lütfen giriş yapın",
+    textNotFound: "Metin Bulunamadı",
+    textNotFoundDesc: "İstenen metin bulunamadı",
+    goToDashboard: "Kontrol Paneline Git",
+    words: "kelime",
+    minRead: "dakika okuma",
   },
 };
 

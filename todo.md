@@ -429,3 +429,39 @@
   - Show text and questions only
 - [ ] Test printing
 - [ ] Deploy to Railway
+
+
+## Phase 42: Study Mode Improvements & Admin Fix
+- [ ] Fix Study Mode page (/study/:id) text formatting
+  - Proper paragraph spacing
+  - Better typography
+  - Show full text with questions below
+- [ ] Add RTL support for Arabic users
+  - Detect user language
+  - Apply dir="rtl" for Arabic
+  - Keep Dutch text LTR always
+- [ ] Implement B1 vocabulary tooltips
+  - Detect B1-level Dutch words automatically
+  - Show translation on hover (tooltip)
+  - Support all user languages (ar, en, tr, nl)
+- [ ] Add double-click to save vocabulary
+  - Double-click on word → save to user's vocabulary list
+  - Show confirmation toast
+  - Add to Vocabulary page
+- [ ] Fix admin access for waleed.qodami@gmail.com
+  - Verify database role is 'admin'
+  - Check adminProcedure middleware
+  - Test /admin access
+- [ ] Deploy to Railway
+
+
+## Phase 43: Study Mode Redesign & Auto-Admin
+- [x] Remove sidebars from Study Mode (Key Vocabulary, Quick Actions)
+- [x] Show full text at top with proper formatting (auto-column for long texts)
+- [x] Show all exam questions below the text (like Staatsexamen)
+- [x] Add answer selection for each question (RadioGroup)
+- [x] Add submit button at the end
+- [x] Add automatic admin role for waleed.qodami@gmail.com on login
+- [x] Update upsertUser to check email === 'waleed.qodami@gmail.com'
+- [ ] Test Study Mode with questions
+- [ ] Deploy to Railway
