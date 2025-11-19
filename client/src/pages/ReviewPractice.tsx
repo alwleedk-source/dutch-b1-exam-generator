@@ -249,11 +249,11 @@ export default function ReviewPractice() {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4 text-center text-sm text-muted-foreground">
             <div>
-              <p className="font-semibold text-foreground">{currentCard.correctCount}</p>
+              <p className="font-semibold text-foreground">{currentCard.correct_count}</p>
               <p>Correct</p>
             </div>
             <div>
-              <p className="font-semibold text-foreground">{currentCard.incorrectCount}</p>
+              <p className="font-semibold text-foreground">{currentCard.incorrect_count}</p>
               <p>Incorrect</p>
             </div>
             <div>

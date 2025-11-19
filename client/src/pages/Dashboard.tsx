@@ -3,12 +3,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { BookOpen, TrendingUp, Target, Flame, Plus } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { useEffect } from "react";
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
   const { t } = useLanguage();
+  const [, setLocation] = useLocation();
+  
+  // Redirect authenticated users to Create Exam page (main page)
+  useEffect(() => {
+    if (user) {
+      setLocation("/create-exam");
+    }
+  }, [user, setLocation]);
   
   const { data: stats, isLoading: statsLoading } = trpc.progress.getMyStats.useQuery();
   const { data: exams, isLoading: examsLoading } = trpc.exam.getMyExams.useQuery();
@@ -166,7 +175,7 @@ export default function Dashboard() {
                       <div className="font-medium">Exam #{exam.id}</div>
                       <div className="text-sm text-muted-foreground">
                         {exam.status === "completed"
-                          ? `Score: ${exam.scorePercentage}%`
+                          ? `Score: ${exam.score_percentage}%`
                           : t.examInProgress}
                       </div>
                     </div>
@@ -174,12 +183,12 @@ export default function Dashboard() {
                       {exam.status === "completed" && (
                         <div
                           className={`text-2xl font-bold ${
-                            (exam.scorePercentage || 0) >= 70
+                            (exam.score_percentage || 0) >= 70
                               ? "text-green-600"
                               : "text-yellow-600"
                           }`}
                         >
-                          {exam.scorePercentage}%
+                          {exam.score_percentage}%
                         </div>
                       )}
                       {exam.status === "in_progress" && (

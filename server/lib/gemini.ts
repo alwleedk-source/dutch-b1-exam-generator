@@ -212,3 +212,26 @@ Respond in JSON format:
 
   return JSON.parse(response);
 }
+
+/**
+ * Generate a title for Dutch text
+ */
+export async function generateTitle(dutchText: string): Promise<string> {
+  const response = await generateWithGemini({
+    messages: [
+      {
+        role: "user",
+        parts: `Generate a short, descriptive title (max 60 characters) for the following Dutch text. The title should be in Dutch and capture the main topic or theme.
+
+Text: ${dutchText.substring(0, 500)}...
+
+Respond with ONLY the title text, no quotes, no extra formatting.`,
+      },
+    ],
+    responseFormat: "text",
+    maxOutputTokens: 50,
+  });
+
+  // Clean up the response
+  return response.trim().replace(/^["']|["']$/g, ''); // Remove quotes if present
+}

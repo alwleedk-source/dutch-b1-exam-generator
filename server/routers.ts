@@ -99,7 +99,7 @@ export const appRouter = router({
 
     create: protectedProcedure
       .input(z.object({
-        dutchText: z.string().min(50, "Text must be at least 50 characters"),
+        dutch_text: z.string().min(50, "Text must be at least 50 characters"),
         title: z.string().optional(),
         source: z.enum(["paste", "upload", "scan"]).default("paste"),
       }))
@@ -107,32 +107,44 @@ export const appRouter = router({
         const { calculateMinHash } = await import("./lib/minhash");
         
         // Calculate word count and reading time
-        const wordCount = input.dutchText.split(/\s+/).length;
+        const wordCount = input.dutch_text.split(/\s+/).length;
         const estimatedReadingMinutes = Math.ceil(wordCount / 200);
         
         // Calculate MinHash signature for duplicate detection
-        const minHashSignature = calculateMinHash(input.dutchText);
-        const minHashSignatureJson = JSON.stringify(minHashSignature); // Average reading speed
+        const minHashSignature = calculateMinHash(input.dutch_text);
+        const minHashSignatureJson = JSON.stringify(minHashSignature);
+
+        // Generate title using AI if not provided
+        let finalTitle = input.title;
+        if (!finalTitle || finalTitle.trim() === "") {
+          try {
+            finalTitle = await gemini.generateTitle(input.dutch_text);
+          } catch (error) {
+            console.error("Failed to generate title:", error);
+            // Fallback: use first 50 characters of text
+            finalTitle = input.dutch_text.substring(0, 50).trim() + "...";
+          }
+        }
 
         // Create text record
         const result = await db.createText({
-          dutchText: input.dutchText,
-          title: input.title,
-          wordCount,
-          estimatedReadingMinutes,
+          dutch_text: input.dutch_text,
+          title: finalTitle,
+          word_count: wordCount,
+          estimated_reading_minutes: estimatedReadingMinutes,
           min_hash_signature: minHashSignatureJson,
-          createdBy: ctx.user.id,
+          created_by: ctx.user.id,
           source: input.source,
           // status defaults to pending in schema
-          isValidDutch: true, // Will be validated by AI
-          isB1Level: true, // Will be validated by AI
+          is_valid_dutch: true, // Will be validated by AI
+          is_b1_level: true, // Will be validated by AI
         });
 
         return { 
           success: true, 
           text_id: result[0].id,
-          wordCount,
-          estimatedReadingMinutes,
+          word_count: wordCount,
+          estimated_reading_minutes: estimatedReadingMinutes,
         };
       }),
 
@@ -147,22 +159,22 @@ export const appRouter = router({
         }
 
         // Validate with Gemini AI
-        const validation = await gemini.validateDutchText(text.dutchText);
+        const validation = await gemini.validateDutchText(text.dutch_text);
 
         // Update text validation
         await db.updateTextValidation(input.text_id, {
-          isValidDutch: validation.isDutch,
+          is_valid_dutch: validation.isDutch,
           detectedLevel: validation.level,
           levelConfidence: validation.confidence,
-          isB1Level: validation.level === "B1",
+          is_b1_level: validation.level === "B1",
         });
 
         return {
           success: true,
-          isValidDutch: validation.isDutch,
+          is_valid_dutch: validation.isDutch,
           detectedLevel: validation.level,
           levelConfidence: validation.confidence,
-          isB1Level: validation.level === "B1",
+          is_b1_level: validation.level === "B1",
           warning: validation.level !== "B1" ? `Text appears to be ${validation.level} level, not B1` : null,
         };
       }),
@@ -184,7 +196,7 @@ export const appRouter = router({
         }
 
         // Translate with Gemini AI
-        const translations = await gemini.translateText(text.dutchText);
+        const translations = await gemini.translateText(text.dutch_text);
 
         // Save translations
         await db.createTranslation({
@@ -237,14 +249,14 @@ export const appRouter = router({
         }
 
         // Generate exam questions with Gemini AI
-        const examData = await gemini.generateExamQuestions(text.dutchText);
+        const examData = await gemini.generateExamQuestions(text.dutch_text);
 
         // Create exam record
         const result = await db.createExam({
           user_id: ctx.user.id,
           text_id: input.text_id,
           questions: JSON.stringify(examData.questions),
-          totalQuestions: examData.questions.length,
+          total_questions: examData.questions.length,
           status: "in_progress",
         });
 
@@ -304,7 +316,7 @@ export const appRouter = router({
         return {
           success: true,
           correct_answers: correctCount,
-          totalQuestions: questions.length,
+          total_questions: questions.length,
           score_percentage,
         };
       }),
@@ -390,7 +402,7 @@ export const appRouter = router({
         }
 
         // Extract vocabulary with Gemini AI
-        const vocabData = await gemini.extractVocabulary(text.dutchText);
+        const vocabData = await gemini.extractVocabulary(text.dutch_text);
 
         // Save vocabulary
         for (const word of vocabData.vocabulary) {
@@ -452,8 +464,8 @@ export const appRouter = router({
           repetitions: srsResult.repetitions,
           next_review_at: srsResult.next_review_at,
           last_reviewed_at: new Date(),
-          correctCount: input.quality >= 3 ? userVocab.correctCount + 1 : userVocab.correctCount,
-          incorrectCount: input.quality < 3 ? userVocab.incorrectCount + 1 : userVocab.incorrectCount,
+          correct_count: input.quality >= 3 ? userVocab.correct_count + 1 : userVocab.correct_count,
+          incorrect_count: input.quality < 3 ? userVocab.incorrect_count + 1 : userVocab.incorrect_count,
           status: srsResult.repetitions >= 5 ? "mastered" : "learning",
         });
 

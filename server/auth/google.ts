@@ -56,15 +56,19 @@ if (!DISABLE_AUTH) {
 
     // Serialize user to session
     passport.serializeUser((user: any, done) => {
+      console.log('[Passport] Serializing user:', user.id);
       done(null, user.id);
     });
 
     // Deserialize user from session
     passport.deserializeUser(async (id: number, done) => {
       try {
+        console.log('[Passport] Deserializing user ID:', id);
         const user = await db.getUserById(id);
+        console.log('[Passport] Deserialized user:', user ? user.id : 'not found');
         done(null, user || null);
       } catch (error) {
+        console.error('[Passport] Deserialize error:', error);
         done(error);
       }
     });

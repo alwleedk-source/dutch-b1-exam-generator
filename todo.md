@@ -244,3 +244,78 @@
 - [x] Fix all TypeScript errors (frontend & backend)
 - [x] Test locally
 - [ ] Push to GitHub and Railway
+
+
+## Phase 26: Railway Deployment Investigation
+- [ ] Check Railway project connection to GitHub
+- [ ] Verify Railway watches correct branch (master vs main)
+- [ ] Check if Railway has auto-deploy enabled
+- [ ] Verify build command and start command
+- [ ] Manually trigger deployment if needed
+- [ ] Test deployed application
+
+
+## Phase 27: Clean Repository for Railway Deployment
+- [ ] Remove old Python/Flask application files
+- [ ] Keep only new React/Express application
+- [ ] Push clean repository to GitHub
+- [ ] Verify Railway builds new application
+- [ ] Test deployment
+
+
+## Phase 28: Fix Authentication & Add Markdown Formatting
+- [ ] Investigate authentication error logs
+- [ ] Fix Google OAuth callback issue
+- [ ] Install markdown-it package
+- [ ] Configure markdown-it for text formatting
+- [ ] Test authentication flow
+- [ ] Test markdown rendering
+- [ ] Deploy to Railway
+
+
+## Phase 29: Fix Session Cookie Issue on Railway
+- [ ] Add detailed logging for session creation
+- [ ] Debug cookie settings (secure, sameSite, domain)
+- [ ] Fix Railway HTTPS proxy trust settings
+- [ ] Test cookie persistence across requests
+- [ ] Verify authentication flow works end-to-end
+- [ ] Deploy and confirm fix
+
+
+## Phase 30: Fix Database Schema Mismatches ✅
+- [x] Identify missing columns (scorePercentage, questions, answers, etc.)
+- [x] Add missing columns to database (score_percentage, total_questions, correct_answers, started_at, completed_at, ease_factor, interval, repetitions)
+- [x] Update Drizzle schema to use snake_case
+- [x] Fix all references in server/db.ts, server/routers.ts
+- [x] Fix all references in client Dashboard.tsx
+- [x] Push fixes to GitHub
+- [ ] Add VITE_APP_LOGO environment variable in Railway
+- [ ] Test all tRPC queries after deployment
+
+
+## Phase 31: Fix ALL Remaining camelCase Columns ✅
+- [x] Find all camelCase columns in schema.ts (correctCount, incorrectCount, dutch_text, word_count, etc.)
+- [x] Update schema.ts to use snake_case for ALL columns
+  - texts table: dutch_text, word_count, estimated_reading_minutes, is_valid_dutch, detected_level, level_confidence, is_b1_level, created_by, moderated_by, moderation_note, moderated_at
+  - user_vocabulary table: correct_count, incorrect_count
+- [x] Update all code references in server/db.ts, server/routers.ts using sed
+- [x] Update all code references in client pages using sed
+- [x] Fix all TypeScript errors
+- [x] Push fixes to GitHub
+
+
+## Phase 32: Redesign Create Exam Page (Main Page) ✅
+- [x] Make Create Exam page the main landing page after login (redirect from Dashboard)
+- [x] Redesign layout - make it prominent and clear, not marginal
+- [x] Implement rich text editor with:
+  - Large, clear Dutch Text input field
+  - Visual editor that accepts formatted text (paste from Word, etc.)
+  - Automatic text cleaning (remove HTML tags, formatting codes, etc.)
+  - TipTap editor for rich text (NOT markdown-it)
+  - Smart paste handling with DOMPurify
+- [x] Add AI-powered title generation:
+  - If user doesn't provide title, AI generates one from the text (using Gemini)
+  - Title is generated server-side during text.create
+- [x] Update routing to make this the default page
+- [x] Test text cleaning and formatting (vitest tests pass)
+- [ ] Deploy to Railway

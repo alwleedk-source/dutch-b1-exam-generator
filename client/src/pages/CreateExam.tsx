@@ -12,6 +12,8 @@ import { Link, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
+import { RichTextEditor } from "@/components/RichTextEditor";
+import { cleanPastedText, formatDutchText, countWords, estimateReadingTime, isTextLongEnough } from "@/lib/textCleaner";
 
 export default function CreateExam() {
   const { user } = useAuth();
@@ -109,7 +111,7 @@ export default function CreateExam() {
     onSuccess: (data) => {
       setValidation(data);
       setStep("validated");
-      if (!data.isValidDutch) {
+      if (!data.is_valid_dutch) {
         toast.error("Text is not in Dutch language!");
       } else if (data.warning) {
         toast.warning(data.warning);
@@ -156,7 +158,7 @@ export default function CreateExam() {
     }
 
     createTextMutation.mutate({
-      dutchText,
+      dutch_text: dutchText,
       title: title || undefined,
       source: "paste",
     });
@@ -263,20 +265,22 @@ export default function CreateExam() {
                   </p>
                 </div>
 
-                {/* Text Input */}
+                {/* Text Input - Rich Text Editor */}
                 <div className="space-y-2">
-                  <Label htmlFor="text">Dutch Text</Label>
-                  <Textarea
-                    id="text"
-                    placeholder="Paste or type Dutch text here..."
+                  <Label htmlFor="text" className="text-lg font-semibold">Dutch Text</Label>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Paste text from Word, Google Docs, or type directly. Formatting will be cleaned automatically.
+                  </p>
+                  <RichTextEditor
                     value={dutchText}
-                    onChange={(e) => handleTextChange(e.target.value)}
-                    rows={12}
-                    className="font-mono"
+                    onChange={handleTextChange}
+                    placeholder="Plak of typ hier Nederlandse tekst... (Paste or type Dutch text here)"
                   />
-                  <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>{dutchText.length} / 5000 characters</span>
-                    <span>{dutchText.split(/\s+/).filter(w => w).length} words</span>
+                  <div className="flex justify-between text-sm text-muted-foreground mt-2">
+                    <span>{countWords(dutchText)} words • {estimateReadingTime(dutchText)} min read</span>
+                    <span className={dutchText.length > 5000 ? 'text-red-500 font-semibold' : ''}>
+                      {dutchText.length} / 5000 characters
+                    </span>
                   </div>
                 </div>
 
@@ -367,13 +371,13 @@ export default function CreateExam() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center gap-2">
-                  {validation.isValidDutch ? (
+                  {validation.is_valid_dutch ? (
                     <CheckCircle className="h-5 w-5 text-green-500" />
                   ) : (
                     <AlertCircle className="h-5 w-5 text-red-500" />
                   )}
                   <span className="font-semibold">
-                    {validation.isValidDutch ? "Valid Dutch text" : "Not Dutch text"}
+                    {validation.is_valid_dutch ? "Valid Dutch text" : "Not Dutch text"}
                   </span>
                 </div>
 
@@ -401,7 +405,7 @@ export default function CreateExam() {
                   <Button
                     className="flex-1"
                     onClick={handleGenerateExam}
-                    disabled={!validation.isValidDutch}
+                    disabled={!validation.is_valid_dutch}
                   >
                     <Sparkles className="mr-2 h-4 w-4" />
                     Generate Exam

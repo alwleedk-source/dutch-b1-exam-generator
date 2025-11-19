@@ -184,7 +184,7 @@ export async function getTextsByUser(user_id: number) {
   return await db
     .select()
     .from(texts)
-    .where(eq(texts.createdBy, user_id))
+    .where(eq(texts.created_by, user_id))
     .orderBy(desc(texts.created_at));
 }
 
@@ -213,8 +213,8 @@ export async function getPendingTexts() {
 export async function updateTextStatus(
   text_id: number,
   status: "pending" | "approved" | "rejected",
-  moderatedBy: number,
-  moderationNote?: string
+  moderated_by: number,
+  moderation_note?: string
 ) {
   const db = await getDb();
   if (!db) return;
@@ -223,9 +223,9 @@ export async function updateTextStatus(
     .update(texts)
     .set({
       status,
-      moderatedBy,
-      moderationNote,
-      moderatedAt: new Date(),
+      moderated_by,
+      moderation_note,
+      moderated_at: new Date(),
       updated_at: new Date(),
     })
     .where(eq(texts.id, text_id));
@@ -234,10 +234,10 @@ export async function updateTextStatus(
 export async function updateTextValidation(
   text_id: number,
   validation: {
-    isValidDutch: boolean;
+    is_valid_dutch: boolean;
     detectedLevel?: "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
     levelConfidence?: number;
-    isB1Level: boolean;
+    is_b1_level: boolean;
   }
 ) {
   const db = await getDb();
@@ -325,7 +325,7 @@ export async function getCompletedExamsByUser(user_id: number) {
     .select()
     .from(exams)
     .where(and(eq(exams.user_id, user_id), eq(exams.status, "completed")))
-    .orderBy(desc(exams.completedAt));
+    .orderBy(desc(exams.completed_at));
 }
 
 export async function updateExam(
@@ -356,7 +356,7 @@ export async function getUserExamStats(user_id: number) {
     .select({
       totalExams: sql<number>`COUNT(*)`,
       completedExams: sql<number>`SUM(CASE WHEN ${exams.status} = 'completed' THEN 1 ELSE 0 END)`,
-      averageScore: sql<number>`AVG(CASE WHEN ${exams.status} = 'completed' THEN ${exams.scorePercentage} ELSE NULL END)`,
+      averageScore: sql<number>`AVG(CASE WHEN ${exams.status} = 'completed' THEN ${exams.score_percentage} ELSE NULL END)`,
       totalTimeMinutes: sql<number>`SUM(CASE WHEN ${exams.status} = 'completed' THEN ${exams.time_spent_minutes} ELSE 0 END)`,
     })
     .from(exams)
@@ -573,15 +573,15 @@ export async function getLeaderboard(period: 'week' | 'month' | 'all', limit: nu
       .select({
         user_id: exams.user_id,
         userName: users.name,
-        score_percentage: exams.scorePercentage,
-        completed_at: exams.completedAt,
+        score_percentage: exams.score_percentage,
+        completed_at: exams.completed_at,
       })
       .from(exams)
       .innerJoin(users, eq(users.id, exams.user_id))
       .where(
         and(
           eq(exams.status, "completed"),
-          dateThreshold ? gte(exams.completedAt, dateThreshold) : undefined
+          dateThreshold ? gte(exams.completed_at, dateThreshold) : undefined
         )
       );
 
@@ -641,8 +641,8 @@ export async function updateUserVocabularySRS(
     repetitions: number;
     next_review_at: Date;
     last_reviewed_at: Date;
-    correctCount: number;
-    incorrectCount: number;
+    correct_count: number;
+    incorrect_count: number;
     status: "new" | "learning" | "mastered";
   }
 ) {

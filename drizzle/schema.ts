@@ -37,36 +37,36 @@ export const texts = pgTable("texts", {
   id: serial("id").primaryKey(),
   
   // Text content
-  dutchText: text("dutchText").notNull(),
+  dutch_text: text("dutch_text").notNull(),
   title: varchar("title", { length: 255 }),
   
   // Metadata
-  wordCount: integer("wordCount").notNull(),
-  estimatedReadingMinutes: integer("estimatedReadingMinutes").notNull(),
+  word_count: integer("word_count").notNull(),
+  estimated_reading_minutes: integer("estimated_reading_minutes").notNull(),
   min_hash_signature: text("min_hash_signature"), // JSON string of MinHash signature for duplicate detection
   
   // Validation status
-  isValidDutch: boolean("isValidDutch").default(true).notNull(),
-  detectedLevel: varchar("detectedLevel", { length: 50 }),
-  levelConfidence: integer("levelConfidence"), // 0-100
-  isB1Level: boolean("isB1Level").default(true).notNull(),
+  is_valid_dutch: boolean("is_valid_dutch").default(true).notNull(),
+  detected_level: varchar("detected_level", { length: 50 }),
+  level_confidence: integer("level_confidence"), // 0-100
+  is_b1_level: boolean("is_b1_level").default(true).notNull(),
   
   // Status
   status: varchar("status", { length: 50 }).default("pending").notNull(),
   
   // Source tracking
-  createdBy: integer("createdBy").notNull(),
+  created_by: integer("created_by").notNull(),
   source: varchar("source", { length: 50 }).default("paste").notNull(),
   
   // Admin moderation
-  moderatedBy: integer("moderatedBy"),
-  moderationNote: text("moderationNote"),
-  moderatedAt: timestamp("moderatedAt"),
+  moderated_by: integer("moderated_by"),
+  moderation_note: text("moderation_note"),
+  moderated_at: timestamp("moderated_at"),
   
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({
-  createdByIdx: index("createdBy_idx").on(table.createdBy),
+  createdByIdx: index("created_by_idx").on(table.created_by),
   statusIdx: index("status_idx").on(table.status),
 }));
 
@@ -107,13 +107,13 @@ export const exams = pgTable("exams", {
   answers: text("answers"), // JSON array of user answers
   
   // Scoring
-  totalQuestions: integer("totalQuestions").notNull(),
-  correctAnswers: integer("correctAnswers"),
-  scorePercentage: integer("scorePercentage"),
+  total_questions: integer("total_questions").notNull(),
+  correct_answers: integer("correct_answers"),
+  score_percentage: integer("score_percentage"),
   
   // Timing
-  startedAt: timestamp("startedAt").defaultNow().notNull(),
-  completedAt: timestamp("completedAt"),
+  started_at: timestamp("started_at").defaultNow().notNull(),
+  completed_at: timestamp("completed_at"),
   time_spent_minutes: integer("time_spent_minutes"),
   
   // Status
@@ -176,8 +176,8 @@ export const userVocabulary = pgTable("userVocabulary", {
   
   // Learning progress
   status: varchar("status", { length: 50 }).default("new").notNull(),
-  correctCount: integer("correctCount").default(0).notNull(),
-  incorrectCount: integer("incorrectCount").default(0).notNull(),
+  correct_count: integer("correct_count").default(0).notNull(),
+  incorrect_count: integer("incorrect_count").default(0).notNull(),
   
   // Spaced repetition (SM-2 algorithm)
   last_reviewed_at: timestamp("last_reviewed_at"),

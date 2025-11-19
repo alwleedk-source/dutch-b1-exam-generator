@@ -140,14 +140,14 @@ export default function StudyMode() {
                   <div className="flex items-center justify-between">
                     <CardTitle>Dutch Text</CardTitle>
                     <Badge variant="outline">
-                      {text.wordCount} words · {text.estimatedReadingMinutes} min read
+                      {text.word_count} words · {text.estimated_reading_minutes} min read
                     </Badge>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div
                     className="prose prose-lg max-w-none leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: highlightVocabulary(text.dutchText) }}
+                    dangerouslySetInnerHTML={{ __html: highlightVocabulary(text.dutch_text) }}
                   />
                 </CardContent>
               </Card>
