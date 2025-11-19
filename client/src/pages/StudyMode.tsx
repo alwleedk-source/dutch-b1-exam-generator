@@ -140,16 +140,24 @@ export default function StudyMode() {
           </CardHeader>
           <CardContent>
             <div 
-              className="prose prose-lg max-w-none leading-relaxed"
+              className="prose prose-lg max-w-none"
               style={{
-                columnCount: wordCount > 400 ? 2 : 1,
-                columnGap: '2rem',
-                direction: language === 'ar' ? 'rtl' : 'ltr',
+                direction: 'ltr',
+                lineHeight: '1.8',
+                fontSize: '1.1rem',
               }}
             >
-              <p className="text-foreground whitespace-pre-wrap">
-                {text?.text?.dutch_text}
-              </p>
+              <div 
+                className="text-foreground"
+                style={{
+                  whiteSpace: 'pre-wrap',
+                  wordSpacing: '0.1em',
+                  letterSpacing: '0.01em',
+                }}
+                dangerouslySetInnerHTML={{
+                  __html: text?.text?.dutch_text?.replace(/\n\n/g, '</p><p style="margin-top: 1.5em; margin-bottom: 1.5em;">').replace(/^/, '<p style="margin-top: 0;">').replace(/$/, '</p>')
+                }}
+              />
             </div>
           </CardContent>
         </Card>
