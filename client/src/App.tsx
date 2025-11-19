@@ -16,6 +16,8 @@ import Leaderboard from "./pages/Leaderboard";
 import Achievements from "./pages/Achievements";
 import StudyMode from "./pages/StudyMode";
 import ReviewPractice from "./pages/ReviewPractice";
+import MyExams from "./pages/MyExams";
+import PublicExams from "./pages/PublicExams";
 
 function Router() {
   return (
@@ -31,6 +33,8 @@ function Router() {
       <Route path="/achievements" component={Achievements} />
       <Route path="/study/:id" component={StudyMode} />
       <Route path="/review" component={ReviewPractice} />
+      <Route path="/my-exams" component={MyExams} />
+      <Route path="/public-exams" component={PublicExams} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

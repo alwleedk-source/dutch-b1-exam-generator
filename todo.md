@@ -319,3 +319,24 @@
 - [x] Update routing to make this the default page
 - [x] Test text cleaning and formatting (vitest tests pass)
 - [ ] Deploy to Railway
+
+
+## Phase 33: Fix Navigation After CreateExam Redesign
+- [x] Add header navigation to CreateExam page with links to:
+  - Progress page
+  - Vocabulary page
+  - My Exams page (user's exam history)
+  - Public Exams page (all available exams)
+  - User profile/logout
+- [x] Create "My Exams" page to show:
+  - User's completed exams with scores
+  - Exam history and progress
+  - Option to retake exams
+- [x] Create "Public Exams" page to show:
+  - All available exams from all users
+  - Exam details (title, text preview, difficulty)
+- [x] Add listPublicTexts API endpoint
+- [x] Add routes to App.tsx
+- [x] Ensure all existing pages (Progress, Vocabulary) are still accessible
+- [ ] Test navigation flow
+- [ ] Deploy to Railway

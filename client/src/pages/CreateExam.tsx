@@ -16,7 +16,7 @@ import { RichTextEditor } from "@/components/RichTextEditor";
 import { cleanPastedText, formatDutchText, countWords, estimateReadingTime, isTextLongEnough } from "@/lib/textCleaner";
 
 export default function CreateExam() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { t } = useLanguage();
   const [, setLocation] = useLocation();
   
@@ -195,9 +195,27 @@ export default function CreateExam() {
                 <h1 className="text-2xl font-bold gradient-text">Dutch B1</h1>
               </div>
             </Link>
-            <Link href="/dashboard">
-              <Button variant="ghost">Dashboard</Button>
-            </Link>
+            
+            <nav className="flex items-center gap-2">
+              <Link href="/create-exam">
+                <Button variant="ghost" size="sm">{t.createNewExam || "Create Exam"}</Button>
+              </Link>
+              <Link href="/my-exams">
+                <Button variant="ghost" size="sm">My Exams</Button>
+              </Link>
+              <Link href="/public-exams">
+                <Button variant="ghost" size="sm">Public Exams</Button>
+              </Link>
+              <Link href="/progress">
+                <Button variant="ghost" size="sm">{t.progress || "Progress"}</Button>
+              </Link>
+              <Link href="/vocabulary">
+                <Button variant="ghost" size="sm">{t.vocabulary || "Vocabulary"}</Button>
+              </Link>
+              <Button variant="ghost" size="sm" onClick={logout}>
+                {t.logout || "Logout"}
+              </Button>
+            </nav>
           </div>
         </div>
       </header>

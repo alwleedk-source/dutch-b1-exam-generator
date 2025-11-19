@@ -217,6 +217,12 @@ export const appRouter = router({
       return await db.getApprovedTexts();
     }),
 
+    listPublicTexts: publicProcedure.query(async () => {
+      // Get all approved texts with exam statistics
+      const texts = await db.getApprovedTexts();
+      return texts;
+    }),
+
     getTextWithTranslation: publicProcedure
       .input(z.object({
         text_id: z.number(),
