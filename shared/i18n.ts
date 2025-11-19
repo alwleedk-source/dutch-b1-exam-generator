@@ -169,7 +169,7 @@ export const translations: Record<Language, Translations> = {
     feature4Desc: "Leer nieuwe woorden met audio en vertalingen",
     
     // Text creation
-    createNewExam: "Nieuw Examen Maken",
+    createNewExam: "Examen Aanmaken",
     pasteText: "Tekst Plakken",
     uploadFile: "Bestand Uploaden",
     scanImage: "Afbeelding Scannen",

@@ -30,9 +30,9 @@ export async function generateWithGemini(options: GeminiGenerateOptions): Promis
   }
 
   try {
-    // Use gemini-1.5-flash for fast responses
+    // Use gemini-2.0-flash for fast responses
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
+      model: "gemini-2.0-flash",
       generationConfig: {
         temperature: options.temperature || 0.7,
         maxOutputTokens: options.maxOutputTokens || 2048,

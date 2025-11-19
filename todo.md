@@ -369,3 +369,10 @@
 - [x] Fixed hardcoded "My Exams" and "Public Exams" in CreateExam
 - [ ] Test language switching in browser
 - [ ] Deploy to Railway
+
+
+## Phase 37: Fix Translation and Gemini API
+- [x] Update Dutch translation for "Create New Exam" to "Examen Aanmaken"
+- [x] Fix Gemini API model name error (gemini-1.5-flash → gemini-2.0-flash)
+- [ ] Test exam creation
+- [ ] Deploy to Railway
