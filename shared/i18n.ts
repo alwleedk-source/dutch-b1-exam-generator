@@ -8,6 +8,7 @@ export interface Translations {
   home: string;
   dashboard: string;
   myExams: string;
+  publicExams: string;
   progress: string;
   vocabulary: string;
   admin: string;
@@ -66,6 +67,16 @@ export interface Translations {
   correctAnswers: string;
   examCompleted: string;
   examInProgress: string;
+  viewResults: string;
+  retake: string;
+  studyText: string;
+  noExamsYet: string;
+  createFirstExam: string;
+  examHistory: string;
+  allExams: string;
+  readText: string;
+  attempts: string;
+  added: string;
   
   // Progress
   myProgress: string;
@@ -128,6 +139,7 @@ export const translations: Record<Language, Translations> = {
     home: "Home",
     dashboard: "Dashboard",
     myExams: "Mijn Examens",
+    publicExams: "Openbare Examens",
     progress: "Voortgang",
     vocabulary: "Woordenschat",
     admin: "Beheer",
@@ -186,6 +198,16 @@ export const translations: Record<Language, Translations> = {
     correctAnswers: "Goede antwoorden",
     examCompleted: "Examen voltooid",
     examInProgress: "Examen bezig",
+    viewResults: "Resultaten Bekijken",
+    retake: "Opnieuw Doen",
+    studyText: "Tekst Bestuderen",
+    noExamsYet: "Nog Geen Examens",
+    createFirstExam: "Maak Je Eerste Examen",
+    examHistory: "Examengeschiedenis",
+    allExams: "Alle Examens",
+    readText: "Tekst Lezen",
+    attempts: "pogingen",
+    added: "Toegevoegd",
     
     // Progress
     myProgress: "Mijn Voortgang",
@@ -247,6 +269,7 @@ export const translations: Record<Language, Translations> = {
     home: "الرئيسية",
     dashboard: "لوحة التحكم",
     myExams: "امتحاناتي",
+    publicExams: "الامتحانات العامة",
     progress: "التقدم",
     vocabulary: "المفردات",
     admin: "الإدارة",
@@ -305,6 +328,16 @@ export const translations: Record<Language, Translations> = {
     correctAnswers: "الإجابات الصحيحة",
     examCompleted: "اكتمل الامتحان",
     examInProgress: "الامتحان قيد التقدم",
+    viewResults: "عرض النتائج",
+    retake: "إعادة الامتحان",
+    studyText: "دراسة النص",
+    noExamsYet: "لا توجد امتحانات بعد",
+    createFirstExam: "أنشئ امتحانك الأول",
+    examHistory: "سجل الامتحانات",
+    allExams: "جميع الامتحانات",
+    readText: "قراءة النص",
+    attempts: "محاولات",
+    added: "أضيف",
     
     // Progress
     myProgress: "تقدمي",
@@ -366,6 +399,7 @@ export const translations: Record<Language, Translations> = {
     home: "Home",
     dashboard: "Dashboard",
     myExams: "My Exams",
+    publicExams: "Public Exams",
     progress: "Progress",
     vocabulary: "Vocabulary",
     admin: "Admin",
@@ -424,6 +458,16 @@ export const translations: Record<Language, Translations> = {
     correctAnswers: "Correct answers",
     examCompleted: "Exam completed",
     examInProgress: "Exam in progress",
+    viewResults: "View Results",
+    retake: "Retake",
+    studyText: "Study Text",
+    noExamsYet: "No Exams Yet",
+    createFirstExam: "Create Your First Exam",
+    examHistory: "Exam History",
+    allExams: "All Exams",
+    readText: "Read Text",
+    attempts: "attempts",
+    added: "Added",
     
     // Progress
     myProgress: "My Progress",
@@ -485,6 +529,7 @@ export const translations: Record<Language, Translations> = {
     home: "Ana Sayfa",
     dashboard: "Kontrol Paneli",
     myExams: "Sınavlarım",
+    publicExams: "Genel Sınavlar",
     progress: "İlerleme",
     vocabulary: "Kelime Bilgisi",
     admin: "Yönetim",
@@ -543,6 +588,16 @@ export const translations: Record<Language, Translations> = {
     correctAnswers: "Doğru cevaplar",
     examCompleted: "Sınav tamamlandı",
     examInProgress: "Sınav devam ediyor",
+    viewResults: "Sonuçları Görüntüle",
+    retake: "Tekrar Dene",
+    studyText: "Metni Çalış",
+    noExamsYet: "Henüz Sınav Yok",
+    createFirstExam: "İlk Sınavınızı Oluşturun",
+    examHistory: "Sınav Geçmişi",
+    allExams: "Tüm Sınavlar",
+    readText: "Metni Oku",
+    attempts: "deneme",
+    added: "Eklendi",
     
     // Progress
     myProgress: "İlerlemem",

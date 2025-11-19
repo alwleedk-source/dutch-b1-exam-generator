@@ -67,26 +67,26 @@ export default function PublicExams() {
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
-            <h2 className="text-3xl font-bold mb-2">Public Exams</h2>
+            <h2 className="text-3xl font-bold mb-2">{t.publicExams}</h2>
             <p className="text-muted-foreground">
-              Practice with exams created by the community
+              {t.allExams}
             </p>
           </div>
 
           {isLoading ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">Loading available exams...</p>
+              <p className="text-muted-foreground">{t.loading}</p>
             </div>
           ) : !texts || texts.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">
                 <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">No Public Exams Yet</h3>
+                <h3 className="text-xl font-semibold mb-2">{t.noExamsYet}</h3>
                 <p className="text-muted-foreground mb-4">
-                  Be the first to create an exam for the community!
+                  {t.createFirstExam}
                 </p>
                 <Link href="/create-exam">
-                  <Button>Create First Exam</Button>
+                  <Button>{t.createFirstExam}</Button>
                 </Link>
               </CardContent>
             </Card>

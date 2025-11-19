@@ -43,10 +43,10 @@ export default function MyExams() {
                 <Button variant="ghost" size="sm">{t.createNewExam || "Create Exam"}</Button>
               </Link>
               <Link href="/my-exams">
-                <Button variant="ghost" size="sm">My Exams</Button>
+                <Button variant="ghost" size="sm">{t.myExams}</Button>
               </Link>
               <Link href="/public-exams">
-                <Button variant="ghost" size="sm">Public Exams</Button>
+                <Button variant="ghost" size="sm">{t.publicExams}</Button>
               </Link>
               <Link href="/progress">
                 <Button variant="ghost" size="sm">{t.progress || "Progress"}</Button>
@@ -66,26 +66,26 @@ export default function MyExams() {
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
-            <h2 className="text-3xl font-bold mb-2">My Exams</h2>
+            <h2 className="text-3xl font-bold mb-2">{t.myExams}</h2>
             <p className="text-muted-foreground">
-              View your exam history and track your progress
+              {t.examHistory}
             </p>
           </div>
 
           {isLoading ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">Loading your exams...</p>
+              <p className="text-muted-foreground">{t.loading}</p>
             </div>
           ) : !exams || exams.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">
                 <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">No Exams Yet</h3>
+                <h3 className="text-xl font-semibold mb-2">{t.noExamsYet}</h3>
                 <p className="text-muted-foreground mb-4">
-                  You haven't taken any exams yet. Start by creating a new exam!
+                  {t.noExamsYet}
                 </p>
                 <Link href="/create-exam">
-                  <Button>Create Your First Exam</Button>
+                  <Button>{t.createFirstExam}</Button>
                 </Link>
               </CardContent>
             </Card>
@@ -137,19 +137,19 @@ export default function MyExams() {
                       <Link href={`/exam/${exam.id}`}>
                         <Button variant="outline" size="sm">
                           <TrendingUp className="h-4 w-4 mr-2" />
-                          View Results
+                          {t.viewResults}
                         </Button>
                       </Link>
                       <Link href={`/study/${exam.text_id}`}>
                         <Button variant="outline" size="sm">
                           <BookOpen className="h-4 w-4 mr-2" />
-                          Study Text
+                          {t.studyText}
                         </Button>
                       </Link>
                       <Link href={`/exam/${exam.id}/retake`}>
                         <Button variant="outline" size="sm">
                           <RotateCcw className="h-4 w-4 mr-2" />
-                          Retake
+                          {t.retake}
                         </Button>
                       </Link>
                     </div>
