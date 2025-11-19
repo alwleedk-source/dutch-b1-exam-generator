@@ -28,10 +28,10 @@ export function AppHeader() {
               <Button variant="ghost" size="sm">{t.createNewExam || "Create Exam"}</Button>
             </Link>
             <Link href="/my-exams">
-              <Button variant="ghost" size="sm">My Exams</Button>
+              <Button variant="ghost" size="sm">{t.myExams}</Button>
             </Link>
             <Link href="/public-exams">
-              <Button variant="ghost" size="sm">Public Exams</Button>
+              <Button variant="ghost" size="sm">{t.publicExams}</Button>
             </Link>
             <Link href="/progress">
               <Button variant="ghost" size="sm">{t.progress || "Progress"}</Button>

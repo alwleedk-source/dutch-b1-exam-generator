@@ -360,3 +360,12 @@
 - [x] Add translations for all 4 languages (Dutch, Arabic, English, Turkish)
 - [ ] Test language switching
 - [ ] Deploy to Railway
+
+
+## Phase 36: Fix Language Switching
+- [x] Check AppHeader - ensure it uses translation keys
+- [x] Check CreateExam page - ensure it uses translation keys
+- [x] Fixed hardcoded "My Exams" and "Public Exams" in AppHeader
+- [x] Fixed hardcoded "My Exams" and "Public Exams" in CreateExam
+- [ ] Test language switching in browser
+- [ ] Deploy to Railway
