@@ -66,8 +66,8 @@ export const texts = pgTable("texts", {
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({
-  createdByIdx: index("created_by_idx").on(table.created_by),
-  statusIdx: index("status_idx").on(table.status),
+  texts_createdByIdx: index("texts_created_by_idx").on(table.created_by),
+  texts_statusIdx: index("texts_status_idx").on(table.status),
 }));
 
 export type Text = typeof texts.$inferSelect;
@@ -88,7 +88,7 @@ export const translations = pgTable("translations", {
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({
-  text_idIdx: index("text_id_idx").on(table.text_id),
+  translations_text_idIdx: index("translations_text_id_idx").on(table.text_id),
 }));
 
 export type Translation = typeof translations.$inferSelect;
@@ -122,9 +122,9 @@ export const exams = pgTable("exams", {
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({
-  user_idIdx: index("user_id_idx").on(table.user_id),
-  text_idIdx: index("text_id_idx").on(table.text_id),
-  statusIdx: index("status_idx").on(table.status),
+  exams_user_idIdx: index("exams_user_id_idx").on(table.user_id),
+  exams_text_idIdx: index("exams_text_id_idx").on(table.text_id),
+  exams_statusIdx: index("exams_status_idx").on(table.status),
 }));
 
 export type Exam = typeof exams.$inferSelect;
@@ -159,8 +159,8 @@ export const vocabulary = pgTable("vocabulary", {
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({
-  text_idIdx: index("text_id_idx").on(table.text_id),
-  dutchWordIdx: index("dutchWord_idx").on(table.dutchWord),
+  vocabulary_text_idIdx: index("vocabulary_text_id_idx").on(table.text_id),
+  vocabulary_dutchWordIdx: index("vocabulary_dutchWord_idx").on(table.dutchWord),
 }));
 
 export type Vocabulary = typeof vocabulary.$inferSelect;
@@ -169,7 +169,7 @@ export type InsertVocabulary = typeof vocabulary.$inferInsert;
 /**
  * User vocabulary learning progress
  */
-export const userVocabulary = pgTable("userVocabulary", {
+export const userVocabulary = pgTable("user_vocabulary", {
   id: serial("id").primaryKey(),
   user_id: integer("user_id").notNull(),
   vocabulary_id: integer("vocabulary_id").notNull(),
@@ -189,8 +189,8 @@ export const userVocabulary = pgTable("userVocabulary", {
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({
-  user_idIdx: index("user_id_idx").on(table.user_id),
-  vocabulary_idIdx: index("vocabulary_id_idx").on(table.vocabulary_id),
+  user_vocabulary_user_idIdx: index("user_vocabulary_user_id_idx").on(table.user_id),
+  user_vocabulary_vocabulary_idIdx: index("user_vocabulary_vocabulary_id_idx").on(table.vocabulary_id),
 }));
 
 export type UserVocabulary = typeof userVocabulary.$inferSelect;
@@ -227,9 +227,9 @@ export const reports = pgTable("reports", {
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({
-  text_idIdx: index("text_id_idx").on(table.text_id),
-  reported_byIdx: index("reported_by_idx").on(table.reported_by),
-  statusIdx: index("status_idx").on(table.status),
+  reports_text_idIdx: index("reports_text_id_idx").on(table.text_id),
+  reports_reported_byIdx: index("reports_reported_by_idx").on(table.reported_by),
+  reports_statusIdx: index("reports_status_idx").on(table.status),
 }));
 
 export type Report = typeof reports.$inferSelect;
@@ -259,7 +259,7 @@ export const achievements = pgTable("achievements", {
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({
-  user_idIdx: index("user_id_idx").on(table.user_id),
+  achievements_user_idIdx: index("achievements_user_id_idx").on(table.user_id),
 }));
 
 export type Achievement = typeof achievements.$inferSelect;

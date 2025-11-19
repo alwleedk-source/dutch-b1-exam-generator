@@ -340,3 +340,13 @@
 - [x] Ensure all existing pages (Progress, Vocabulary) are still accessible
 - [ ] Test navigation flow
 - [ ] Deploy to Railway
+
+
+## Phase 34: Fix Missing Navigation and Database Errors
+- [x] Create shared AppHeader component
+- [x] Add header navigation to Progress page
+- [x] Add header navigation to Vocabulary page
+- [x] Fix database table name: userVocabulary → user_vocabulary in schema
+- [x] Fix all duplicate index names in schema (texts, exams, vocabulary, reports, achievements)
+- [ ] Test all pages have consistent navigation
+- [ ] Deploy to Railway

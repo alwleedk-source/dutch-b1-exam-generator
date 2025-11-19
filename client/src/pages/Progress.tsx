@@ -1,14 +1,16 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
+import { AppHeader } from "@/components/AppHeader";
 
 export default function Progress() {
   const { user } = useAuth();
   const { data: stats } = trpc.progress.getMyStats.useQuery(undefined, { enabled: !!user });
   
   return (
-    <div className="min-h-screen p-8 bg-gradient-bg">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-bg">
+      <AppHeader />
+      <div className="max-w-6xl mx-auto p-8">
         <h1 className="text-3xl font-bold mb-8">Your Progress</h1>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>

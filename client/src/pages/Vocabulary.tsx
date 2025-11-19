@@ -2,11 +2,12 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Loader2, Volume2, Star, CheckCircle } from "lucide-react";
-import { Link } from "wouter";
+import { Loader2, Volume2, Star, CheckCircle, BookOpen } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useState } from "react";
+import { AppHeader } from "@/components/AppHeader";
+import { Link } from "wouter";
 
 export default function Vocabulary() {
   const { user } = useAuth();
@@ -70,25 +71,7 @@ export default function Vocabulary() {
 
   return (
     <div className="min-h-screen bg-gradient-bg">
-      {/* Header */}
-      <header className="border-b border-border/50 glass sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/">
-              <div className="flex items-center gap-2 cursor-pointer">
-                <BookOpen className="h-8 w-8 text-primary" />
-                <h1 className="text-2xl font-bold gradient-text">Dutch B1</h1>
-              </div>
-            </Link>
-
-            <div className="flex items-center gap-4">
-              <Link href="/dashboard">
-                <Button variant="ghost">Dashboard</Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+      <AppHeader />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
