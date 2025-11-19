@@ -9,6 +9,7 @@ export default defineConfig({
   schema: "./drizzle/schema.ts",
   out: "./drizzle",
   dialect: "postgresql",
+  casing: "snake_case",
   dbCredentials: {
     url: connectionString,
   },

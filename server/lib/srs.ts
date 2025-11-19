@@ -14,17 +14,17 @@
  */
 
 export interface SRSCard {
-  easeFactor: number;      // Difficulty multiplier (default: 2.5)
+  ease_factor: number;      // Difficulty multiplier (default: 2.5)
   interval: number;         // Days until next review
   repetitions: number;      // Number of successful reviews
-  nextReviewAt: Date;       // When to review next
+  next_review_at: Date;       // When to review next
 }
 
 export interface SRSResult {
-  easeFactor: number;
+  ease_factor: number;
   interval: number;
   repetitions: number;
-  nextReviewAt: Date;
+  next_review_at: Date;
 }
 
 /**
@@ -34,10 +34,10 @@ export interface SRSResult {
  * @returns Updated SRS card state
  */
 export function calculateNextReview(quality: number, card: SRSCard): SRSResult {
-  let { easeFactor, interval, repetitions } = card;
+  let { ease_factor, interval, repetitions } = card;
 
   // Update ease factor based on quality
-  easeFactor = Math.max(1.3, easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)));
+  ease_factor = Math.max(1.3, ease_factor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)));
 
   // If quality < 3, reset repetitions and interval
   if (quality < 3) {
@@ -52,19 +52,19 @@ export function calculateNextReview(quality: number, card: SRSCard): SRSResult {
     } else if (repetitions === 2) {
       interval = 6;
     } else {
-      interval = Math.round(interval * easeFactor);
+      interval = Math.round(interval * ease_factor);
     }
   }
 
   // Calculate next review date
-  const nextReviewAt = new Date();
-  nextReviewAt.setDate(nextReviewAt.getDate() + interval);
+  const next_review_at = new Date();
+  next_review_at.setDate(next_review_at.getDate() + interval);
 
   return {
-    easeFactor,
+    ease_factor,
     interval,
     repetitions,
-    nextReviewAt,
+    next_review_at,
   };
 }
 
@@ -73,35 +73,35 @@ export function calculateNextReview(quality: number, card: SRSCard): SRSResult {
  */
 export function initializeSRSCard(): SRSCard {
   return {
-    easeFactor: 2.5,
+    ease_factor: 2.5,
     interval: 0,
     repetitions: 0,
-    nextReviewAt: new Date(),
+    next_review_at: new Date(),
   };
 }
 
 /**
  * Check if a card is due for review
  */
-export function isDueForReview(nextReviewAt: Date): boolean {
-  return new Date() >= nextReviewAt;
+export function isDueForReview(next_review_at: Date): boolean {
+  return new Date() >= next_review_at;
 }
 
 /**
  * Get cards due for review from a list
  */
-export function getDueCards<T extends { nextReviewAt: Date }>(cards: T[]): T[] {
+export function getDueCards<T extends { next_review_at: Date }>(cards: T[]): T[] {
   const now = new Date();
-  return cards.filter(card => card.nextReviewAt <= now);
+  return cards.filter(card => card.next_review_at <= now);
 }
 
 /**
  * Calculate mastery level based on SRS stats
  * @returns Mastery percentage (0-100)
  */
-export function calculateMastery(repetitions: number, easeFactor: number): number {
+export function calculateMastery(repetitions: number, ease_factor: number): number {
   // Mastery increases with repetitions and ease factor
   const repetitionScore = Math.min(repetitions * 10, 60); // Max 60% from repetitions
-  const easeScore = Math.min((easeFactor - 1.3) / (2.5 - 1.3) * 40, 40); // Max 40% from ease
+  const easeScore = Math.min((ease_factor - 1.3) / (2.5 - 1.3) * 40, 40); // Max 40% from ease
   return Math.min(Math.round(repetitionScore + easeScore), 100);
 }

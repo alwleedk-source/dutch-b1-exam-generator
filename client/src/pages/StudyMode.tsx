@@ -20,12 +20,12 @@ export default function StudyMode() {
   const textId = id ? parseInt(id) : undefined;
 
   const { data: text, isLoading } = trpc.text.getTextById.useQuery(
-    { textId: textId! },
+    { text_id: textId! },
     { enabled: !!textId && !!user }
   );
 
   const { data: vocabulary } = trpc.vocabulary.getVocabularyByText.useQuery(
-    { textId: textId! },
+    { text_id: textId! },
     { enabled: !!textId && !!user }
   );
 

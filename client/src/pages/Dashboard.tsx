@@ -78,7 +78,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {statsLoading ? "..." : stats?.user?.totalExamsCompleted || 0}
+                {statsLoading ? "..." : stats?.user?.total_exams_completed || 0}
               </div>
               <p className="text-xs text-muted-foreground">
                 {t.totalExams}
@@ -108,7 +108,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {statsLoading ? "..." : stats?.user?.totalVocabularyLearned || 0}
+                {statsLoading ? "..." : stats?.user?.total_vocabulary_learned || 0}
               </div>
               <p className="text-xs text-muted-foreground">
                 {t.newWords}
@@ -123,7 +123,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {statsLoading ? "..." : stats?.user?.currentStreak || 0}
+                {statsLoading ? "..." : stats?.user?.current_streak || 0}
               </div>
               <p className="text-xs text-muted-foreground">
                 days

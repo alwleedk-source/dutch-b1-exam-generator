@@ -234,3 +234,13 @@
 - [x] Fix all TypeScript errors
 - [ ] Test database connection (will test on Railway)
 - [ ] Push to GitHub
+
+
+## Phase 25: PostgreSQL snake_case Fix ✅
+- [x] Convert all column names from camelCase to snake_case in schema
+- [x] Update Drizzle schema with snake_case naming
+- [x] Regenerate types
+- [x] Update all database queries
+- [x] Fix all TypeScript errors (frontend & backend)
+- [x] Test locally
+- [ ] Push to GitHub and Railway

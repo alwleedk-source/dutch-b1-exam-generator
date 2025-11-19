@@ -183,10 +183,10 @@ export default function AdminDashboard() {
                         <div className="flex gap-2">
                           {text.status === 'pending' && (
                             <>
-                              <Button size="sm" variant="outline" onClick={() => approveTextMutation.mutate({ textId: text.id })}>
+                              <Button size="sm" variant="outline" onClick={() => approveTextMutation.mutate({ text_id: text.id })}>
                                 <CheckCircle className="h-4 w-4" />
                               </Button>
-                              <Button size="sm" variant="outline" onClick={() => rejectTextMutation.mutate({ textId: text.id })}>
+                              <Button size="sm" variant="outline" onClick={() => rejectTextMutation.mutate({ text_id: text.id })}>
                                 <XCircle className="h-4 w-4" />
                               </Button>
                             </>

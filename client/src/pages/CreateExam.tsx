@@ -95,9 +95,9 @@ export default function CreateExam() {
 
   const createTextMutation = trpc.text.create.useMutation({
     onSuccess: (data) => {
-      setTextId(data.textId);
+      setTextId(data.text_id);
       setStep("validating");
-      validateTextMutation.mutate({ textId: data.textId });
+      validateTextMutation.mutate({ text_id: data.text_id });
     },
     onError: (error) => {
       toast.error("Failed to create text: " + error.message);
@@ -165,7 +165,7 @@ export default function CreateExam() {
   const handleGenerateExam = () => {
     if (!textId) return;
     setStep("generating");
-    generateExamMutation.mutate({ textId: textId });
+    generateExamMutation.mutate({ text_id: textId });
   };
 
   if (!user) {

@@ -21,7 +21,7 @@ export default function Progress() {
           </Card>
           <Card>
             <CardHeader><CardTitle>Vocabulary Learned</CardTitle></CardHeader>
-            <CardContent><p className="text-4xl font-bold">{stats?.user?.totalVocabularyLearned || 0}</p></CardContent>
+            <CardContent><p className="text-4xl font-bold">{stats?.user?.total_vocabulary_learned || 0}</p></CardContent>
           </Card>
         </div>
       </div>

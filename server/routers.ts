@@ -27,10 +27,10 @@ export const appRouter = router({
     }),
     updatePreferences: protectedProcedure
       .input(z.object({
-        preferredLanguage: z.enum(["nl", "ar", "en", "tr"]),
+        preferred_language: z.enum(["nl", "ar", "en", "tr"]),
       }))
       .mutation(async ({ ctx, input }) => {
-        await db.updateUserPreferences(ctx.user.id, input.preferredLanguage);
+        await db.updateUserPreferences(ctx.user.id, input.preferred_language);
         return { success: true };
       }),
   }),
@@ -71,11 +71,11 @@ export const appRouter = router({
         // Get all existing texts with their signatures
         const allTexts = await db.getAllTexts();
         const textsWithSignatures = allTexts
-          .filter(t => t.minHashSignature)
+          .filter(t => t.min_hash_signature)
           .map(t => ({
             id: t.id,
             title: t.title || `Text #${t.id}`,
-            signature: JSON.parse(t.minHashSignature!),
+            signature: JSON.parse(t.min_hash_signature!),
           }));
         
         // Check for duplicates
@@ -92,9 +92,9 @@ export const appRouter = router({
       }),
 
     getTextById: publicProcedure
-      .input(z.object({ textId: z.number() }))
+      .input(z.object({ text_id: z.number() }))
       .query(async ({ input }) => {
-        return await db.getTextById(input.textId);
+        return await db.getTextById(input.text_id);
       }),
 
     create: protectedProcedure
@@ -120,7 +120,7 @@ export const appRouter = router({
           title: input.title,
           wordCount,
           estimatedReadingMinutes,
-          minHashSignature: minHashSignatureJson,
+          min_hash_signature: minHashSignatureJson,
           createdBy: ctx.user.id,
           source: input.source,
           // status defaults to pending in schema
@@ -130,7 +130,7 @@ export const appRouter = router({
 
         return { 
           success: true, 
-          textId: result[0].id,
+          text_id: result[0].id,
           wordCount,
           estimatedReadingMinutes,
         };
@@ -138,10 +138,10 @@ export const appRouter = router({
 
     validateText: protectedProcedure
       .input(z.object({
-        textId: z.number(),
+        text_id: z.number(),
       }))
       .mutation(async ({ ctx, input }) => {
-        const text = await db.getTextById(input.textId);
+        const text = await db.getTextById(input.text_id);
         if (!text) {
           throw new TRPCError({ code: "NOT_FOUND", message: "Text not found" });
         }
@@ -150,7 +150,7 @@ export const appRouter = router({
         const validation = await gemini.validateDutchText(text.dutchText);
 
         // Update text validation
-        await db.updateTextValidation(input.textId, {
+        await db.updateTextValidation(input.text_id, {
           isValidDutch: validation.isDutch,
           detectedLevel: validation.level,
           levelConfidence: validation.confidence,
@@ -169,16 +169,16 @@ export const appRouter = router({
 
     translateText: protectedProcedure
       .input(z.object({
-        textId: z.number(),
+        text_id: z.number(),
       }))
       .mutation(async ({ ctx, input }) => {
-        const text = await db.getTextById(input.textId);
+        const text = await db.getTextById(input.text_id);
         if (!text) {
           throw new TRPCError({ code: "NOT_FOUND", message: "Text not found" });
         }
 
         // Check if translation already exists
-        const existing = await db.getTranslationByTextId(input.textId);
+        const existing = await db.getTranslationByTextId(input.text_id);
         if (existing) {
           return { success: true, cached: true };
         }
@@ -188,7 +188,7 @@ export const appRouter = router({
 
         // Save translations
         await db.createTranslation({
-          textId: input.textId,
+          text_id: input.text_id,
           arabicTranslation: translations.arabic,
           englishTranslation: translations.english,
           turkishTranslation: translations.turkish,
@@ -207,15 +207,15 @@ export const appRouter = router({
 
     getTextWithTranslation: publicProcedure
       .input(z.object({
-        textId: z.number(),
+        text_id: z.number(),
       }))
       .query(async ({ input }) => {
-        const text = await db.getTextById(input.textId);
+        const text = await db.getTextById(input.text_id);
         if (!text) {
           throw new TRPCError({ code: "NOT_FOUND", message: "Text not found" });
         }
 
-        const translation = await db.getTranslationByTextId(input.textId);
+        const translation = await db.getTranslationByTextId(input.text_id);
 
         return {
           text,
@@ -228,10 +228,10 @@ export const appRouter = router({
   exam: router({
     generateExam: protectedProcedure
       .input(z.object({
-        textId: z.number(),
+        text_id: z.number(),
       }))
       .mutation(async ({ ctx, input }) => {
-        const text = await db.getTextById(input.textId);
+        const text = await db.getTextById(input.text_id);
         if (!text) {
           throw new TRPCError({ code: "NOT_FOUND", message: "Text not found" });
         }
@@ -241,8 +241,8 @@ export const appRouter = router({
 
         // Create exam record
         const result = await db.createExam({
-          userId: ctx.user.id,
-          textId: input.textId,
+          user_id: ctx.user.id,
+          text_id: input.text_id,
           questions: JSON.stringify(examData.questions),
           totalQuestions: examData.questions.length,
           status: "in_progress",
@@ -259,7 +259,7 @@ export const appRouter = router({
       .input(z.object({
         examId: z.number(),
         answers: z.array(z.string()),
-        timeSpentMinutes: z.number(),
+        time_spent_minutes: z.number(),
       }))
       .mutation(async ({ ctx, input }) => {
         const exam = await db.getExamById(input.examId);
@@ -267,7 +267,7 @@ export const appRouter = router({
           throw new TRPCError({ code: "NOT_FOUND", message: "Exam not found" });
         }
 
-        if (exam.userId !== ctx.user.id) {
+        if (exam.user_id !== ctx.user.id) {
           throw new TRPCError({ code: "FORBIDDEN", message: "Not your exam" });
         }
 
@@ -281,31 +281,31 @@ export const appRouter = router({
           }
         });
 
-        const scorePercentage = Math.round((correctCount / questions.length) * 100);
+        const score_percentage = Math.round((correctCount / questions.length) * 100);
 
         // Update exam
         await db.updateExam(input.examId, {
           answers: JSON.stringify(input.answers),
-          correctAnswers: correctCount,
-          scorePercentage,
-          completedAt: new Date(),
-          timeSpentMinutes: input.timeSpentMinutes,
+          correct_answers: correctCount,
+          score_percentage,
+          completed_at: new Date(),
+          time_spent_minutes: input.time_spent_minutes,
           status: "completed",
         });
 
         // Update user stats
         const userStats = await db.getUserExamStats(ctx.user.id);
         await db.updateUserStats(ctx.user.id, {
-          totalExamsCompleted: Number(userStats?.completedExams || 0),
-          totalTimeSpentMinutes: Number(userStats?.totalTimeMinutes || 0),
-          lastActivityDate: new Date(),
+          total_exams_completed: Number(userStats?.completedExams || 0),
+          total_time_spent_minutes: Number(userStats?.totalTimeMinutes || 0),
+          last_activity_date: new Date(),
         });
 
         return {
           success: true,
-          correctAnswers: correctCount,
+          correct_answers: correctCount,
           totalQuestions: questions.length,
-          scorePercentage,
+          score_percentage,
         };
       }),
 
@@ -323,7 +323,7 @@ export const appRouter = router({
           throw new TRPCError({ code: "NOT_FOUND", message: "Exam not found" });
         }
 
-        if (exam.userId !== ctx.user.id) {
+        if (exam.user_id !== ctx.user.id) {
           throw new TRPCError({ code: "FORBIDDEN", message: "Not your exam" });
         }
 
@@ -374,17 +374,17 @@ export const appRouter = router({
       }),
 
     getVocabularyByText: publicProcedure
-      .input(z.object({ textId: z.number() }))
+      .input(z.object({ text_id: z.number() }))
       .query(async ({ input }) => {
-        return await db.getVocabularyByTextId(input.textId);
+        return await db.getVocabularyByTextId(input.text_id);
       }),
 
     extractVocabulary: protectedProcedure
       .input(z.object({
-        textId: z.number(),
+        text_id: z.number(),
       }))
       .mutation(async ({ ctx, input }) => {
-        const text = await db.getTextById(input.textId);
+        const text = await db.getTextById(input.text_id);
         if (!text) {
           throw new TRPCError({ code: "NOT_FOUND", message: "Text not found" });
         }
@@ -395,7 +395,7 @@ export const appRouter = router({
         // Save vocabulary
         for (const word of vocabData.vocabulary) {
           await db.createVocabulary({
-            textId: input.textId,
+            text_id: input.text_id,
             dutchWord: word.dutch,
             arabicTranslation: word.arabic,
             englishTranslation: word.english,
@@ -420,7 +420,7 @@ export const appRouter = router({
       const allVocab = await db.getUserVocabularyProgress(ctx.user.id);
       return getDueCards(allVocab.map((v: any) => ({
         ...v,
-        nextReviewAt: v.nextReviewAt || new Date(),
+        next_review_at: v.next_review_at || new Date(),
       })));
     }),
 
@@ -433,25 +433,25 @@ export const appRouter = router({
         const { calculateNextReview } = await import("./lib/srs");
         
         const userVocab = await db.getUserVocabularyById(input.userVocabId);
-        if (!userVocab || userVocab.userId !== ctx.user.id) {
+        if (!userVocab || userVocab.user_id !== ctx.user.id) {
           throw new TRPCError({ code: "NOT_FOUND", message: "Vocabulary not found" });
         }
 
         // Calculate next review using SM-2
         const srsResult = calculateNextReview(input.quality, {
-          easeFactor: userVocab.easeFactor / 1000, // Convert back to float
+          ease_factor: userVocab.ease_factor / 1000, // Convert back to float
           interval: userVocab.interval,
           repetitions: userVocab.repetitions,
-          nextReviewAt: userVocab.nextReviewAt || new Date(),
+          next_review_at: userVocab.next_review_at || new Date(),
         });
 
         // Update user vocabulary
         await db.updateUserVocabularySRS(input.userVocabId, {
-          easeFactor: Math.round(srsResult.easeFactor * 1000), // Store as integer
+          ease_factor: Math.round(srsResult.ease_factor * 1000), // Store as integer
           interval: srsResult.interval,
           repetitions: srsResult.repetitions,
-          nextReviewAt: srsResult.nextReviewAt,
-          lastReviewedAt: new Date(),
+          next_review_at: srsResult.next_review_at,
+          last_reviewed_at: new Date(),
           correctCount: input.quality >= 3 ? userVocab.correctCount + 1 : userVocab.correctCount,
           incorrectCount: input.quality < 3 ? userVocab.incorrectCount + 1 : userVocab.incorrectCount,
           status: srsResult.repetitions >= 5 ? "mastered" : "learning",
@@ -465,19 +465,19 @@ export const appRouter = router({
   report: router({
     createReport: protectedProcedure
       .input(z.object({
-        textId: z.number(),
-        reportType: z.enum(["level_issue", "content_issue"]),
-        levelIssueType: z.enum(["too_easy", "too_hard"]).optional(),
-        contentIssueType: z.enum(["inappropriate", "spam", "not_dutch", "other"]).optional(),
+        text_id: z.number(),
+        report_type: z.enum(["level_issue", "content_issue"]),
+        level_issue_type: z.enum(["too_easy", "too_hard"]).optional(),
+        content_issue_type: z.enum(["inappropriate", "spam", "not_dutch", "other"]).optional(),
         details: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         await db.createReport({
-          textId: input.textId,
-          reportedBy: ctx.user.id,
-          reportType: input.reportType === "level_issue" ? "level_incorrect" : "content_issue",
-          levelIssueType: input.levelIssueType,
-          contentIssueType: input.contentIssueType,
+          text_id: input.text_id,
+          reported_by: ctx.user.id,
+          report_type: input.report_type === "level_issue" ? "level_incorrect" : "content_issue",
+          level_issue_type: input.level_issue_type,
+          content_issue_type: input.content_issue_type,
           details: input.details,
         });
 
@@ -486,10 +486,10 @@ export const appRouter = router({
 
     getReportsByText: adminProcedure
       .input(z.object({
-        textId: z.number(),
+        text_id: z.number(),
       }))
       .query(async ({ input }) => {
-        return await db.getReportsByTextId(input.textId);
+        return await db.getReportsByTextId(input.text_id);
       }),
   }),
 
@@ -505,21 +505,21 @@ export const appRouter = router({
 
     approveText: adminProcedure
       .input(z.object({
-        textId: z.number(),
+        text_id: z.number(),
         note: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        await db.updateTextStatus(input.textId, "approved", ctx.user.id, input.note);
+        await db.updateTextStatus(input.text_id, "approved", ctx.user.id, input.note);
         return { success: true };
       }),
 
     rejectText: adminProcedure
       .input(z.object({
-        textId: z.number(),
+        text_id: z.number(),
         note: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        await db.updateTextStatus(input.textId, "rejected", ctx.user.id, input.note);
+        await db.updateTextStatus(input.text_id, "rejected", ctx.user.id, input.note);
         return { success: true };
       }),
 

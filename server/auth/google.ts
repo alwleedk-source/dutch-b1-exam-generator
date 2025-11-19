@@ -31,11 +31,11 @@ if (!DISABLE_AUTH) {
 
             // Upsert user in database
             await db.upsertUser({
-              openId: `google_${googleId}`,
+              open_id: `google_${googleId}`,
               name: name || undefined,
               email: email || undefined,
-              loginMethod: "google",
-              lastSignedIn: new Date(),
+              login_method: "google",
+              last_signed_in: new Date(),
             });
 
             // Get user from database

@@ -19,7 +19,7 @@ const isNonEmptyString = (value: unknown): value is string =>
   typeof value === "string" && value.length > 0;
 
 export type SessionPayload = {
-  openId: string;
+  open_id: string;
   appId: string;
   name: string;
 };
@@ -162,15 +162,15 @@ class SDKServer {
   /**
    * Create a session token for a Manus user openId
    * @example
-   * const sessionToken = await sdk.createSessionToken(userInfo.openId);
+   * const sessionToken = await sdk.createSessionToken(userInfo.open_id);
    */
   async createSessionToken(
-    openId: string,
+    open_id: string,
     options: { expiresInMs?: number; name?: string } = {}
   ): Promise<string> {
     return this.signSession(
       {
-        openId,
+        open_id: open_id,
         appId: ENV.appId,
         name: options.name || "",
       },
@@ -188,7 +188,7 @@ class SDKServer {
     const secretKey = this.getSessionSecret();
 
     return new SignJWT({
-      openId: payload.openId,
+      open_id: payload.open_id,
       appId: payload.appId,
       name: payload.name,
     })
@@ -199,7 +199,7 @@ class SDKServer {
 
   async verifySession(
     cookieValue: string | undefined | null
-  ): Promise<{ openId: string; appId: string; name: string } | null> {
+  ): Promise<{ open_id: string; appId: string; name: string } | null> {
     if (!cookieValue) {
       console.warn("[Auth] Missing session cookie");
       return null;
@@ -222,7 +222,7 @@ class SDKServer {
       }
 
       return {
-        openId,
+        open_id: openId,
         appId,
         name,
       };
@@ -266,7 +266,7 @@ class SDKServer {
       throw ForbiddenError("Invalid session cookie");
     }
 
-    const sessionUserId = session.openId;
+    const sessionUserId = session.open_id;
     const signedInAt = new Date();
     let user = await db.getUserByOpenId(sessionUserId);
 
@@ -275,11 +275,11 @@ class SDKServer {
       try {
         const userInfo = await this.getUserInfoWithJwt(sessionCookie ?? "");
         await db.upsertUser({
-          openId: userInfo.openId,
+          open_id: userInfo.openId,
           name: userInfo.name || null,
           email: userInfo.email ?? null,
-          loginMethod: userInfo.loginMethod ?? userInfo.platform ?? null,
-          lastSignedIn: signedInAt,
+          login_method: userInfo.loginMethod ?? userInfo.platform ?? null,
+          last_signed_in: signedInAt,
         });
         user = await db.getUserByOpenId(userInfo.openId);
       } catch (error) {
@@ -293,8 +293,8 @@ class SDKServer {
     }
 
     await db.upsertUser({
-      openId: user.openId,
-      lastSignedIn: signedInAt,
+      open_id: user.open_id,
+      last_signed_in: signedInAt,
     });
 
     return user;

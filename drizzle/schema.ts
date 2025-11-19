@@ -5,26 +5,26 @@ import { boolean, index, integer, pgTable, serial, text, timestamp, varchar } fr
  */
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  openId: varchar("openId", { length: 64 }).notNull().unique(),
+  open_id: varchar("open_id", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
-  loginMethod: varchar("loginMethod", { length: 64 }),
+  login_method: varchar("login_method", { length: 64 }),
   role: varchar("role", { length: 50 }).default("user").notNull(),
   
   // User preferences
-  preferredLanguage: varchar("preferredLanguage", { length: 50 }).default("nl").notNull(),
+  preferred_language: varchar("preferred_language", { length: 50 }).default("nl").notNull(),
   
   // Statistics
-  totalExamsCompleted: integer("totalExamsCompleted").default(0).notNull(),
-  totalVocabularyLearned: integer("totalVocabularyLearned").default(0).notNull(),
-  totalTimeSpentMinutes: integer("totalTimeSpentMinutes").default(0).notNull(),
-  currentStreak: integer("currentStreak").default(0).notNull(),
-  longestStreak: integer("longestStreak").default(0).notNull(),
-  lastActivityDate: timestamp("lastActivityDate"),
+  total_exams_completed: integer("total_exams_completed").default(0).notNull(),
+  total_vocabulary_learned: integer("total_vocabulary_learned").default(0).notNull(),
+  total_time_spent_minutes: integer("total_time_spent_minutes").default(0).notNull(),
+  current_streak: integer("current_streak").default(0).notNull(),
+  longest_streak: integer("longest_streak").default(0).notNull(),
+  last_activity_date: timestamp("last_activity_date"),
   
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
-  lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+  last_signed_in: timestamp("last_signed_in").defaultNow().notNull(),
 });
 
 export type User = typeof users.$inferSelect;
@@ -43,7 +43,7 @@ export const texts = pgTable("texts", {
   // Metadata
   wordCount: integer("wordCount").notNull(),
   estimatedReadingMinutes: integer("estimatedReadingMinutes").notNull(),
-  minHashSignature: text("minHashSignature"), // JSON string of MinHash signature for duplicate detection
+  min_hash_signature: text("min_hash_signature"), // JSON string of MinHash signature for duplicate detection
   
   // Validation status
   isValidDutch: boolean("isValidDutch").default(true).notNull(),
@@ -63,8 +63,8 @@ export const texts = pgTable("texts", {
   moderationNote: text("moderationNote"),
   moderatedAt: timestamp("moderatedAt"),
   
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({
   createdByIdx: index("createdBy_idx").on(table.createdBy),
   statusIdx: index("status_idx").on(table.status),
@@ -78,17 +78,17 @@ export type InsertText = typeof texts.$inferInsert;
  */
 export const translations = pgTable("translations", {
   id: serial("id").primaryKey(),
-  textId: integer("textId").notNull(),
+  text_id: integer("text_id").notNull(),
   
   // Translations (Dutch text translated to other languages)
   arabicTranslation: text("arabicTranslation"),
   englishTranslation: text("englishTranslation"),
   turkishTranslation: text("turkishTranslation"),
   
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({
-  textIdIdx: index("textId_idx").on(table.textId),
+  text_idIdx: index("text_id_idx").on(table.text_id),
 }));
 
 export type Translation = typeof translations.$inferSelect;
@@ -99,8 +99,8 @@ export type InsertTranslation = typeof translations.$inferInsert;
  */
 export const exams = pgTable("exams", {
   id: serial("id").primaryKey(),
-  userId: integer("userId").notNull(),
-  textId: integer("textId").notNull(),
+  user_id: integer("user_id").notNull(),
+  text_id: integer("text_id").notNull(),
   
   // Exam data
   questions: text("questions").notNull(), // JSON array of questions
@@ -114,16 +114,16 @@ export const exams = pgTable("exams", {
   // Timing
   startedAt: timestamp("startedAt").defaultNow().notNull(),
   completedAt: timestamp("completedAt"),
-  timeSpentMinutes: integer("timeSpentMinutes"),
+  time_spent_minutes: integer("time_spent_minutes"),
   
   // Status
   status: varchar("status", { length: 50 }).default("in_progress").notNull(),
   
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({
-  userIdIdx: index("userId_idx").on(table.userId),
-  textIdIdx: index("textId_idx").on(table.textId),
+  user_idIdx: index("user_id_idx").on(table.user_id),
+  text_idIdx: index("text_id_idx").on(table.text_id),
   statusIdx: index("status_idx").on(table.status),
 }));
 
@@ -135,7 +135,7 @@ export type InsertExam = typeof exams.$inferInsert;
  */
 export const vocabulary = pgTable("vocabulary", {
   id: serial("id").primaryKey(),
-  textId: integer("textId").notNull(),
+  text_id: integer("text_id").notNull(),
   
   // Word data
   dutchWord: varchar("dutchWord", { length: 255 }).notNull(),
@@ -156,10 +156,10 @@ export const vocabulary = pgTable("vocabulary", {
   difficulty: varchar("difficulty", { length: 50 }),
   frequency: integer("frequency").default(1).notNull(), // How many times it appears
   
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({
-  textIdIdx: index("textId_idx").on(table.textId),
+  text_idIdx: index("text_id_idx").on(table.text_id),
   dutchWordIdx: index("dutchWord_idx").on(table.dutchWord),
 }));
 
@@ -171,8 +171,8 @@ export type InsertVocabulary = typeof vocabulary.$inferInsert;
  */
 export const userVocabulary = pgTable("userVocabulary", {
   id: serial("id").primaryKey(),
-  userId: integer("userId").notNull(),
-  vocabularyId: integer("vocabularyId").notNull(),
+  user_id: integer("user_id").notNull(),
+  vocabulary_id: integer("vocabulary_id").notNull(),
   
   // Learning progress
   status: varchar("status", { length: 50 }).default("new").notNull(),
@@ -180,17 +180,17 @@ export const userVocabulary = pgTable("userVocabulary", {
   incorrectCount: integer("incorrectCount").default(0).notNull(),
   
   // Spaced repetition (SM-2 algorithm)
-  lastReviewedAt: timestamp("lastReviewedAt"),
-  nextReviewAt: timestamp("nextReviewAt").defaultNow().notNull(),
-  easeFactor: integer("easeFactor").default(2500).notNull(), // Stored as integer (2.5 * 1000)
+  last_reviewed_at: timestamp("last_reviewed_at"),
+  next_review_at: timestamp("next_review_at").defaultNow().notNull(),
+  ease_factor: integer("ease_factor").default(2500).notNull(), // Stored as integer (2.5 * 1000)
   interval: integer("interval").default(0).notNull(), // Days until next review
   repetitions: integer("repetitions").default(0).notNull(), // Number of successful reviews
   
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({
-  userIdIdx: index("userId_idx").on(table.userId),
-  vocabularyIdIdx: index("vocabularyId_idx").on(table.vocabularyId),
+  user_idIdx: index("user_id_idx").on(table.user_id),
+  vocabulary_idIdx: index("vocabulary_id_idx").on(table.vocabulary_id),
 }));
 
 export type UserVocabulary = typeof userVocabulary.$inferSelect;
@@ -201,17 +201,17 @@ export type InsertUserVocabulary = typeof userVocabulary.$inferInsert;
  */
 export const reports = pgTable("reports", {
   id: serial("id").primaryKey(),
-  textId: integer("textId").notNull(),
-  reportedBy: integer("reportedBy").notNull(),
+  text_id: integer("text_id").notNull(),
+  reported_by: integer("reported_by").notNull(),
   
   // Report type (2 simple options)
-  reportType: varchar("reportType", { length: 50 }).notNull(),
+  report_type: varchar("report_type", { length: 50 }).notNull(),
   
   // Level issue details
-  levelIssueType: varchar("levelIssueType", { length: 50 }),
+  level_issue_type: varchar("level_issue_type", { length: 50 }),
   
   // Content issue details
-  contentIssueType: varchar("contentIssueType", { length: 50 }),
+  content_issue_type: varchar("content_issue_type", { length: 50 }),
   
   // Additional details
   details: text("details"),
@@ -220,15 +220,15 @@ export const reports = pgTable("reports", {
   status: varchar("status", { length: 50 }).default("pending").notNull(),
   
   // Admin response
-  reviewedBy: integer("reviewedBy"),
-  reviewNote: text("reviewNote"),
-  reviewedAt: timestamp("reviewedAt"),
+  reviewed_by: integer("reviewed_by"),
+  review_note: text("review_note"),
+  reviewed_at: timestamp("reviewed_at"),
   
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({
-  textIdIdx: index("textId_idx").on(table.textId),
-  reportedByIdx: index("reportedBy_idx").on(table.reportedBy),
+  text_idIdx: index("text_id_idx").on(table.text_id),
+  reported_byIdx: index("reported_by_idx").on(table.reported_by),
   statusIdx: index("status_idx").on(table.status),
 }));
 
@@ -240,7 +240,7 @@ export type InsertReport = typeof reports.$inferInsert;
  */
 export const achievements = pgTable("achievements", {
   id: serial("id").primaryKey(),
-  userId: integer("userId").notNull(),
+  user_id: integer("user_id").notNull(),
   
   // Achievement type
   achievementType: varchar("achievementType", { length: 100 }).notNull(),
@@ -256,10 +256,10 @@ export const achievements = pgTable("achievements", {
   isCompleted: boolean("isCompleted").default(false).notNull(),
   
   completedAt: timestamp("completedAt"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({
-  userIdIdx: index("userId_idx").on(table.userId),
+  user_idIdx: index("user_id_idx").on(table.user_id),
 }));
 
 export type Achievement = typeof achievements.$inferSelect;

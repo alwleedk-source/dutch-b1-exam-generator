@@ -27,7 +27,7 @@ export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
       const client = postgres(process.env.DATABASE_URL);
-      _db = drizzle(client);
+      _db = drizzle(client, { casing: "snake_case" });
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
@@ -39,7 +39,7 @@ export async function getDb() {
 // ==================== USER FUNCTIONS ====================
 
 export async function upsertUser(user: InsertUser): Promise<void> {
-  if (!user.openId) {
+  if (!user.open_id) {
     throw new Error("User openId is required for upsert");
   }
 
@@ -51,11 +51,11 @@ export async function upsertUser(user: InsertUser): Promise<void> {
 
   try {
     const values: InsertUser = {
-      openId: user.openId,
+      open_id: user.open_id,
     };
     const updateSet: Record<string, unknown> = {};
 
-    const textFields = ["name", "email", "loginMethod"] as const;
+    const textFields = ["name", "email", "login_method"] as const;
     type TextField = (typeof textFields)[number];
 
     const assignNullable = (field: TextField) => {
@@ -68,28 +68,28 @@ export async function upsertUser(user: InsertUser): Promise<void> {
 
     textFields.forEach(assignNullable);
 
-    if (user.lastSignedIn !== undefined) {
-      values.lastSignedIn = user.lastSignedIn;
-      updateSet.lastSignedIn = user.lastSignedIn;
+    if (user.last_signed_in !== undefined) {
+      values.last_signed_in = user.last_signed_in;
+      updateSet.last_signed_in = user.last_signed_in;
     }
     if (user.role !== undefined) {
       values.role = user.role;
       updateSet.role = user.role;
-    } else if (user.openId === ENV.ownerOpenId) {
+    } else if (user.open_id === ENV.ownerOpenId) {
       values.role = "admin";
       updateSet.role = "admin";
     }
 
-    if (!values.lastSignedIn) {
-      values.lastSignedIn = new Date();
+    if (!values.last_signed_in) {
+      values.last_signed_in = new Date();
     }
 
     if (Object.keys(updateSet).length === 0) {
-      updateSet.lastSignedIn = new Date();
+      updateSet.last_signed_in = new Date();
     }
 
     await db.insert(users).values(values).onConflictDoUpdate({
-      target: users.openId,
+      target: users.open_id,
       set: updateSet,
     });
   } catch (error) {
@@ -98,7 +98,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
   }
 }
 
-export async function getUserByOpenId(openId: string) {
+export async function getUserByOpenId(open_id: string) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get user: database not available");
@@ -108,7 +108,7 @@ export async function getUserByOpenId(openId: string) {
   const result = await db
     .select()
     .from(users)
-    .where(eq(users.openId, openId))
+    .where(eq(users.open_id, open_id))
     .limit(1);
 
   return result.length > 0 ? result[0] : undefined;
@@ -122,25 +122,25 @@ export async function getUserById(id: number) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-export async function updateUserPreferences(userId: number, preferredLanguage: "nl" | "ar" | "en" | "tr") {
+export async function updateUserPreferences(user_id: number, preferred_language: "nl" | "ar" | "en" | "tr") {
   const db = await getDb();
   if (!db) return;
 
   await db
     .update(users)
-    .set({ preferredLanguage, updatedAt: new Date() })
-    .where(eq(users.id, userId));
+    .set({ preferred_language, updated_at: new Date() })
+    .where(eq(users.id, user_id));
 }
 
 export async function updateUserStats(
-  userId: number,
+  user_id: number,
   stats: {
-    totalExamsCompleted?: number;
-    totalVocabularyLearned?: number;
-    totalTimeSpentMinutes?: number;
-    currentStreak?: number;
-    longestStreak?: number;
-    lastActivityDate?: Date;
+    total_exams_completed?: number;
+    total_vocabulary_learned?: number;
+    total_time_spent_minutes?: number;
+    current_streak?: number;
+    longest_streak?: number;
+    last_activity_date?: Date;
   }
 ) {
   const db = await getDb();
@@ -148,15 +148,15 @@ export async function updateUserStats(
 
   await db
     .update(users)
-    .set({ ...stats, updatedAt: new Date() })
-    .where(eq(users.id, userId));
+    .set({ ...stats, updated_at: new Date() })
+    .where(eq(users.id, user_id));
 }
 
 export async function getAllUsers() {
   const db = await getDb();
   if (!db) return [];
 
-  return await db.select().from(users).orderBy(desc(users.createdAt));
+  return await db.select().from(users).orderBy(desc(users.created_at));
 }
 
 // ==================== TEXT FUNCTIONS ====================
@@ -177,15 +177,15 @@ export async function getTextById(id: number) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-export async function getTextsByUser(userId: number) {
+export async function getTextsByUser(user_id: number) {
   const db = await getDb();
   if (!db) return [];
 
   return await db
     .select()
     .from(texts)
-    .where(eq(texts.createdBy, userId))
-    .orderBy(desc(texts.createdAt));
+    .where(eq(texts.createdBy, user_id))
+    .orderBy(desc(texts.created_at));
 }
 
 export async function getApprovedTexts() {
@@ -196,7 +196,7 @@ export async function getApprovedTexts() {
     .select()
     .from(texts)
     .where(eq(texts.status, "approved"))
-    .orderBy(desc(texts.createdAt));
+    .orderBy(desc(texts.created_at));
 }
 
 export async function getPendingTexts() {
@@ -207,11 +207,11 @@ export async function getPendingTexts() {
     .select()
     .from(texts)
     .where(eq(texts.status, "pending"))
-    .orderBy(desc(texts.createdAt));
+    .orderBy(desc(texts.created_at));
 }
 
 export async function updateTextStatus(
-  textId: number,
+  text_id: number,
   status: "pending" | "approved" | "rejected",
   moderatedBy: number,
   moderationNote?: string
@@ -226,13 +226,13 @@ export async function updateTextStatus(
       moderatedBy,
       moderationNote,
       moderatedAt: new Date(),
-      updatedAt: new Date(),
+      updated_at: new Date(),
     })
-    .where(eq(texts.id, textId));
+    .where(eq(texts.id, text_id));
 }
 
 export async function updateTextValidation(
-  textId: number,
+  text_id: number,
   validation: {
     isValidDutch: boolean;
     detectedLevel?: "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
@@ -245,8 +245,8 @@ export async function updateTextValidation(
 
   await db
     .update(texts)
-    .set({ ...validation, updatedAt: new Date() })
-    .where(eq(texts.id, textId));
+    .set({ ...validation, updated_at: new Date() })
+    .where(eq(texts.id, text_id));
 }
 
 // ==================== TRANSLATION FUNCTIONS ====================
@@ -259,20 +259,20 @@ export async function createTranslation(translation: InsertTranslation) {
   return result;
 }
 
-export async function getTranslationByTextId(textId: number) {
+export async function getTranslationByTextId(text_id: number) {
   const db = await getDb();
   if (!db) return undefined;
 
   const result = await db
     .select()
     .from(translations)
-    .where(eq(translations.textId, textId))
+    .where(eq(translations.text_id, text_id))
     .limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 
 export async function updateTranslation(
-  textId: number,
+  text_id: number,
   updates: {
     arabicTranslation?: string;
     englishTranslation?: string;
@@ -284,8 +284,8 @@ export async function updateTranslation(
 
   await db
     .update(translations)
-    .set({ ...updates, updatedAt: new Date() })
-    .where(eq(translations.textId, textId));
+    .set({ ...updates, updated_at: new Date() })
+    .where(eq(translations.text_id, text_id));
 }
 
 // ==================== EXAM FUNCTIONS ====================
@@ -306,25 +306,25 @@ export async function getExamById(id: number) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-export async function getExamsByUser(userId: number) {
+export async function getExamsByUser(user_id: number) {
   const db = await getDb();
   if (!db) return [];
 
   return await db
     .select()
     .from(exams)
-    .where(eq(exams.userId, userId))
-    .orderBy(desc(exams.createdAt));
+    .where(eq(exams.user_id, user_id))
+    .orderBy(desc(exams.created_at));
 }
 
-export async function getCompletedExamsByUser(userId: number) {
+export async function getCompletedExamsByUser(user_id: number) {
   const db = await getDb();
   if (!db) return [];
 
   return await db
     .select()
     .from(exams)
-    .where(and(eq(exams.userId, userId), eq(exams.status, "completed")))
+    .where(and(eq(exams.user_id, user_id), eq(exams.status, "completed")))
     .orderBy(desc(exams.completedAt));
 }
 
@@ -332,10 +332,10 @@ export async function updateExam(
   examId: number,
   updates: {
     answers?: string;
-    correctAnswers?: number;
-    scorePercentage?: number;
-    completedAt?: Date;
-    timeSpentMinutes?: number;
+    correct_answers?: number;
+    score_percentage?: number;
+    completed_at?: Date;
+    time_spent_minutes?: number;
     status?: "in_progress" | "completed" | "abandoned";
   }
 ) {
@@ -344,11 +344,11 @@ export async function updateExam(
 
   await db
     .update(exams)
-    .set({ ...updates, updatedAt: new Date() })
+    .set({ ...updates, updated_at: new Date() })
     .where(eq(exams.id, examId));
 }
 
-export async function getUserExamStats(userId: number) {
+export async function getUserExamStats(user_id: number) {
   const db = await getDb();
   if (!db) return null;
 
@@ -357,10 +357,10 @@ export async function getUserExamStats(userId: number) {
       totalExams: sql<number>`COUNT(*)`,
       completedExams: sql<number>`SUM(CASE WHEN ${exams.status} = 'completed' THEN 1 ELSE 0 END)`,
       averageScore: sql<number>`AVG(CASE WHEN ${exams.status} = 'completed' THEN ${exams.scorePercentage} ELSE NULL END)`,
-      totalTimeMinutes: sql<number>`SUM(CASE WHEN ${exams.status} = 'completed' THEN ${exams.timeSpentMinutes} ELSE 0 END)`,
+      totalTimeMinutes: sql<number>`SUM(CASE WHEN ${exams.status} = 'completed' THEN ${exams.time_spent_minutes} ELSE 0 END)`,
     })
     .from(exams)
-    .where(eq(exams.userId, userId));
+    .where(eq(exams.user_id, user_id));
 
   return result.length > 0 ? result[0] : null;
 }
@@ -375,14 +375,14 @@ export async function createVocabulary(vocab: InsertVocabulary) {
   return result;
 }
 
-export async function getVocabularyByTextId(textId: number) {
+export async function getVocabularyByTextId(text_id: number) {
   const db = await getDb();
   if (!db) return [];
 
   return await db
     .select()
     .from(vocabulary)
-    .where(eq(vocabulary.textId, textId));
+    .where(eq(vocabulary.text_id, text_id));
 }
 
 export async function getVocabularyById(id: number) {
@@ -403,7 +403,7 @@ export async function updateVocabularyAudio(vocabId: number, audioUrl: string, a
 
   await db
     .update(vocabulary)
-    .set({ audioUrl, audioKey, updatedAt: new Date() })
+    .set({ audioUrl, audioKey, updated_at: new Date() })
     .where(eq(vocabulary.id, vocabId));
 }
 
@@ -417,26 +417,26 @@ export async function createUserVocabulary(userVocab: InsertUserVocabulary) {
   return result;
 }
 
-export async function getUserVocabularyProgress(userId: number) {
+export async function getUserVocabularyProgress(user_id: number) {
   const db = await getDb();
   if (!db) return [];
 
   return await db
     .select()
     .from(userVocabulary)
-    .where(eq(userVocabulary.userId, userId))
-    .orderBy(desc(userVocabulary.lastReviewedAt));
+    .where(eq(userVocabulary.user_id, user_id))
+    .orderBy(desc(userVocabulary.last_reviewed_at));
 }
 
 export async function updateUserVocabularyProgress(
-  userId: number,
-  vocabularyId: number,
+  user_id: number,
+  vocabulary_id: number,
   updates: {
     status?: "new" | "learning" | "mastered";
     correctCount?: number;
     incorrectCount?: number;
     lastReviewedAt?: Date;
-    nextReviewAt?: Date;
+    next_review_at?: Date;
   }
 ) {
   const db = await getDb();
@@ -444,11 +444,11 @@ export async function updateUserVocabularyProgress(
 
   await db
     .update(userVocabulary)
-    .set({ ...updates, updatedAt: new Date() })
+    .set({ ...updates, updated_at: new Date() })
     .where(
       and(
-        eq(userVocabulary.userId, userId),
-        eq(userVocabulary.vocabularyId, vocabularyId)
+        eq(userVocabulary.user_id, user_id),
+        eq(userVocabulary.vocabulary_id, vocabulary_id)
       )
     );
 }
@@ -463,15 +463,15 @@ export async function createReport(report: InsertReport) {
   return result;
 }
 
-export async function getReportsByTextId(textId: number) {
+export async function getReportsByTextId(text_id: number) {
   const db = await getDb();
   if (!db) return [];
 
   return await db
     .select()
     .from(reports)
-    .where(eq(reports.textId, textId))
-    .orderBy(desc(reports.createdAt));
+    .where(eq(reports.text_id, text_id))
+    .orderBy(desc(reports.created_at));
 }
 
 export async function getPendingReports() {
@@ -482,13 +482,13 @@ export async function getPendingReports() {
     .select()
     .from(reports)
     .where(eq(reports.status, "pending"))
-    .orderBy(desc(reports.createdAt));
+    .orderBy(desc(reports.created_at));
 }
 
 export async function updateReportStatus(
   reportId: number,
   status: "pending" | "reviewed" | "resolved" | "dismissed",
-  reviewedBy: number,
+  reviewed_by: number,
   reviewNote?: string
 ) {
   const db = await getDb();
@@ -498,10 +498,10 @@ export async function updateReportStatus(
     .update(reports)
     .set({
       status,
-      reviewedBy,
-      reviewNote,
-      reviewedAt: new Date(),
-      updatedAt: new Date(),
+      reviewed_by: reviewed_by,
+      review_note: reviewNote,
+      reviewed_at: new Date(),
+      updated_at: new Date(),
     })
     .where(eq(reports.id, reportId));
 }
@@ -516,15 +516,15 @@ export async function createAchievement(achievement: InsertAchievement) {
   return result;
 }
 
-export async function getUserAchievements(userId: number) {
+export async function getUserAchievements(user_id: number) {
   const db = await getDb();
   if (!db) return [];
 
   return await db
     .select()
     .from(achievements)
-    .where(eq(achievements.userId, userId))
-    .orderBy(desc(achievements.createdAt));
+    .where(eq(achievements.user_id, user_id))
+    .orderBy(desc(achievements.created_at));
 }
 
 export async function updateAchievementProgress(
@@ -538,11 +538,11 @@ export async function updateAchievementProgress(
   const updates: any = {
     currentProgress,
     isCompleted,
-    updatedAt: new Date(),
+    updated_at: new Date(),
   };
 
   if (isCompleted) {
-    updates.completedAt = new Date();
+    updates.completed_at = new Date();
   }
 
   await db
@@ -571,13 +571,13 @@ export async function getLeaderboard(period: 'week' | 'month' | 'all', limit: nu
     // Get all completed exams with user info
     const completedExams = await db
       .select({
-        userId: exams.userId,
+        user_id: exams.user_id,
         userName: users.name,
-        scorePercentage: exams.scorePercentage,
-        completedAt: exams.completedAt,
+        score_percentage: exams.scorePercentage,
+        completed_at: exams.completedAt,
       })
       .from(exams)
-      .innerJoin(users, eq(users.id, exams.userId))
+      .innerJoin(users, eq(users.id, exams.user_id))
       .where(
         and(
           eq(exams.status, "completed"),
@@ -589,12 +589,12 @@ export async function getLeaderboard(period: 'week' | 'month' | 'all', limit: nu
     const userStats = new Map<number, { name: string; scores: number[] }>();
     
     for (const exam of completedExams) {
-      if (!exam.scorePercentage) continue;
+      if (!exam.score_percentage) continue;
       
-      if (!userStats.has(exam.userId)) {
-        userStats.set(exam.userId, { name: exam.userName || "Anonymous", scores: [] });
+      if (!userStats.has(exam.user_id)) {
+        userStats.set(exam.user_id, { name: exam.userName || "Anonymous", scores: [] });
       }
-      userStats.get(exam.userId)!.scores.push(exam.scorePercentage);
+      userStats.get(exam.user_id)!.scores.push(exam.score_percentage);
     }
 
     // Calculate averages and format results
@@ -636,11 +636,11 @@ export async function getUserVocabularyById(userVocabId: number) {
 export async function updateUserVocabularySRS(
   userVocabId: number,
   data: {
-    easeFactor: number;
+    ease_factor: number;
     interval: number;
     repetitions: number;
-    nextReviewAt: Date;
-    lastReviewedAt: Date;
+    next_review_at: Date;
+    last_reviewed_at: Date;
     correctCount: number;
     incorrectCount: number;
     status: "new" | "learning" | "mastered";
