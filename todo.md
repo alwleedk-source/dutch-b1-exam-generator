@@ -418,3 +418,14 @@
 - [x] Update getExamById to include text title and content
 - [ ] Test exam display with different text formats
 - [ ] Deploy to Railway
+
+
+## Phase 41: Print-Friendly View
+- [x] Add print button to TakeExam page header (with Printer icon)
+- [x] Add print-friendly CSS (@media print)
+  - Remove header, buttons, and interactive elements
+  - Use black text on white background
+  - Optimize layout for A4 paper
+  - Show text and questions only
+- [ ] Test printing
+- [ ] Deploy to Railway

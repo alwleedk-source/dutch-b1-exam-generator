@@ -8,7 +8,7 @@ import { trpc } from "@/lib/trpc";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Clock, FileText } from "lucide-react";
+import { Clock, FileText, Printer } from "lucide-react";
 
 export default function TakeExam() {
   const { user } = useAuth();
@@ -60,7 +60,21 @@ export default function TakeExam() {
   };
   
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <style>{`
+        @media print {
+          body { background: white !important; }
+          .print\\:hidden { display: none !important; }
+          .sticky { position: relative !important; }
+          .container { max-width: 100% !important; padding: 0 !important; }
+          .prose { max-width: 100% !important; }
+          button, .no-print { display: none !important; }
+          * { color: black !important; background: white !important; }
+          h1, h2, h3 { color: black !important; font-weight: bold !important; }
+          p { line-height: 1.6 !important; margin-bottom: 0.5rem !important; }
+        }
+      `}</style>
+      <div className="min-h-screen bg-background">
       {/* Header with progress */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
         <div className="container max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -73,13 +87,24 @@ export default function TakeExam() {
               </p>
             </div>
           </div>
-          <Button 
-            onClick={handleSubmit} 
-            disabled={!allAnswered || submitExamMutation.isPending}
-            size="lg"
-          >
-            {submitExamMutation.isPending ? t.loading : t.submitExam}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline"
+              size="lg"
+              onClick={() => window.print()}
+              className="print:hidden"
+            >
+              <Printer className="h-4 w-4 mr-2" />
+              Print
+            </Button>
+            <Button 
+              onClick={handleSubmit} 
+              disabled={!allAnswered || submitExamMutation.isPending}
+              size="lg"
+            >
+              {submitExamMutation.isPending ? t.loading : t.submitExam}
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -152,5 +177,6 @@ export default function TakeExam() {
         </div>
       </div>
     </div>
+    </>
   );
 }
