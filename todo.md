@@ -389,3 +389,14 @@
 - [x] Admin-only route protection already exists (adminProcedure)
 - [ ] Test admin features
 - [ ] Deploy to Railway
+
+
+## Phase 39: Loading State & Admin Notifications
+- [x] Add loading state component for exam creation with progress messages
+- [x] Update CreateExam to show loading progress (checking text → generating title → creating questions)
+- [x] Add 6 new translation keys for loading messages (all 4 languages)
+- [x] Add email notification when new text is submitted for review
+- [x] Use notifyOwner helper to send notification to admin in text.create
+- [ ] Test loading state
+- [ ] Test email notifications
+- [ ] Deploy to Railway

@@ -131,6 +131,12 @@ export interface Translations {
   success: string;
   confirm: string;
   close: string;
+  checkingDuplicate: string;
+  generatingTitle: string;
+  creatingQuestions: string;
+  almostDone: string;
+  examCreatedSuccessfully: string;
+  failedToCreateExam: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -262,6 +268,12 @@ export const translations: Record<Language, Translations> = {
     success: "Succes",
     confirm: "Bevestigen",
     close: "Sluiten",
+    checkingDuplicate: "Controleren op dubbele tekst...",
+    generatingTitle: "Titel genereren met AI...",
+    creatingQuestions: "Examenvragen maken...",
+    almostDone: "Bijna klaar...",
+    examCreatedSuccessfully: "Examen succesvol aangemaakt!",
+    failedToCreateExam: "Examen maken mislukt",
   },
   
   ar: {
@@ -392,6 +404,12 @@ export const translations: Record<Language, Translations> = {
     success: "نجاح",
     confirm: "تأكيد",
     close: "إغلاق",
+    checkingDuplicate: "التحقق من النص المكرر...",
+    generatingTitle: "توليد العنوان بالذكاء الاصطناعي...",
+    creatingQuestions: "إنشاء أسئلة الامتحان...",
+    almostDone: "انتهى تقريباً...",
+    examCreatedSuccessfully: "تم إنشاء الامتحان بنجاح!",
+    failedToCreateExam: "فشل إنشاء الامتحان",
   },
   
   en: {
@@ -522,6 +540,12 @@ export const translations: Record<Language, Translations> = {
     success: "Success",
     confirm: "Confirm",
     close: "Close",
+    checkingDuplicate: "Checking for duplicate text...",
+    generatingTitle: "Generating title with AI...",
+    creatingQuestions: "Creating exam questions...",
+    almostDone: "Almost done...",
+    examCreatedSuccessfully: "Exam created successfully!",
+    failedToCreateExam: "Failed to create exam",
   },
   
   tr: {
@@ -652,6 +676,12 @@ export const translations: Record<Language, Translations> = {
     success: "Başarılı",
     confirm: "Onayla",
     close: "Kapat",
+    checkingDuplicate: "Yinelenen metin kontrol ediliyor...",
+    generatingTitle: "Yapay zeka ile başlık oluşturuluyor...",
+    creatingQuestions: "Sınav soruları oluşturuluyor...",
+    almostDone: "Neredeyse bitti...",
+    examCreatedSuccessfully: "Sınav başarıyla oluşturuldu!",
+    failedToCreateExam: "Sınav oluşturulamadı",
   },
 };
 

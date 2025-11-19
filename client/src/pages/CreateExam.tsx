@@ -24,6 +24,7 @@ export default function CreateExam() {
   const [title, setTitle] = useState("");
   const [textId, setTextId] = useState<number | null>(null);
   const [step, setStep] = useState<"input" | "validating" | "validated" | "generating">("input");
+  const [loadingMessage, setLoadingMessage] = useState("");
   const [validation, setValidation] = useState<any>(null);
   const [agreedToPublic, setAgreedToPublic] = useState(false);
   const [similarTexts, setSimilarTexts] = useState<Array<{ id: number; title: string; similarity: number }>>([]);
@@ -96,16 +97,29 @@ export default function CreateExam() {
   };
 
   const createTextMutation = trpc.text.create.useMutation({
+    onMutate: () => {
+      setStep("generating");
+      setLoadingMessage(t.checkingDuplicate || "Checking for duplicate text...");
+      
+      // Simulate progress messages
+      setTimeout(() => setLoadingMessage(t.generatingTitle || "Generating title with AI..."), 1000);
+      setTimeout(() => setLoadingMessage(t.creatingQuestions || "Creating exam questions..."), 3000);
+      setTimeout(() => setLoadingMessage(t.almostDone || "Almost done..."), 6000);
+    },
     onSuccess: (data) => {
       // New flow: text.create now returns exam_id and questions directly
       setTextId(data.text_id);
-      toast.success("Exam created successfully!");
-      // Redirect to exam page
-      window.location.href = `/exam/${data.exam_id}`;
+      setLoadingMessage(t.success || "Success!");
+      toast.success(t.examCreatedSuccessfully || "Exam created successfully!");
+      // Redirect to exam page after short delay
+      setTimeout(() => {
+        window.location.href = `/exam/${data.exam_id}`;
+      }, 500);
     },
     onError: (error) => {
-      toast.error("Failed to create exam: " + error.message);
+      toast.error(t.failedToCreateExam + ": " + error.message);
       setStep("input");
+      setLoadingMessage("");
     },
   });
 

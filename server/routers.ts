@@ -171,6 +171,18 @@ export const appRouter = router({
           status: "in_progress",
         });
 
+        // Notify admin about new text submission
+        try {
+          const { notifyOwner } = await import("./_core/notification");
+          await notifyOwner({
+            title: "New Text Submitted for Review",
+            content: `User ${ctx.user.name || ctx.user.email || 'Unknown'} submitted a new text: "${finalTitle}" (${wordCount} words). Please review at /admin`,
+          });
+        } catch (error) {
+          console.error("Failed to notify admin:", error);
+          // Don't fail the request if notification fails
+        }
+
         return { 
           success: true, 
           text_id: textId,
