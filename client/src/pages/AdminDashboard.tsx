@@ -1,9 +1,10 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Users, FileText, AlertCircle, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { Users, FileText, AlertCircle, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -53,9 +54,7 @@ export default function AdminDashboard() {
             <CardDescription>Admin access required</CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="/dashboard">
-              <Button>Go to Dashboard</Button>
-            </Link>
+            <Button onClick={() => window.location.href = '/'}>Go to Home</Button>
           </CardContent>
         </Card>
       </div>
@@ -64,21 +63,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-bg">
-      <header className="border-b border-border/50 glass sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/">
-              <div className="flex items-center gap-2 cursor-pointer">
-                <BookOpen className="h-8 w-8 text-primary" />
-                <h1 className="text-2xl font-bold gradient-text">Admin Panel</h1>
-              </div>
-            </Link>
-            <Link href="/dashboard">
-              <Button variant="ghost">Dashboard</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <AppHeader />
 
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">

@@ -169,6 +169,27 @@ export async function createText(text: InsertText) {
   return result;
 }
 
+export async function checkDuplicateText(minHashSignature: number[], userId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  const minHashSignatureJson = JSON.stringify(minHashSignature);
+  
+  // Check if a text with the same MinHash signature exists for this user
+  const result = await db
+    .select()
+    .from(texts)
+    .where(
+      and(
+        eq(texts.min_hash_signature, minHashSignatureJson),
+        eq(texts.created_by, userId)
+      )
+    )
+    .limit(1);
+  
+  return result.length > 0;
+}
+
 export async function getTextById(id: number) {
   const db = await getDb();
   if (!db) return undefined;

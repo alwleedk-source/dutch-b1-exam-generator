@@ -114,6 +114,15 @@ export const appRouter = router({
         const minHashSignature = calculateMinHash(input.dutch_text);
         const minHashSignatureJson = JSON.stringify(minHashSignature);
 
+        // Check for duplicate text BEFORE calling Gemini (save API costs)
+        const isDuplicate = await db.checkDuplicateText(minHashSignature, ctx.user.id);
+        if (isDuplicate) {
+          throw new TRPCError({ 
+            code: "BAD_REQUEST", 
+            message: "This text already exists. Please use a different text." 
+          });
+        }
+
         // Generate title using AI if not provided
         let finalTitle = input.title;
         if (!finalTitle || finalTitle.trim() === "") {
@@ -126,7 +135,18 @@ export const appRouter = router({
           }
         }
 
-        // Create text record
+        // Generate exam questions with Gemini AI BEFORE saving to DB
+        let examData;
+        try {
+          examData = await gemini.generateExamQuestions(input.dutch_text);
+        } catch (error: any) {
+          throw new TRPCError({ 
+            code: "INTERNAL_SERVER_ERROR", 
+            message: `Failed to generate exam: ${error.message}` 
+          });
+        }
+
+        // Only save to DB if Gemini succeeded
         const result = await db.createText({
           dutch_text: input.dutch_text,
           title: finalTitle,
@@ -140,11 +160,24 @@ export const appRouter = router({
           is_b1_level: true, // Will be validated by AI
         });
 
+        const textId = result[0].id;
+
+        // Create exam record
+        const examResult = await db.createExam({
+          user_id: ctx.user.id,
+          text_id: textId,
+          questions: JSON.stringify(examData.questions),
+          total_questions: examData.questions.length,
+          status: "in_progress",
+        });
+
         return { 
           success: true, 
-          text_id: result[0].id,
+          text_id: textId,
+          exam_id: examResult[0].id,
           word_count: wordCount,
           estimated_reading_minutes: estimatedReadingMinutes,
+          questions: examData.questions,
         };
       }),
 
@@ -513,6 +546,18 @@ export const appRouter = router({
 
   // Admin dashboard
   admin: router({
+    getStats: adminProcedure.query(async () => {
+      const allTexts = await db.getAllTexts();
+      const allUsers = await db.getAllUsers();
+      
+      return {
+        pending: allTexts.filter((t: any) => t.status === 'pending').length,
+        approved: allTexts.filter((t: any) => t.status === 'approved').length,
+        rejected: allTexts.filter((t: any) => t.status === 'rejected').length,
+        totalUsers: allUsers.length,
+      };
+    }),
+
     getAllUsers: adminProcedure.query(async () => {
       return await db.getAllUsers();
     }),

@@ -97,12 +97,14 @@ export default function CreateExam() {
 
   const createTextMutation = trpc.text.create.useMutation({
     onSuccess: (data) => {
+      // New flow: text.create now returns exam_id and questions directly
       setTextId(data.text_id);
-      setStep("validating");
-      validateTextMutation.mutate({ text_id: data.text_id });
+      toast.success("Exam created successfully!");
+      // Redirect to exam page
+      window.location.href = `/exam/${data.exam_id}`;
     },
     onError: (error) => {
-      toast.error("Failed to create text: " + error.message);
+      toast.error("Failed to create exam: " + error.message);
       setStep("input");
     },
   });

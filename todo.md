@@ -376,3 +376,16 @@
 - [x] Fix Gemini API model name error (gemini-1.5-flash → gemini-2.0-flash)
 - [ ] Test exam creation
 - [ ] Deploy to Railway
+
+
+## Phase 38: Fix Text Creation Flow & Add Admin Dashboard
+- [x] Fix text.create to only save to DB after Gemini successfully generates exam
+- [x] Add duplicate text detection before calling Gemini (save API costs)
+- [x] Add checkDuplicateText function to db.ts
+- [x] Update CreateExam.tsx to handle new flow (direct redirect to exam)
+- [x] Admin Dashboard page already exists (/admin)
+- [x] Add getStats API for admin dashboard
+- [x] Update AdminDashboard to use AppHeader
+- [x] Admin-only route protection already exists (adminProcedure)
+- [ ] Test admin features
+- [ ] Deploy to Railway
