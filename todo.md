@@ -400,3 +400,21 @@
 - [ ] Test loading state
 - [ ] Test email notifications
 - [ ] Deploy to Railway
+
+
+## Phase 40: Staatsexamen-Style Exam Display & Formatting
+- [x] Redesign TakeExam page to show full text at top (no sidebar)
+- [x] Display questions below the text (like Staatsexamen format)
+- [x] Add full text display with auto-column detection (2 columns for long texts)
+- [x] Add RadioGroup for better answer selection UX
+- [x] Add progress tracking in sticky header
+- [x] Implement smart text formatting preservation:
+  - Added preserveFormatting option to RichTextEditor
+  - Preserve paragraph breaks and headers when enabled
+  - Keep original formatting when pasted (removes only dangerous tags)
+- [x] Increase character limit from 5000 to 6000 in:
+  - Text extraction API (ocr.ts)
+- [x] Set waleed.qodami@gmail.com as admin in database
+- [x] Update getExamById to include text title and content
+- [ ] Test exam display with different text formats
+- [ ] Deploy to Railway

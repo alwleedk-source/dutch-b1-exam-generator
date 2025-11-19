@@ -1,45 +1,156 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useParams } from "wouter";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { useParams, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Clock, FileText } from "lucide-react";
 
 export default function TakeExam() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const params = useParams();
+  const [, setLocation] = useLocation();
   const examId = params.id ? parseInt(params.id) : null;
-  const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [startTime] = useState(Date.now());
   
-  const { data: exam } = trpc.exam.getExamDetails.useQuery({ examId: examId! }, { enabled: !!examId });
+  const { data: examData } = trpc.exam.getExamDetails.useQuery({ examId: examId! }, { enabled: !!examId });
+  const exam = examData as typeof examData & { title: string; dutch_text: string };
   
-  if (!exam) return <div className="p-8">Loading...</div>;
+  const submitExamMutation = trpc.exam.submitExam.useMutation({
+    onSuccess: (data) => {
+      toast.success(`${t.examCompleted}! ${t.score}: ${data.correct_answers}/${data.total_questions}`);
+      setLocation(`/exam/${examId}/results`);
+    },
+    onError: (error) => {
+      toast.error("Failed to submit exam: " + error.message);
+    },
+  });
+  
+  if (!exam) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+        <p className="text-muted-foreground">{t.loading}</p>
+      </div>
+    </div>
+  );
   
   const questions = JSON.parse(exam.questions as string);
+  const answeredCount = Object.keys(answers).length;
+  const allAnswered = answeredCount === questions.length;
+  
+  const handleSubmit = () => {
+    if (!allAnswered) {
+      toast.error(`Please answer all questions (${answeredCount}/${questions.length} answered)`);
+      return;
+    }
+    
+    const timeSpentMinutes = Math.floor((Date.now() - startTime) / 60000);
+    submitExamMutation.mutate({
+      examId: examId!,
+      answers: Object.values(answers),
+      time_spent_minutes: timeSpentMinutes,
+    });
+  };
   
   return (
-    <div className="min-h-screen p-8 bg-gradient-bg">
-      <Card className="max-w-4xl mx-auto p-6">
-        <h2 className="text-2xl font-bold mb-4">Question {currentQ + 1} of {questions.length}</h2>
-        <p className="mb-4">{questions[currentQ]?.question}</p>
-        <div className="space-y-2">
-          {questions[currentQ]?.options.map((opt: string, i: number) => (
-            <Button 
-              key={i} 
-              variant={answers[currentQ] === opt ? "default" : "outline"}
-              className="w-full justify-start" 
-              onClick={() => setAnswers({...answers, [currentQ]: opt})}
+    <div className="min-h-screen bg-background">
+      {/* Header with progress */}
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+        <div className="container max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <FileText className="h-5 w-5 text-primary" />
+            <div>
+              <h1 className="font-semibold">{exam.title}</h1>
+              <p className="text-sm text-muted-foreground">
+                {answeredCount} / {questions.length} {t.question}s answered
+              </p>
+            </div>
+          </div>
+          <Button 
+            onClick={handleSubmit} 
+            disabled={!allAnswered || submitExamMutation.isPending}
+            size="lg"
+          >
+            {submitExamMutation.isPending ? t.loading : t.submitExam}
+          </Button>
+        </div>
+      </div>
+
+      <div className="container max-w-5xl mx-auto px-4 py-8">
+        {/* Full Text Display */}
+        <Card className="p-8 mb-8">
+          <div className="prose prose-lg max-w-none">
+            <h2 className="text-2xl font-bold mb-6">{exam.title}</h2>
+            <div 
+              className="whitespace-pre-wrap leading-relaxed text-foreground"
+              style={{ 
+                columnCount: exam.dutch_text.length > 2000 ? 2 : 1,
+                columnGap: '3rem',
+                textAlign: 'justify'
+              }}
             >
-              {opt}
-            </Button>
+              {exam.dutch_text}
+            </div>
+          </div>
+        </Card>
+
+        {/* Questions Section */}
+        <div className="space-y-6">
+          <h3 className="text-xl font-semibold flex items-center gap-2">
+            <Clock className="h-5 w-5" />
+            {t.question}s
+          </h3>
+          
+          {questions.map((q: any, index: number) => (
+            <Card key={index} className="p-6">
+              <div className="mb-4">
+                <span className="text-sm font-medium text-primary">
+                  {t.question} {index + 1}
+                </span>
+                <p className="text-lg font-medium mt-2">{q.question}</p>
+              </div>
+              
+              <RadioGroup
+                value={answers[index] || ""}
+                onValueChange={(value) => setAnswers({ ...answers, [index]: value })}
+              >
+                <div className="space-y-3">
+                  {q.options.map((option: string, optIndex: number) => (
+                    <div key={optIndex} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent transition-colors">
+                      <RadioGroupItem value={option} id={`q${index}-opt${optIndex}`} />
+                      <Label 
+                        htmlFor={`q${index}-opt${optIndex}`}
+                        className="flex-1 cursor-pointer text-base"
+                      >
+                        {option}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </RadioGroup>
+            </Card>
           ))}
         </div>
-        <div className="mt-6 flex gap-2">
-          <Button onClick={() => setCurrentQ(Math.max(0, currentQ - 1))} disabled={currentQ === 0}>Previous</Button>
-          <Button onClick={() => setCurrentQ(Math.min(questions.length - 1, currentQ + 1))}>Next</Button>
+
+        {/* Submit Button (bottom) */}
+        <div className="mt-8 flex justify-center">
+          <Button 
+            onClick={handleSubmit} 
+            disabled={!allAnswered || submitExamMutation.isPending}
+            size="lg"
+            className="min-w-[200px]"
+          >
+            {submitExamMutation.isPending ? t.loading : t.submitExam}
+          </Button>
         </div>
-      </Card>
+      </div>
     </div>
   );
 }

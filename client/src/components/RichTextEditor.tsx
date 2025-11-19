@@ -9,9 +9,10 @@ interface RichTextEditorProps {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  preserveFormatting?: boolean; // New option to preserve original formatting
 }
 
-export function RichTextEditor({ value, onChange, placeholder, className }: RichTextEditorProps) {
+export function RichTextEditor({ value, onChange, placeholder, className, preserveFormatting = false }: RichTextEditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -27,23 +28,45 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
       attributes: {
         class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none min-h-[400px] max-w-none p-4',
       },
-      // Handle paste event to clean text
+      // Handle paste event
       handlePaste: (view, event) => {
         const html = event.clipboardData?.getData('text/html');
         const text = event.clipboardData?.getData('text/plain');
 
-        if (html) {
-          // Clean HTML content
-          const cleaned = cleanPastedText(html);
-          editor?.commands.insertContent(cleaned);
-          event.preventDefault();
-          return true;
-        } else if (text) {
-          // Clean plain text
-          const cleaned = cleanPastedText(text);
-          editor?.commands.insertContent(cleaned);
-          event.preventDefault();
-          return true;
+        if (preserveFormatting) {
+          // Preserve original formatting (paragraphs, line breaks, etc.)
+          if (html) {
+            // Keep basic HTML structure but remove dangerous tags
+            const cleaned = html
+              .replace(/<script[^>]*>.*?<\/script>/gi, '')
+              .replace(/<style[^>]*>.*?<\/style>/gi, '')
+              .replace(/<iframe[^>]*>.*?<\/iframe>/gi, '');
+            editor?.commands.insertContent(cleaned);
+            event.preventDefault();
+            return true;
+          } else if (text) {
+            // Preserve line breaks and paragraphs
+            const formatted = text
+              .split('\n\n')
+              .map(para => `<p>${para.replace(/\n/g, '<br>')}</p>`)
+              .join('');
+            editor?.commands.insertContent(formatted);
+            event.preventDefault();
+            return true;
+          }
+        } else {
+          // Clean text (remove all formatting)
+          if (html) {
+            const cleaned = cleanPastedText(html);
+            editor?.commands.insertContent(cleaned);
+            event.preventDefault();
+            return true;
+          } else if (text) {
+            const cleaned = cleanPastedText(text);
+            editor?.commands.insertContent(cleaned);
+            event.preventDefault();
+            return true;
+          }
         }
 
         return false;

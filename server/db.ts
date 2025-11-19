@@ -323,7 +323,30 @@ export async function getExamById(id: number) {
   const db = await getDb();
   if (!db) return undefined;
 
-  const result = await db.select().from(exams).where(eq(exams.id, id)).limit(1);
+  const result = await db
+    .select({
+      id: exams.id,
+      user_id: exams.user_id,
+      text_id: exams.text_id,
+      questions: exams.questions,
+      answers: exams.answers,
+      total_questions: exams.total_questions,
+      correct_answers: exams.correct_answers,
+      score_percentage: exams.score_percentage,
+      started_at: exams.started_at,
+      completed_at: exams.completed_at,
+      time_spent_seconds: exams.time_spent_seconds,
+      status: exams.status,
+      created_at: exams.created_at,
+      updated_at: exams.updated_at,
+      title: texts.title,
+      dutch_text: texts.dutch_text,
+    })
+    .from(exams)
+    .leftJoin(texts, eq(exams.text_id, texts.id))
+    .where(eq(exams.id, id))
+    .limit(1);
+    
   return result.length > 0 ? result[0] : undefined;
 }
 
