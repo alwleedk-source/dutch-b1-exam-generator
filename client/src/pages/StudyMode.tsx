@@ -18,14 +18,16 @@ export default function StudyMode() {
   const { t, language } = useLanguage();
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string>>({});
 
-  const { data: text, isLoading: textLoading } = trpc.text.getTextWithTranslation.useQuery(
-    { text_id: parseInt(textId!) },
+  // First, get exam details to find the text_id
+  const { data: examData, isLoading: examLoading } = trpc.exam.getExamDetails.useQuery(
+    { examId: parseInt(textId!) },
     { enabled: !!textId }
   );
 
-  const { data: examData, isLoading: examLoading } = trpc.exam.getExamDetails.useQuery(
-    { examId: parseInt(textId!) },
-    { enabled: !!textId && !!user }
+  // Then, get the text using the text_id from exam
+  const { data: text, isLoading: textLoading } = trpc.text.getTextWithTranslation.useQuery(
+    { text_id: examData?.text_id || 0 },
+    { enabled: !!examData?.text_id }
   );
 
   const submitExamMutation = trpc.exam.submitExam.useMutation({
