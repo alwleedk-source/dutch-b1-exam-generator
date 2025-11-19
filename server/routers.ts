@@ -376,18 +376,14 @@ export const appRouter = router({
       return await db.getExamsByUser(ctx.user.id);
     }),
 
-    getExamDetails: protectedProcedure
+    getExamDetails: publicProcedure
       .input(z.object({
         examId: z.number(),
       }))
-      .query(async ({ ctx, input }) => {
+      .query(async ({ input }) => {
         const exam = await db.getExamById(input.examId);
         if (!exam) {
           throw new TRPCError({ code: "NOT_FOUND", message: "Exam not found" });
-        }
-
-        if (exam.user_id !== ctx.user.id) {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Not your exam" });
         }
 
         return exam;
