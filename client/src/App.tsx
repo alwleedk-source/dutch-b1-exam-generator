@@ -18,6 +18,7 @@ import StudyMode from "./pages/StudyMode";
 import ReviewPractice from "./pages/ReviewPractice";
 import MyExams from "./pages/MyExams";
 import PublicExams from "./pages/PublicExams";
+import ExamResults from "./pages/ExamResults";
 
 function Router() {
   return (
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/create-exam" component={CreateExam} />
       <Route path="/exam/:id" component={TakeExam} />
+      <Route path="/exam/:id/results" component={ExamResults} />
       <Route path="/progress" component={Progress} />
       <Route path="/vocabulary" component={Vocabulary} />
       <Route path="/admin" component={AdminDashboard} />
