@@ -20,6 +20,9 @@ import MyExams from "./pages/MyExams";
 import PublicExams from "./pages/PublicExams";
 import ExamResults from "./pages/ExamResults";
 import ExamReview from "./pages/ExamReview";
+import LanguageSelector from "./components/LanguageSelector";
+import { useAuth } from "./hooks/use-auth";
+import { useState, useEffect } from "react";
 
 function Router() {
   return (
@@ -46,12 +49,31 @@ function Router() {
 }
 
 function App() {
+  const { user } = useAuth();
+  const [showLanguageSelector, setShowLanguageSelector] = useState(false);
+  
+  useEffect(() => {
+    // Check if user needs to select language
+    const hasLanguage = user?.preferred_language || localStorage.getItem('preferredLanguage');
+    if (!hasLanguage) {
+      setShowLanguageSelector(true);
+    }
+  }, [user]);
+  
+  const handleLanguageSelected = (language: string) => {
+    setShowLanguageSelector(false);
+  };
+  
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light" switchable>
         <LanguageProvider>
           <TooltipProvider>
             <Toaster />
+            <LanguageSelector 
+              open={showLanguageSelector} 
+              onLanguageSelected={handleLanguageSelected} 
+            />
             <Router />
           </TooltipProvider>
         </LanguageProvider>

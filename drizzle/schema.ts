@@ -12,7 +12,7 @@ export const users = pgTable("users", {
   role: varchar("role", { length: 50 }).default("user").notNull(),
   
   // User preferences
-  preferred_language: varchar("preferred_language", { length: 50 }).default("nl").notNull(),
+  preferred_language: varchar("preferred_language", { length: 50 }), // ar, en, tr, nl
   
   // Statistics
   total_exams_completed: integer("total_exams_completed").default(0).notNull(),

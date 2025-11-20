@@ -632,6 +632,17 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
+
+  // User management
+  user: router({    updatePreferredLanguage: protectedProcedure
+      .input(z.object({
+        language: z.enum(["ar", "en", "tr", "nl"]),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await db.updateUserPreferences(ctx.user.id, input.language);
+        return { success: true };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

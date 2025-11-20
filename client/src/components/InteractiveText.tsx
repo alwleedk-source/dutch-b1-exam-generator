@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/hooks/use-auth";
 
 interface InteractiveTextProps {
   textId: number;
@@ -20,8 +21,22 @@ interface VocabularyWord {
  * Lightweight implementation using pure CSS tooltips
  */
 export default function InteractiveText({ textId, content, className = "" }: InteractiveTextProps) {
+  const { user } = useAuth();
   const [vocabulary, setVocabulary] = useState<Map<string, VocabularyWord>>(new Map());
+  const [preferredLanguage, setPreferredLanguage] = useState<string>('en');
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Get preferred language from user or localStorage
+  useEffect(() => {
+    if (user?.preferred_language) {
+      setPreferredLanguage(user.preferred_language);
+    } else {
+      const savedLang = localStorage.getItem('preferredLanguage');
+      if (savedLang) {
+        setPreferredLanguage(savedLang);
+      }
+    }
+  }, [user]);
   
   // Fetch vocabulary for this text
   const { data: vocabData } = trpc.text.getVocabulary.useQuery({ textId });
@@ -83,10 +98,27 @@ export default function InteractiveText({ textId, content, className = "" }: Int
           span.className = 'vocab-word';
           span.textContent = word;
           span.setAttribute('data-word', vocabWord.word);
-          span.setAttribute('data-arabic', vocabWord.arabic);
-          span.setAttribute('data-english', vocabWord.english);
-          span.setAttribute('data-turkish', vocabWord.turkish);
-          span.setAttribute('data-dutch', vocabWord.dutchDefinition);
+          
+          // Set translation based on preferred language
+          let translation = '';
+          switch (preferredLanguage) {
+            case 'ar':
+              translation = vocabWord.arabic || vocabWord.english;
+              break;
+            case 'en':
+              translation = vocabWord.english || vocabWord.arabic;
+              break;
+            case 'tr':
+              translation = vocabWord.turkish || vocabWord.english;
+              break;
+            case 'nl':
+              translation = vocabWord.dutchDefinition || '';
+              break;
+            default:
+              translation = vocabWord.english || vocabWord.arabic;
+          }
+          
+          span.setAttribute('data-translation', translation);
           fragment.appendChild(span);
         } else {
           fragment.appendChild(document.createTextNode(word));
@@ -117,7 +149,7 @@ export default function InteractiveText({ textId, content, className = "" }: Int
         }
         
         .vocab-word::after {
-          content: attr(data-arabic) " • " attr(data-english);
+          content: attr(data-translation);
           position: absolute;
           bottom: 100%;
           left: 50%;

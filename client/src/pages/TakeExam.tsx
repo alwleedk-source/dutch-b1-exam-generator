@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Clock, FileText, Printer, Home, X, BookOpen } from "lucide-react";
 import { Link } from "wouter";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function TakeExam() {
   const { user } = useAuth();
@@ -125,6 +126,7 @@ export default function TakeExam() {
 
             {/* Actions */}
             <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+              <LanguageSwitcher />
               <Button 
                 variant="ghost"
                 size="sm"
