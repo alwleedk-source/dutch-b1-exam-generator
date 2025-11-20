@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,66 +16,46 @@ const languages = [
   { code: "tr", name: "Türkçe", flag: "🇹🇷" },
 ];
 
-interface LanguageSwitcherProps {
-  currentLanguage?: string;
-  onLanguageChange?: (language: string) => void;
-}
-
-export default function LanguageSwitcher({ currentLanguage, onLanguageChange }: LanguageSwitcherProps) {
+export default function LanguageSwitcher() {
   const { user } = useAuth();
-  const [selectedLang, setSelectedLang] = useState(
-    currentLanguage || user?.preferred_language || localStorage.getItem('preferredLanguage') || 'en'
-  );
-  
   const updateLanguageMutation = trpc.user.updatePreferredLanguage.useMutation({
     onSuccess: () => {
-      toast.success("Language updated successfully");
-    },
-    onError: () => {
-      toast.error("Failed to update language");
+      toast.success("Language updated");
+      window.location.reload();
     },
   });
-  
-  const handleLanguageChange = (code: string) => {
-    setSelectedLang(code);
-    
+
+  const currentLanguage = languages.find(l => l.code === (user?.preferred_language || localStorage.getItem("preferredLanguage")));
+
+  const handleLanguageChange = (languageCode: string) => {
+    localStorage.setItem("preferredLanguage", languageCode);
     if (user) {
-      // Save to database for logged-in users
-      updateLanguageMutation.mutate({ language: code as "ar" | "en" | "tr" | "nl" });
+      updateLanguageMutation.mutate({ language: languageCode });
     } else {
-      // Save to localStorage for non-logged-in users
-      localStorage.setItem('preferredLanguage', code);
+      window.location.reload();
     }
-    
-    // Notify parent component
-    if (onLanguageChange) {
-      onLanguageChange(code);
-    }
-    
-    // Reload page to apply language change
-    window.location.reload();
   };
-  
-  const currentLangData = languages.find(l => l.code === selectedLang) || languages[1];
-  
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-2">
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+        >
           <Globe className="h-4 w-4" />
-          <span className="hidden sm:inline">{currentLangData.flag} {currentLangData.name}</span>
-          <span className="sm:hidden">{currentLangData.flag}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-40">
         {languages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
             onClick={() => handleLanguageChange(lang.code)}
-            className={`gap-2 ${selectedLang === lang.code ? 'bg-accent' : ''}`}
+            className={currentLanguage?.code === lang.code ? "bg-accent" : ""}
           >
-            <span className="text-xl">{lang.flag}</span>
-            <span>{lang.name}</span>
+            <span className="mr-2">{lang.flag}</span>
+            <span className="text-sm">{lang.name}</span>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
