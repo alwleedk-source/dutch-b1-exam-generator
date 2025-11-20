@@ -32,7 +32,7 @@ export function AppHeader() {
           </Link>
           
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-2">
+          <nav className="hidden md:flex items-center gap-2">
             <Link href="/create-exam">
               <Button variant="ghost" size="sm">{t.createNewExam || "Create Exam"}</Button>
             </Link>
@@ -55,7 +55,7 @@ export function AppHeader() {
           </nav>
 
           {/* Mobile Navigation */}
-          <div className="flex lg:hidden items-center gap-2">
+          <div className="flex md:hidden items-center gap-2">
             <LanguageSwitcher />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
