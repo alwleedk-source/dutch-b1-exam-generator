@@ -100,20 +100,31 @@ export default function MyExams() {
                           Exam #{exam.id}
                         </CardTitle>
                         <CardDescription>
-                          Completed on {new Date(exam.completed_at || exam.created_at).toLocaleDateString()}
+                          {exam.status === 'completed' 
+                            ? `Completed on ${new Date(exam.completed_at || exam.created_at).toLocaleDateString()}`
+                            : `Created on ${new Date(exam.created_at).toLocaleDateString()}`
+                          }
                         </CardDescription>
                       </div>
                       <div className="text-right">
-                        <div className={`text-3xl font-bold ${
-                          (exam.score_percentage || 0) >= 80 ? 'text-green-500' :
-                          (exam.score_percentage || 0) >= 60 ? 'text-yellow-500' :
-                          'text-red-500'
-                        }`}>
-                          {exam.score_percentage || 0}%
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {exam.correct_answers || 0}/{exam.total_questions} correct
-                        </p>
+                        {exam.status === 'completed' ? (
+                          <>
+                            <div className={`text-3xl font-bold ${
+                              (exam.score_percentage || 0) >= 80 ? 'text-green-500' :
+                              (exam.score_percentage || 0) >= 60 ? 'text-yellow-500' :
+                              'text-red-500'
+                            }`}>
+                              {exam.score_percentage || 0}%
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              {exam.correct_answers || 0}/{exam.total_questions} correct
+                            </p>
+                          </>
+                        ) : (
+                          <div className="px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-600 text-sm font-medium">
+                            In Progress
+                          </div>
+                        )}
                       </div>
                     </div>
                   </CardHeader>
@@ -134,24 +145,43 @@ export default function MyExams() {
                     </div>
                     
                     <div className="flex gap-2">
-                      <Link href={`/exam/${exam.id}`}>
-                        <Button variant="outline" size="sm">
-                          <TrendingUp className="h-4 w-4 mr-2" />
-                          {t.viewResults}
-                        </Button>
-                      </Link>
-                      <Link href={`/study/${exam.text_id}`}>
-                        <Button variant="outline" size="sm">
-                          <BookOpen className="h-4 w-4 mr-2" />
-                          {t.studyText}
-                        </Button>
-                      </Link>
-                      <Link href={`/exam/${exam.id}/retake`}>
-                        <Button variant="outline" size="sm">
-                          <RotateCcw className="h-4 w-4 mr-2" />
-                          {t.retake}
-                        </Button>
-                      </Link>
+                      {exam.status === 'completed' ? (
+                        <>
+                          <Link href={`/exam/${exam.id}`}>
+                            <Button variant="outline" size="sm">
+                              <TrendingUp className="h-4 w-4 mr-2" />
+                              {t.viewResults}
+                            </Button>
+                          </Link>
+                          <Link href={`/study/${exam.text_id}`}>
+                            <Button variant="outline" size="sm">
+                              <BookOpen className="h-4 w-4 mr-2" />
+                              {t.studyText}
+                            </Button>
+                          </Link>
+                          <Link href={`/exam/${exam.id}/retake`}>
+                            <Button variant="outline" size="sm">
+                              <RotateCcw className="h-4 w-4 mr-2" />
+                              {t.retake}
+                            </Button>
+                          </Link>
+                        </>
+                      ) : (
+                        <>
+                          <Link href={`/exam/${exam.id}`}>
+                            <Button size="sm">
+                              <BookOpen className="h-4 w-4 mr-2" />
+                              Start Exam
+                            </Button>
+                          </Link>
+                          <Link href={`/study/${exam.text_id}`}>
+                            <Button variant="outline" size="sm">
+                              <BookOpen className="h-4 w-4 mr-2" />
+                              {t.studyText}
+                            </Button>
+                          </Link>
+                        </>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
