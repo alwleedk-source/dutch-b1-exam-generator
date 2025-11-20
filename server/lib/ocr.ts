@@ -49,8 +49,8 @@ export function validateExtractedText(text: string): {
     return { isValid: false, reason: 'No text extracted from image' };
   }
   
-  if (text.length < 100) {
-    return { isValid: false, reason: 'Text too short (minimum 100 characters)' };
+  if (text.length < 2500) {
+    return { isValid: false, reason: 'Text too short (minimum 2500 characters for quality exam generation)' };
   }
   
   if (text.length > MAX_TEXT_LENGTH) {
