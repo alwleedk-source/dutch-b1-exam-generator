@@ -35,7 +35,7 @@ export default function CreateExam() {
     onSuccess: (data) => {
       setDutchText(data.text);
       setIsExtracting(false);
-      toast.success(`Text extracted! ${data.characterCount} characters${data.isTruncated ? ' (truncated to 5000)' : ''}`);
+      toast.success(`Text extracted! ${data.characterCount} characters${data.isTruncated ? ' (truncated to 6000)' : ''}`);
       
       // Check for duplicates after extraction
       checkDuplicateMutation.mutate({ text: data.text });
@@ -163,8 +163,8 @@ export default function CreateExam() {
       return;
     }
 
-    if (dutchText.length > 5000) {
-      toast.error("Text too long (maximum 5000 characters)");
+    if (dutchText.length > 6000) {
+      toast.error("Text too long (maximum 6000 characters)");
       return;
     }
 
@@ -251,7 +251,7 @@ export default function CreateExam() {
               <CardHeader>
                 <CardTitle>Step 1: Add Dutch Text</CardTitle>
                 <CardDescription>
-                  Paste text or upload an image (OCR). Maximum 5000 characters.
+                  Paste text or upload an image (OCR). Maximum 6000 characters.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -312,8 +312,8 @@ export default function CreateExam() {
                   />
                   <div className="flex justify-between text-sm text-muted-foreground mt-2">
                     <span>{countWords(dutchText)} words • {estimateReadingTime(dutchText)} min read</span>
-                    <span className={dutchText.length > 5000 ? 'text-red-500 font-semibold' : ''}>
-                      {dutchText.length} / 5000 characters
+                    <span className={dutchText.length > 6000 ? 'text-red-500 font-semibold' : ''}>
+                      {dutchText.length} / 6000 characters
                     </span>
                   </div>
                 </div>
