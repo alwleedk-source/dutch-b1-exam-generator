@@ -19,9 +19,9 @@ export default function StudyMode() {
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string>>({});
 
   // First, get exam details to find the text_id
-  const { data: examData, isLoading: examLoading } = trpc.exam.getExamDetails.useQuery(
+  const { data: examData, isLoading: examLoading, error: examError } = trpc.exam.getExamDetails.useQuery(
     { examId: parseInt(examId!) },
-    { enabled: !!examId }
+    { enabled: !!examId, retry: false }
   );
 
   // Then, get the text using the text_id from exam
@@ -56,6 +56,28 @@ export default function StudyMode() {
       time_spent_minutes: 0,
     });
   };
+
+  // Handle exam error
+  if (examError) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <AppHeader />
+        <main className="flex-1 container py-8 flex items-center justify-center">
+          <Card className="max-w-md">
+            <CardHeader>
+              <CardTitle>Exam Not Found</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                This exam does not exist or has been deleted.
+              </p>
+              <Button onClick={() => navigate('/public-exams')}>Browse Exams</Button>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    );
+  }
 
   if (textLoading || examLoading) {
     return (

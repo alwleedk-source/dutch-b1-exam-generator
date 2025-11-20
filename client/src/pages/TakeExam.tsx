@@ -19,7 +19,10 @@ export default function TakeExam() {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [startTime] = useState(Date.now());
   
-  const { data: examData } = trpc.exam.getExamDetails.useQuery({ examId: examId! }, { enabled: !!examId });
+  const { data: examData, error: examError, isLoading: examLoading } = trpc.exam.getExamDetails.useQuery(
+    { examId: examId! }, 
+    { enabled: !!examId, retry: false }
+  );
   const exam = examData as typeof examData & { title: string; dutch_text: string };
   
   const submitExamMutation = trpc.exam.submitExam.useMutation({
@@ -32,7 +35,23 @@ export default function TakeExam() {
     },
   });
   
-  if (!exam) return (
+  // Handle error state
+  if (examError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Card className="p-6 max-w-md">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold mb-2">Exam Not Found</h2>
+            <p className="text-muted-foreground mb-4">This exam does not exist or has been deleted.</p>
+            <Button onClick={() => setLocation('/public-exams')}>Browse Exams</Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+  
+  // Handle loading state
+  if (examLoading || !exam) return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
