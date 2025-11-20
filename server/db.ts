@@ -372,6 +372,17 @@ export async function getCompletedExamsByUser(user_id: number) {
     .orderBy(desc(exams.completed_at));
 }
 
+export async function getExamsByTextId(text_id: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(exams)
+    .where(eq(exams.text_id, text_id))
+    .limit(1); // Only need one exam to get the questions
+}
+
 export async function updateExam(
   examId: number,
   updates: {

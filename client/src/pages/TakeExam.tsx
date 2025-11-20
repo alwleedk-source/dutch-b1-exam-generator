@@ -25,7 +25,7 @@ export default function TakeExam() {
     { examId: examId! }, 
     { enabled: !!examId, retry: false }
   );
-  const exam = examData as typeof examData & { title: string; dutch_text: string };
+  const exam = examData as typeof examData & { title: string; dutch_text: string; formatted_html?: string; text_type?: string };
   
   const submitExamMutation = trpc.exam.submitExam.useMutation({
     onSuccess: (data) => {
@@ -186,16 +186,25 @@ export default function TakeExam() {
         <Card className="p-4 sm:p-6 md:p-8 mb-6 sm:mb-8">
           <div className="prose prose-sm sm:prose-base md:prose-lg max-w-none">
             <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">{exam.title}</h2>
-            <div 
-              className="whitespace-pre-wrap leading-relaxed text-foreground"
-              style={{ 
-                columnCount: window.innerWidth >= 1024 && exam.dutch_text.length > 2000 ? 2 : 1,
-                columnGap: '3rem',
-                textAlign: window.innerWidth >= 640 ? 'justify' : 'left'
-              }}
-            >
-              {exam.dutch_text}
-            </div>
+            {exam.formatted_html ? (
+              <div 
+                className="formatted-text-container"
+                style={{ direction: 'ltr' }}
+                dangerouslySetInnerHTML={{ __html: exam.formatted_html }}
+              />
+            ) : (
+              <div 
+                className="whitespace-pre-wrap leading-relaxed text-foreground"
+                style={{ 
+                  direction: 'ltr',
+                  columnCount: window.innerWidth >= 1024 && exam.dutch_text.length > 2000 ? 2 : 1,
+                  columnGap: '3rem',
+                  textAlign: window.innerWidth >= 640 ? 'justify' : 'left'
+                }}
+              >
+                {exam.dutch_text}
+              </div>
+            )}
           </div>
         </Card>
 
@@ -212,7 +221,7 @@ export default function TakeExam() {
                 <span className="text-xs sm:text-sm font-medium text-primary">
                   {t.question} {index + 1}
                 </span>
-                <p className="text-base sm:text-lg font-medium mt-1.5 sm:mt-2" dir="auto">{q.question}</p>
+                <p className="text-base sm:text-lg font-medium mt-1.5 sm:mt-2" dir="ltr">{q.question}</p>
               </div>
               
               <RadioGroup
@@ -226,7 +235,7 @@ export default function TakeExam() {
                       <Label 
                         htmlFor={`q${index}-opt${optIndex}`}
                         className="flex-1 cursor-pointer text-sm sm:text-base leading-snug"
-                        dir="auto"
+                        dir="ltr"
                       >
                         {option}
                       </Label>

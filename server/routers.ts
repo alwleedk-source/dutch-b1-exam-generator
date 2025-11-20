@@ -307,22 +307,35 @@ export const appRouter = router({
           throw new TRPCError({ code: "NOT_FOUND", message: "Text not found" });
         }
 
-        // Generate exam questions with Gemini AI
-        const examData = await gemini.generateExamQuestions(text.dutch_text);
+        // Try to find an existing exam for this text to reuse questions
+        const existingExams = await db.getExamsByTextId(input.text_id);
+        let questions;
 
-        // Create exam record
+        if (existingExams && existingExams.length > 0) {
+          // Reuse questions from existing exam
+          const existingExam = existingExams[0];
+          questions = JSON.parse(existingExam.questions);
+          console.log('[generateExam] Reusing questions from existing exam', existingExam.id);
+        } else {
+          // Generate new questions with Gemini AI
+          console.log('[generateExam] No existing exam found, generating new questions with Gemini');
+          const examData = await gemini.generateExamQuestions(text.dutch_text);
+          questions = examData.questions;
+        }
+
+        // Create exam record for current user
         const result = await db.createExam({
           user_id: ctx.user.id,
           text_id: input.text_id,
-          questions: JSON.stringify(examData.questions),
-          total_questions: examData.questions.length,
+          questions: JSON.stringify(questions),
+          total_questions: questions.length,
           status: "in_progress",
         });
 
         return {
           success: true,
           examId: result[0].id,
-          questions: examData.questions,
+          questions: questions,
         };
       }),
 
@@ -422,7 +435,14 @@ export const appRouter = router({
           throw new TRPCError({ code: "NOT_FOUND", message: "Exam not found" });
         }
 
-        return exam;
+        // Get text details including formatted_html
+        const text = await db.getTextById(exam.text_id);
+        
+        return {
+          ...exam,
+          formatted_html: text?.formatted_html,
+          text_type: text?.text_type,
+        };
       }),
   }),
 

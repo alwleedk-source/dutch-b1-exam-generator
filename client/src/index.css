@@ -245,3 +245,99 @@
     }
   }
 }
+/* ==================== FORMATTED TEXT STYLES ==================== */
+.formatted-text-container {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 16px;
+  line-height: 1.7;
+  color: hsl(var(--foreground));
+}
+
+.formatted-text-container p {
+  margin-bottom: 1.2em;
+  text-align: justify;
+  hyphens: auto;
+}
+
+.formatted-text-container .section-heading,
+.formatted-text-container h3 {
+  font-weight: 700;
+  font-size: 1.25em;
+  margin-top: 1.8em;
+  margin-bottom: 0.8em;
+  color: hsl(var(--primary));
+  line-height: 1.3;
+}
+
+.formatted-text-container .section-heading:first-child,
+.formatted-text-container h3:first-child {
+  margin-top: 0;
+}
+
+/* Columns layout for newspaper style */
+.formatted-text-container.columns-layout {
+  column-count: 2;
+  column-gap: 2.5rem;
+  column-rule: 1px solid hsl(var(--border));
+}
+
+/* Prevent headings from breaking across columns */
+.formatted-text-container.columns-layout .section-heading,
+.formatted-text-container.columns-layout h3 {
+  break-after: avoid;
+  column-span: none;
+}
+
+/* Instruction list styling */
+.formatted-text-container .instruction-list,
+.formatted-text-container ol {
+  list-style-type: decimal;
+  padding-left: 2em;
+  margin: 1.2em 0;
+}
+
+.formatted-text-container .instruction-list li,
+.formatted-text-container ol li {
+  margin-bottom: 0.8em;
+  line-height: 1.6;
+}
+
+/* Bullet list styling */
+.formatted-text-container .bullet-list,
+.formatted-text-container ul {
+  list-style-type: disc;
+  padding-left: 2em;
+  margin: 1.2em 0;
+}
+
+.formatted-text-container .bullet-list li,
+.formatted-text-container ul li {
+  margin-bottom: 0.8em;
+  line-height: 1.6;
+}
+
+/* Responsive: disable columns on tablets and mobile */
+@media (max-width: 1024px) {
+  .formatted-text-container.columns-layout {
+    column-count: 1;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .formatted-text-container {
+    font-size: 15px;
+  }
+  
+  .formatted-text-container p {
+    text-align: left;
+    margin-bottom: 1em;
+  }
+  
+  .formatted-text-container .section-heading,
+  .formatted-text-container h3 {
+    font-size: 1.15em;
+    margin-top: 1.5em;
+    margin-bottom: 0.6em;
+  }
+}
