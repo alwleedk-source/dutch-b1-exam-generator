@@ -212,7 +212,7 @@ export default function TakeExam() {
                 <span className="text-xs sm:text-sm font-medium text-primary">
                   {t.question} {index + 1}
                 </span>
-                <p className="text-base sm:text-lg font-medium mt-1.5 sm:mt-2">{q.question}</p>
+                <p className="text-base sm:text-lg font-medium mt-1.5 sm:mt-2" dir="auto">{q.question}</p>
               </div>
               
               <RadioGroup
@@ -226,6 +226,7 @@ export default function TakeExam() {
                       <Label 
                         htmlFor={`q${index}-opt${optIndex}`}
                         className="flex-1 cursor-pointer text-sm sm:text-base leading-snug"
+                        dir="auto"
                       >
                         {option}
                       </Label>

@@ -1,8 +1,16 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Menu, LogOut, FileText, BookMarked, TrendingUp, Library, Plus } from "lucide-react";
 import { Link } from "wouter";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 /**
  * Shared application header with navigation
@@ -14,16 +22,17 @@ export function AppHeader() {
 
   return (
     <header className="border-b border-border/50 glass sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           <Link href="/">
             <div className="flex items-center gap-2 cursor-pointer">
-              <BookOpen className="h-8 w-8 text-primary" />
-              <h1 className="text-2xl font-bold gradient-text">Dutch B1</h1>
+              <BookOpen className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+              <h1 className="text-lg sm:text-2xl font-bold gradient-text">Dutch B1</h1>
             </div>
           </Link>
           
-          <nav className="flex items-center gap-2">
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-2">
             <Link href="/create-exam">
               <Button variant="ghost" size="sm">{t.createNewExam || "Create Exam"}</Button>
             </Link>
@@ -39,10 +48,60 @@ export function AppHeader() {
             <Link href="/vocabulary">
               <Button variant="ghost" size="sm">{t.vocabulary || "Vocabulary"}</Button>
             </Link>
+            <LanguageSwitcher />
             <Button variant="ghost" size="sm" onClick={logout}>
               {t.logout || "Logout"}
             </Button>
           </nav>
+
+          {/* Mobile Navigation */}
+          <div className="flex lg:hidden items-center gap-2">
+            <LanguageSwitcher />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <Link href="/create-exam">
+                  <DropdownMenuItem>
+                    <Plus className="mr-2 h-4 w-4" />
+                    {t.createNewExam || "Create Exam"}
+                  </DropdownMenuItem>
+                </Link>
+                <Link href="/my-exams">
+                  <DropdownMenuItem>
+                    <FileText className="mr-2 h-4 w-4" />
+                    {t.myExams}
+                  </DropdownMenuItem>
+                </Link>
+                <Link href="/public-exams">
+                  <DropdownMenuItem>
+                    <BookMarked className="mr-2 h-4 w-4" />
+                    {t.publicExams}
+                  </DropdownMenuItem>
+                </Link>
+                <Link href="/progress">
+                  <DropdownMenuItem>
+                    <TrendingUp className="mr-2 h-4 w-4" />
+                    {t.progress || "Progress"}
+                  </DropdownMenuItem>
+                </Link>
+                <Link href="/vocabulary">
+                  <DropdownMenuItem>
+                    <Library className="mr-2 h-4 w-4" />
+                    {t.vocabulary || "Vocabulary"}
+                  </DropdownMenuItem>
+                </Link>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={logout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  {t.logout || "Logout"}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
     </header>
