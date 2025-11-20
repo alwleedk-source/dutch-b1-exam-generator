@@ -19,7 +19,7 @@ export default function Progress() {
           </Card>
           <Card>
             <CardHeader><CardTitle className="text-base sm:text-lg">Average Score</CardTitle></CardHeader>
-            <CardContent><p className="text-3xl sm:text-4xl font-bold">{stats?.examStats?.averageScore?.toFixed(1) || 0}%</p></CardContent>
+            <CardContent><p className="text-3xl sm:text-4xl font-bold">{stats?.examStats?.averageScore ? Number(stats.examStats.averageScore).toFixed(1) : 0}%</p></CardContent>
           </Card>
           <Card>
             <CardHeader><CardTitle className="text-base sm:text-lg">Vocabulary Learned</CardTitle></CardHeader>
