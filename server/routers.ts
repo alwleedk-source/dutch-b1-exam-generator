@@ -338,8 +338,15 @@ export const appRouter = router({
           throw new TRPCError({ code: "NOT_FOUND", message: "Exam not found" });
         }
 
+        // Debug logging
+        console.log('[submitExam] Exam user_id:', exam.user_id, 'Current user id:', ctx.user.id);
+        
         if (exam.user_id !== ctx.user.id) {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Not your exam" });
+          console.error('[submitExam] User mismatch! Exam belongs to user', exam.user_id, 'but current user is', ctx.user.id);
+          throw new TRPCError({ 
+            code: "FORBIDDEN", 
+            message: `This exam belongs to another user. Exam user: ${exam.user_id}, Your user: ${ctx.user.id}` 
+          });
         }
 
         const questions = JSON.parse(exam.questions);

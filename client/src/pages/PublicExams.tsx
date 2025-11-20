@@ -5,14 +5,34 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { BookOpen, Users, TrendingUp, Clock, Play } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
+import { useState } from "react";
 
 export default function PublicExams() {
   const { user, logout } = useAuth();
   const { t } = useLanguage();
+  const [, setLocation] = useLocation();
+  const [generatingExamId, setGeneratingExamId] = useState<number | null>(null);
 
   const { data: texts, isLoading } = trpc.text.listPublicTexts.useQuery();
+  
+  const generateExamMutation = trpc.exam.generateExam.useMutation({
+    onSuccess: (data) => {
+      toast.success("Exam generated successfully!");
+      setLocation(`/exam/${data.examId}`);
+    },
+    onError: (error) => {
+      toast.error("Failed to generate exam: " + error.message);
+      setGeneratingExamId(null);
+    },
+  });
+  
+  const handleStartExam = (textId: number) => {
+    setGeneratingExamId(textId);
+    generateExamMutation.mutate({ text_id: textId });
+  };
 
   if (!user) {
     return (
@@ -105,18 +125,14 @@ export default function PublicExams() {
                     </div>
                     
                     <div className="flex gap-2">
-                      <Link href={`/study/${text.id}`}>
-                        <Button size="sm">
-                          <Play className="h-4 w-4 mr-2" />
-                          Start Exam
-                        </Button>
-                      </Link>
-                      <Link href={`/study/${text.id}`}>
-                        <Button variant="outline" size="sm">
-                          <BookOpen className="h-4 w-4 mr-2" />
-                          Read Text
-                        </Button>
-                      </Link>
+                      <Button 
+                        size="sm"
+                        onClick={() => handleStartExam(text.id)}
+                        disabled={generatingExamId === text.id}
+                      >
+                        <Play className="h-4 w-4 mr-2" />
+                        {generatingExamId === text.id ? "Generating..." : "Start Exam"}
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
