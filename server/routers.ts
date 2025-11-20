@@ -425,6 +425,99 @@ export const appRouter = router({
       };
     }),
 
+    getDetailedAnalysis: protectedProcedure.query(async ({ ctx }) => {
+      const completedExams = await db.getCompletedExamsByUser(ctx.user.id);
+      
+      // Initialize counters for each question type
+      const questionTypeStats: Record<string, { correct: number; total: number }> = {
+        main_idea: { correct: 0, total: 0 },
+        search: { correct: 0, total: 0 },
+        sequence: { correct: 0, total: 0 },
+        inference: { correct: 0, total: 0 },
+        vocabulary: { correct: 0, total: 0 },
+      };
+
+      let totalQuestions = 0;
+      let totalCorrect = 0;
+
+      // Analyze each exam
+      for (const exam of completedExams) {
+        if (!exam.user_answers || !exam.questions) continue;
+        
+        const questions = JSON.parse(exam.questions);
+        const userAnswers = JSON.parse(exam.user_answers);
+
+        questions.forEach((q: any, idx: number) => {
+          const questionType = q.question_type || 'search';
+          const isCorrect = userAnswers[idx] === q.correct_answer;
+
+          if (questionTypeStats[questionType]) {
+            questionTypeStats[questionType].total++;
+            if (isCorrect) {
+              questionTypeStats[questionType].correct++;
+            }
+          }
+
+          totalQuestions++;
+          if (isCorrect) totalCorrect++;
+        });
+      }
+
+      // Calculate percentages and identify strengths/weaknesses
+      const strengths: string[] = [];
+      const weaknesses: string[] = [];
+      const recommendations: string[] = [];
+
+      const typeLabels: Record<string, string> = {
+        main_idea: "Hoofdgedachte (Main Idea)",
+        search: "Zoeken naar informatie (Search)",
+        sequence: "Volgorde begrijpen (Sequence)",
+        inference: "Conclusies trekken (Inference)",
+        vocabulary: "Woordenschat (Vocabulary)",
+      };
+
+      Object.entries(questionTypeStats).forEach(([type, stats]) => {
+        if (stats.total === 0) return;
+        
+        const percentage = (stats.correct / stats.total) * 100;
+        const label = typeLabels[type];
+
+        if (percentage >= 80) {
+          strengths.push(`Uitstekend in ${label} (${percentage.toFixed(0)}%)`);
+        } else if (percentage < 60) {
+          weaknesses.push(`Verbeter ${label} (${percentage.toFixed(0)}%)`);
+          
+          // Add specific recommendations
+          if (type === 'main_idea') {
+            recommendations.push("Oefen met het identificeren van de hoofdgedachte door te vragen: 'Waar gaat deze tekst vooral over?'");
+          } else if (type === 'vocabulary') {
+            recommendations.push("Leer meer Nederlandse woorden. Gebruik de woordenschat functie om nieuwe woorden te oefenen.");
+          } else if (type === 'inference') {
+            recommendations.push("Oefen met het trekken van conclusies. Vraag jezelf: 'Wat kan ik afleiden uit deze informatie?'");
+          } else if (type === 'sequence') {
+            recommendations.push("Let op signaalwoorden zoals 'eerst', 'daarna', 'ten slotte' om de volgorde te begrijpen.");
+          } else if (type === 'search') {
+            recommendations.push("Oefen met scannen: zoek snel naar specifieke informatie zonder de hele tekst te lezen.");
+          }
+        }
+      });
+
+      // General recommendations based on overall performance
+      const overallPercentage = totalQuestions > 0 ? (totalCorrect / totalQuestions) * 100 : 0;
+      if (overallPercentage < 70) {
+        recommendations.push("Lees elke dag 15-30 minuten Nederlandse teksten om je leesvaardigheid te verbeteren.");
+      }
+
+      return {
+        totalQuestions,
+        totalCorrect,
+        byQuestionType: questionTypeStats,
+        strengths,
+        weaknesses,
+        recommendations,
+      };
+    }),
+
     getMyAchievements: protectedProcedure.query(async ({ ctx }) => {
       return await db.getUserAchievements(ctx.user.id);
     }),
