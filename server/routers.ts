@@ -341,12 +341,20 @@ export const appRouter = router({
         // Debug logging
         console.log('[submitExam] Exam user_id:', exam.user_id, 'Current user id:', ctx.user.id);
         
-        if (exam.user_id !== ctx.user.id) {
+        // Allow dev user (999) to submit any exam when DISABLE_AUTH is enabled
+        const DISABLE_AUTH = process.env.DISABLE_AUTH === "true";
+        const isDevUser = ctx.user.id === 999;
+        
+        if (exam.user_id !== ctx.user.id && !(DISABLE_AUTH && isDevUser)) {
           console.error('[submitExam] User mismatch! Exam belongs to user', exam.user_id, 'but current user is', ctx.user.id);
           throw new TRPCError({ 
             code: "FORBIDDEN", 
             message: `This exam belongs to another user. Exam user: ${exam.user_id}, Your user: ${ctx.user.id}` 
           });
+        }
+        
+        if (DISABLE_AUTH && isDevUser && exam.user_id !== ctx.user.id) {
+          console.log('[submitExam] Dev user bypassing ownership check');
         }
 
         const questions = JSON.parse(exam.questions);
