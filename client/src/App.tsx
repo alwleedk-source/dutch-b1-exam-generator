@@ -31,7 +31,7 @@ function Router() {
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/leaderboard" component={Leaderboard} />
       <Route path="/achievements" component={Achievements} />
-      <Route path="/study/:id" component={StudyMode} />
+      <Route path="/study/:examId" component={StudyMode} />
       <Route path="/review" component={ReviewPractice} />
       <Route path="/my-exams" component={MyExams} />
       <Route path="/public-exams" component={PublicExams} />

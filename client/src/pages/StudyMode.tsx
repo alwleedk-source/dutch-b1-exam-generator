@@ -12,7 +12,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { useAuth } from "@/_core/hooks/useAuth";
 
 export default function StudyMode() {
-  const { textId } = useParams<{ textId: string }>();
+  const { examId } = useParams<{ examId: string }>();
   const [, navigate] = useLocation();
   const { user } = useAuth();
   const { t, language } = useLanguage();
@@ -20,8 +20,8 @@ export default function StudyMode() {
 
   // First, get exam details to find the text_id
   const { data: examData, isLoading: examLoading } = trpc.exam.getExamDetails.useQuery(
-    { examId: parseInt(textId!) },
-    { enabled: !!textId }
+    { examId: parseInt(examId!) },
+    { enabled: !!examId }
   );
 
   // Then, get the text using the text_id from exam
@@ -65,7 +65,7 @@ export default function StudyMode() {
     );
   }
 
-  if (!text) {
+  if (!text?.text) {
     return (
       <div className="min-h-screen flex flex-col">
         <AppHeader />

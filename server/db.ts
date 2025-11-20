@@ -335,7 +335,7 @@ export async function getExamById(id: number) {
       score_percentage: exams.score_percentage,
       started_at: exams.started_at,
       completed_at: exams.completed_at,
-      time_spent_seconds: exams.time_spent_seconds,
+      time_spent_minutes: exams.time_spent_minutes,
       status: exams.status,
       created_at: exams.created_at,
       updated_at: exams.updated_at,

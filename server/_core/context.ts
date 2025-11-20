@@ -17,14 +17,21 @@ export async function createContext(
   if (DISABLE_AUTH) {
     const devUser: User = {
       id: 999,
-      google_id: "dev-user",
+      open_id: "dev-user",
       email: "dev@example.com",
       name: "Development User",
-      picture: null,
+      login_method: "dev",
       role: "admin",
       preferred_language: "en",
+      total_exams_completed: 0,
+      total_vocabulary_learned: 0,
+      total_time_spent_minutes: 0,
+      current_streak: 0,
+      longest_streak: 0,
+      last_activity_date: null,
       created_at: new Date(),
       updated_at: new Date(),
+      last_signed_in: new Date(),
     };
     
     return {
