@@ -59,11 +59,10 @@ export default function ExamResults() {
     );
   }
 
-  const staatsexamenScore = examData.staatsexamen_score || 276;
   const scorePercentage = examData.score_percentage || 0;
   const correctAnswers = examData.correct_answers || 0;
   const totalQuestions = examData.total_questions || 0;
-  const passed = staatsexamenScore >= 500;
+  const passed = scorePercentage >= 60;
 
   // Parse performance analysis if available
   let performanceAnalysis: any = null;
@@ -116,61 +115,40 @@ export default function ExamResults() {
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Score Card */}
-          <Card className={`border-2 ${passed ? 'border-green-500' : 'border-red-500'}`}>
+          <Card>
             <CardHeader className="text-center pb-4">
               <div className="flex justify-center mb-4">
-                {passed ? (
-                  <div className="h-20 w-20 rounded-full bg-green-500/10 flex items-center justify-center">
-                    <CheckCircle className="h-12 w-12 text-green-500" />
+                <div className={`h-32 w-32 rounded-full ${passed ? 'bg-green-500/10' : 'bg-yellow-500/10'} flex items-center justify-center`}>
+                  <div className="text-center">
+                    <div className="text-5xl font-bold" style={{ color: passed ? '#22c55e' : '#eab308' }}>
+                      {scorePercentage}%
+                    </div>
                   </div>
-                ) : (
-                  <div className="h-20 w-20 rounded-full bg-red-500/10 flex items-center justify-center">
-                    <XCircle className="h-12 w-12 text-red-500" />
-                  </div>
-                )}
+                </div>
               </div>
-              <CardTitle className="text-3xl mb-2">
-                {passed ? 'Gefeliciteerd! Je bent geslaagd!' : 'Helaas, je bent niet geslaagd'}
+              <CardTitle className="text-2xl mb-2">
+                Jouw resultaat
               </CardTitle>
-              <CardDescription className="text-lg">
+              <CardDescription className="text-base">
                 {passed 
-                  ? 'Je hebt het Staatsexamen NT2 niveau B1 succesvol afgerond'
-                  : 'Je hebt het minimale score van 500 niet behaald'}
+                  ? 'Goed gedaan! Blijf oefenen om je vaardigheden te verbeteren'
+                  : 'Blijf oefenen, je bent op de goede weg!'}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Staatsexamen Score */}
-              <div className="text-center">
-                <div className="text-6xl font-bold mb-2" style={{ color: passed ? '#22c55e' : '#ef4444' }}>
-                  {staatsexamenScore}
-                </div>
-                <p className="text-muted-foreground">Staatsexamen Score (276-740)</p>
-                <div className="mt-4">
-                  <Progress 
-                    value={((staatsexamenScore - 276) / (740 - 276)) * 100} 
-                    className="h-3"
-                  />
-                  <div className="flex justify-between mt-2 text-sm text-muted-foreground">
-                    <span>276</span>
-                    <span className="font-semibold">500 (Minimum)</span>
-                    <span>740</span>
-                  </div>
-                </div>
-              </div>
-
+            <CardContent>
               {/* Basic Stats */}
-              <div className="grid grid-cols-3 gap-4 pt-6 border-t">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-green-500">{correctAnswers}</div>
-                  <p className="text-sm text-muted-foreground">Correct</p>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center p-4 rounded-lg bg-green-500/5">
+                  <div className="text-3xl font-bold text-green-500 mb-1">{correctAnswers}</div>
+                  <p className="text-sm text-muted-foreground">Goed</p>
                 </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-red-500">{totalQuestions - correctAnswers}</div>
-                  <p className="text-sm text-muted-foreground">Incorrect</p>
+                <div className="text-center p-4 rounded-lg bg-red-500/5">
+                  <div className="text-3xl font-bold text-red-500 mb-1">{totalQuestions - correctAnswers}</div>
+                  <p className="text-sm text-muted-foreground">Fout</p>
                 </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold">{scorePercentage}%</div>
-                  <p className="text-sm text-muted-foreground">Percentage</p>
+                <div className="text-center p-4 rounded-lg bg-primary/5">
+                  <div className="text-3xl font-bold text-primary mb-1">{totalQuestions}</div>
+                  <p className="text-sm text-muted-foreground">Totaal</p>
                 </div>
               </div>
             </CardContent>
