@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -38,35 +39,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-bg">
       {/* Header */}
-      <header className="border-b border-border/50 glass sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/">
-              <div className="flex items-center gap-2 cursor-pointer">
-                <BookOpen className="h-8 w-8 text-primary" />
-                <h1 className="text-2xl font-bold gradient-text">Dutch B1</h1>
-              </div>
-            </Link>
-
-            <div className="flex items-center gap-4">
-              <Link href="/progress">
-                <Button variant="ghost">{t.progress}</Button>
-              </Link>
-              <Link href="/vocabulary">
-                <Button variant="ghost">{t.vocabulary}</Button>
-              </Link>
-              {user.role === "admin" && (
-                <Link href="/admin">
-                  <Button variant="ghost">{t.admin}</Button>
-                </Link>
-              )}
-              <Button variant="outline" onClick={logout}>
-                {t.logout}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <AppHeader />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">

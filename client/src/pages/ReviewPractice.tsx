@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -70,21 +71,7 @@ export default function ReviewPractice() {
   if (!dueCards || dueCards.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-bg">
-        <header className="border-b border-border/50 glass sticky top-0 z-50">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <Link href="/">
-                <div className="flex items-center gap-2 cursor-pointer">
-                  <BookOpen className="h-8 w-8 text-primary" />
-                  <h1 className="text-2xl font-bold gradient-text">Dutch B1</h1>
-                </div>
-              </Link>
-              <Link href="/dashboard">
-                <Button variant="ghost">Dashboard</Button>
-              </Link>
-            </div>
-          </div>
-        </header>
+        <AppHeader />
 
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-2xl mx-auto">
@@ -117,27 +104,7 @@ export default function ReviewPractice() {
   return (
     <div className="min-h-screen bg-gradient-bg">
       {/* Header */}
-      <header className="border-b border-border/50 glass sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/">
-              <div className="flex items-center gap-2 cursor-pointer">
-                <BookOpen className="h-8 w-8 text-primary" />
-                <h1 className="text-2xl font-bold gradient-text">Dutch B1</h1>
-              </div>
-            </Link>
-
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-muted-foreground">
-                {currentIndex + 1} / {dueCards.length}
-              </span>
-              <Link href="/dashboard">
-                <Button variant="ghost" size="sm">Exit</Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+      <AppHeader />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
