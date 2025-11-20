@@ -8,7 +8,8 @@ import { trpc } from "@/lib/trpc";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Clock, FileText, Printer } from "lucide-react";
+import { Clock, FileText, Printer, Home, X, BookOpen } from "lucide-react";
+import { Link } from "wouter";
 
 export default function TakeExam() {
   const { user } = useAuth();
@@ -95,34 +96,69 @@ export default function TakeExam() {
       `}</style>
       <div className="min-h-screen bg-background">
       {/* Header with progress */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-        <div className="container max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <FileText className="h-5 w-5 text-primary" />
-            <div>
-              <h1 className="font-semibold">{exam.title}</h1>
-              <p className="text-sm text-muted-foreground">
-                {answeredCount} / {questions.length} {t.question}s answered
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b print:hidden">
+        <div className="container max-w-5xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between">
+            {/* Logo and Title */}
+            <div className="flex items-center gap-4">
+              <Link href="/">
+                <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+                  <BookOpen className="h-6 w-6 text-primary" />
+                  <span className="font-bold text-lg gradient-text hidden sm:inline">Dutch B1</span>
+                </div>
+              </Link>
+              <div className="h-6 w-px bg-border hidden sm:block" />
+              <div className="hidden sm:block">
+                <h1 className="font-semibold text-sm">{exam.title}</h1>
+                <p className="text-xs text-muted-foreground">
+                  {answeredCount} / {questions.length} vragen beantwoord
+                </p>
+              </div>
+            </div>
+
+            {/* Mobile Progress */}
+            <div className="sm:hidden">
+              <p className="text-sm font-medium">
+                {answeredCount}/{questions.length}
               </p>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="outline"
-              size="lg"
-              onClick={() => window.print()}
-              className="print:hidden"
-            >
-              <Printer className="h-4 w-4 mr-2" />
-              Print
-            </Button>
-            <Button 
-              onClick={handleSubmit} 
-              disabled={!allAnswered || submitExamMutation.isPending}
-              size="lg"
-            >
-              {submitExamMutation.isPending ? t.loading : t.submitExam}
-            </Button>
+
+            {/* Actions */}
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="ghost"
+                size="sm"
+                onClick={() => window.print()}
+                className="hidden md:flex"
+              >
+                <Printer className="h-4 w-4 mr-2" />
+                Print
+              </Button>
+              <Button 
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  if (answeredCount > 0) {
+                    if (confirm('Weet je zeker dat je het examen wilt verlaten? Je voortgang gaat verloren.')) {
+                      setLocation('/my-exams');
+                    }
+                  } else {
+                    setLocation('/my-exams');
+                  }
+                }}
+                className="hidden sm:flex"
+              >
+                <X className="h-4 w-4 mr-2" />
+                Afsluiten
+              </Button>
+              <Button 
+                onClick={handleSubmit} 
+                disabled={!allAnswered || submitExamMutation.isPending}
+                size="sm"
+              >
+                {submitExamMutation.isPending ? t.loading : 'Indienen'}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
