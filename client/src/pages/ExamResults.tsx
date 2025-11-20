@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { useParams, useLocation, Link } from "wouter";
 import { trpc } from "@/lib/trpc";
-import { CheckCircle, XCircle, TrendingUp, TrendingDown, BookOpen, RotateCcw, Home, Award } from "lucide-react";
+import { CheckCircle, XCircle, TrendingUp, TrendingDown, BookOpen, RotateCcw, Home, Award, Eye } from "lucide-react";
 
 export default function ExamResults() {
   const { user } = useAuth();
@@ -226,6 +226,12 @@ export default function ExamResults() {
 
           {/* Actions */}
           <div className="flex flex-wrap gap-4 justify-center">
+            <Link href={`/exam/${examId}/review`}>
+              <Button size="lg">
+                <Eye className="h-4 w-4 mr-2" />
+                Bekijk antwoorden
+              </Button>
+            </Link>
             <Link href={`/study/${examData.text_id}`}>
               <Button variant="outline" size="lg">
                 <BookOpen className="h-4 w-4 mr-2" />
@@ -239,7 +245,7 @@ export default function ExamResults() {
               </Button>
             </Link>
             <Link href="/my-exams">
-              <Button size="lg">
+              <Button variant="outline" size="lg">
                 Mijn examens
               </Button>
             </Link>

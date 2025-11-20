@@ -188,7 +188,8 @@ Respond in JSON format:
       "correctAnswerIndex": 0,
       "questionType": "Main Idea" | "Scanning" | "Sequencing" | "Inference" | "Vocabulary",
       "difficulty": "easy" | "medium" | "hard",
-      "explanation": "Waarom dit het correcte antwoord is (in het Nederlands)"
+      "explanation": "Waarom dit het correcte antwoord is (in het Nederlands)",
+      "evidence": "De exacte zin of alinea uit de tekst die het correcte antwoord bewijst"
     }
   ]
 }

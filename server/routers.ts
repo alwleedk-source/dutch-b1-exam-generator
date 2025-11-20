@@ -367,6 +367,8 @@ export const appRouter = router({
           correct_answers: correctCount,
           score_percentage,
           staatsexamen_score,
+          performance_analysis: JSON.stringify(performanceAnalysis),
+          recommendations: JSON.stringify(recommendations),
           completed_at: new Date(),
           time_spent_minutes: input.time_spent_minutes,
           status: "completed",
