@@ -81,9 +81,9 @@ export const translations = pgTable("translations", {
   text_id: integer("text_id").notNull(),
   
   // Translations (Dutch text translated to other languages)
-  arabicTranslation: text("arabicTranslation"),
-  englishTranslation: text("englishTranslation"),
-  turkishTranslation: text("turkishTranslation"),
+  arabicTranslation: text("arabic_translation"),
+  englishTranslation: text("english_translation"),
+  turkishTranslation: text("turkish_translation"),
   
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
