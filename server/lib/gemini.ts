@@ -133,81 +133,141 @@ Respond in JSON format:
 }
 
 /**
- * Generate exam questions from Dutch text
+ * Generate exam questions from Dutch text (Staatsexamen NT2 style)
  */
-export async function generateExamQuestions(dutchText: string) {
+export async function generateExamQuestions(dutchText: string, questionCount: number = 10) {
   const response = await generateWithGemini({
     messages: [
       {
         role: "user",
-        parts: `Based on the following Dutch B1 text, generate 10 multiple-choice reading comprehension questions.
+        parts: `Je bent een expert in het maken van Staatsexamen NT2 Lezen I (B1) vragen. Genereer ${questionCount} meerkeuzevragen op basis van de volgende Nederlandse tekst.
 
-Text: ${dutchText}
+Tekst:
+${dutchText}
 
-Requirements:
-- 10 questions total
-- Each question has 4 options (A, B, C, D)
-- Only one correct answer per question
-- Questions should test reading comprehension at B1 level
-- Mix of question types: main idea, details, inference, vocabulary
+=== BELANGRIJKE INSTRUCTIES ===
 
+1. VRAAGTYPEN EN VERDELING:
+   - Hoofdidee vragen (20%): "Wat is het doel van de tekst?", "Voor wie is deze tekst bedoeld?"
+   - Scannen naar details (30%): "Waarover kun je meer informatie vinden?", "Hoeveel kost...?"
+   - Volgorde/Sequencing (10%): "In welke volgorde moet je...?", "Wat moet je eerst doen?"
+   - Inferentie/Conclusie (15%): "Wat kun je concluderen uit...?", "Waarom is ... belangrijk?"
+   - Woordenschat in context (25%): "Wat betekent het woord '...' in deze context?"
+
+2. VRAAGFORMULERING:
+   - Gebruik typische Staatsexamen formuleringen zoals:
+     * "volgens de tekst" (volgens de tekst)
+     * "In welke volgorde..." (volgorde vragen)
+     * "Waarover kun je..." (scannen vragen)
+     * "Wat is het doel van..." (hoofdidee)
+   - Vragen moeten ALTIJD in het Nederlands zijn
+   - Vermijd vage of dubbelzinnige formuleringen
+
+3. ANTWOORDOPTIES:
+   - Elke vraag heeft PRECIES 3 opties (A, B, C) of 4 opties (A, B, C, D)
+   - Gebruik realistische afleidingsopties (distractors) die:
+     * Deels waar lijken maar niet volledig correct zijn
+     * Informatie uit andere delen van de tekst bevatten
+     * Logisch klinken maar niet het beste antwoord zijn
+   - Het correcte antwoord moet ALTIJD direct of indirect in de tekst te vinden zijn
+
+4. MOEILIJKHEIDSGRAAD:
+   - Mix van gemakkelijke (40%), middel (40%) en moeilijke (20%) vragen
+   - Moeilijke vragen vereisen:
+     * Het combineren van informatie uit verschillende paragrafen
+     * Het lezen tussen de regels
+     * Het begrijpen van impliciete betekenissen
+
+5. OUTPUT FORMAAT:
 Respond in JSON format:
 {
   "questions": [
     {
-      "question": "Question text in Dutch",
-      "options": ["A) ...", "B) ...", "C) ...", "D) ..."],
-      "correctAnswer": "A",
-      "explanation": "Why this is correct"
+      "question": "Vraag tekst in het Nederlands",
+      "options": ["...", "...", "..."],
+      "correctAnswerIndex": 0,
+      "questionType": "Main Idea" | "Scanning" | "Sequencing" | "Inference" | "Vocabulary",
+      "difficulty": "easy" | "medium" | "hard",
+      "explanation": "Waarom dit het correcte antwoord is (in het Nederlands)"
     }
   ]
-}`,
+}
+
+Zorg ervoor dat de vragen de tekst grondig testen en dat studenten de hele tekst moeten lezen om alle vragen correct te beantwoorden.`,
       },
     ],
     responseFormat: "json",
     maxOutputTokens: 4096,
+    temperature: 0.8,
   });
 
   return JSON.parse(response);
 }
 
 /**
- * Extract vocabulary from Dutch text
+ * Extract vocabulary from Dutch text (B1 level important words)
  */
-export async function extractVocabulary(dutchText: string) {
+export async function extractVocabulary(dutchText: string, maxWords: number = 20) {
   const response = await generateWithGemini({
     messages: [
       {
         role: "user",
-        parts: `Extract 10-15 important B1-level Dutch words from this text that would be useful for language learners.
+        parts: `Je bent een expert in Nederlands als tweede taal (NT2) op B1 niveau. Extraheer de ${maxWords} belangrijkste en meest nuttige woorden uit de volgende Nederlandse tekst voor studenten die zich voorbereiden op het Staatsexamen NT2 B1.
 
-Text: ${dutchText}
+Tekst:
+${dutchText}
 
-For each word, provide:
-- The Dutch word
-- Arabic translation
-- English translation
-- Turkish translation
-- An example sentence from the text
-- Difficulty level (easy, medium, hard)
+=== BELANGRIJKE INSTRUCTIES ===
 
+1. WOORDSELECTIE:
+   - Kies woorden die ESSENTIEEL zijn voor het begrijpen van de tekst
+   - Focus op B1-niveau woorden (niet te makkelijk, niet te moeilijk)
+   - Geef voorrang aan:
+     * Werkwoorden en zelfstandige naamwoorden
+     * Woorden die vaak voorkomen in Staatsexamen teksten
+     * Woorden die meerdere betekenissen kunnen hebben
+   - Vermijd:
+     * Basiswoorden die A1/A2 studenten al kennen (zoals "de", "het", "is")
+     * Zeer zeldzame of technische woorden
+     * Eigennamen
+
+2. VERTALINGEN:
+   - Geef nauwkeurige vertalingen in Arabisch, Engels, Turks en Nederlands
+   - Voor Nederlands: geef een korte definitie of synoniem
+   - Vertalingen moeten passen bij de context in de tekst
+
+3. VOORBEELDZINNEN:
+   - Gebruik de EXACTE zin uit de tekst waar het woord voorkomt
+   - Als de zin te lang is (>100 karakters), verkort hem dan maar behoud de context
+
+4. MOEILIJKHEIDSGRAAD:
+   - easy: A2-B1 overgangswoorden
+   - medium: Typische B1 woorden
+   - hard: B1-B2 overgangswoorden
+
+5. OUTPUT FORMAAT:
 Respond in JSON format:
 {
   "vocabulary": [
     {
-      "dutch": "word",
-      "arabic": "translation",
+      "dutch": "woord",
+      "arabic": "الترجمة",
       "english": "translation",
-      "turkish": "translation",
-      "example": "sentence",
-      "difficulty": "medium"
+      "turkish": "çeviri",
+      "dutch_definition": "Nederlandse definitie of synoniem",
+      "example": "Exacte zin uit de tekst",
+      "difficulty": "easy" | "medium" | "hard",
+      "word_type": "noun" | "verb" | "adjective" | "adverb" | "other"
     }
   ]
-}`,
+}
+
+Zorg ervoor dat de geselecteerde woorden studenten echt helpen om de tekst beter te begrijpen en hun woordenschat uit te breiden.`,
       },
     ],
     responseFormat: "json",
     maxOutputTokens: 4096,
+    temperature: 0.7,
   });
 
   return JSON.parse(response);

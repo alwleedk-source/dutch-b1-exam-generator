@@ -39,6 +39,8 @@ export const texts = pgTable("texts", {
   // Text content
   dutch_text: text("dutch_text").notNull(),
   title: varchar("title", { length: 255 }),
+  formatted_html: text("formatted_html"), // Auto-formatted HTML version
+  text_type: varchar("text_type", { length: 50 }), // newspaper, article, instruction, list, plain
   
   // Metadata
   word_count: integer("word_count").notNull(),
@@ -110,6 +112,7 @@ export const exams = pgTable("exams", {
   total_questions: integer("total_questions").notNull(),
   correct_answers: integer("correct_answers"),
   score_percentage: integer("score_percentage"),
+  staatsexamen_score: integer("staatsexamen_score"), // Official Staatsexamen score (276-740)
   
   // Timing
   started_at: timestamp("started_at").defaultNow().notNull(),
@@ -139,6 +142,8 @@ export const vocabulary = pgTable("vocabulary", {
   
   // Word data
   dutchWord: varchar("dutchWord", { length: 255 }).notNull(),
+  dutchDefinition: text("dutchDefinition"), // Dutch definition or synonym
+  wordType: varchar("wordType", { length: 50 }), // noun, verb, adjective, adverb, other
   
   // Translations
   arabicTranslation: varchar("arabicTranslation", { length: 255 }),

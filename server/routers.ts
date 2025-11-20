@@ -123,6 +123,10 @@ export const appRouter = router({
           });
         }
 
+        // Format text automatically
+        const { formatText } = await import("./lib/text-formatter");
+        const formattedResult = formatText(input.dutch_text);
+        
         // Generate title using AI if not provided
         let finalTitle = input.title;
         if (!finalTitle || finalTitle.trim() === "") {
@@ -150,6 +154,8 @@ export const appRouter = router({
         const result = await db.createText({
           dutch_text: input.dutch_text,
           title: finalTitle,
+          formatted_html: formattedResult.html,
+          text_type: formattedResult.textType,
           word_count: wordCount,
           estimated_reading_minutes: estimatedReadingMinutes,
           min_hash_signature: minHashSignatureJson,
@@ -339,18 +345,26 @@ export const appRouter = router({
 
         // Grade the exam
         questions.forEach((q: any, index: number) => {
-          if (input.answers[index] === q.correctAnswer) {
+          const correctAnswer = String.fromCharCode(65 + (q.correctAnswerIndex || 0)); // Convert 0->A, 1->B, etc.
+          if (input.answers[index] === correctAnswer) {
             correctCount++;
           }
         });
 
         const score_percentage = Math.round((correctCount / questions.length) * 100);
+        
+        // Calculate official Staatsexamen score
+        const { calculateStaatsexamenScore, analyzePerformanceByType, generateRecommendations } = await import("./lib/scoring");
+        const staatsexamen_score = calculateStaatsexamenScore(correctCount);
+        const performanceAnalysis = analyzePerformanceByType(questions, input.answers);
+        const recommendations = generateRecommendations(performanceAnalysis);
 
         // Update exam
         await db.updateExam(input.examId, {
           answers: JSON.stringify(input.answers),
           correct_answers: correctCount,
           score_percentage,
+          staatsexamen_score,
           completed_at: new Date(),
           time_spent_minutes: input.time_spent_minutes,
           status: "completed",
@@ -369,6 +383,9 @@ export const appRouter = router({
           correct_answers: correctCount,
           total_questions: questions.length,
           score_percentage,
+          staatsexamen_score,
+          performanceAnalysis,
+          recommendations,
         };
       }),
 
@@ -456,6 +473,8 @@ export const appRouter = router({
           await db.createVocabulary({
             text_id: input.text_id,
             dutchWord: word.dutch,
+            dutchDefinition: word.dutch_definition,
+            wordType: word.word_type,
             arabicTranslation: word.arabic,
             englishTranslation: word.english,
             turkishTranslation: word.turkish,
