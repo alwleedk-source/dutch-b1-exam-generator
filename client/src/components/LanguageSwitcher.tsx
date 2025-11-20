@@ -8,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Globe } from "lucide-react";
 import { trpc } from "@/lib/trpc";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
 
 const languages = [

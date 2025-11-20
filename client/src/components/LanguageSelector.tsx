@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 interface LanguageSelectorProps {
   open: boolean;
