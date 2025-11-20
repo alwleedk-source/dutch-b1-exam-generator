@@ -21,7 +21,7 @@ import PublicExams from "./pages/PublicExams";
 import ExamResults from "./pages/ExamResults";
 import ExamReview from "./pages/ExamReview";
 import LanguageSelector from "./components/LanguageSelector";
-import { useAuth } from "./hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { useState, useEffect } from "react";
 
 function Router() {
