@@ -4,6 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { getLoginUrl } from "@/const";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { BookOpen, Brain, Globe, TrendingUp, Sparkles, Zap, Target, Award } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Link } from "wouter";
 import { Language } from "@shared/i18n";
 
@@ -29,9 +35,9 @@ export default function Home() {
               <h1 className="text-2xl font-bold gradient-text">Dutch B1</h1>
             </div>
 
-            <div className="flex items-center gap-4">
-              {/* Language Selector */}
-              <div className="flex gap-2">
+            <div className="flex items-center gap-2 sm:gap-4">
+              {/* Language Selector - Compact on Mobile */}
+              <div className="hidden sm:flex gap-2">
                 {languages.map((lang) => (
                   <Button
                     key={lang.code}
@@ -41,18 +47,42 @@ export default function Home() {
                     className="gap-1"
                   >
                     <span>{lang.flag}</span>
-                    <span className="hidden sm:inline">{lang.name}</span>
+                    <span className="hidden md:inline">{lang.name}</span>
                   </Button>
                 ))}
               </div>
 
+              {/* Mobile Language Selector - Dropdown */}
+              <div className="sm:hidden">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-1">
+                      <Globe className="h-4 w-4" />
+                      <span>{languages.find(l => l.code === language)?.flag}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {languages.map((lang) => (
+                      <DropdownMenuItem
+                        key={lang.code}
+                        onClick={() => setLanguage(lang.code)}
+                        className={language === lang.code ? "bg-primary/10" : ""}
+                      >
+                        <span className="mr-2">{lang.flag}</span>
+                        {lang.name}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
               {isAuthenticated ? (
                 <Link href="/dashboard">
-                  <Button>{t.dashboard}</Button>
+                  <Button size="sm" className="sm:text-base">{t.dashboard}</Button>
                 </Link>
               ) : (
                 <a href={getLoginUrl()}>
-                  <Button>{t.login}</Button>
+                  <Button size="sm" className="sm:text-base">{t.login}</Button>
                 </a>
               )}
             </div>
