@@ -31,42 +31,12 @@ interface Section {
 
 /**
  * Assess text complexity to decide between rule-based or AI formatting
+ * ALWAYS returns "complex" to force AI formatting for perfect results
  */
 function assessComplexity(text: string): "simple" | "complex" {
-  const lines = text.split('\n');
-  const nonEmptyLines = lines.filter(l => l.trim().length > 0);
-  
-  // Indicators of simple text
-  const hasDoubleNewlines = /\n\s*\n/.test(text);
-  const hasSimpleBullets = /^[-•]\s/m.test(text);
-  const hasSimpleNumbering = /^\d+\.\s/m.test(text);
-  const hasRomanNumerals = /^[IVX]+\s/m.test(text);
-  const hasClearHeadings = /^[A-Z][^.!?]{10,60}:?\s*$/m.test(text);
-  
-  // Indicators of complex text
-  const hasSingleNewlinesOnly = nonEmptyLines.length > 5 && !hasDoubleNewlines;
-  const hasMixedLists = (text.match(/^[-•]\s/gm)?.length || 0) > 0 && 
-                        (text.match(/^\d+\.\s/gm)?.length || 0) > 0;
-  const hasNestedStructure = /^\s{2,}[-•\d]/m.test(text);
-  const hasAmbiguousStructure = !hasClearHeadings && !hasRomanNumerals && 
-                                nonEmptyLines.length > 10;
-  const hasVeryLongParagraphs = text.split(/\n\s*\n/).some(p => p.length > 1000);
-  
-  // Calculate complexity score
-  let complexityScore = 0;
-  
-  if (hasSingleNewlinesOnly) complexityScore += 3;
-  if (hasMixedLists) complexityScore += 2;
-  if (hasNestedStructure) complexityScore += 2;
-  if (hasAmbiguousStructure) complexityScore += 2;
-  if (hasVeryLongParagraphs) complexityScore += 1;
-  
-  // Reduce score for simple indicators
-  if (hasDoubleNewlines) complexityScore -= 1;
-  if (hasRomanNumerals) complexityScore -= 1;
-  if (hasClearHeadings) complexityScore -= 1;
-  
-  return complexityScore >= 3 ? "complex" : "simple";
+  // ALWAYS use AI formatter for perfect formatting
+  // No more rule-based formatting - AI is mandatory
+  return "complex";
 }
 
 /**
