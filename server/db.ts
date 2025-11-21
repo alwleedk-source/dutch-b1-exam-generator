@@ -534,6 +534,79 @@ export async function updateVocabularyAudio(vocabId: number, audioUrl: string, a
 
 // ==================== USER VOCABULARY FUNCTIONS ====================
 
+export async function updateUserVocabularyCount(user_id: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  // Count total vocabulary for this user
+  const result = await db.execute(sql`
+    SELECT COUNT(*) as count FROM "user_vocabulary" WHERE "user_id" = ${user_id}
+  `);
+  
+  const count = result.rows[0]?.count || 0;
+  
+  // Update user stats
+  await db
+    .update(users)
+    .set({ 
+      total_vocabulary_learned: Number(count),
+      updated_at: new Date() 
+    })
+    .where(eq(users.id, user_id));
+}
+
+export async function updateUserStreak(user_id: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  const user = await getUserById(user_id);
+  if (!user) return;
+
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  
+  // Get last activity date
+  const lastActivity = user.last_activity_date ? new Date(user.last_activity_date) : null;
+  const lastActivityDay = lastActivity ? new Date(lastActivity.getFullYear(), lastActivity.getMonth(), lastActivity.getDate()) : null;
+  
+  let newStreak = user.current_streak || 0;
+  let newLongestStreak = user.longest_streak || 0;
+  
+  if (!lastActivityDay) {
+    // First activity ever
+    newStreak = 1;
+  } else {
+    const daysDiff = Math.floor((today.getTime() - lastActivityDay.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (daysDiff === 0) {
+      // Same day, no change to streak
+      return;
+    } else if (daysDiff === 1) {
+      // Consecutive day, increment streak
+      newStreak = (user.current_streak || 0) + 1;
+    } else {
+      // Streak broken, reset to 1
+      newStreak = 1;
+    }
+  }
+  
+  // Update longest streak if current is higher
+  if (newStreak > newLongestStreak) {
+    newLongestStreak = newStreak;
+  }
+  
+  // Update user stats
+  await db
+    .update(users)
+    .set({ 
+      current_streak: newStreak,
+      longest_streak: newLongestStreak,
+      last_activity_date: now,
+      updated_at: now
+    })
+    .where(eq(users.id, user_id));
+}
+
 export async function createUserVocabulary(userVocab: InsertUserVocabulary) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -557,6 +630,13 @@ export async function createUserVocabulary(userVocab: InsertUserVocabulary) {
       ${userVocab.interval}, ${userVocab.repetitions}
     )
   `);
+  
+  // Update user's total vocabulary count
+  await updateUserVocabularyCount(userVocab.user_id);
+  
+  // Update user's streak
+  await updateUserStreak(userVocab.user_id);
+  
   return result;
 }
 
@@ -863,6 +943,12 @@ export async function updateUserVocabularySRS(
     .update(userVocabulary)
     .set({ ...data, ease_factor: easeFactor })
     .where(eq(userVocabulary.id, userVocabId));
+  
+  // Get user_id from userVocabulary to update streak
+  const userVocab = await getUserVocabularyById(userVocabId);
+  if (userVocab) {
+    await updateUserStreak(userVocab.user_id);
+  }
 }
 
 

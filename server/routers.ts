@@ -521,6 +521,9 @@ export const appRouter = router({
           total_time_spent_minutes: Number(userStats?.totalTimeMinutes || 0),
           last_activity_date: new Date(),
         });
+        
+        // Update user streak
+        await db.updateUserStreak(ctx.user.id);
 
         return {
           success: true,
