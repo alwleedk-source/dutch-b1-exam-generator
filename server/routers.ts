@@ -807,10 +807,11 @@ export const appRouter = router({
           status: "new",
           correct_count: 0,
           incorrect_count: 0,
+          last_reviewed_at: null,
+          next_review_at: new Date(),
           ease_factor: 2500,
           interval: 0,
           repetitions: 0,
-          next_review_at: new Date(),
         });
         
         return { success: true };
