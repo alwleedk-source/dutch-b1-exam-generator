@@ -38,6 +38,18 @@ export function PracticeModal({ open, onOpenChange, wordId, onComplete }: Practi
     },
   });
 
+  const generateAudioMutation = trpc.vocabulary.generateAudio.useMutation({
+    onSuccess: (data) => {
+      const audio = new Audio(data.audioUrl);
+      audio.play();
+      audio.onended = () => setPlayingAudio(false);
+    },
+    onError: (error) => {
+      toast.error(t.audioError || "Failed to generate audio");
+      setPlayingAudio(false);
+    },
+  });
+
   // Filter to get practice words (start with selected word if provided)
   const words = allVocabulary || [];
   const currentWord = words[currentIndex];
@@ -83,20 +95,30 @@ export function PracticeModal({ open, onOpenChange, wordId, onComplete }: Practi
   };
 
   const handlePlayAudio = async () => {
-    if (!currentWord?.audioUrl || playingAudio) return;
+    if (!currentWord || playingAudio) return;
 
-    try {
-      setPlayingAudio(true);
-      const audio = new Audio(currentWord.audioUrl);
-      audio.onended = () => setPlayingAudio(false);
-      audio.onerror = () => {
+    setPlayingAudio(true);
+
+    if (currentWord.audioUrl) {
+      // Play existing audio
+      try {
+        const audio = new Audio(currentWord.audioUrl);
+        audio.onended = () => setPlayingAudio(false);
+        audio.onerror = () => {
+          setPlayingAudio(false);
+          toast.error(t.audioError || "Failed to play audio");
+        };
+        await audio.play();
+      } catch (error) {
         setPlayingAudio(false);
         toast.error(t.audioError || "Failed to play audio");
-      };
-      await audio.play();
-    } catch (error) {
-      setPlayingAudio(false);
-      toast.error(t.audioError || "Failed to play audio");
+      }
+    } else {
+      // Generate audio if not available
+      generateAudioMutation.mutate({ 
+        vocabId: currentWord.vocabulary_id || currentWord.vocabularyId, 
+        word: currentWord.word 
+      });
     }
   };
 
@@ -288,7 +310,7 @@ export function PracticeModal({ open, onOpenChange, wordId, onComplete }: Practi
                         e.stopPropagation();
                         handlePlayAudio();
                       }}
-                      disabled={!currentWord.audioUrl || playingAudio}
+                      disabled={playingAudio}
                     >
                       <Volume2 className="h-5 w-5 mr-2" />
                       {t.listen || "Listen"}
@@ -375,7 +397,7 @@ export function PracticeModal({ open, onOpenChange, wordId, onComplete }: Practi
                 <Button
                   variant="outline"
                   onClick={handlePlayAudio}
-                  disabled={!currentWord.audioUrl || playingAudio}
+                  disabled={playingAudio}
                 >
                   <Volume2 className="h-5 w-5 mr-2" />
                   {t.listen || "Listen"}

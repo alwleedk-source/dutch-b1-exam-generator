@@ -702,9 +702,18 @@ export async function getUserVocabularyProgress(user_id: number) {
     arabicTranslation: r.arabic_translation,
     englishTranslation: r.english_translation,
     turkishTranslation: r.turkish_translation,
+    dutchDefinition: r.dutch_definition,
     definition: r.dutch_definition,
     audioUrl: r.audio_url,
     audioKey: r.audio_key,
+    // Add camelCase aliases for counts
+    correctCount: r.correct_count,
+    incorrectCount: r.incorrect_count,
+    // Add camelCase aliases for dates
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+    nextReviewAt: r.next_review_at,
+    lastReviewedAt: r.last_reviewed_at,
   }));
 }
 
