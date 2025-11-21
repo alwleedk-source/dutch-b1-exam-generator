@@ -205,7 +205,11 @@ export default function AdminDashboard() {
                 </TableHeader>
                 <TableBody>
                   {paginatedExams.map((exam: any) => (
-                    <TableRow key={exam.id}>
+                    <TableRow 
+                      key={exam.id}
+                      className="cursor-pointer hover:bg-muted/50 transition-colors"
+                      onClick={() => setExamToView(exam.id)}
+                    >
                       <TableCell className="font-mono text-sm">{exam.id}</TableCell>
                       <TableCell className="max-w-xs truncate">
                         {exam.text_title || `Text #${exam.text_id}`}
@@ -226,7 +230,7 @@ export default function AdminDashboard() {
                       <TableCell className="text-sm text-muted-foreground">
                         {new Date(exam.created_at).toLocaleDateString()}
                       </TableCell>
-                      <TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
                         <div className="flex gap-2">
                           <Button
                             size="sm"
