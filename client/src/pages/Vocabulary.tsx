@@ -1,20 +1,41 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Volume2, Star, CheckCircle, BookOpen } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
+import { 
+  Loader2, Volume2, Star, CheckCircle, BookOpen, 
+  Search, Filter, ArrowUpDown, Grid3x3, List,
+  Play, Trophy
+} from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { AppHeader } from "@/components/AppHeader";
 import { NotAuthenticatedPage } from "@/components/NotAuthenticatedPage";
 import { Link } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+type ViewMode = 'grid' | 'list';
+type FilterMode = 'all' | 'learning' | 'mastered' | 'due';
+type SortMode = 'alphabetical' | 'mastery' | 'date' | 'next-review';
 
 export default function Vocabulary() {
   const { t } = useLanguage();
   const { user } = useAuth();
   const [playingId, setPlayingId] = useState<number | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [filterMode, setFilterMode] = useState<FilterMode>('all');
+  const [sortMode, setSortMode] = useState<SortMode>('date');
+  const [searchQuery, setSearchQuery] = useState('');
   
   // Get user's preferred language
   const preferredLanguage = user?.preferred_language || localStorage.getItem('preferredLanguage') || 'en';
@@ -25,13 +46,10 @@ export default function Vocabulary() {
   );
 
   const generateAudioMutation = trpc.vocabulary.generateAudio.useMutation({
-    onSuccess: (data, variables) => {
-      // Don't show toast - audio plays automatically
-      // Play audio
+    onSuccess: (data) => {
       const audio = new Audio(data.audioUrl);
       audio.play();
       audio.onended = () => setPlayingId(null);
-      // Refetch to update audioUrl in UI
       refetch();
     },
     onError: (error) => {
@@ -41,7 +59,7 @@ export default function Vocabulary() {
   });
 
   const handlePlayAudio = (word: any) => {
-    if (playingId === word.id) return; // Already playing
+    if (playingId === word.id) return;
 
     setPlayingId(word.id);
 
@@ -53,6 +71,104 @@ export default function Vocabulary() {
       generateAudioMutation.mutate({ vocabId: word.id, word: word.word });
     }
   };
+
+  // Get translation based on user's preferred language
+  const getTranslation = (word: any) => {
+    switch (preferredLanguage) {
+      case 'ar':
+        return word.arabicTranslation || word.englishTranslation || word.turkishTranslation;
+      case 'en':
+        return word.englishTranslation || word.arabicTranslation || word.turkishTranslation;
+      case 'tr':
+        return word.turkishTranslation || word.englishTranslation || word.arabicTranslation;
+      case 'nl':
+        return word.definition;
+      default:
+        return word.englishTranslation || word.arabicTranslation || word.turkishTranslation;
+    }
+  };
+
+  // Calculate mastery percentage
+  const getMasteryPercentage = (word: any) => {
+    const total = word.correctCount + word.incorrectCount;
+    if (total === 0) return 0;
+    return Math.round((word.correctCount / total) * 100);
+  };
+
+  // Check if word is due for review
+  const isDue = (word: any) => {
+    if (!word.nextReviewAt) return false;
+    return new Date(word.nextReviewAt) <= new Date();
+  };
+
+  // Filter and sort vocabulary
+  const filteredAndSortedVocabulary = useMemo(() => {
+    if (!vocabulary) return [];
+
+    let filtered = [...vocabulary];
+
+    // Apply search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(word =>
+        word.word.toLowerCase().includes(query) ||
+        getTranslation(word).toLowerCase().includes(query)
+      );
+    }
+
+    // Apply status filter
+    switch (filterMode) {
+      case 'learning':
+        filtered = filtered.filter(word => 
+          word.status === 'learning' || getMasteryPercentage(word) < 80
+        );
+        break;
+      case 'mastered':
+        filtered = filtered.filter(word => 
+          word.status === 'mastered' || getMasteryPercentage(word) >= 80
+        );
+        break;
+      case 'due':
+        filtered = filtered.filter(word => isDue(word));
+        break;
+    }
+
+    // Apply sorting
+    switch (sortMode) {
+      case 'alphabetical':
+        filtered.sort((a, b) => a.word.localeCompare(b.word));
+        break;
+      case 'mastery':
+        filtered.sort((a, b) => getMasteryPercentage(b) - getMasteryPercentage(a));
+        break;
+      case 'date':
+        filtered.sort((a, b) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        break;
+      case 'next-review':
+        filtered.sort((a, b) => {
+          if (!a.nextReviewAt) return 1;
+          if (!b.nextReviewAt) return -1;
+          return new Date(a.nextReviewAt).getTime() - new Date(b.nextReviewAt).getTime();
+        });
+        break;
+    }
+
+    return filtered;
+  }, [vocabulary, searchQuery, filterMode, sortMode, preferredLanguage]);
+
+  // Calculate statistics
+  const stats = useMemo(() => {
+    if (!vocabulary) return { total: 0, mastered: 0, learning: 0, due: 0 };
+    
+    return {
+      total: vocabulary.length,
+      mastered: vocabulary.filter(w => getMasteryPercentage(w) >= 80).length,
+      learning: vocabulary.filter(w => getMasteryPercentage(w) < 80).length,
+      due: vocabulary.filter(w => isDue(w)).length,
+    };
+  }, [vocabulary]);
 
   if (!user) {
     return <NotAuthenticatedPage message="Please log in to view your vocabulary" />;
@@ -70,15 +186,99 @@ export default function Vocabulary() {
     <div className="min-h-screen bg-gradient-bg">
       <AppHeader />
 
-      {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Title */}
+        <div className="max-w-7xl mx-auto">
+          {/* Header with Stats */}
           <div className="mb-8 animate-fade-in">
-            <h2 className="text-3xl font-bold mb-2">{t.yourVocabulary}</h2>
-            <p className="text-muted-foreground">
-              {vocabulary?.length || 0} {t.wordsLearned}
-            </p>
+            <h2 className="text-3xl font-bold mb-4">{t.yourVocabulary}</h2>
+            
+            {/* Statistics Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl font-bold text-primary">{stats.total}</div>
+                  <div className="text-sm text-muted-foreground">{t.wordsLearned}</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl font-bold text-green-600">{stats.mastered}</div>
+                  <div className="text-sm text-muted-foreground">{t.vocabMastered}</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl font-bold text-blue-600">{stats.learning}</div>
+                  <div className="text-sm text-muted-foreground">{t.vocabLearning}</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl font-bold text-orange-600">{stats.due}</div>
+                  <div className="text-sm text-muted-foreground">{t.vocabDue}</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Controls */}
+            <div className="flex flex-col md:flex-row gap-4 mb-6">
+              {/* Search */}
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder={t.searchWord}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+
+              {/* Filter */}
+              <Select value={filterMode} onValueChange={(value: FilterMode) => setFilterMode(value)}>
+                <SelectTrigger className="w-full md:w-[180px]">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t.filterAll}</SelectItem>
+                  <SelectItem value="learning">{t.filterLearning}</SelectItem>
+                  <SelectItem value="mastered">{t.filterMastered}</SelectItem>
+                  <SelectItem value="due">{t.filterDue}</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Sort */}
+              <Select value={sortMode} onValueChange={(value: SortMode) => setSortMode(value)}>
+                <SelectTrigger className="w-full md:w-[180px]">
+                  <ArrowUpDown className="h-4 w-4 mr-2" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="date">{t.sortNewest}</SelectItem>
+                  <SelectItem value="alphabetical">{t.sortAlphabetical}</SelectItem>
+                  <SelectItem value="mastery">{t.sortMastery}</SelectItem>
+                  <SelectItem value="next-review">{t.sortNextReview}</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* View Mode Toggle */}
+              <div className="flex gap-2">
+                <Button
+                  variant={viewMode === 'grid' ? 'default' : 'outline'}
+                  size="icon"
+                  onClick={() => setViewMode('grid')}
+                >
+                  <Grid3x3 className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === 'list' ? 'default' : 'outline'}
+                  size="icon"
+                  onClick={() => setViewMode('list')}
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </div>
 
           {/* Vocabulary List */}
@@ -95,71 +295,59 @@ export default function Vocabulary() {
                 </Link>
               </CardContent>
             </Card>
+          ) : filteredAndSortedVocabulary.length === 0 ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
+                <h3 className="text-xl font-semibold mb-2">{t.noResults}</h3>
+                <p className="text-muted-foreground">
+                  {t.tryDifferentFilter}
+                </p>
+              </CardContent>
+            </Card>
           ) : (
-            <div className="grid gap-4">
-              {vocabulary.map((word: any) => (
-                <Card key={word.id} className="hover:border-primary/50 transition-colors">
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-2xl font-bold">{word.word}</h3>
-                          {word.context && (
-                            <Badge variant="outline" className="text-xs">
-                              {word.context}
-                            </Badge>
-                          )}
-                          {word.mastered && (
-                            <Badge variant="default" className="gap-1">
-                              <CheckCircle className="h-3 w-3" />
-                              Mastered
-                            </Badge>
-                          )}
+            <div className={
+              viewMode === 'grid' 
+                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                : "grid gap-3"
+            }>
+              {filteredAndSortedVocabulary.map((word: any) => {
+                const masteryPercentage = getMasteryPercentage(word);
+                const translation = getTranslation(word);
+                const isWordDue = isDue(word);
+
+                return (
+                  <Card 
+                    key={word.id} 
+                    className={`hover:border-primary/50 transition-all ${
+                      isWordDue ? 'border-orange-500/50 shadow-orange-100' : ''
+                    }`}
+                  >
+                    <CardContent className="p-4">
+                      {/* Header */}
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="text-xl font-bold">{word.word}</h3>
+                            {masteryPercentage >= 80 && (
+                              <CheckCircle className="h-4 w-4 text-green-500" />
+                            )}
+                            {isWordDue && (
+                              <Badge variant="outline" className="text-xs bg-orange-50 text-orange-700 border-orange-300">
+                                {t.vocabDue}
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-muted-foreground text-sm mb-2">{translation}</p>
                         </div>
 
-                        {(() => {
-                          // Select translation based on user's preferred language
-                          let translation = '';
-                          switch (preferredLanguage) {
-                            case 'ar':
-                              translation = word.arabicTranslation || word.englishTranslation || word.turkishTranslation;
-                              break;
-                            case 'en':
-                              translation = word.englishTranslation || word.arabicTranslation || word.turkishTranslation;
-                              break;
-                            case 'tr':
-                              translation = word.turkishTranslation || word.englishTranslation || word.arabicTranslation;
-                              break;
-                            case 'nl':
-                              translation = word.definition;
-                              break;
-                            default:
-                              translation = word.englishTranslation || word.arabicTranslation || word.turkishTranslation;
-                          }
-                          return translation ? (
-                            <p className="text-muted-foreground mb-3">{translation}</p>
-                          ) : null;
-                        })()}
-
-                        {word.definition && (
-                          <p className="text-sm text-muted-foreground italic mb-3">
-                            {word.definition}
-                          </p>
-                        )}
-
-                        {word.exampleSentence && (
-                          <div className="p-3 rounded-lg bg-muted">
-                            <p className="text-sm">{word.exampleSentence}</p>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex flex-col gap-2">
+                        {/* Audio Button */}
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="icon"
+                          className="h-8 w-8"
                           onClick={() => handlePlayAudio(word)}
-                          disabled={playingId === word.id || generateAudioMutation.isPending}
+                          disabled={playingId === word.id}
                         >
                           {playingId === word.id ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -167,20 +355,53 @@ export default function Vocabulary() {
                             <Volume2 className="h-4 w-4" />
                           )}
                         </Button>
+                      </div>
 
-                        {word.practiceCount > 0 && (
-                          <div className="text-center">
-                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                              <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                              <span>{word.practiceCount}</span>
-                            </div>
-                          </div>
+                      {/* Progress Bar */}
+                      <div className="mb-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs text-muted-foreground">{t.masteryLevel}</span>
+                          <span className="text-xs font-medium">{masteryPercentage}%</span>
+                        </div>
+                        <Progress 
+                          value={masteryPercentage} 
+                          className="h-2"
+                        />
+                      </div>
+
+                      {/* Stats */}
+                      <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
+                        <div className="flex items-center gap-3">
+                          <span className="flex items-center gap-1">
+                            <CheckCircle className="h-3 w-3 text-green-600" />
+                            {word.correctCount}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <span className="text-red-600">✗</span>
+                            {word.incorrectCount}
+                          </span>
+                        </div>
+                        {word.repetitions > 0 && (
+                          <span className="flex items-center gap-1">
+                            <Trophy className="h-3 w-3 text-yellow-600" />
+                            {word.repetitions}
+                          </span>
                         )}
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+
+                      {/* Action Button */}
+                      <Button 
+                        className="w-full" 
+                        size="sm"
+                        variant={isWordDue ? "default" : "outline"}
+                      >
+                        <Play className="h-4 w-4 mr-2" />
+                        {isWordDue ? t.reviewNow : t.practice}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           )}
         </div>

@@ -179,6 +179,23 @@ export interface Translations {
   wordsLearned: string;
   noVocabularyYet: string;
   completeExamsToStart: string;
+  vocabMastered: string;
+  vocabLearning: string;
+  vocabDue: string;
+  searchWord: string;
+  filterAll: string;
+  filterLearning: string;
+  filterMastered: string;
+  filterDue: string;
+  sortNewest: string;
+  sortAlphabetical: string;
+  sortMastery: string;
+  sortNextReview: string;
+  masteryLevel: string;
+  reviewNow: string;
+  practice: string;
+  noResults: string;
+  tryDifferentFilter: string;
   
   // Exam Results page
   examNotFound: string;
@@ -394,7 +411,24 @@ export const translations: Record<Language, Translations> = {
     yourVocabulary: "Jouw Woordenschat",
     wordsLearned: "woorden geleerd",
     noVocabularyYet: "Nog geen woordenschat",
-    completeExamsToStart: "Voltooi examens om je woordenschat op te bouwen",
+    completeExamsToStart: "Voltooi examens om woorden te beginnen leren",
+    vocabMastered: "Beheerst",
+    vocabLearning: "Aan het leren",
+    vocabDue: "Te herzien",
+    searchWord: "Zoek een woord...",
+    filterAll: "Alles",
+    filterLearning: "Aan het leren",
+    filterMastered: "Beheerst",
+    filterDue: "Te herzien",
+    sortNewest: "Nieuwste",
+    sortAlphabetical: "Alfabetisch",
+    sortMastery: "Beheersing",
+    sortNextReview: "Volgende herziening",
+    masteryLevel: "Beheersingsniveau",
+    reviewNow: "Nu herzien",
+    practice: "Oefenen",
+    noResults: "Geen resultaten",
+    tryDifferentFilter: "Probeer andere zoek- of filtercriteria",
     
     // Exam Results page
     examNotFound: "Examen Niet Gevonden",
@@ -604,13 +638,28 @@ export const translations: Record<Language, Translations> = {
     stepCreateQuestions: "إنشاء 10 أسئلة فهم",
     stepExtractVocabulary: "استخراج المفردات المهمة",
     stepFormatText: "تنسيق النص النهائي",
-    
-    // Vocabulary page
+     // Vocabulary page
     yourVocabulary: "مفرداتك",
-    wordsLearned: "كلمة مُتعلمة",
+    wordsLearned: "كلمات تعلمتها",
     noVocabularyYet: "لا توجد مفردات بعد",
-    completeExamsToStart: "أكمل الامتحانات لبناء مفرداتك",
-    
+    completeExamsToStart: "أكمل الامتحانات للبدء في تعلم الكلمات",
+    vocabMastered: "متقنة",
+    vocabLearning: "قيد التعلم",
+    vocabDue: "مستحقة للمراجعة",
+    searchWord: "بحث عن كلمة...",
+    filterAll: "الكل",
+    filterLearning: "قيد التعلم",
+    filterMastered: "متقنة",
+    filterDue: "مستحقة للمراجعة",
+    sortNewest: "الأحدث",
+    sortAlphabetical: "أبجدي",
+    sortMastery: "الإتقان",
+    sortNextReview: "المراجعة القادمة",
+    masteryLevel: "مستوى الإتقان",
+    reviewNow: "مراجعة الآن",
+    practice: "تدريب",
+    noResults: "لا توجد نتائج",
+    tryDifferentFilter: "جرب تغيير معايير البحث أو الفلترة",
     // Exam Results page
     examNotFound: "الامتحان غير موجود",
     examNotFoundDesc: "هذا الامتحان غير موجود أو تم حذفه.",
@@ -819,12 +868,28 @@ export const translations: Record<Language, Translations> = {
     stepCreateQuestions: "Create 10 comprehension questions",
     stepExtractVocabulary: "Extract important vocabulary",
     stepFormatText: "Format final text",
-    
-    // Vocabulary page
+       // Vocabulary page
     yourVocabulary: "Your Vocabulary",
     wordsLearned: "words learned",
     noVocabularyYet: "No vocabulary yet",
-    completeExamsToStart: "Complete exams to start building your vocabulary",
+    completeExamsToStart: "Complete exams to start learning words",
+    vocabMastered: "Mastered",
+    vocabLearning: "Learning",
+    vocabDue: "Due for Review",
+    searchWord: "Search for a word...",
+    filterAll: "All",
+    filterLearning: "Learning",
+    filterMastered: "Mastered",
+    filterDue: "Due for Review",
+    sortNewest: "Newest",
+    sortAlphabetical: "Alphabetical",
+    sortMastery: "Mastery",
+    sortNextReview: "Next Review",
+    masteryLevel: "Mastery Level",
+    reviewNow: "Review Now",
+    practice: "Practice",
+    noResults: "No results",
+    tryDifferentFilter: "Try different search or filter criteria",
     
     // Exam Results page
     examNotFound: "Exam Not Found",
@@ -1035,11 +1100,28 @@ export const translations: Record<Language, Translations> = {
     stepExtractVocabulary: "Önemli kelimeleri çıkar",
     stepFormatText: "Son metni biçimlendir",
     
-    // Vocabulary page
-    yourVocabulary: "Kelime Dağarcığınız",
+     // Vocabulary page
+    yourVocabulary: "Kelime Hazneniz",
     wordsLearned: "kelime öğrenildi",
     noVocabularyYet: "Henüz kelime yok",
-    completeExamsToStart: "Kelime dağarcığınızı oluşturmak için sınavları tamamlayın",
+    completeExamsToStart: "Kelime öğrenmeye başlamak için sınavları tamamlayın",
+    vocabMastered: "Uzmanlaştı",
+    vocabLearning: "Öğreniyor",
+    vocabDue: "Gözden Geçirilecek",
+    searchWord: "Kelime ara...",
+    filterAll: "Tümü",
+    filterLearning: "Öğreniyor",
+    filterMastered: "Uzmanlaştı",
+    filterDue: "Gözden Geçirilecek",
+    sortNewest: "En Yeni",
+    sortAlphabetical: "Alfabetik",
+    sortMastery: "Ustalık",
+    sortNextReview: "Sonraki İnceleme",
+    masteryLevel: "Ustalık Seviyesi",
+    reviewNow: "Şimdi Gözden Geçir",
+    practice: "Pratik Yap",
+    noResults: "Sonuç yok",
+    tryDifferentFilter: "Farklı arama veya filtre kriterleri deneyin",
     
     // Exam Results page
     examNotFound: "Sınav Bulunamadı",
