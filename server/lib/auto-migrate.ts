@@ -4,6 +4,7 @@ import { sql } from "drizzle-orm";
 /**
  * Auto-migration script that runs on app startup
  * Creates missing tables if they don't exist
+ * Migrates existing tables to new schema if needed
  */
 export async function autoMigrate() {
   console.log("[Auto-Migrate] Starting auto-migration...");
@@ -15,15 +16,15 @@ export async function autoMigrate() {
       return;
     }
 
-    // Check if vocabulary table exists
-    const vocabularyExists = await checkTableExists(db, "vocabulary");
+    // Check if vocabulary table exists and has correct schema
+    const vocabularyNeedsMigration = await checkVocabularySchema(db);
     
-    if (!vocabularyExists) {
-      console.log("[Auto-Migrate] Creating vocabulary table...");
-      await createVocabularyTable(db);
-      console.log("[Auto-Migrate] ✅ vocabulary table created");
+    if (vocabularyNeedsMigration) {
+      console.log("[Auto-Migrate] Vocabulary table needs schema migration...");
+      await migrateVocabularyTable(db);
+      console.log("[Auto-Migrate] ✅ vocabulary table migrated");
     } else {
-      console.log("[Auto-Migrate] ✅ vocabulary table already exists");
+      console.log("[Auto-Migrate] ✅ vocabulary table schema is correct");
     }
 
     // Check if user_vocabulary table exists
@@ -54,42 +55,85 @@ async function checkTableExists(db: any, tableName: string): Promise<boolean> {
       );
     `);
     
-    return result.rows[0]?.exists || false;
+    return result[0]?.exists || false;
   } catch (error) {
     console.error(`[Auto-Migrate] Error checking table ${tableName}:`, error);
     return false;
   }
 }
 
-async function createVocabularyTable(db: any) {
-  await db.execute(sql`
-    CREATE TABLE IF NOT EXISTS "vocabulary" (
-      "id" serial PRIMARY KEY,
-      "text_id" integer NOT NULL,
-      "dutchWord" varchar(255) NOT NULL,
-      "dutchDefinition" text,
-      "wordType" varchar(50),
-      "arabicTranslation" varchar(255),
-      "englishTranslation" varchar(255),
-      "turkishTranslation" varchar(255),
-      "audioUrl" text,
-      "audioKey" varchar(255),
-      "exampleSentence" text,
-      "difficulty" varchar(50),
-      "frequency" integer DEFAULT 1 NOT NULL,
-      "created_at" timestamp DEFAULT now() NOT NULL,
-      "updated_at" timestamp DEFAULT now() NOT NULL
-    );
-  `);
+async function checkVocabularySchema(db: any): Promise<boolean> {
+  try {
+    // Check if table exists
+    const tableExists = await checkTableExists(db, "vocabulary");
+    
+    if (!tableExists) {
+      // Table doesn't exist, needs creation
+      return true;
+    }
 
-  // Create indexes
-  await db.execute(sql`
-    CREATE INDEX IF NOT EXISTS "vocabulary_text_id_idx" ON "vocabulary" USING btree ("text_id");
-  `);
+    // Check if dutchWord column exists (camelCase)
+    const result = await db.execute(sql`
+      SELECT EXISTS (
+        SELECT FROM information_schema.columns 
+        WHERE table_schema = 'public' 
+        AND table_name = 'vocabulary'
+        AND column_name = 'dutchWord'
+      );
+    `);
+    
+    const hasCamelCase = result[0]?.exists || false;
+    
+    // If dutchWord doesn't exist, table needs migration
+    return !hasCamelCase;
+  } catch (error) {
+    console.error("[Auto-Migrate] Error checking vocabulary schema:", error);
+    return false;
+  }
+}
 
-  await db.execute(sql`
-    CREATE INDEX IF NOT EXISTS "vocabulary_dutchWord_idx" ON "vocabulary" USING btree ("dutchWord");
-  `);
+async function migrateVocabularyTable(db: any) {
+  try {
+    // Drop old table if exists
+    console.log("[Auto-Migrate] Dropping old vocabulary table...");
+    await db.execute(sql`DROP TABLE IF EXISTS "vocabulary" CASCADE;`);
+    
+    // Create new table with correct schema
+    console.log("[Auto-Migrate] Creating vocabulary table with new schema...");
+    await db.execute(sql`
+      CREATE TABLE "vocabulary" (
+        "id" serial PRIMARY KEY,
+        "text_id" integer NOT NULL,
+        "dutchWord" varchar(255) NOT NULL,
+        "dutchDefinition" text,
+        "wordType" varchar(50),
+        "arabicTranslation" varchar(255),
+        "englishTranslation" varchar(255),
+        "turkishTranslation" varchar(255),
+        "audioUrl" text,
+        "audioKey" varchar(255),
+        "exampleSentence" text,
+        "difficulty" varchar(50),
+        "frequency" integer DEFAULT 1 NOT NULL,
+        "created_at" timestamp DEFAULT now() NOT NULL,
+        "updated_at" timestamp DEFAULT now() NOT NULL
+      );
+    `);
+
+    // Create indexes
+    await db.execute(sql`
+      CREATE INDEX "vocabulary_text_id_idx" ON "vocabulary" USING btree ("text_id");
+    `);
+
+    await db.execute(sql`
+      CREATE INDEX "vocabulary_dutchWord_idx" ON "vocabulary" USING btree ("dutchWord");
+    `);
+    
+    console.log("[Auto-Migrate] Vocabulary table created successfully");
+  } catch (error) {
+    console.error("[Auto-Migrate] Error migrating vocabulary table:", error);
+    throw error;
+  }
 }
 
 async function createUserVocabularyTable(db: any) {
