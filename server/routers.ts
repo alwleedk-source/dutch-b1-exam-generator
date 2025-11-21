@@ -126,9 +126,11 @@ export const appRouter = router({
           });
         }
 
-        // Format text automatically
-        const { formatText } = await import("./lib/text-formatter");
-        const formattedResult = formatText(input.dutch_text);
+        // Format text automatically with advanced AI-powered formatter
+        const { formatTextAdvanced } = await import("./lib/advanced-text-formatter");
+        const formattedResult = await formatTextAdvanced(input.dutch_text);
+        
+        console.log(`[Text Creation] Formatting: ${formattedResult.usedAI ? 'AI-powered' : 'Rule-based'}, Type: ${formattedResult.textType}, Columns: ${formattedResult.hasColumns}`);
         
         // Generate title using AI if not provided
         let finalTitle = input.title;
