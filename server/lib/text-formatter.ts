@@ -18,6 +18,9 @@ function isHeading(line: string): boolean {
   // Empty line
   if (!trimmed) return false;
   
+  // Roman numeral section markers (I, II, III, IV, V, etc.)
+  if (/^[IVX]+\s/.test(trimmed)) return true;
+  
   // Too long to be a heading (more than 80 chars)
   if (trimmed.length > 80) return false;
   
@@ -285,54 +288,69 @@ function formatArticleText(text: string, hasColumns: boolean): string {
   const className = hasColumns ? "formatted-text article-text columns-layout" : "formatted-text article-text";
   let html = `<div class="${className}">`;
   
-  // Split by double newlines OR single newlines followed by a heading-like line
-  const lines = text.split('\n');
-  let currentParagraph: string[] = [];
+  // First split by double newlines to get major sections
+  const sections = text.split(/\n\s*\n/);
   
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
+  for (const section of sections) {
+    const trimmed = section.trim();
+    if (!trimmed) continue;
     
-    // Skip very short lines (likely headers/footers)
-    if (line.length > 0 && line.length < 10 && !/^[A-Z]/.test(line)) {
-      continue;
-    }
+    const lines = trimmed.split('\n');
+    let currentParagraph: string[] = [];
+    let inList = false;
     
-    // Empty line - end of paragraph
-    if (!line) {
-      if (currentParagraph.length > 0) {
-        const merged = currentParagraph.join(' ').replace(/\s+/g, ' ');
-        if (isHeading(merged)) {
-          html += `<h3 class="section-heading">${escapeHtml(merged)}</h3>`;
-        } else {
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+      
+      // Check for bullet points
+      const bulletMatch = line.match(/^[-•]\s*(.+)$/);
+      if (bulletMatch) {
+        // Flush current paragraph
+        if (currentParagraph.length > 0) {
+          const merged = currentParagraph.join(' ').replace(/\s+/g, ' ');
           html += `<p>${escapeHtml(merged)}</p>`;
+          currentParagraph = [];
         }
-        currentParagraph = [];
+        
+        if (!inList) {
+          html += '<ul class="bullet-list">';
+          inList = true;
+        }
+        html += `<li>${escapeHtml(bulletMatch[1])}</li>`;
+        continue;
       }
-      continue;
+      
+      // Close list if we were in one
+      if (inList) {
+        html += '</ul>';
+        inList = false;
+      }
+      
+      // Check if this line is a heading (including Roman numerals)
+      if (isHeading(line)) {
+        // Flush current paragraph
+        if (currentParagraph.length > 0) {
+          const merged = currentParagraph.join(' ').replace(/\s+/g, ' ');
+          html += `<p>${escapeHtml(merged)}</p>`;
+          currentParagraph = [];
+        }
+        // Add heading
+        html += `<h3 class="section-heading">${escapeHtml(line)}</h3>`;
+      } else {
+        // Add to current paragraph
+        currentParagraph.push(line);
+      }
     }
     
-    // Check if this line is a heading
-    if (isHeading(line)) {
-      // Flush current paragraph
-      if (currentParagraph.length > 0) {
-        const merged = currentParagraph.join(' ').replace(/\s+/g, ' ');
-        html += `<p>${escapeHtml(merged)}</p>`;
-        currentParagraph = [];
-      }
-      // Add heading
-      html += `<h3 class="section-heading">${escapeHtml(line)}</h3>`;
-    } else {
-      // Add to current paragraph
-      currentParagraph.push(line);
+    // Close list if still open
+    if (inList) {
+      html += '</ul>';
     }
-  }
-  
-  // Flush remaining paragraph
-  if (currentParagraph.length > 0) {
-    const merged = currentParagraph.join(' ').replace(/\s+/g, ' ');
-    if (isHeading(merged)) {
-      html += `<h3 class="section-heading">${escapeHtml(merged)}</h3>`;
-    } else {
+    
+    // Flush remaining paragraph
+    if (currentParagraph.length > 0) {
+      const merged = currentParagraph.join(' ').replace(/\s+/g, ' ');
       html += `<p>${escapeHtml(merged)}</p>`;
     }
   }
