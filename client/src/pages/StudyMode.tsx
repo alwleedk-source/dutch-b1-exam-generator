@@ -173,10 +173,12 @@ export default function StudyMode() {
             >
               <div 
                 className="text-foreground"
+                dir="ltr"
                 style={{
                   whiteSpace: 'pre-wrap',
                   wordSpacing: '0.1em',
                   letterSpacing: '0.01em',
+                  textAlign: 'left',
                 }}
                 dangerouslySetInnerHTML={{
                   __html: text?.text?.dutch_text?.replace(/\n\n/g, '</p><p style="margin-top: 1.5em; margin-bottom: 1.5em;">').replace(/^/, '<p style="margin-top: 0;">').replace(/$/, '</p>')

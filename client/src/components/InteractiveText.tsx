@@ -222,6 +222,8 @@ export default function InteractiveText({ textId, content, className = "" }: Int
       <div 
         ref={containerRef}
         className={className}
+        dir="ltr"
+        style={{ textAlign: 'left' }}
         dangerouslySetInnerHTML={{ __html: content }}
       />
     </>
