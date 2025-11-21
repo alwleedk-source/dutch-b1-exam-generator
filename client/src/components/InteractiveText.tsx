@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
@@ -19,22 +19,17 @@ interface VocabularyWord {
 
 /**
  * Interactive text component with hover translations
- * Lightweight implementation using pure CSS tooltips
+ * Rewritten to use React state instead of DOM manipulation
  */
 export default function InteractiveText({ textId, content, className = "" }: InteractiveTextProps) {
   const { user } = useAuth();
   const [vocabulary, setVocabulary] = useState<Map<string, VocabularyWord>>(new Map());
   const [preferredLanguage, setPreferredLanguage] = useState<string>('en');
-  const containerRef = useRef<HTMLDivElement>(null);
-  const processedRef = useRef<boolean>(false);
-  const utils = trpc.useUtils();
   
   // Mutation to save word to vocabulary
   const saveWordMutation = trpc.vocabulary.saveWordFromText.useMutation({
     onSuccess: () => {
       toast.success('Word saved to vocabulary!');
-      // Don't invalidate here to prevent re-render and disappearing words
-      // User can refresh vocabulary page to see new words
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to save word');
@@ -74,114 +69,144 @@ export default function InteractiveText({ textId, content, className = "" }: Int
     }
   }, [vocabData]);
   
-  useEffect(() => {
-    if (!containerRef.current || vocabulary.size === 0) return;
-    
-    // Prevent re-processing if already processed for this content
-    if (processedRef.current) return;
-    
-    // Find all text nodes and wrap vocabulary words
-    const container = containerRef.current;
-    const walker = document.createTreeWalker(
-      container,
-      NodeFilter.SHOW_TEXT,
-      null
-    );
-    
-    const textNodes: Text[] = [];
-    let node: Node | null;
-    
-    while ((node = walker.nextNode())) {
-      if (node.parentElement?.tagName !== 'SCRIPT' && 
-          node.parentElement?.tagName !== 'STYLE' &&
-          !node.parentElement?.classList.contains('vocab-word')) {
-        textNodes.push(node as Text);
-      }
+  // Handle double-click to save word
+  const handleSaveWord = (word: string) => {
+    saveWordMutation.mutate({
+      textId: textId,
+      dutchWord: word,
+    });
+  };
+  
+  // Get translation based on preferred language
+  const getTranslation = (vocabWord: VocabularyWord): string => {
+    switch (preferredLanguage) {
+      case 'ar':
+        return vocabWord.arabic || vocabWord.english;
+      case 'en':
+        return vocabWord.english || vocabWord.arabic;
+      case 'tr':
+        return vocabWord.turkish || vocabWord.english;
+      case 'nl':
+        return vocabWord.dutchDefinition || '';
+      default:
+        return vocabWord.english || vocabWord.arabic;
+    }
+  };
+  
+  // Process content and wrap vocabulary words
+  // Using useMemo to avoid re-processing on every render
+  const processedContent = useMemo(() => {
+    if (vocabulary.size === 0) {
+      return content;
     }
     
-    textNodes.forEach(textNode => {
-      const text = textNode.textContent || '';
-      const words = text.split(/(\s+|[.,!?;:])/);
-      
-      let hasVocab = false;
-      const fragment = document.createDocumentFragment();
-      
-      words.forEach(word => {
-        const normalized = word.toLowerCase().replace(/[.,!?;:]/g, '');
-        const vocabWord = vocabulary.get(normalized);
+    // Create a temporary div to parse HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content;
+    
+    // Function to process text nodes recursively
+    const processNode = (node: Node): Node => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent || '';
+        const words = text.split(/(\s+|[.,!?;:])/);
         
-        if (vocabWord && word.trim().length > 0) {
-          hasVocab = true;
-          const wrapper = document.createElement('span');
-          wrapper.className = 'vocab-word-wrapper';
-          wrapper.style.position = 'relative';
-          wrapper.style.display = 'inline';
+        let hasVocab = false;
+        const fragment = document.createDocumentFragment();
+        
+        words.forEach(word => {
+          const normalized = word.toLowerCase().replace(/[.,!?;:]/g, '');
+          const vocabWord = vocabulary.get(normalized);
           
-          const span = document.createElement('span');
-          span.className = 'vocab-word';
-          span.textContent = word;
-          span.setAttribute('data-word', vocabWord.word);
-          
-          // Set translation based on preferred language
-          let translation = '';
-          switch (preferredLanguage) {
-            case 'ar':
-              translation = vocabWord.arabic || vocabWord.english;
-              break;
-            case 'en':
-              translation = vocabWord.english || vocabWord.arabic;
-              break;
-            case 'tr':
-              translation = vocabWord.turkish || vocabWord.english;
-              break;
-            case 'nl':
-              translation = vocabWord.dutchDefinition || '';
-              break;
-            default:
-              translation = vocabWord.english || vocabWord.arabic;
-          }
-          
-          // Create tooltip
-          const tooltip = document.createElement('div');
-          tooltip.className = 'vocab-tooltip';
-          tooltip.innerHTML = `
-            <div class="tooltip-translation">${translation}</div>
-            <div class="tooltip-hint">💾 Double-click to save</div>
-          `;
-          
-          // Add double-click handler to save word
-          span.addEventListener('dblclick', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
+          if (vocabWord && word.trim().length > 0) {
+            hasVocab = true;
+            const wrapper = document.createElement('span');
+            wrapper.className = 'vocab-word-wrapper';
+            wrapper.setAttribute('data-word', vocabWord.word);
             
-            // Save word to user's vocabulary
-            saveWordMutation.mutate({
-              textId: textId,
-              dutchWord: vocabWord.word,
-            });
-          });
-          
-          wrapper.appendChild(span);
-          wrapper.appendChild(tooltip);
-          fragment.appendChild(wrapper);
-        } else {
-          fragment.appendChild(document.createTextNode(word));
+            const span = document.createElement('span');
+            span.className = 'vocab-word';
+            span.textContent = word;
+            
+            const translation = getTranslation(vocabWord);
+            const tooltip = document.createElement('div');
+            tooltip.className = 'vocab-tooltip';
+            tooltip.innerHTML = `
+              <div class="tooltip-translation">${translation}</div>
+              <div class="tooltip-hint">💾 Double-click to save</div>
+            `;
+            
+            wrapper.appendChild(span);
+            wrapper.appendChild(tooltip);
+            fragment.appendChild(wrapper);
+          } else {
+            fragment.appendChild(document.createTextNode(word));
+          }
+        });
+        
+        return hasVocab ? fragment : node;
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const element = node as Element;
+        // Skip script, style, and already processed vocab words
+        if (element.tagName === 'SCRIPT' || 
+            element.tagName === 'STYLE' || 
+            element.classList.contains('vocab-word-wrapper')) {
+          return node;
         }
-      });
+        
+        // Process child nodes
+        const newElement = element.cloneNode(false) as Element;
+        Array.from(node.childNodes).forEach(child => {
+          const processedChild = processNode(child);
+          if (processedChild.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+            Array.from((processedChild as DocumentFragment).childNodes).forEach(fragChild => {
+              newElement.appendChild(fragChild.cloneNode(true));
+            });
+          } else {
+            newElement.appendChild(processedChild.cloneNode(true));
+          }
+        });
+        return newElement;
+      }
       
-      if (hasVocab && textNode.parentNode) {
-        textNode.parentNode.replaceChild(fragment, textNode);
+      return node;
+    };
+    
+    // Process all child nodes
+    const processedDiv = document.createElement('div');
+    Array.from(tempDiv.childNodes).forEach(child => {
+      const processedChild = processNode(child);
+      if (processedChild.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+        Array.from((processedChild as DocumentFragment).childNodes).forEach(fragChild => {
+          processedDiv.appendChild(fragChild.cloneNode(true));
+        });
+      } else {
+        processedDiv.appendChild(processedChild.cloneNode(true));
       }
     });
     
-    // Mark as processed
-    processedRef.current = true;
-  }, [vocabulary, preferredLanguage]); // Only re-run when vocabulary or language changes
+    return processedDiv.innerHTML;
+  }, [content, vocabulary, preferredLanguage]);
   
-  // Reset processed flag when content actually changes
+  // Handle clicks on vocab words
   useEffect(() => {
-    processedRef.current = false;
-  }, [content]);
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.classList.contains('vocab-word')) {
+        const wrapper = target.closest('.vocab-word-wrapper');
+        if (wrapper) {
+          const word = wrapper.getAttribute('data-word');
+          if (word && e.detail === 2) { // Double-click
+            e.preventDefault();
+            e.stopPropagation();
+            handleSaveWord(word);
+          }
+        }
+      }
+    };
+    
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, [textId]);
   
   return (
     <>
@@ -284,11 +309,10 @@ export default function InteractiveText({ textId, content, className = "" }: Int
       `}</style>
       
       <div 
-        ref={containerRef}
         className={className}
         dir="ltr"
         style={{ textAlign: 'left' }}
-        dangerouslySetInnerHTML={{ __html: content }}
+        dangerouslySetInnerHTML={{ __html: processedContent }}
       />
     </>
   );
