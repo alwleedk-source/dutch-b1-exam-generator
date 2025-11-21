@@ -1,13 +1,10 @@
 /**
  * Advanced AI-Powered Text Formatting System
  * Intelligently formats any Dutch text with excellent structure detection
+ * Uses Gemini AI for analysis
  */
 
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import * as gemini from "./gemini";
 
 export interface FormattedText {
   html: string;
@@ -73,7 +70,7 @@ function assessComplexity(text: string): "simple" | "complex" {
 }
 
 /**
- * AI-powered text structure analysis
+ * AI-powered text structure analysis using Gemini
  */
 async function analyzeTextStructure(text: string): Promise<TextAnalysis> {
   const prompt = `Je bent een expert in het analyseren van Nederlandse teksten. Analyseer de volgende tekst en bepaal de structuur.
@@ -113,39 +110,50 @@ REGELS VOOR ALINEA'S:
 
 Geef het resultaat in JSON formaat:
 {
-  "textType": "newspaper" | "article" | "instruction" | "list" | "plain",
-  "layout": "single-column" | "two-column",
-  "confidence": 0-100,
+  "textType": "newspaper",
+  "layout": "single-column",
+  "confidence": 85,
   "sections": [
     {
-      "type": "heading" | "paragraph" | "bullet-list" | "numbered-list",
-      "level": 1-3,
+      "type": "heading",
+      "level": 2,
       "content": "De volledige tekst van deze sectie",
       "startLine": 0,
-      "endLine": 5,
-      "items": ["item 1", "item 2"] // Alleen voor lijsten
+      "endLine": 5
+    },
+    {
+      "type": "paragraph",
+      "content": "De volledige tekst van deze alinea",
+      "startLine": 6,
+      "endLine": 10
+    },
+    {
+      "type": "bullet-list",
+      "content": "- item 1\\n- item 2",
+      "items": ["item 1", "item 2"],
+      "startLine": 11,
+      "endLine": 13
     }
   ]
-}`;
+}
+
+BELANGRIJK: Geef ALLEEN valide JSON terug, geen andere tekst.`;
 
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4.1-mini",
+    const response = await gemini.generateWithGemini({
       messages: [
         {
-          role: "system",
-          content: "Je bent een expert in tekstanalyse en structuurherkenning voor Nederlandse teksten. Geef altijd valide JSON terug."
-        },
-        {
           role: "user",
-          content: prompt
+          parts: prompt
         }
       ],
-      response_format: { type: "json_object" },
       temperature: 0.3,
+      maxOutputTokens: 4096,
+      responseFormat: "json"
     });
 
-    const analysis = JSON.parse(response.choices[0].message.content || "{}");
+    // Parse JSON response
+    const analysis = JSON.parse(response);
     return analysis as TextAnalysis;
   } catch (error) {
     console.error("AI analysis failed:", error);
@@ -269,7 +277,7 @@ export async function formatTextAdvanced(text: string): Promise<FormattedText> {
   }
   
   // Step 2: Use AI for complex texts
-  console.log("[Text Formatter] Using AI-powered formatter");
+  console.log("[Text Formatter] Using AI-powered formatter (Gemini)");
   
   try {
     const analysis = await analyzeTextStructure(text);
