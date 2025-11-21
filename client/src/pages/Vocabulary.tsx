@@ -16,6 +16,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { NotAuthenticatedPage } from "@/components/NotAuthenticatedPage";
 import { Link } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { PracticeModal } from "@/components/PracticeModal";
 import {
   Select,
   SelectContent,
@@ -36,6 +37,8 @@ export default function Vocabulary() {
   const [filterMode, setFilterMode] = useState<FilterMode>('all');
   const [sortMode, setSortMode] = useState<SortMode>('date');
   const [searchQuery, setSearchQuery] = useState('');
+  const [practiceModalOpen, setPracticeModalOpen] = useState(false);
+  const [practiceWordId, setPracticeWordId] = useState<number | undefined>();
   
   // Get user's preferred language
   const preferredLanguage = user?.preferred_language || localStorage.getItem('preferredLanguage') || 'en';
@@ -338,7 +341,10 @@ export default function Vocabulary() {
                               </Badge>
                             )}
                           </div>
-                          <p className="text-muted-foreground text-sm mb-2">{translation}</p>
+                          <p className="text-muted-foreground text-sm">{translation}</p>
+                          {word.definition && (
+                            <p className="text-xs text-muted-foreground/70 italic mt-1">{word.definition}</p>
+                          )}
                         </div>
 
                         {/* Audio Button */}
@@ -394,6 +400,10 @@ export default function Vocabulary() {
                         className="w-full" 
                         size="sm"
                         variant={isWordDue ? "default" : "outline"}
+                        onClick={() => {
+                          setPracticeWordId(word.id);
+                          setPracticeModalOpen(true);
+                        }}
                       >
                         <Play className="h-4 w-4 mr-2" />
                         {isWordDue ? t.reviewNow : t.practice}
@@ -406,6 +416,17 @@ export default function Vocabulary() {
           )}
         </div>
       </main>
+
+      {/* Practice Modal */}
+      <PracticeModal
+        open={practiceModalOpen}
+        onOpenChange={setPracticeModalOpen}
+        wordId={practiceWordId}
+        onComplete={() => {
+          refetch();
+          setPracticeModalOpen(false);
+        }}
+      />
     </div>
   );
 }

@@ -844,6 +844,46 @@ export const appRouter = router({
         
         return { success: true };
       }),
+
+    updatePracticeProgress: protectedProcedure
+      .input(z.object({
+        userVocabId: z.number(),
+        isCorrect: z.boolean(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { calculateNextReview } = await import("./lib/srs");
+        
+        const userVocab = await db.getUserVocabularyById(input.userVocabId);
+        if (!userVocab || userVocab.user_id !== ctx.user.id) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Vocabulary not found" });
+        }
+
+        // Convert isCorrect to SM-2 quality rating
+        // Correct = 4 (good response), Incorrect = 2 (incorrect but remembered)
+        const quality = input.isCorrect ? 4 : 2;
+
+        // Calculate next review using SM-2
+        const srsResult = calculateNextReview(quality, {
+          ease_factor: userVocab.ease_factor / 1000, // Convert to decimal
+          interval: userVocab.interval,
+          repetitions: userVocab.repetitions,
+          next_review_at: userVocab.next_review_at || new Date(),
+        });
+
+        // Update user vocabulary
+        await db.updateUserVocabularySRS(input.userVocabId, {
+          ease_factor: Math.round(srsResult.ease_factor * 1000), // Store as integer
+          interval: srsResult.interval,
+          repetitions: srsResult.repetitions,
+          next_review_at: srsResult.next_review_at,
+          last_reviewed_at: new Date(),
+          correct_count: input.isCorrect ? userVocab.correct_count + 1 : userVocab.correct_count,
+          incorrect_count: input.isCorrect ? userVocab.incorrect_count : userVocab.incorrect_count + 1,
+          status: srsResult.repetitions >= 5 ? "mastered" : "learning",
+        });
+
+        return { success: true, ...srsResult };
+      }),
   }),
 
   // Reporting

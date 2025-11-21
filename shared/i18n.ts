@@ -197,6 +197,24 @@ export interface Translations {
   noResults: string;
   tryDifferentFilter: string;
   
+  // Practice mode
+  flashcards: string;
+  multipleChoice: string;
+  listen: string;
+  clickToReveal: string;
+  howWellRemembered: string;
+  hard: string;
+  medium: string;
+  easy: string;
+  previous: string;
+  next: string;
+  reset: string;
+  selectCorrectTranslation: string;
+  practiceComplete: string;
+  audioError: string;
+  correct: string;
+  incorrect: string;
+  
   // Exam Results page
   examNotFound: string;
   examNotFoundDesc: string;
@@ -430,6 +448,24 @@ export const translations: Record<Language, Translations> = {
     noResults: "Geen resultaten",
     tryDifferentFilter: "Probeer andere zoek- of filtercriteria",
     
+    // Practice mode
+    flashcards: "Flashcards",
+    multipleChoice: "Meerkeuzevragen",
+    listen: "Luisteren",
+    clickToReveal: "Klik om antwoord te onthullen",
+    howWellRemembered: "Hoe goed herinner je het?",
+    hard: "Moeilijk",
+    medium: "Gemiddeld",
+    easy: "Makkelijk",
+    previous: "Vorige",
+    next: "Volgende",
+    reset: "Opnieuw",
+    selectCorrectTranslation: "Selecteer de juiste vertaling:",
+    practiceComplete: "Oefening voltooid",
+    audioError: "Kan audio niet afspelen",
+    correct: "Correct",
+    incorrect: "Onjuist",
+    
     // Exam Results page
     examNotFound: "Examen Niet Gevonden",
     examNotFoundDesc: "Dit examen bestaat niet of is verwijderd.",
@@ -660,6 +696,25 @@ export const translations: Record<Language, Translations> = {
     practice: "تدريب",
     noResults: "لا توجد نتائج",
     tryDifferentFilter: "جرب تغيير معايير البحث أو الفلترة",
+    
+    // Practice mode
+    flashcards: "بطاقات تعليمية",
+    multipleChoice: "اختيار من متعدد",
+    listen: "استمع",
+    clickToReveal: "اضغط لإظهار الإجابة",
+    howWellRemembered: "كيف كان تذكرك؟",
+    hard: "صعب",
+    medium: "متوسط",
+    easy: "سهل",
+    previous: "السابق",
+    next: "التالي",
+    reset: "إعادة",
+    selectCorrectTranslation: "اختر الترجمة الصحيحة:",
+    practiceComplete: "اكتمل التدريب",
+    audioError: "فشل تشغيل الصوت",
+    correct: "صحيح",
+    incorrect: "خطأ",
+    
     // Exam Results page
     examNotFound: "الامتحان غير موجود",
     examNotFoundDesc: "هذا الامتحان غير موجود أو تم حذفه.",
@@ -890,6 +945,24 @@ export const translations: Record<Language, Translations> = {
     practice: "Practice",
     noResults: "No results",
     tryDifferentFilter: "Try different search or filter criteria",
+    
+    // Practice mode
+    flashcards: "Flashcards",
+    multipleChoice: "Multiple Choice",
+    listen: "Listen",
+    clickToReveal: "Click to reveal answer",
+    howWellRemembered: "How well did you remember?",
+    hard: "Hard",
+    medium: "Medium",
+    easy: "Easy",
+    previous: "Previous",
+    next: "Next",
+    reset: "Reset",
+    selectCorrectTranslation: "Select the correct translation:",
+    practiceComplete: "Practice complete",
+    audioError: "Failed to play audio",
+    correct: "Correct",
+    incorrect: "Incorrect",
     
     // Exam Results page
     examNotFound: "Exam Not Found",
@@ -1122,6 +1195,24 @@ export const translations: Record<Language, Translations> = {
     practice: "Pratik Yap",
     noResults: "Sonuç yok",
     tryDifferentFilter: "Farklı arama veya filtre kriterleri deneyin",
+    
+    // Practice mode
+    flashcards: "Flashcards",
+    multipleChoice: "Çoktan Seçmeli",
+    listen: "Dinle",
+    clickToReveal: "Cevabı görmek için tıklayın",
+    howWellRemembered: "Ne kadar iyi hatırladınız?",
+    hard: "Zor",
+    medium: "Orta",
+    easy: "Kolay",
+    previous: "Önceki",
+    next: "Sonraki",
+    reset: "Sıfırla",
+    selectCorrectTranslation: "Doğru çeviriyi seçin:",
+    practiceComplete: "Pratik tamamlandı",
+    audioError: "Ses çalınamadı",
+    correct: "Doğru",
+    incorrect: "Yanlış",
     
     // Exam Results page
     examNotFound: "Sınav Bulunamadı",
