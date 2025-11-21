@@ -807,3 +807,16 @@ export async function deleteExam(examId: number) {
   // Delete the exam
   await db.delete(exams).where(eq(exams.id, examId));
 }
+
+
+export async function deleteText(textId: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  // Delete related records first
+  await db.delete(exams).where(eq(exams.text_id, textId));
+  await db.delete(reports).where(eq(reports.text_id, textId));
+  
+  // Delete the text
+  await db.delete(texts).where(eq(texts.id, textId));
+}

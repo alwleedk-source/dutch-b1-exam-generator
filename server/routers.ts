@@ -787,6 +787,15 @@ export const appRouter = router({
         return { success: true };
       }),
 
+    deleteText: adminProcedure
+      .input(z.object({
+        text_id: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.deleteText(input.text_id);
+        return { success: true };
+      }),
+
     getPendingReports: adminProcedure.query(async () => {
       return await db.getPendingReports();
     }),

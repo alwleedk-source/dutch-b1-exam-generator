@@ -17,6 +17,8 @@ export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [examToDelete, setExamToDelete] = useState<number | null>(null);
   const [examToView, setExamToView] = useState<number | null>(null);
+  const [textToDelete, setTextToDelete] = useState<number | null>(null);
+  const [textToView, setTextToView] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const examsPerPage = 20;
 
@@ -61,6 +63,17 @@ export default function AdminDashboard() {
     },
     onError: (error) => {
       toast.error("Failed to delete exam: " + error.message);
+    },
+  });
+
+  const deleteTextMutation = trpc.admin.deleteText.useMutation({
+    onSuccess: () => {
+      toast.success("Text deleted successfully");
+      setTextToDelete(null);
+      window.location.reload();
+    },
+    onError: (error) => {
+      toast.error("Failed to delete text: " + error.message);
     },
   });
 
@@ -323,13 +336,27 @@ export default function AdminDashboard() {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setTextToView(text.id)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setTextToDelete(text.id)}
+                          >
+                            <Trash2 className="h-4 w-4 text-red-600" />
+                          </Button>
                           {text.status === 'pending' && (
                             <>
                               <Button size="sm" variant="outline" onClick={() => approveTextMutation.mutate({ text_id: text.id })}>
-                                <CheckCircle className="h-4 w-4" />
+                                <CheckCircle className="h-4 w-4 text-green-600" />
                               </Button>
                               <Button size="sm" variant="outline" onClick={() => rejectTextMutation.mutate({ text_id: text.id })}>
-                                <XCircle className="h-4 w-4" />
+                                <XCircle className="h-4 w-4 text-red-600" />
                               </Button>
                             </>
                           )}
@@ -467,6 +494,84 @@ export default function AdminDashboard() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setExamToView(null)}>
               Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Text View Dialog */}
+      <Dialog open={!!textToView} onOpenChange={() => setTextToView(null)}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Text Details</DialogTitle>
+          </DialogHeader>
+          {textToView && (() => {
+            const text = allTexts?.find((t: any) => t.id === textToView);
+            return text ? (
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-semibold mb-2">Title</h3>
+                  <p>{text.title || `Text #${text.id}`}</p>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2">Status</h3>
+                  <Badge variant={text.status === 'approved' ? 'default' : 'secondary'}>
+                    {text.status}
+                  </Badge>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2">Type</h3>
+                  <p>{text.text_type || '—'}</p>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2">Dutch Text</h3>
+                  <div className="p-4 bg-muted rounded-lg max-h-96 overflow-y-auto" dir="ltr">
+                    {text.formatted_html ? (
+                      <div dangerouslySetInnerHTML={{ __html: text.formatted_html }} />
+                    ) : (
+                      <p className="whitespace-pre-wrap">{text.dutch_text}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p>Text not found</p>
+            );
+          })()}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTextToView(null)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Text Delete Confirmation Dialog */}
+      <Dialog open={!!textToDelete} onOpenChange={() => setTextToDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Text</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this text? This will also delete all related exams and reports. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTextToDelete(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => textToDelete && deleteTextMutation.mutate({ text_id: textToDelete })}
+              disabled={deleteTextMutation.isPending}
+            >
+              {deleteTextMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
