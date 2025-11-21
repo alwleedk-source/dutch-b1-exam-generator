@@ -612,13 +612,16 @@ export async function getUserVocabularyProgress(user_id: number) {
   `);
 
   // Convert ease_factor from decimal to integer for consistency
-  // Map field names to match client expectations
+  // Return all translations, let client choose based on user preference
   return results.map((r: any) => ({
     ...r,
     ease_factor: r.ease_factor ? Math.round(parseFloat(r.ease_factor.toString()) * 1000) : 2500,
     // Add aliases for client compatibility
     word: r.dutch_word,
-    translation: r.arabic_translation || r.english_translation || r.turkish_translation,
+    // Keep all translations available
+    arabicTranslation: r.arabic_translation,
+    englishTranslation: r.english_translation,
+    turkishTranslation: r.turkish_translation,
     definition: r.dutch_definition,
     audioUrl: r.audio_url,
     audioKey: r.audio_key,

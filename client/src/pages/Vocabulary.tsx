@@ -13,6 +13,9 @@ import { Link } from "wouter";
 export default function Vocabulary() {
   const { user } = useAuth();
   const [playingId, setPlayingId] = useState<number | null>(null);
+  
+  // Get user's preferred language
+  const preferredLanguage = user?.preferred_language || localStorage.getItem('preferredLanguage') || 'en';
 
   const { data: vocabulary, isLoading, refetch } = trpc.vocabulary.getMyVocabularyProgress.useQuery(
     undefined,
@@ -112,9 +115,29 @@ export default function Vocabulary() {
                           )}
                         </div>
 
-                        {word.translation && (
-                          <p className="text-muted-foreground mb-3">{word.translation}</p>
-                        )}
+                        {(() => {
+                          // Select translation based on user's preferred language
+                          let translation = '';
+                          switch (preferredLanguage) {
+                            case 'ar':
+                              translation = word.arabicTranslation || word.englishTranslation || word.turkishTranslation;
+                              break;
+                            case 'en':
+                              translation = word.englishTranslation || word.arabicTranslation || word.turkishTranslation;
+                              break;
+                            case 'tr':
+                              translation = word.turkishTranslation || word.englishTranslation || word.arabicTranslation;
+                              break;
+                            case 'nl':
+                              translation = word.definition;
+                              break;
+                            default:
+                              translation = word.englishTranslation || word.arabicTranslation || word.turkishTranslation;
+                          }
+                          return translation ? (
+                            <p className="text-muted-foreground mb-3">{translation}</p>
+                          ) : null;
+                        })()}
 
                         {word.definition && (
                           <p className="text-sm text-muted-foreground italic mb-3">

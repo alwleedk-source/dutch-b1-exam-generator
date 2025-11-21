@@ -26,6 +26,7 @@ export default function InteractiveText({ textId, content, className = "" }: Int
   const [vocabulary, setVocabulary] = useState<Map<string, VocabularyWord>>(new Map());
   const [preferredLanguage, setPreferredLanguage] = useState<string>('en');
   const containerRef = useRef<HTMLDivElement>(null);
+  const processedRef = useRef<boolean>(false);
   const utils = trpc.useUtils();
   
   // Mutation to save word to vocabulary
@@ -72,11 +73,16 @@ export default function InteractiveText({ textId, content, className = "" }: Int
     }
   }, [vocabData]);
   
+  // Reset processed flag when content changes
+  useEffect(() => {
+    processedRef.current = false;
+  }, [content]);
+  
   useEffect(() => {
     if (!containerRef.current || vocabulary.size === 0) return;
     
     // Prevent re-processing if already processed
-    if (containerRef.current.dataset.processed === 'true') return;
+    if (processedRef.current) return;
     
     // Find all text nodes and wrap vocabulary words
     const container = containerRef.current;
@@ -173,7 +179,7 @@ export default function InteractiveText({ textId, content, className = "" }: Int
     });
     
     // Mark as processed
-    containerRef.current.dataset.processed = 'true';
+    processedRef.current = true;
   }, [vocabulary, content]);
   
   return (
