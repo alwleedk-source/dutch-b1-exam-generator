@@ -156,7 +156,24 @@ export async function getAllUsers() {
   const db = await getDb();
   if (!db) return [];
 
-  return await db.select().from(users).orderBy(desc(users.created_at));
+  const allUsers = await db.select().from(users).orderBy(desc(users.created_at));
+  
+  // Add totalExamsCompleted for each user
+  const usersWithStats = await Promise.all(
+    allUsers.map(async (user) => {
+      const completedExams = await db
+        .select()
+        .from(exams)
+        .where(and(eq(exams.user_id, user.id), eq(exams.status, 'completed')));
+      
+      return {
+        ...user,
+        totalExamsCompleted: completedExams.length,
+      };
+    })
+  );
+  
+  return usersWithStats;
 }
 
 // ==================== TEXT FUNCTIONS ====================

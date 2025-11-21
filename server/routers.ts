@@ -759,6 +759,10 @@ export const appRouter = router({
       return await db.getAllUsers();
     }),
 
+    getAllTexts: adminProcedure.query(async () => {
+      return await db.getAllTexts();
+    }),
+
     getPendingTexts: adminProcedure.query(async () => {
       return await db.getPendingTexts();
     }),
