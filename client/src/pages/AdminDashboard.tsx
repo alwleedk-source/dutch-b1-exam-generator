@@ -17,12 +17,14 @@ export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [examToDelete, setExamToDelete] = useState<number | null>(null);
   const [examToView, setExamToView] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const examsPerPage = 20;
 
   const { data: allUsers } = trpc.admin.getAllUsers.useQuery(undefined, { enabled: !!user && user.role === 'admin' });
-  const { data: allTexts } = trpc.admin.getPendingTexts.useQuery(undefined, { enabled: !!user && user.role === 'admin' });
+  const { data: allTexts } = trpc.admin.getAllTexts.useQuery(undefined, { enabled: !!user && user.role === 'admin' });
   const { data: reports } = trpc.admin.getPendingReports.useQuery(undefined, { enabled: !!user && user.role === 'admin' });
   const { data: allExams, refetch: refetchExams } = trpc.admin.getAllExams.useQuery(
-    { search: searchQuery, limit: 100 },
+    { search: searchQuery },
     { enabled: !!user && user.role === 'admin' }
   );
   const { data: examDetails } = trpc.admin.getExamDetailsAdmin.useQuery(
@@ -88,6 +90,12 @@ export default function AdminDashboard() {
 
   const completedExams = allExams?.filter((e: any) => e.status === 'completed').length || 0;
   const inProgressExams = allExams?.filter((e: any) => e.status === 'in_progress').length || 0;
+
+  // Pagination
+  const totalPages = Math.ceil((allExams?.length || 0) / examsPerPage);
+  const startIndex = (currentPage - 1) * examsPerPage;
+  const endIndex = startIndex + examsPerPage;
+  const paginatedExams = allExams?.slice(startIndex, endIndex) || [];
 
   return (
     <div className="min-h-screen bg-gradient-bg">
