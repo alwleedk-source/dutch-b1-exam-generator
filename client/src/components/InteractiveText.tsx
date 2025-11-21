@@ -75,6 +75,9 @@ export default function InteractiveText({ textId, content, className = "" }: Int
   useEffect(() => {
     if (!containerRef.current || vocabulary.size === 0) return;
     
+    // Prevent re-processing if already processed
+    if (containerRef.current.dataset.processed === 'true') return;
+    
     // Find all text nodes and wrap vocabulary words
     const container = containerRef.current;
     const walker = document.createTreeWalker(
@@ -107,6 +110,11 @@ export default function InteractiveText({ textId, content, className = "" }: Int
         
         if (vocabWord && word.trim().length > 0) {
           hasVocab = true;
+          const wrapper = document.createElement('span');
+          wrapper.className = 'vocab-word-wrapper';
+          wrapper.style.position = 'relative';
+          wrapper.style.display = 'inline';
+          
           const span = document.createElement('span');
           span.className = 'vocab-word';
           span.textContent = word;
@@ -131,7 +139,13 @@ export default function InteractiveText({ textId, content, className = "" }: Int
               translation = vocabWord.english || vocabWord.arabic;
           }
           
-          span.setAttribute('data-translation', translation);
+          // Create tooltip
+          const tooltip = document.createElement('div');
+          tooltip.className = 'vocab-tooltip';
+          tooltip.innerHTML = `
+            <div class="tooltip-translation">${translation}</div>
+            <div class="tooltip-hint">💾 Double-click to save</div>
+          `;
           
           // Add double-click handler to save word
           span.addEventListener('dblclick', (e) => {
@@ -145,7 +159,9 @@ export default function InteractiveText({ textId, content, className = "" }: Int
             });
           });
           
-          fragment.appendChild(span);
+          wrapper.appendChild(span);
+          wrapper.appendChild(tooltip);
+          fragment.appendChild(wrapper);
         } else {
           fragment.appendChild(document.createTextNode(word));
         }
@@ -155,19 +171,27 @@ export default function InteractiveText({ textId, content, className = "" }: Int
         textNode.parentNode.replaceChild(fragment, textNode);
       }
     });
+    
+    // Mark as processed
+    containerRef.current.dataset.processed = 'true';
   }, [vocabulary, content]);
   
   return (
     <>
       <style>{`
-        .vocab-word {
+        .vocab-word-wrapper {
           position: relative;
+          display: inline;
+        }
+        
+        .vocab-word {
           cursor: pointer;
           border-bottom: 2px dotted #3b82f6;
           color: #2563eb;
           font-weight: 500;
           transition: all 0.2s ease;
           user-select: none;
+          display: inline;
         }
         
         .vocab-word:hover {
@@ -175,73 +199,77 @@ export default function InteractiveText({ textId, content, className = "" }: Int
           border-bottom-color: #1d4ed8;
         }
         
-        .vocab-word::after {
-          content: attr(data-translation) "\A\A💾 Double-click to save";
-          white-space: pre-wrap;
+        .vocab-tooltip {
           position: absolute;
           bottom: 100%;
           left: 50%;
           transform: translateX(-50%) translateY(-8px);
           background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
           color: white;
-          padding: 12px 16px;
+          padding: 10px 14px;
           border-radius: 8px;
-          font-size: 13px;
-          font-weight: 400;
           opacity: 0;
           pointer-events: none;
           transition: opacity 0.2s ease, transform 0.2s ease;
           z-index: 1000;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-          line-height: 1.4;
-          text-align: center;
-          max-width: 200px;
+          white-space: nowrap;
+          min-width: 100px;
         }
         
-        .vocab-word:hover::after {
+        .vocab-word-wrapper:hover .vocab-tooltip {
           opacity: 1;
           transform: translateX(-50%) translateY(-4px);
         }
         
-        /* Arrow */
-        .vocab-word::before {
-          content: "";
-          position: absolute;
-          bottom: 100%;
-          left: 50%;
-          transform: translateX(-50%) translateY(2px);
-          border: 6px solid transparent;
-          border-top-color: #1e293b;
-          opacity: 0;
-          pointer-events: none;
-          transition: opacity 0.2s ease;
-          z-index: 1001;
+        .tooltip-translation {
+          font-size: 15px;
+          font-weight: 600;
+          margin-bottom: 6px;
+          text-align: center;
+          direction: ltr;
+          unicode-bidi: embed;
         }
         
-        .vocab-word:hover::before {
-          opacity: 1;
+        .tooltip-hint {
+          font-size: 11px;
+          font-weight: 400;
+          opacity: 0.85;
+          text-align: center;
+          border-top: 1px solid rgba(255, 255, 255, 0.2);
+          padding-top: 6px;
+          margin-top: 2px;
+        }
+        
+        /* Arrow */
+        .vocab-tooltip::after {
+          content: "";
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          transform: translateX(-50%);
+          border: 6px solid transparent;
+          border-top-color: #1e293b;
         }
         
         /* Mobile: show tooltip below */
         @media (max-width: 640px) {
-          .vocab-word::after {
+          .vocab-tooltip {
             bottom: auto;
             top: 100%;
             transform: translateX(-50%) translateY(8px);
-            max-width: 250px;
             white-space: normal;
-            text-align: center;
+            max-width: 250px;
           }
           
-          .vocab-word:hover::after {
+          .vocab-word-wrapper:hover .vocab-tooltip {
             transform: translateX(-50%) translateY(4px);
           }
           
-          .vocab-word::before {
-            bottom: auto;
-            top: 100%;
-            transform: translateX(-50%) translateY(-2px);
+          .vocab-tooltip::after {
+            top: auto;
+            bottom: 100%;
             border-top-color: transparent;
             border-bottom-color: #1e293b;
           }
