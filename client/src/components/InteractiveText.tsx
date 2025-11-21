@@ -46,12 +46,12 @@ export default function InteractiveText({ textId, content, className = "" }: Int
       const vocabMap = new Map<string, VocabularyWord>();
       vocabData.forEach((item: any) => {
         // Normalize word (lowercase, remove punctuation)
-        const normalized = item.word.toLowerCase().replace(/[.,!?;:]/g, '');
+        const normalized = item.dutchWord.toLowerCase().replace(/[.,!?;:]/g, '');
         vocabMap.set(normalized, {
-          word: item.word,
-          arabic: item.arabic || '',
-          english: item.english || '',
-          turkish: item.turkish || '',
+          word: item.dutchWord,
+          arabic: item.arabicTranslation || '',
+          english: item.englishTranslation || '',
+          turkish: item.turkishTranslation || '',
           dutchDefinition: item.dutchDefinition || '',
         });
       });
