@@ -246,27 +246,33 @@ Zorg ervoor dat de vragen de tekst grondig testen en dat studenten de hele tekst
 /**
  * Extract vocabulary from Dutch text (B1 level important words)
  */
-export async function extractVocabulary(dutchText: string, maxWords: number = 20) {
+export async function extractVocabulary(dutchText: string, maxWords: number = 25) {
   const response = await generateWithGemini({
     messages: [
       {
         role: "user",
-        parts: `Je bent een expert in Nederlands als tweede taal (NT2) op B1 niveau. Extraheer de ${maxWords} belangrijkste en meest nuttige woorden uit de volgende Nederlandse tekst voor studenten die zich voorbereiden op het Staatsexamen NT2 B1.
+        parts: `Je bent een expert in Nederlands als tweede taal (NT2) op B1 niveau. Extraheer de ${maxWords} belangrijkste en MOEILIJKSTE woorden uit de volgende Nederlandse tekst voor studenten die zich voorbereiden op het Staatsexamen NT2 B1.
 
 Tekst:
 ${dutchText}
 
 === BELANGRIJKE INSTRUCTIES ===
 
-1. WOORDSELECTIE:
-   - Kies woorden die ESSENTIEEL zijn voor het begrijpen van de tekst
-   - Focus op B1-niveau woorden (niet te makkelijk, niet te moeilijk)
-   - Geef voorrang aan:
-     * Werkwoorden en zelfstandige naamwoorden
-     * Woorden die vaak voorkomen in Staatsexamen teksten
-     * Woorden die meerdere betekenissen kunnen hebben
-   - Vermijd:
-     * Basiswoorden die A1/A2 studenten al kennen (zoals "de", "het", "is")
+1. WOORDSELECTIE (PRIORITEIT OP MOEILIJKE WOORDEN):
+   - Kies woorden die ESSENTIEEL en UITDAGEND zijn voor B1 studenten
+   - Focus op B1-B2 niveau woorden (liever iets moeilijker dan te makkelijk)
+   - Geef HOOGSTE voorrang aan:
+     * Moeilijke werkwoorden (vooral onregelmatige werkwoorden)
+     * Abstracte zelfstandige naamwoorden
+     * Bijvoeglijke naamwoorden die nuance toevoegen
+     * Woorden die meerdere betekenissen hebben (context-afhankelijk)
+     * Uitdrukkingen en idiomatische woorden
+   - Geef TWEEDE voorrang aan:
+     * Werkwoorden en zelfstandige naamwoorden die vaak voorkomen in Staatsexamen teksten
+     * Woorden die cruciaal zijn voor tekstbegrip
+   - VERMIJD ABSOLUUT:
+     * Basiswoorden die A1/A2 studenten al kennen (zoals "de", "het", "is", "hebben", "zijn", "gaan")
+     * Te makkelijke woorden (zoals "huis", "dag", "eten")
      * Zeer zeldzame of technische woorden
      * Eigennamen
 

@@ -542,6 +542,24 @@ export async function createUserVocabulary(userVocab: InsertUserVocabulary) {
   return result;
 }
 
+export async function getUserVocabularyByVocabId(user_id: number, vocabulary_id: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db
+    .select()
+    .from(userVocabulary)
+    .where(
+      and(
+        eq(userVocabulary.user_id, user_id),
+        eq(userVocabulary.vocabulary_id, vocabulary_id)
+      )
+    )
+    .limit(1);
+
+  return result[0] || null;
+}
+
 export async function getUserVocabularyProgress(user_id: number) {
   const db = await getDb();
   if (!db) return [];

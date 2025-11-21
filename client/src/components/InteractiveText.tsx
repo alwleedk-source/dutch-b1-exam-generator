@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { toast } from "sonner";
 
 interface InteractiveTextProps {
   textId: number;
@@ -25,6 +26,18 @@ export default function InteractiveText({ textId, content, className = "" }: Int
   const [vocabulary, setVocabulary] = useState<Map<string, VocabularyWord>>(new Map());
   const [preferredLanguage, setPreferredLanguage] = useState<string>('en');
   const containerRef = useRef<HTMLDivElement>(null);
+  const utils = trpc.useUtils();
+  
+  // Mutation to save word to vocabulary
+  const saveWordMutation = trpc.vocabulary.saveWordFromText.useMutation({
+    onSuccess: () => {
+      toast.success('Word saved to vocabulary!');
+      utils.vocabulary.getMyVocabularyProgress.invalidate();
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Failed to save word');
+    },
+  });
   
   // Get preferred language from user or localStorage
   useEffect(() => {
@@ -119,6 +132,19 @@ export default function InteractiveText({ textId, content, className = "" }: Int
           }
           
           span.setAttribute('data-translation', translation);
+          
+          // Add double-click handler to save word
+          span.addEventListener('dblclick', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Save word to user's vocabulary
+            saveWordMutation.mutate({
+              textId: textId,
+              dutchWord: vocabWord.word,
+            });
+          });
+          
           fragment.appendChild(span);
         } else {
           fragment.appendChild(document.createTextNode(word));
@@ -136,11 +162,12 @@ export default function InteractiveText({ textId, content, className = "" }: Int
       <style>{`
         .vocab-word {
           position: relative;
-          cursor: help;
+          cursor: pointer;
           border-bottom: 2px dotted #3b82f6;
           color: #2563eb;
           font-weight: 500;
           transition: all 0.2s ease;
+          user-select: none;
         }
         
         .vocab-word:hover {
@@ -149,7 +176,8 @@ export default function InteractiveText({ textId, content, className = "" }: Int
         }
         
         .vocab-word::after {
-          content: attr(data-translation);
+          content: attr(data-translation) "\A\A💾 Double-click to save";
+          white-space: pre-wrap;
           position: absolute;
           bottom: 100%;
           left: 50%;
@@ -160,7 +188,6 @@ export default function InteractiveText({ textId, content, className = "" }: Int
           border-radius: 8px;
           font-size: 13px;
           font-weight: 400;
-          white-space: nowrap;
           opacity: 0;
           pointer-events: none;
           transition: opacity 0.2s ease, transform 0.2s ease;
@@ -168,6 +195,8 @@ export default function InteractiveText({ textId, content, className = "" }: Int
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
           line-height: 1.4;
+          text-align: center;
+          max-width: 200px;
         }
         
         .vocab-word:hover::after {

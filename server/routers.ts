@@ -956,3 +956,51 @@ export const appRouter = router({
 });
 
 export type AppRouter = typeof appRouter;
+
+    saveWordFromText: protectedProcedure
+      .input(z.object({
+        textId: z.number(),
+        dutchWord: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Get the vocabulary entry for this word from this text
+        const vocabList = await db.getVocabularyByTextId(input.textId);
+        const vocabEntry = vocabList.find((v: any) => 
+          v.dutchWord.toLowerCase() === input.dutchWord.toLowerCase()
+        );
+        
+        if (!vocabEntry) {
+          throw new TRPCError({ 
+            code: "NOT_FOUND", 
+            message: "Word not found in this text's vocabulary" 
+          });
+        }
+        
+        // Check if user already has this word
+        const existingUserVocab = await db.getUserVocabularyByVocabId(
+          ctx.user.id, 
+          vocabEntry.id
+        );
+        
+        if (existingUserVocab) {
+          throw new TRPCError({ 
+            code: "CONFLICT", 
+            message: "You already have this word in your vocabulary" 
+          });
+        }
+        
+        // Add to user's vocabulary
+        await db.createUserVocabulary({
+          user_id: ctx.user.id,
+          vocabulary_id: vocabEntry.id,
+          status: "new",
+          correct_count: 0,
+          incorrect_count: 0,
+          ease_factor: 2500,
+          interval: 0,
+          repetitions: 0,
+          next_review_at: new Date(),
+        });
+        
+        return { success: true };
+      }),
