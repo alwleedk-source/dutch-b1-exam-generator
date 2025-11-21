@@ -229,9 +229,11 @@ export default function TakeExam() {
                 onValueChange={(value) => setAnswers({ ...answers, [index]: value })}
               >
                 <div className="space-y-2 sm:space-y-3">
-                  {q.options.map((option: string, optIndex: number) => (
+                  {q.options.map((option: string, optIndex: number) => {
+                    const optionLetter = String.fromCharCode(65 + optIndex); // A, B, C, D
+                    return (
                     <div key={optIndex} className="flex items-center space-x-2 sm:space-x-3 p-2.5 sm:p-3 rounded-lg hover:bg-accent transition-colors">
-                      <RadioGroupItem value={option} id={`q${index}-opt${optIndex}`} className="flex-shrink-0" />
+                      <RadioGroupItem value={optionLetter} id={`q${index}-opt${optIndex}`} className="flex-shrink-0" />
                       <Label 
                         htmlFor={`q${index}-opt${optIndex}`}
                         className="flex-1 cursor-pointer text-sm sm:text-base leading-snug"
@@ -240,7 +242,7 @@ export default function TakeExam() {
                         {option}
                       </Label>
                     </div>
-                  ))}
+                  );})}
                 </div>
               </RadioGroup>
             </Card>

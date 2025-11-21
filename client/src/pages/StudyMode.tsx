@@ -202,14 +202,17 @@ export default function StudyMode() {
                     value={selectedAnswers[index] || ""}
                     onValueChange={(value) => setSelectedAnswers(prev => ({ ...prev, [index]: value }))}
                   >
-                    {q.options.map((option: string, optIndex: number) => (
+                    {q.options.map((option: string, optIndex: number) => {
+                      const optionLetter = String.fromCharCode(65 + optIndex); // A, B, C, D
+                      return (
                       <div key={optIndex} className="flex items-center space-x-2 mb-2">
-                        <RadioGroupItem value={option} id={`q${index}-opt${optIndex}`} />
+                        <RadioGroupItem value={optionLetter} id={`q${index}-opt${optIndex}`} />
                         <Label htmlFor={`q${index}-opt${optIndex}`} className="cursor-pointer">
                           {option}
                         </Label>
                       </div>
-                    ))}
+                    );
+                    })}
                   </RadioGroup>
                 </div>
               ))}
