@@ -24,7 +24,7 @@ export default function Vocabulary() {
 
   const generateAudioMutation = trpc.vocabulary.generateAudio.useMutation({
     onSuccess: (data, variables) => {
-      toast.success("Audio generated!");
+      // Don't show toast - audio plays automatically
       // Play audio
       const audio = new Audio(data.audioUrl);
       audio.play();

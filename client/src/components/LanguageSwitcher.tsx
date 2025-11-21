@@ -6,9 +6,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Globe } from "lucide-react";
-import { trpc } from "@/lib/trpc";
-import { useAuth } from "@/_core/hooks/useAuth";
-import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const languages = [
   { code: "ar", name: "العربية", flag: "🇸🇦" },
@@ -17,23 +15,12 @@ const languages = [
 ];
 
 export default function LanguageSwitcher() {
-  const { user } = useAuth();
-  const updateLanguageMutation = trpc.user.updatePreferredLanguage.useMutation({
-    onSuccess: () => {
-      toast.success("Language updated");
-      window.location.reload();
-    },
-  });
+  const { language, setLanguage } = useLanguage();
 
-  const currentLanguage = languages.find(l => l.code === (user?.preferred_language || localStorage.getItem("preferredLanguage")));
+  const currentLanguage = languages.find(l => l.code === language);
 
   const handleLanguageChange = (languageCode: string) => {
-    localStorage.setItem("preferredLanguage", languageCode);
-    if (user) {
-      updateLanguageMutation.mutate({ language: languageCode });
-    } else {
-      window.location.reload();
-    }
+    setLanguage(languageCode as any);
   };
 
   return (
