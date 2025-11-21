@@ -129,7 +129,7 @@ Geef het resultaat in JSON formaat:
     },
     {
       "type": "bullet-list",
-      "content": "- item 1\\n- item 2",
+      "content": "- item 1 - item 2",
       "items": ["item 1", "item 2"],
       "startLine": 11,
       "endLine": 13
@@ -137,7 +137,13 @@ Geef het resultaat in JSON formaat:
   ]
 }
 
-BELANGRIJK: Geef ALLEEN valide JSON terug, geen andere tekst.`;
+BELANGRIJK: 
+- Geef ALLEEN valide JSON terug, geen andere tekst
+- GEEN markdown code blocks
+- GEEN extra uitleg
+- Gebruik GEEN newline characters (\\n) in content velden
+- Gebruik GEEN quotes (\") in content, vervang met enkele quotes (')
+- Zorg dat de JSON correct escaped is`;
 
   try {
     const response = await gemini.generateWithGemini({
@@ -152,9 +158,30 @@ BELANGRIJK: Geef ALLEEN valide JSON terug, geen andere tekst.`;
       responseFormat: "json"
     });
 
-    // Parse JSON response
-    const analysis = JSON.parse(response);
-    return analysis as TextAnalysis;
+    // Parse JSON response - handle potential formatting issues
+    let jsonText = response.trim();
+    
+    // Remove markdown code blocks if present
+    if (jsonText.startsWith('```json')) {
+      jsonText = jsonText.replace(/^```json\s*/,'').replace(/\s*```$/,'');
+    } else if (jsonText.startsWith('```')) {
+      jsonText = jsonText.replace(/^```\s*/,'').replace(/\s*```$/,'');
+    }
+    
+    // Try to extract JSON if there's extra text
+    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      jsonText = jsonMatch[0];
+    }
+    
+    try {
+      const analysis = JSON.parse(jsonText);
+      return analysis as TextAnalysis;
+    } catch (parseError) {
+      console.error("JSON parse error:", parseError);
+      console.error("Raw response:", response.substring(0, 500));
+      throw parseError;
+    }
   } catch (error) {
     console.error("AI analysis failed:", error);
     // Fallback to basic analysis
