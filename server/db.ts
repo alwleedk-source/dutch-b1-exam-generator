@@ -582,11 +582,47 @@ export async function getUserVocabularyProgress(user_id: number) {
   const db = await getDb();
   if (!db) return [];
 
-  return await db
-    .select()
-    .from(userVocabulary)
-    .where(eq(userVocabulary.user_id, user_id))
-    .orderBy(desc(userVocabulary.last_reviewed_at));
+  // Use raw SQL to handle camelCase column names in database
+  const results = await db.execute(sql`
+    SELECT 
+      uv.id,
+      uv.user_id,
+      uv.vocabulary_id,
+      uv.status,
+      uv.correct_count,
+      uv.incorrect_count,
+      uv.last_reviewed_at,
+      uv.next_review_at,
+      uv.ease_factor,
+      uv.interval,
+      uv.repetitions,
+      uv.created_at,
+      uv.updated_at,
+      v."dutchWord" as dutch_word,
+      v."arabicTranslation" as arabic_translation,
+      v."englishTranslation" as english_translation,
+      v."turkishTranslation" as turkish_translation,
+      v."dutchDefinition" as dutch_definition,
+      v."audioUrl" as audio_url,
+      v."audioKey" as audio_key
+    FROM user_vocabulary uv
+    INNER JOIN vocabulary v ON uv.vocabulary_id = v.id
+    WHERE uv.user_id = ${user_id}
+    ORDER BY uv.created_at DESC
+  `);
+
+  // Convert ease_factor from decimal to integer for consistency
+  // Map field names to match client expectations
+  return results.map((r: any) => ({
+    ...r,
+    ease_factor: r.ease_factor ? Math.round(parseFloat(r.ease_factor.toString()) * 1000) : 2500,
+    // Add aliases for client compatibility
+    word: r.dutch_word,
+    translation: r.arabic_translation || r.english_translation || r.turkish_translation,
+    definition: r.dutch_definition,
+    audioUrl: r.audio_url,
+    audioKey: r.audio_key,
+  }));
 }
 
 export async function updateUserVocabularyProgress(
@@ -791,7 +827,14 @@ export async function getUserVocabularyById(userVocabId: number) {
     .where(eq(userVocabulary.id, userVocabId))
     .limit(1);
 
-  return result[0];
+  const record = result[0];
+  if (!record) return undefined;
+
+  // Convert ease_factor from decimal to integer for consistency
+  return {
+    ...record,
+    ease_factor: record.ease_factor ? Math.round(parseFloat(record.ease_factor.toString()) * 1000) : 2500,
+  };
 }
 
 export async function updateUserVocabularySRS(
