@@ -39,7 +39,7 @@ export default function InteractiveText({ textId, content, className = "" }: Int
   }, [user]);
   
   // Fetch vocabulary for this text
-  const { data: vocabData } = trpc.text.getVocabulary.useQuery({ textId });
+  const { data: vocabData } = trpc.vocabulary.getVocabularyByText.useQuery({ text_id: textId });
   
   useEffect(() => {
     if (vocabData) {
