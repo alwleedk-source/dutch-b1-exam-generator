@@ -143,6 +143,10 @@ export interface Translations {
   wordSaved: string;
   notAuthenticated: string;
   pleaseLogin: string;
+  pleaseLoginToAccess: string;
+  loginWithGoogle: string;
+  dontHaveAccount: string;
+  signUpAutomatically: string;
   textNotFound: string;
   textNotFoundDesc: string;
   goToDashboard: string;
@@ -291,6 +295,10 @@ export const translations: Record<Language, Translations> = {
     wordSaved: "Woord opgeslagen!",
     notAuthenticated: "Niet Ingelogd",
     pleaseLogin: "Log in om Studiemodus te gebruiken",
+    pleaseLoginToAccess: "Log in om deze pagina te openen",
+    loginWithGoogle: "Inloggen met Google",
+    dontHaveAccount: "Geen account?",
+    signUpAutomatically: "Automatisch aanmelden bij eerste login",
     textNotFound: "Tekst Niet Gevonden",
     textNotFoundDesc: "De gevraagde tekst kon niet worden gevonden",
     goToDashboard: "Naar Dashboard",
@@ -438,6 +446,10 @@ export const translations: Record<Language, Translations> = {
     wordSaved: "تم حفظ الكلمة!",
     notAuthenticated: "غير مسجل الدخول",
     pleaseLogin: "يرجى تسجيل الدخول لاستخدام وضع الدراسة",
+    pleaseLoginToAccess: "يرجى تسجيل الدخول للوصول إلى هذه الصفحة",
+    loginWithGoogle: "تسجيل الدخول بواسطة Google",
+    dontHaveAccount: "ليس لديك حساب؟",
+    signUpAutomatically: "سيتم إنشاء حساب تلقائياً عند تسجيل الدخول لأول مرة",
     textNotFound: "النص غير موجود",
     textNotFoundDesc: "لم يتم العثور على النص المطلوب",
     goToDashboard: "الذهاب إلى لوحة التحكم",
@@ -585,6 +597,10 @@ export const translations: Record<Language, Translations> = {
     wordSaved: "Word saved!",
     notAuthenticated: "Not Authenticated",
     pleaseLogin: "Please log in to use Study Mode",
+    pleaseLoginToAccess: "Please log in to access this page",
+    loginWithGoogle: "Login with Google",
+    dontHaveAccount: "Don't have an account?",
+    signUpAutomatically: "Sign up automatically when you log in for the first time",
     textNotFound: "Text Not Found",
     textNotFoundDesc: "The requested text could not be found",
     goToDashboard: "Go to Dashboard",
@@ -732,6 +748,10 @@ export const translations: Record<Language, Translations> = {
     wordSaved: "Kelime kaydedildi!",
     notAuthenticated: "Kimlik Doğrulanmadı",
     pleaseLogin: "Çalışma Modunu kullanmak için lütfen giriş yapın",
+    pleaseLoginToAccess: "Bu sayfaya erişmek için lütfen giriş yapın",
+    loginWithGoogle: "Google ile Giriş Yap",
+    dontHaveAccount: "Hesabınız yok mu?",
+    signUpAutomatically: "İlk kez giriş yaptığınızda otomatik olarak kaydolun",
     textNotFound: "Metin Bulunamadı",
     textNotFoundDesc: "İstenen metin bulunamadı",
     goToDashboard: "Kontrol Paneline Git",

@@ -7,6 +7,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useState } from "react";
 import { AppHeader } from "@/components/AppHeader";
+import { NotAuthenticatedPage } from "@/components/NotAuthenticatedPage";
 import { Link } from "wouter";
 
 export default function Vocabulary() {
@@ -49,16 +50,7 @@ export default function Vocabulary() {
   };
 
   if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-bg">
-        <Card>
-          <CardHeader>
-            <CardTitle>Not Authenticated</CardTitle>
-            <CardDescription>Please log in to view your vocabulary</CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    );
+    return <NotAuthenticatedPage message="Please log in to view your vocabulary" />;
   }
 
   if (isLoading) {

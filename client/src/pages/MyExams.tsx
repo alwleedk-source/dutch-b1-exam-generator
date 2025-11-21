@@ -1,5 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { AppHeader } from "@/components/AppHeader";
+import { NotAuthenticatedPage } from "@/components/NotAuthenticatedPage";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -93,16 +94,7 @@ export default function MyExams() {
   };
 
   if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-bg">
-        <Card>
-          <CardHeader>
-            <CardTitle>Not Authenticated</CardTitle>
-            <CardDescription>Please log in to view your exams</CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    );
+    return <NotAuthenticatedPage message="Please log in to view your exams" />;
   }
 
   return (
