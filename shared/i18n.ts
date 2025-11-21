@@ -152,6 +152,22 @@ export interface Translations {
   goToDashboard: string;
   words: string;
   minRead: string;
+  
+  // Progress bar for exam generation
+  processingWithAI: string;
+  processingWithGemini: string;
+  progressLabel: string;
+  processingStatus: string;
+  completedStatus: string;
+  unifiedProcessing: string;
+  unifiedProcessingDesc: string;
+  
+  // Processing steps
+  stepCleanText: string;
+  stepGenerateTitle: string;
+  stepCreateQuestions: string;
+  stepExtractVocabulary: string;
+  stepFormatText: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -304,6 +320,22 @@ export const translations: Record<Language, Translations> = {
     goToDashboard: "Naar Dashboard",
     words: "woorden",
     minRead: "min lezen",
+    
+    // Progress bar for exam generation
+    processingWithAI: "Tekst verwerken met AI...",
+    processingWithGemini: "Gemini AI wordt gebruikt om de tekst volledig te verwerken",
+    progressLabel: "Voortgang",
+    processingStatus: "Bezig met verwerken...",
+    completedStatus: "✓ Voltooid",
+    unifiedProcessing: "Slimme geïntegreerde verwerking",
+    unifiedProcessingDesc: "Alle stappen worden in één aanroep verwerkt om tijd te besparen en de beste kwaliteit te garanderen",
+    
+    // Processing steps
+    stepCleanText: "Tekst opschonen en corrigeren",
+    stepGenerateTitle: "Slimme titel genereren",
+    stepCreateQuestions: "10 begripsvragen maken",
+    stepExtractVocabulary: "Belangrijke woordenschat extraheren",
+    stepFormatText: "Definitieve tekst formatteren",
   },
   
   ar: {
@@ -455,6 +487,22 @@ export const translations: Record<Language, Translations> = {
     goToDashboard: "الذهاب إلى لوحة التحكم",
     words: "كلمات",
     minRead: "دقيقة قراءة",
+    
+    // Progress bar for exam generation
+    processingWithAI: "جاري معالجة النص بالذكاء الاصطناعي...",
+    processingWithGemini: "يتم استخدام Gemini AI لمعالجة النص بشكل كامل",
+    progressLabel: "التقدم",
+    processingStatus: "جاري المعالجة...",
+    completedStatus: "✓ تم",
+    unifiedProcessing: "معالجة ذكية موحدة",
+    unifiedProcessingDesc: "يتم معالجة جميع الخطوات في استدعاء واحد لتوفير الوقت وضمان أفضل جودة",
+    
+    // Processing steps
+    stepCleanText: "تنظيف وتصحيح النص",
+    stepGenerateTitle: "توليد عنوان ذكي",
+    stepCreateQuestions: "إنشاء 10 أسئلة فهم",
+    stepExtractVocabulary: "استخراج المفردات المهمة",
+    stepFormatText: "تنسيق النص النهائي",
   },
   
   en: {
@@ -606,6 +654,22 @@ export const translations: Record<Language, Translations> = {
     goToDashboard: "Go to Dashboard",
     words: "words",
     minRead: "min read",
+    
+    // Progress bar for exam generation
+    processingWithAI: "Processing text with AI...",
+    processingWithGemini: "Using Gemini AI to process the text completely",
+    progressLabel: "Progress",
+    processingStatus: "Processing...",
+    completedStatus: "✓ Done",
+    unifiedProcessing: "Smart unified processing",
+    unifiedProcessingDesc: "All steps are processed in a single call to save time and ensure best quality",
+    
+    // Processing steps
+    stepCleanText: "Clean and correct text",
+    stepGenerateTitle: "Generate smart title",
+    stepCreateQuestions: "Create 10 comprehension questions",
+    stepExtractVocabulary: "Extract important vocabulary",
+    stepFormatText: "Format final text",
   },
   
   tr: {
@@ -757,6 +821,22 @@ export const translations: Record<Language, Translations> = {
     goToDashboard: "Kontrol Paneline Git",
     words: "kelime",
     minRead: "dakika okuma",
+    
+    // Progress bar for exam generation
+    processingWithAI: "Metin yapay zeka ile işleniyor...",
+    processingWithGemini: "Metni tamamen işlemek için Gemini AI kullanılıyor",
+    progressLabel: "İlerleme",
+    processingStatus: "İşleniyor...",
+    completedStatus: "✓ Tamamlandı",
+    unifiedProcessing: "Akıllı birleşik işleme",
+    unifiedProcessingDesc: "Zaman kazanmak ve en iyi kaliteyi sağlamak için tüm adımlar tek bir çağrıda işlenir",
+    
+    // Processing steps
+    stepCleanText: "Metni temizle ve düzelt",
+    stepGenerateTitle: "Akıllı başlık oluştur",
+    stepCreateQuestions: "10 anlama sorusu oluştur",
+    stepExtractVocabulary: "Önemli kelimeleri çıkar",
+    stepFormatText: "Son metni biçimlendir",
   },
 };
 

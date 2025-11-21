@@ -118,11 +118,11 @@ export default function CreateExam() {
       
       // Initialize processing steps
       const steps = [
-        { id: 'clean', label: 'تنظيف وتصحيح النص', status: 'processing' as const },
-        { id: 'title', label: 'توليد عنوان ذكي', status: 'pending' as const },
-        { id: 'questions', label: 'إنشاء 10 أسئلة فهم', status: 'pending' as const },
-        { id: 'vocabulary', label: 'استخراج المفردات المهمة', status: 'pending' as const },
-        { id: 'format', label: 'تنسيق النص النهائي', status: 'pending' as const },
+        { id: 'clean', label: t.stepCleanText, status: 'processing' as const },
+        { id: 'title', label: t.stepGenerateTitle, status: 'pending' as const },
+        { id: 'questions', label: t.stepCreateQuestions, status: 'pending' as const },
+        { id: 'vocabulary', label: t.stepExtractVocabulary, status: 'pending' as const },
+        { id: 'format', label: t.stepFormatText, status: 'pending' as const },
       ];
       setProcessingSteps(steps);
       
@@ -463,17 +463,17 @@ export default function CreateExam() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Sparkles className="h-6 w-6 text-primary animate-pulse" />
-                  جاري معالجة النص بالذكاء الاصطناعي...
+                  {t.processingWithAI}
                 </CardTitle>
                 <CardDescription>
-                  يتم استخدام Gemini AI لمعالجة النص بشكل كامل
+                  {t.processingWithGemini}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6 py-8">
                 {/* Progress Bar */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm mb-2">
-                    <span className="text-muted-foreground">التقدم</span>
+                    <span className="text-muted-foreground">{t.progressLabel}</span>
                     <span className="font-semibold text-primary">
                       {Math.round((processingSteps.filter(s => s.status === 'completed').length / processingSteps.length) * 100)}%
                     </span>
@@ -531,12 +531,12 @@ export default function CreateExam() {
                           </span>
                           {step.status === 'processing' && (
                             <span className="text-xs text-primary animate-pulse">
-                              جاري المعالجة...
+                              {t.processingStatus}
                             </span>
                           )}
                           {step.status === 'completed' && (
                             <span className="text-xs text-primary">
-                              ✓ تم
+                              {t.completedStatus}
                             </span>
                           )}
                         </div>
@@ -550,9 +550,9 @@ export default function CreateExam() {
                   <div className="flex items-start gap-3">
                     <Sparkles className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
                     <div className="text-sm text-blue-900 dark:text-blue-100">
-                      <p className="font-semibold mb-1">معالجة ذكية موحدة</p>
+                      <p className="font-semibold mb-1">{t.unifiedProcessing}</p>
                       <p className="text-blue-700 dark:text-blue-300">
-                        يتم معالجة جميع الخطوات في استدعاء واحد لتوفير الوقت وضمان أفضل جودة
+                        {t.unifiedProcessingDesc}
                       </p>
                     </div>
                   </div>
