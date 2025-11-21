@@ -27,8 +27,21 @@ export function useAuth(options?: UseAuthOptions) {
 
   const logout = useCallback(async () => {
     try {
+      // Clear local state immediately
+      utils.auth.me.setData(undefined, null);
+      
+      // Clear localStorage
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("manus-runtime-user-info");
+      }
+      
+      // Call logout mutation
       await logoutMutation.mutateAsync();
+      
     } catch (error: unknown) {
+      console.error("Logout error:", error);
+      
+      // Even if logout fails, clear local state and redirect
       if (
         error instanceof TRPCClientError &&
         error.data?.code === "UNAUTHORIZED"
@@ -39,13 +52,18 @@ export function useAuth(options?: UseAuthOptions) {
         }
         return;
       }
-      throw error;
+      
+      // For any other error, still redirect
+      console.warn("Logout failed, but redirecting anyway");
     } finally {
+      // Ensure state is cleared
       utils.auth.me.setData(undefined, null);
       await utils.auth.me.invalidate();
-      // Redirect to home page after logout
+      
+      // Force redirect to home page
       if (typeof window !== "undefined") {
-        window.location.href = "/";
+        // Use replace to prevent back button from returning to authenticated page
+        window.location.replace("/");
       }
     }
   }, [logoutMutation, utils]);
