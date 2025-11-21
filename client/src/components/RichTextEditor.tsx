@@ -10,9 +10,10 @@ interface RichTextEditorProps {
   placeholder?: string;
   className?: string;
   preserveFormatting?: boolean; // New option to preserve original formatting
+  onImagePaste?: (file: File) => void; // Callback for image paste
 }
 
-export function RichTextEditor({ value, onChange, placeholder, className, preserveFormatting = false }: RichTextEditorProps) {
+export function RichTextEditor({ value, onChange, placeholder, className, preserveFormatting = false, onImagePaste }: RichTextEditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -29,7 +30,27 @@ export function RichTextEditor({ value, onChange, placeholder, className, preser
         class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none min-h-[400px] max-w-none p-4',
       },
       // Handle paste event
-      handlePaste: (view, event) => {
+      handlePaste: async (view, event) => {
+        // 1. Check for images first
+        const files = Array.from(event.clipboardData?.files || []);
+        const imageFile = files.find(file => file.type.startsWith('image/'));
+        
+        if (imageFile) {
+          // Handle image paste
+          event.preventDefault();
+          
+          if (onImagePaste) {
+            // Pass image to parent component for handling
+            onImagePaste(imageFile);
+          } else {
+            // Fallback: show message
+            console.warn('Image pasted but no onImagePaste handler provided');
+          }
+          
+          return true;
+        }
+        
+        // 2. Handle text/HTML paste as before
         const html = event.clipboardData?.getData('text/html');
         const text = event.clipboardData?.getData('text/plain');
 

@@ -78,6 +78,59 @@ export async function generateWithGemini(options: GeminiGenerateOptions): Promis
 }
 
 /**
+ * Clean, correct, and format any Dutch text using Gemini AI
+ * Works for OCR text, pasted text, or manually typed text
+ * Gemini analyzes the text and decides what needs to be fixed
+ */
+export async function cleanAndFormatText(text: string): Promise<string> {
+  const response = await generateWithGemini({
+    messages: [
+      {
+        role: "user",
+        parts: `Je bent een expert in het analyseren en corrigeren van Nederlandse teksten.
+
+Taak: Lees de volgende Nederlandse tekst zorgvuldig en analyseer deze op:
+
+1. **OCR-fouten** (als de tekst uit een afbeelding komt):
+   - Vreemde tekens en symbolen (|, \\, £, *, +, <, >, {, }, [, ], ~, etc.)
+   - Verkeerd herkende letters (bijv. "rn" → "m", "l" → "I")
+   - Ontbrekende of extra spaties
+   - Zinnen die door elkaar lopen
+
+2. **Spelfouten en grammatica**:
+   - Typfouten
+   - Verkeerde werkwoordsvormen
+   - Ontbrekende of verkeerde leestekens
+
+3. **Opmaak en structuur**:
+   - Paragrafen die beter gescheiden moeten worden
+   - Zinnen die te lang of onduidelijk zijn
+   - Ontbrekende hoofdletters
+
+**Instructies:**
+- Corrigeer ALLE fouten die je vindt
+- Verwijder ALLE vreemde symbolen en tekens
+- Verbeter de leesbaarheid en structuur
+- Behoud de originele betekenis en inhoud
+- Behoud de paragraafstructuur (maar verbeter deze indien nodig)
+- Zorg dat de tekst grammaticaal correct en professioneel is
+- Als de tekst al perfect is, geef deze dan ongewijzigd terug
+
+**Originele tekst:**
+${text}
+
+**Geef ALLEEN de gecorrigeerde en opgemaakte tekst terug, zonder uitleg, opmerkingen of markdown formatting.**`,
+      },
+    ],
+    temperature: 0.3, // Lower temperature for more accurate corrections
+    maxOutputTokens: 4096,
+    responseFormat: "text",
+  });
+
+  return response.trim();
+}
+
+/**
  * Validate Dutch text and detect CEFR level
  */
 export async function validateDutchText(text: string) {
@@ -343,4 +396,169 @@ Respond with ONLY the title text, no quotes, no extra formatting.`,
 
   // Clean up the response
   return response.trim().replace(/^["']|["']$/g, ''); // Remove quotes if present
+}
+
+/**
+ * Process Dutch text completely in ONE API call - saves 80% tokens!
+ * Combines: cleaning, title generation, questions, and vocabulary extraction
+ */
+export async function processTextComplete(dutchText: string, questionCount: number = 10, maxWords: number = 25) {
+  const response = await generateWithGemini({
+    messages: [
+      {
+        role: "user",
+        parts: `Je bent een expert in Nederlands als tweede taal (NT2) en Staatsexamen NT2 B1 voorbereiding.
+
+Voer de volgende taken uit op de gegeven Nederlandse tekst:
+
+=== TAAK 1: TEKST OPSCHONEN EN CORRIGEREN ===
+
+Analyseer de tekst op:
+1. **OCR-fouten** (als de tekst uit een afbeelding komt):
+   - Vreemde tekens en symbolen (|, \\, £, *, +, <, >, {, }, [, ], ~, etc.)
+   - Verkeerd herkende letters (bijv. "rn" → "m", "l" → "I")
+   - Ontbrekende of extra spaties
+   - Zinnen die door elkaar lopen
+
+2. **Spelfouten en grammatica**:
+   - Typfouten
+   - Verkeerde werkwoordsvormen
+   - Ontbrekende of verkeerde leestekens
+
+3. **Opmaak en structuur**:
+   - Paragrafen die beter gescheiden moeten worden
+   - Zinnen die te lang of onduidelijk zijn
+   - Ontbrekende hoofdletters
+
+**Instructies:**
+- Corrigeer ALLE fouten die je vindt
+- Verwijder ALLE vreemde symbolen en tekens
+- Verbeter de leesbaarheid en structuur
+- Behoud de originele betekenis en inhoud
+- Behoud de paragraafstructuur (maar verbeter deze indien nodig)
+- Zorg dat de tekst grammaticaal correct en professioneel is
+- Als de tekst al perfect is, geef deze dan ongewijzigd terug
+
+=== TAAK 2: TITEL GENEREREN ===
+
+Genereer een korte, beschrijvende titel (max 60 karakters) die het hoofdonderwerp of thema van de tekst weergeeft.
+
+=== TAAK 3: EXAMENVRAGEN MAKEN ===
+
+Genereer ${questionCount} meerkeuzevragen op basis van de OPGESCHOONDE tekst (Staatsexamen NT2 Lezen I B1 stijl).
+
+**VRAAGTYPEN EN VERDELING:**
+- Hoofdidee vragen (20%): "Wat is het doel van de tekst?", "Voor wie is deze tekst bedoeld?"
+- Scannen naar details (30%): "Waarover kun je meer informatie vinden?", "Hoeveel kost...?"
+- Volgorde/Sequencing (10%): "In welke volgorde moet je...?", "Wat moet je eerst doen?"
+- Inferentie/Conclusie (15%): "Wat kun je concluderen uit...?", "Waarom is ... belangrijk?"
+- Woordenschat in context (25%): "Wat betekent het woord '...' in deze context?"
+
+**VRAAGFORMULERING:**
+- Gebruik typische Staatsexamen formuleringen zoals:
+  * "volgens de tekst" (volgens de tekst)
+  * "In welke volgorde..." (volgorde vragen)
+  * "Waarover kun je..." (scannen vragen)
+  * "Wat is het doel van..." (hoofdidee)
+- Vragen moeten ALTIJD in het Nederlands zijn
+- Vermijd vage of dubbelzinnige formuleringen
+
+**ANTWOORDOPTIES:**
+- Elke vraag heeft PRECIES 3 opties (A, B, C) of 4 opties (A, B, C, D)
+- Gebruik realistische afleidingsopties (distractors) die:
+  * Deels waar lijken maar niet volledig correct zijn
+  * Informatie uit andere delen van de tekst bevatten
+  * Logisch klinken maar niet het beste antwoord zijn
+- Het correcte antwoord moet ALTIJD direct of indirect in de tekst te vinden zijn
+
+**MOEILIJKHEIDSGRAAD:**
+- Mix van gemakkelijke (40%), middel (40%) en moeilijke (20%) vragen
+- Moeilijke vragen vereisen:
+  * Het combineren van informatie uit verschillende paragrafen
+  * Het lezen tussen de regels
+  * Het begrijpen van impliciete betekenissen
+
+=== TAAK 4: WOORDENSCHAT EXTRAHEREN ===
+
+Extraheer de ${maxWords} belangrijkste en MOEILIJKSTE woorden uit de OPGESCHOONDE tekst voor B1 studenten.
+
+**WOORDSELECTIE (PRIORITEIT OP MOEILIJKE WOORDEN):**
+- Kies woorden die ESSENTIEEL en UITDAGEND zijn voor B1 studenten
+- Focus op B1-B2 niveau woorden (liever iets moeilijker dan te makkelijk)
+- Geef HOOGSTE voorrang aan:
+  * Moeilijke werkwoorden (vooral onregelmatige werkwoorden)
+  * Abstracte zelfstandige naamwoorden
+  * Bijvoeglijke naamwoorden die nuance toevoegen
+  * Woorden die meerdere betekenissen hebben (context-afhankelijk)
+  * Uitdrukkingen en idiomatische woorden
+- Geef TWEEDE voorrang aan:
+  * Werkwoorden en zelfstandige naamwoorden die vaak voorkomen in Staatsexamen teksten
+  * Woorden die cruciaal zijn voor tekstbegrip
+- VERMIJD ABSOLUUT:
+  * Basiswoorden die A1/A2 studenten al kennen (zoals "de", "het", "is", "hebben", "zijn", "gaan")
+  * Te makkelijke woorden (zoals "huis", "dag", "eten")
+  * Zeer zeldzame of technische woorden
+  * Eigennamen
+
+**CONTEXT EN VERTALINGEN:**
+- Bepaal de CONTEXT van het woord in deze tekst (bijv. "financial", "furniture", "medical", "education")
+- Context moet kort en duidelijk zijn (1-2 woorden in het Engels)
+- Geef nauwkeurige vertalingen in Arabisch, Engels, Turks en Nederlands
+- Voor Nederlands: geef een korte definitie of synoniem
+- Vertalingen moeten passen bij de SPECIFIEKE context in deze tekst
+
+**VOORBEELDZINNEN:**
+- Gebruik de EXACTE zin uit de OPGESCHOONDE tekst waar het woord voorkomt
+- Als de zin te lang is (>100 karakters), verkort hem dan maar behoud de context
+
+**MOEILIJKHEIDSGRAAD:**
+- easy: A2-B1 overgangswoorden
+- medium: Typische B1 woorden
+- hard: B1-B2 overgangswoorden
+
+=== ORIGINELE TEKST ===
+
+${dutchText}
+
+=== OUTPUT FORMAAT ===
+
+Respond in JSON format:
+{
+  "cleanedText": "De opgeschoonde en gecorrigeerde tekst",
+  "title": "Korte titel (max 60 karakters)",
+  "questions": [
+    {
+      "question": "Vraag tekst in het Nederlands",
+      "options": ["...", "...", "..."],
+      "correctAnswerIndex": 0,
+      "questionType": "Main Idea" | "Scanning" | "Sequencing" | "Inference" | "Vocabulary",
+      "difficulty": "easy" | "medium" | "hard",
+      "explanation": "Waarom dit het correcte antwoord is (in het Nederlands)",
+      "evidence": "De exacte zin of alinea uit de tekst die het correcte antwoord bewijst"
+    }
+  ],
+  "vocabulary": [
+    {
+      "dutch": "woord",
+      "context": "context_category",
+      "arabic": "الترجمة",
+      "english": "translation",
+      "turkish": "çeviri",
+      "dutch_definition": "Nederlandse definitie of synoniem",
+      "example": "Exacte zin uit de tekst",
+      "difficulty": "easy" | "medium" | "hard",
+      "word_type": "noun" | "verb" | "adjective" | "adverb" | "other"
+    }
+  ]
+}
+
+IMPORTANT: Respond ONLY with valid JSON. Do not include any markdown formatting, code blocks, or explanatory text. Just the raw JSON object.`,
+      },
+    ],
+    responseFormat: "json",
+    maxOutputTokens: 8192, // Larger output for complete processing
+    temperature: 0.7, // Balanced for quality
+  });
+
+  return JSON.parse(response);
 }

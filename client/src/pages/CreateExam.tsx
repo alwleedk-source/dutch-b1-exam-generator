@@ -27,6 +27,11 @@ export default function CreateExam() {
   const [textId, setTextId] = useState<number | null>(null);
   const [step, setStep] = useState<"input" | "validating" | "validated" | "generating">("input");
   const [loadingMessage, setLoadingMessage] = useState("");
+  const [processingSteps, setProcessingSteps] = useState<Array<{
+    id: string;
+    label: string;
+    status: 'pending' | 'processing' | 'completed' | 'error';
+  }>>([]);
   const [validation, setValidation] = useState<any>(null);
   const [agreedToPublic, setAgreedToPublic] = useState(false);
   const [similarTexts, setSimilarTexts] = useState<Array<{ id: number; title: string; similarity: number }>>([]);
@@ -65,7 +70,14 @@ export default function CreateExam() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    processImageFile(file);
+  };
 
+  const handleImagePaste = (file: File) => {
+    processImageFile(file);
+  };
+
+  const processImageFile = (file: File) => {
     // Check file type
     if (!file.type.startsWith('image/')) {
       toast.error("Please upload an image file");
@@ -79,6 +91,8 @@ export default function CreateExam() {
     }
 
     setIsExtracting(true);
+    toast.info("Extracting text from pasted image...");
+    
     const reader = new FileReader();
     reader.onload = () => {
       const base64 = reader.result as string;
@@ -101,12 +115,45 @@ export default function CreateExam() {
   const createTextMutation = trpc.text.create.useMutation({
     onMutate: () => {
       setStep("generating");
-      setLoadingMessage(t.checkingDuplicate || "Checking for duplicate text...");
       
-      // Simulate progress messages
-      setTimeout(() => setLoadingMessage(t.generatingTitle || "Generating title with AI..."), 1000);
-      setTimeout(() => setLoadingMessage(t.creatingQuestions || "Creating exam questions..."), 3000);
-      setTimeout(() => setLoadingMessage(t.almostDone || "Almost done..."), 6000);
+      // Initialize processing steps
+      const steps = [
+        { id: 'clean', label: 'تنظيف وتصحيح النص', status: 'processing' as const },
+        { id: 'title', label: 'توليد عنوان ذكي', status: 'pending' as const },
+        { id: 'questions', label: 'إنشاء 10 أسئلة فهم', status: 'pending' as const },
+        { id: 'vocabulary', label: 'استخراج المفردات المهمة', status: 'pending' as const },
+        { id: 'format', label: 'تنسيق النص النهائي', status: 'pending' as const },
+      ];
+      setProcessingSteps(steps);
+      
+      // Simulate step progression (since we use unified call, we estimate timing)
+      setTimeout(() => {
+        setProcessingSteps(prev => prev.map((s, i) => 
+          i === 0 ? { ...s, status: 'completed' } : 
+          i === 1 ? { ...s, status: 'processing' } : s
+        ));
+      }, 2000);
+      
+      setTimeout(() => {
+        setProcessingSteps(prev => prev.map((s, i) => 
+          i <= 1 ? { ...s, status: 'completed' } : 
+          i === 2 ? { ...s, status: 'processing' } : s
+        ));
+      }, 4000);
+      
+      setTimeout(() => {
+        setProcessingSteps(prev => prev.map((s, i) => 
+          i <= 2 ? { ...s, status: 'completed' } : 
+          i === 3 ? { ...s, status: 'processing' } : s
+        ));
+      }, 7000);
+      
+      setTimeout(() => {
+        setProcessingSteps(prev => prev.map((s, i) => 
+          i <= 3 ? { ...s, status: 'completed' } : 
+          i === 4 ? { ...s, status: 'processing' } : s
+        ));
+      }, 9000);
     },
     onSuccess: (data) => {
       // New flow: text.create now returns exam_id and questions directly
@@ -270,6 +317,7 @@ export default function CreateExam() {
                     value={dutchText}
                     onChange={handleTextChange}
                     placeholder="Plak of typ hier Nederlandse tekst... (Paste or type Dutch text here)"
+                    onImagePaste={handleImagePaste}
                   />
                   <div className="flex justify-between text-sm text-muted-foreground mt-2">
                     <span>{countWords(dutchText)} words • {estimateReadingTime(dutchText)} min read</span>
@@ -412,12 +460,103 @@ export default function CreateExam() {
 
           {step === "generating" && (
             <Card>
-              <CardContent className="py-12 text-center">
-                <Loader2 className="h-16 w-16 animate-spin text-primary mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Generating Exam...</h3>
-                <p className="text-muted-foreground">
-                  Creating 10 comprehension questions with AI
-                </p>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-6 w-6 text-primary animate-pulse" />
+                  جاري معالجة النص بالذكاء الاصطناعي...
+                </CardTitle>
+                <CardDescription>
+                  يتم استخدام Gemini AI لمعالجة النص بشكل كامل
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6 py-8">
+                {/* Progress Bar */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="text-muted-foreground">التقدم</span>
+                    <span className="font-semibold text-primary">
+                      {Math.round((processingSteps.filter(s => s.status === 'completed').length / processingSteps.length) * 100)}%
+                    </span>
+                  </div>
+                  <div className="h-3 bg-secondary rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-primary to-primary/80 transition-all duration-500 ease-out"
+                      style={{ 
+                        width: `${(processingSteps.filter(s => s.status === 'completed').length / processingSteps.length) * 100}%` 
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Processing Steps */}
+                <div className="space-y-4">
+                  {processingSteps.map((step, index) => (
+                    <div 
+                      key={step.id}
+                      className="flex items-center gap-4 p-4 rounded-lg border transition-all duration-300"
+                      style={{
+                        backgroundColor: step.status === 'completed' ? 'hsl(var(--primary) / 0.1)' : 
+                                       step.status === 'processing' ? 'hsl(var(--primary) / 0.05)' : 
+                                       'transparent',
+                        borderColor: step.status === 'completed' ? 'hsl(var(--primary) / 0.3)' : 
+                                    step.status === 'processing' ? 'hsl(var(--primary) / 0.2)' : 
+                                    'hsl(var(--border))',
+                      }}
+                    >
+                      {/* Step Icon */}
+                      <div className="flex-shrink-0">
+                        {step.status === 'completed' && (
+                          <CheckCircle className="h-6 w-6 text-primary" />
+                        )}
+                        {step.status === 'processing' && (
+                          <Loader2 className="h-6 w-6 text-primary animate-spin" />
+                        )}
+                        {step.status === 'pending' && (
+                          <div className="h-6 w-6 rounded-full border-2 border-muted" />
+                        )}
+                        {step.status === 'error' && (
+                          <AlertCircle className="h-6 w-6 text-destructive" />
+                        )}
+                      </div>
+
+                      {/* Step Content */}
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium" style={{
+                            color: step.status === 'completed' ? 'hsl(var(--primary))' : 
+                                   step.status === 'processing' ? 'hsl(var(--foreground))' : 
+                                   'hsl(var(--muted-foreground))'
+                          }}>
+                            {step.label}
+                          </span>
+                          {step.status === 'processing' && (
+                            <span className="text-xs text-primary animate-pulse">
+                              جاري المعالجة...
+                            </span>
+                          )}
+                          {step.status === 'completed' && (
+                            <span className="text-xs text-primary">
+                              ✓ تم
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Info Message */}
+                <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <Sparkles className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                    <div className="text-sm text-blue-900 dark:text-blue-100">
+                      <p className="font-semibold mb-1">معالجة ذكية موحدة</p>
+                      <p className="text-blue-700 dark:text-blue-300">
+                        يتم معالجة جميع الخطوات في استدعاء واحد لتوفير الوقت وضمان أفضل جودة
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           )}

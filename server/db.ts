@@ -538,7 +538,22 @@ export async function createUserVocabulary(userVocab: InsertUserVocabulary) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  const result = await db.insert(userVocabulary).values(userVocab);
+  // Use raw SQL to avoid Drizzle inserting 'default' for last_reviewed_at
+  const nextReviewDate = userVocab.next_review_at instanceof Date 
+    ? userVocab.next_review_at.toISOString() 
+    : userVocab.next_review_at;
+    
+  const result = await db.execute(sql`
+    INSERT INTO "user_vocabulary" (
+      "user_id", "vocabulary_id", "status", "correct_count", "incorrect_count",
+      "next_review_at", "ease_factor", "interval", "repetitions"
+    ) VALUES (
+      ${userVocab.user_id}, ${userVocab.vocabulary_id}, ${userVocab.status}, 
+      ${userVocab.correct_count}, ${userVocab.incorrect_count},
+      ${nextReviewDate}, ${userVocab.ease_factor}, 
+      ${userVocab.interval}, ${userVocab.repetitions}
+    )
+  `);
   return result;
 }
 
