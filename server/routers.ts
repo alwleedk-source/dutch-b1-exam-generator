@@ -497,7 +497,10 @@ export const appRouter = router({
           };
           
           questionType = typeMapping[questionType] || questionType.toLowerCase().replace(/ /g, '_');
-          const isCorrect = userAnswers[idx] === q.correct_answer || userAnswers[idx] === q.correctAnswerIndex;
+          
+          // Convert correctAnswerIndex to letter (A, B, C, D) for comparison
+          const correctAnswerLetter = String.fromCharCode(65 + (q.correctAnswerIndex || 0));
+          const isCorrect = userAnswers[idx] === correctAnswerLetter;
 
           if (questionTypeStats[questionType]) {
             questionTypeStats[questionType].total++;
