@@ -33,7 +33,8 @@ export default function InteractiveText({ textId, content, className = "" }: Int
   const saveWordMutation = trpc.vocabulary.saveWordFromText.useMutation({
     onSuccess: () => {
       toast.success('Word saved to vocabulary!');
-      utils.vocabulary.getMyVocabularyProgress.invalidate();
+      // Don't invalidate here to prevent re-render and disappearing words
+      // User can refresh vocabulary page to see new words
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to save word');
@@ -73,15 +74,10 @@ export default function InteractiveText({ textId, content, className = "" }: Int
     }
   }, [vocabData]);
   
-  // Reset processed flag when content changes
-  useEffect(() => {
-    processedRef.current = false;
-  }, [content]);
-  
   useEffect(() => {
     if (!containerRef.current || vocabulary.size === 0) return;
     
-    // Prevent re-processing if already processed
+    // Prevent re-processing if already processed for this content
     if (processedRef.current) return;
     
     // Find all text nodes and wrap vocabulary words
@@ -180,7 +176,12 @@ export default function InteractiveText({ textId, content, className = "" }: Int
     
     // Mark as processed
     processedRef.current = true;
-  }, [vocabulary, content]);
+  }, [vocabulary, preferredLanguage]); // Only re-run when vocabulary or language changes
+  
+  // Reset processed flag when content actually changes
+  useEffect(() => {
+    processedRef.current = false;
+  }, [content]);
   
   return (
     <>
