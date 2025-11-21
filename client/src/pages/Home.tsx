@@ -10,12 +10,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Language } from "@shared/i18n";
+import { useEffect } from "react";
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
   const { language, setLanguage, t } = useLanguage();
+  const [, setLocation] = useLocation();
+
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      setLocation("/dashboard");
+    }
+  }, [isAuthenticated, user, setLocation]);
 
   const languages: { code: Language; name: string; flag: string }[] = [
     { code: "nl", name: "Nederlands", flag: "🇳🇱" },

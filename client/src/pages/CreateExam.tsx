@@ -145,7 +145,7 @@ export default function CreateExam() {
 
   const generateExamMutation = trpc.exam.generateExam.useMutation({
     onSuccess: (data) => {
-      toast.success("Exam generated successfully!");
+      // Redirect immediately without showing toast (faster UX)
       setLocation(`/exam/${data.examId}`);
     },
     onError: (error) => {

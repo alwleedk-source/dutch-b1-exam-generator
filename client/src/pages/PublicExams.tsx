@@ -21,7 +21,7 @@ export default function PublicExams() {
   
   const generateExamMutation = trpc.exam.generateExam.useMutation({
     onSuccess: (data) => {
-      toast.success("Exam generated successfully!");
+      // Redirect immediately without showing toast (faster UX)
       setLocation(`/exam/${data.examId}`);
     },
     onError: (error) => {
@@ -82,12 +82,12 @@ export default function PublicExams() {
                           {text.title || `Text #${text.id}`}
                         </CardTitle>
                         <CardDescription>
-                          {text.word_count} words • {text.estimated_reading_minutes} min read
+                          {text.word_count} {t.words} • {text.estimated_reading_minutes} {t.minRead}
                         </CardDescription>
                       </div>
                       <div className="flex flex-col gap-2">
                         {text.is_b1_level && (
-                          <Badge variant="default">B1 Level</Badge>
+                          <Badge variant="default">B1 {t.levelDetected || "Level"}</Badge>
                         )}
                         {text.detected_level && (
                           <Badge variant="outline">{text.detected_level}</Badge>
@@ -98,7 +98,7 @@ export default function PublicExams() {
                   <CardContent>
                     {/* Text Preview */}
                     <div className="mb-4 p-4 bg-muted/50 rounded-lg">
-                      <p className="text-sm line-clamp-3">
+                      <p className="text-sm line-clamp-3" dir="ltr">
                         {text.dutch_text?.substring(0, 200)}...
                       </p>
                     </div>
@@ -107,7 +107,7 @@ export default function PublicExams() {
                     <div className="flex items-center gap-6 text-sm text-muted-foreground mb-4">
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4" />
-                        <span>Added {new Date(text.created_at).toLocaleDateString()}</span>
+                        <span>{t.added} {new Date(text.created_at).toLocaleDateString()}</span>
                       </div>
                       {text.status && (
                         <Badge variant="outline" className="capitalize">
@@ -123,7 +123,7 @@ export default function PublicExams() {
                         disabled={generatingExamId === text.id}
                       >
                         <Play className="h-4 w-4 mr-2" />
-                        {generatingExamId === text.id ? "Generating..." : "Start Exam"}
+                        {generatingExamId === text.id ? t.loading : t.startExam}
                       </Button>
                     </div>
                   </CardContent>
