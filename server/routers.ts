@@ -714,6 +714,31 @@ export const appRouter = router({
       .query(async ({ input }) => {
         return await db.getReportsByTextId(input.text_id);
       }),
+
+    // Report exam (for inappropriate content, spam, etc.)
+    createReportForExam: protectedProcedure
+      .input(z.object({
+        exam_id: z.number(),
+        reason: z.enum(["inappropriate_content", "spam", "cheating", "other"]),
+        details: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Get exam to find text_id
+        const exam = await db.getExamById(input.exam_id);
+        if (!exam) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Exam not found" });
+        }
+
+        await db.createReport({
+          text_id: exam.text_id,
+          reported_by: ctx.user.id,
+          report_type: "content_issue",
+          content_issue_type: input.reason === "inappropriate_content" ? "inappropriate" : "other",
+          details: `Exam #${input.exam_id}: ${input.reason}${input.details ? ` - ${input.details}` : ""}`,
+        });
+
+        return { success: true };
+      }),
   }),
 
   // Admin dashboard
@@ -770,6 +795,52 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         await db.updateReportStatus(input.reportId, input.status, ctx.user.id, input.note);
+        return { success: true };
+      }),
+
+    // Get all exams with search
+    getAllExams: adminProcedure
+      .input(z.object({
+        search: z.string().optional(),
+        status: z.enum(["all", "in_progress", "completed"]).optional(),
+        limit: z.number().optional(),
+        offset: z.number().optional(),
+      }))
+      .query(async ({ input }) => {
+        return await db.getAllExams(input);
+      }),
+
+    // Get exam details for admin
+    getExamDetailsAdmin: adminProcedure
+      .input(z.object({
+        exam_id: z.number(),
+      }))
+      .query(async ({ input }) => {
+        const exam = await db.getExamById(input.exam_id);
+        if (!exam) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Exam not found" });
+        }
+        
+        // Get text details
+        const text = await db.getTextById(exam.text_id);
+        
+        // Get user details
+        const user = await db.getUserById(exam.user_id);
+        
+        return {
+          ...exam,
+          text,
+          user,
+        };
+      }),
+
+    // Delete exam
+    deleteExam: adminProcedure
+      .input(z.object({
+        exam_id: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.deleteExam(input.exam_id);
         return { success: true };
       }),
   }),

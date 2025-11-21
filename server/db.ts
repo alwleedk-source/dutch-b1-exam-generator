@@ -717,3 +717,89 @@ export async function getAllTexts() {
 
   return await db.select().from(texts);
 }
+
+
+// Admin functions for exam management
+export async function getAllExams(options?: {
+  search?: string;
+  status?: "all" | "in_progress" | "completed";
+  limit?: number;
+  offset?: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  let query = db
+    .select({
+      id: exams.id,
+      user_id: exams.user_id,
+      text_id: exams.text_id,
+      status: exams.status,
+      score: exams.score,
+      total_questions: exams.total_questions,
+      created_at: exams.created_at,
+      completed_at: exams.completed_at,
+      // Join user info
+      user_name: users.name,
+      user_email: users.email,
+      // Join text info
+      text_title: texts.title,
+      text_word_count: texts.word_count,
+    })
+    .from(exams)
+    .leftJoin(users, eq(exams.user_id, users.id))
+    .leftJoin(texts, eq(exams.text_id, texts.id))
+    .orderBy(desc(exams.created_at));
+
+  // Apply status filter
+  if (options?.status && options.status !== "all") {
+    query = query.where(eq(exams.status, options.status));
+  }
+
+  // Apply limit and offset
+  if (options?.limit) {
+    query = query.limit(options.limit);
+  }
+  if (options?.offset) {
+    query = query.offset(options.offset);
+  }
+
+  const results = await query;
+
+  // Apply search filter (client-side for simplicity)
+  if (options?.search && options.search.trim()) {
+    const searchLower = options.search.toLowerCase();
+    return results.filter((exam: any) => 
+      exam.text_title?.toLowerCase().includes(searchLower) ||
+      exam.user_name?.toLowerCase().includes(searchLower) ||
+      exam.user_email?.toLowerCase().includes(searchLower) ||
+      exam.id.toString().includes(searchLower)
+    );
+  }
+
+  return results;
+}
+
+export async function deleteExam(examId: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  // Delete related records first
+  await db.delete(userAnswers).where(eq(userAnswers.exam_id, examId));
+  
+  // Delete the exam
+  await db.delete(exams).where(eq(exams.id, examId));
+}
+
+export async function getUserById(userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  return result[0];
+}
