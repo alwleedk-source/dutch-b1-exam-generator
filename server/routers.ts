@@ -478,10 +478,10 @@ export const appRouter = router({
 
       // Analyze each exam
       for (const exam of completedExams) {
-        if (!exam.user_answers || !exam.questions) continue;
+        if (!exam.answers || !exam.questions) continue;
         
         const questions = JSON.parse(exam.questions);
-        const userAnswers = JSON.parse(exam.user_answers);
+        const userAnswers = JSON.parse(exam.answers);
 
         questions.forEach((q: any, idx: number) => {
           // Map questionType from Gemini (camelCase) to our format (snake_case)
