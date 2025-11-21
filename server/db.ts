@@ -538,7 +538,10 @@ export async function createUserVocabulary(userVocab: InsertUserVocabulary) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  // Use raw SQL to avoid Drizzle inserting 'default' for last_reviewed_at
+  // Convert ease_factor from integer (2500) to decimal (2.5) for database
+  const easeFactor = userVocab.ease_factor ? userVocab.ease_factor / 1000 : 2.5;
+  
+  // Convert next_review_at to ISO string if it's a Date
   const nextReviewDate = userVocab.next_review_at instanceof Date 
     ? userVocab.next_review_at.toISOString() 
     : userVocab.next_review_at;
@@ -550,7 +553,7 @@ export async function createUserVocabulary(userVocab: InsertUserVocabulary) {
     ) VALUES (
       ${userVocab.user_id}, ${userVocab.vocabulary_id}, ${userVocab.status}, 
       ${userVocab.correct_count}, ${userVocab.incorrect_count},
-      ${nextReviewDate}, ${userVocab.ease_factor}, 
+      ${nextReviewDate}, ${easeFactor}, 
       ${userVocab.interval}, ${userVocab.repetitions}
     )
   `);
@@ -807,9 +810,12 @@ export async function updateUserVocabularySRS(
   const db = await getDb();
   if (!db) return;
 
+  // Convert ease_factor from integer (2500) to decimal (2.5) for database
+  const easeFactor = data.ease_factor / 1000;
+
   await db
     .update(userVocabulary)
-    .set(data)
+    .set({ ...data, ease_factor: easeFactor })
     .where(eq(userVocabulary.id, userVocabId));
 }
 
