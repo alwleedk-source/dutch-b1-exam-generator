@@ -11,6 +11,7 @@ import authRoutes from "../auth/routes";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { autoMigrate } from "../lib/auto-migrate";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -60,6 +61,9 @@ async function startServer() {
       proxy: process.env.NODE_ENV === "production", // Trust Railway proxy
     })
   );
+  
+  // Run auto-migration to ensure tables exist
+  await autoMigrate();
   
   // Debug middleware to log session info
   app.use((req, res, next) => {
