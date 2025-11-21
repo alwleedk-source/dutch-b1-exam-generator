@@ -9,8 +9,10 @@ import { useState } from "react";
 import { AppHeader } from "@/components/AppHeader";
 import { NotAuthenticatedPage } from "@/components/NotAuthenticatedPage";
 import { Link } from "wouter";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Vocabulary() {
+  const { t } = useLanguage();
   const { user } = useAuth();
   const [playingId, setPlayingId] = useState<number | null>(null);
   
@@ -73,9 +75,9 @@ export default function Vocabulary() {
         <div className="max-w-4xl mx-auto">
           {/* Title */}
           <div className="mb-8 animate-fade-in">
-            <h2 className="text-3xl font-bold mb-2">Your Vocabulary</h2>
+            <h2 className="text-3xl font-bold mb-2">{t.yourVocabulary}</h2>
             <p className="text-muted-foreground">
-              {vocabulary?.length || 0} words learned
+              {vocabulary?.length || 0} {t.wordsLearned}
             </p>
           </div>
 
@@ -84,12 +86,12 @@ export default function Vocabulary() {
             <Card>
               <CardContent className="py-12 text-center">
                 <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-                <h3 className="text-xl font-semibold mb-2">No vocabulary yet</h3>
+                <h3 className="text-xl font-semibold mb-2">{t.noVocabularyYet}</h3>
                 <p className="text-muted-foreground mb-4">
-                  Complete exams to start building your vocabulary
+                  {t.completeExamsToStart}
                 </p>
                 <Link href="/create-exam">
-                  <Button>Create Your First Exam</Button>
+                  <Button>{t.createFirstExam}</Button>
                 </Link>
               </CardContent>
             </Card>

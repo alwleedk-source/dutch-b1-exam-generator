@@ -168,6 +168,49 @@ export interface Translations {
   stepCreateQuestions: string;
   stepExtractVocabulary: string;
   stepFormatText: string;
+  
+  // Vocabulary page
+  yourVocabulary: string;
+  wordsLearned: string;
+  noVocabularyYet: string;
+  completeExamsToStart: string;
+  
+  // Exam Results page
+  examNotFound: string;
+  examNotFoundDesc: string;
+  examNotCompleted: string;
+  examNotCompletedDesc: string;
+  takeExam: string;
+  loadingResults: string;
+  passed: string;
+  failed: string;
+  needsImprovement: string;
+  excellent: string;
+  performanceAnalysis: string;
+  recommendations: string;
+  reviewAnswers: string;
+  
+  // Exam Review page
+  examReview: string;
+  yourAnswer: string;
+  correctAnswer: string;
+  correct: string;
+  incorrect: string;
+  
+  // Progress page
+  noProgressYet: string;
+  takeFirstExam: string;
+  
+  // Leaderboard page
+  leaderboard: string;
+  topScorers: string;
+  rank: string;
+  player: string;
+  
+  // Not Found page
+  pageNotFound: string;
+  pageNotFoundDesc: string;
+  goHome: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -336,6 +379,49 @@ export const translations: Record<Language, Translations> = {
     stepCreateQuestions: "10 begripsvragen maken",
     stepExtractVocabulary: "Belangrijke woordenschat extraheren",
     stepFormatText: "Definitieve tekst formatteren",
+    
+    // Vocabulary page
+    yourVocabulary: "Jouw Woordenschat",
+    wordsLearned: "woorden geleerd",
+    noVocabularyYet: "Nog geen woordenschat",
+    completeExamsToStart: "Voltooi examens om je woordenschat op te bouwen",
+    
+    // Exam Results page
+    examNotFound: "Examen Niet Gevonden",
+    examNotFoundDesc: "Dit examen bestaat niet of is verwijderd.",
+    examNotCompleted: "Examen Niet Voltooid",
+    examNotCompletedDesc: "Je moet dit examen eerst voltooien om de resultaten te zien.",
+    takeExam: "Examen Maken",
+    loadingResults: "Resultaten laden...",
+    passed: "Geslaagd",
+    failed: "Niet Geslaagd",
+    needsImprovement: "Verbetering Nodig",
+    excellent: "Uitstekend",
+    performanceAnalysis: "Prestatie-analyse",
+    recommendations: "Aanbevelingen",
+    reviewAnswers: "Antwoorden Bekijken",
+    
+    // Exam Review page
+    examReview: "Examen Beoordeling",
+    yourAnswer: "Jouw Antwoord",
+    correctAnswer: "Correct Antwoord",
+    correct: "Correct",
+    incorrect: "Onjuist",
+    
+    // Progress page
+    noProgressYet: "Nog geen voortgang",
+    takeFirstExam: "Maak je eerste examen om je voortgang bij te houden",
+    
+    // Leaderboard page
+    leaderboard: "Klassement",
+    topScorers: "Top Scorers",
+    rank: "Rang",
+    player: "Speler",
+    
+    // Not Found page
+    pageNotFound: "Pagina Niet Gevonden",
+    pageNotFoundDesc: "De pagina die je zoekt bestaat niet.",
+    goHome: "Naar Home",
   },
   
   ar: {
@@ -503,6 +589,49 @@ export const translations: Record<Language, Translations> = {
     stepCreateQuestions: "إنشاء 10 أسئلة فهم",
     stepExtractVocabulary: "استخراج المفردات المهمة",
     stepFormatText: "تنسيق النص النهائي",
+    
+    // Vocabulary page
+    yourVocabulary: "مفرداتك",
+    wordsLearned: "كلمة مُتعلمة",
+    noVocabularyYet: "لا توجد مفردات بعد",
+    completeExamsToStart: "أكمل الامتحانات لبناء مفرداتك",
+    
+    // Exam Results page
+    examNotFound: "الامتحان غير موجود",
+    examNotFoundDesc: "هذا الامتحان غير موجود أو تم حذفه.",
+    examNotCompleted: "الامتحان غير مكتمل",
+    examNotCompletedDesc: "يجب إكمال هذا الامتحان أولاً لرؤية النتائج.",
+    takeExam: "بدء الامتحان",
+    loadingResults: "جاري تحميل النتائج...",
+    passed: "ناجح",
+    failed: "راسب",
+    needsImprovement: "يحتاج تحسين",
+    excellent: "ممتاز",
+    performanceAnalysis: "تحليل الأداء",
+    recommendations: "التوصيات",
+    reviewAnswers: "مراجعة الإجابات",
+    
+    // Exam Review page
+    examReview: "مراجعة الامتحان",
+    yourAnswer: "إجابتك",
+    correctAnswer: "الإجابة الصحيحة",
+    correct: "صحيح",
+    incorrect: "خطأ",
+    
+    // Progress page
+    noProgressYet: "لا يوجد تقدم بعد",
+    takeFirstExam: "خذ امتحانك الأول لتتبع تقدمك",
+    
+    // Leaderboard page
+    leaderboard: "لوحة المتصدرين",
+    topScorers: "أعلى النقاط",
+    rank: "الترتيب",
+    player: "اللاعب",
+    
+    // Not Found page
+    pageNotFound: "الصفحة غير موجودة",
+    pageNotFoundDesc: "الصفحة التي تبحث عنها غير موجودة.",
+    goHome: "العودة للرئيسية",
   },
   
   en: {
@@ -670,6 +799,49 @@ export const translations: Record<Language, Translations> = {
     stepCreateQuestions: "Create 10 comprehension questions",
     stepExtractVocabulary: "Extract important vocabulary",
     stepFormatText: "Format final text",
+    
+    // Vocabulary page
+    yourVocabulary: "Your Vocabulary",
+    wordsLearned: "words learned",
+    noVocabularyYet: "No vocabulary yet",
+    completeExamsToStart: "Complete exams to start building your vocabulary",
+    
+    // Exam Results page
+    examNotFound: "Exam Not Found",
+    examNotFoundDesc: "This exam does not exist or has been deleted.",
+    examNotCompleted: "Exam Not Completed",
+    examNotCompletedDesc: "You need to complete this exam first to see the results.",
+    takeExam: "Take Exam",
+    loadingResults: "Loading results...",
+    passed: "Passed",
+    failed: "Failed",
+    needsImprovement: "Needs Improvement",
+    excellent: "Excellent",
+    performanceAnalysis: "Performance Analysis",
+    recommendations: "Recommendations",
+    reviewAnswers: "Review Answers",
+    
+    // Exam Review page
+    examReview: "Exam Review",
+    yourAnswer: "Your Answer",
+    correctAnswer: "Correct Answer",
+    correct: "Correct",
+    incorrect: "Incorrect",
+    
+    // Progress page
+    noProgressYet: "No progress yet",
+    takeFirstExam: "Take your first exam to track your progress",
+    
+    // Leaderboard page
+    leaderboard: "Leaderboard",
+    topScorers: "Top Scorers",
+    rank: "Rank",
+    player: "Player",
+    
+    // Not Found page
+    pageNotFound: "Page Not Found",
+    pageNotFoundDesc: "The page you're looking for doesn't exist.",
+    goHome: "Go Home",
   },
   
   tr: {
@@ -837,6 +1009,49 @@ export const translations: Record<Language, Translations> = {
     stepCreateQuestions: "10 anlama sorusu oluştur",
     stepExtractVocabulary: "Önemli kelimeleri çıkar",
     stepFormatText: "Son metni biçimlendir",
+    
+    // Vocabulary page
+    yourVocabulary: "Kelime Dağarcığınız",
+    wordsLearned: "kelime öğrenildi",
+    noVocabularyYet: "Henüz kelime yok",
+    completeExamsToStart: "Kelime dağarcığınızı oluşturmak için sınavları tamamlayın",
+    
+    // Exam Results page
+    examNotFound: "Sınav Bulunamadı",
+    examNotFoundDesc: "Bu sınav mevcut değil veya silinmiş.",
+    examNotCompleted: "Sınav Tamamlanmadı",
+    examNotCompletedDesc: "Sonuçları görmek için önce bu sınavı tamamlamanız gerekiyor.",
+    takeExam: "Sınava Başla",
+    loadingResults: "Sonuçlar yükleniyor...",
+    passed: "Geçti",
+    failed: "Kaldı",
+    needsImprovement: "Geliştirilmeli",
+    excellent: "Mükemmel",
+    performanceAnalysis: "Performans Analizi",
+    recommendations: "Öneriler",
+    reviewAnswers: "Cevapları İncele",
+    
+    // Exam Review page
+    examReview: "Sınav İncelemesi",
+    yourAnswer: "Cevabınız",
+    correctAnswer: "Doğru Cevap",
+    correct: "Doğru",
+    incorrect: "Yanlış",
+    
+    // Progress page
+    noProgressYet: "Henüz ilerleme yok",
+    takeFirstExam: "İlerlemenizi takip etmek için ilk sınavınızı yapın",
+    
+    // Leaderboard page
+    leaderboard: "Lider Tablosu",
+    topScorers: "En Yüksek Puanlar",
+    rank: "Sıra",
+    player: "Oyuncu",
+    
+    // Not Found page
+    pageNotFound: "Sayfa Bulunamadı",
+    pageNotFoundDesc: "Aradığınız sayfa mevcut değil.",
+    goHome: "Ana Sayfaya Dön",
   },
 };
 

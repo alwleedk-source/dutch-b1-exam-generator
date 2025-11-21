@@ -6,8 +6,10 @@ import { Progress } from "@/components/ui/progress";
 import { useParams, useLocation, Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { CheckCircle, XCircle, TrendingUp, TrendingDown, BookOpen, RotateCcw, Home, Award, Eye } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function ExamResults() {
+  const { t } = useLanguage();
   const { user } = useAuth();
   const params = useParams();
   const [, setLocation] = useLocation();
@@ -24,9 +26,9 @@ export default function ExamResults() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-bg">
         <Card className="p-6 max-w-md">
           <div className="text-center">
-            <h2 className="text-xl font-semibold mb-2">Exam Not Found</h2>
-            <p className="text-muted-foreground mb-4">This exam does not exist or has been deleted.</p>
-            <Button onClick={() => setLocation('/my-exams')}>My Exams</Button>
+            <h2 className="text-xl font-semibold mb-2">{t.examNotFound}</h2>
+            <p className="text-muted-foreground mb-4">{t.examNotFoundDesc}</p>
+            <Button onClick={() => setLocation('/my-exams')}>{t.myExams}</Button>
           </div>
         </Card>
       </div>
@@ -39,7 +41,7 @@ export default function ExamResults() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-bg">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading results...</p>
+          <p className="text-muted-foreground">{t.loadingResults}</p>
         </div>
       </div>
     );
@@ -51,9 +53,9 @@ export default function ExamResults() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-bg">
         <Card className="p-6 max-w-md">
           <div className="text-center">
-            <h2 className="text-xl font-semibold mb-2">Exam Not Completed</h2>
-            <p className="text-muted-foreground mb-4">You need to complete this exam first to see the results.</p>
-            <Button onClick={() => setLocation(`/exam/${examId}`)}>Take Exam</Button>
+            <h2 className="text-xl font-semibold mb-2">{t.examNotCompleted}</h2>
+            <p className="text-muted-foreground mb-4">{t.examNotCompletedDesc}</p>
+            <Button onClick={() => setLocation(`/exam/${examId}`)}>{t.takeExam}</Button>
           </div>
         </Card>
       </div>
