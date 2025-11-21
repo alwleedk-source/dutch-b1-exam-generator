@@ -138,14 +138,15 @@ export type InsertExam = typeof exams.$inferInsert;
  */
 export const vocabulary = pgTable("vocabulary", {
   id: serial("id").primaryKey(),
-  text_id: integer("text_id").notNull(),
+  text_id: integer("text_id"), // Optional now, kept for backwards compatibility
   
   // Word data
   dutchWord: varchar("dutchWord", { length: 255 }).notNull(),
+  context: varchar("context", { length: 100 }), // Context for word meaning (e.g., "financial", "furniture")
   dutchDefinition: text("dutchDefinition"), // Dutch definition or synonym
   wordType: varchar("wordType", { length: 50 }), // noun, verb, adjective, adverb, other
   
-  // Translations
+  // Translations (context-aware)
   arabicTranslation: varchar("arabicTranslation", { length: 255 }),
   englishTranslation: varchar("englishTranslation", { length: 255 }),
   turkishTranslation: varchar("turkishTranslation", { length: 255 }),
@@ -155,7 +156,8 @@ export const vocabulary = pgTable("vocabulary", {
   audioKey: varchar("audioKey", { length: 255 }), // R2 key for reference
   
   // Context
-  exampleSentence: text("exampleSentence"),
+  exampleSentence: text("exampleSentence"), // Example sentence from source text
+  sourceTextId: integer("sourceTextId"), // First text that introduced this word+context
   
   // Metadata
   difficulty: varchar("difficulty", { length: 50 }),
@@ -164,8 +166,12 @@ export const vocabulary = pgTable("vocabulary", {
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({
-  vocabulary_text_idIdx: index("vocabulary_text_id_idx").on(table.text_id),
   vocabulary_dutchWordIdx: index("vocabulary_dutchWord_idx").on(table.dutchWord),
+  vocabulary_sourceTextIdIdx: index("vocabulary_source_text_id_idx").on(table.sourceTextId),
+  // Unique constraint on (dutchWord, context) to ensure one entry per word+context
+  vocabulary_word_context_unique: uniqueIndex("vocabulary_word_context_unique")
+    .on(table.dutchWord, table.context)
+    .where(sql`${table.context} IS NOT NULL`),
 }));
 
 export type Vocabulary = typeof vocabulary.$inferSelect;
@@ -200,6 +206,25 @@ export const userVocabulary = pgTable("user_vocabulary", {
 
 export type UserVocabulary = typeof userVocabulary.$inferSelect;
 export type InsertUserVocabulary = typeof userVocabulary.$inferInsert;
+
+/**
+ * Junction table for many-to-many relationship between texts and vocabulary
+ * Allows shared vocabulary across multiple texts
+ */
+export const textVocabulary = pgTable("text_vocabulary", {
+  id: serial("id").primaryKey(),
+  text_id: integer("text_id").notNull(),
+  vocabulary_id: integer("vocabulary_id").notNull(),
+  
+  created_at: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+  text_vocabulary_text_idIdx: index("text_vocabulary_text_id_idx").on(table.text_id),
+  text_vocabulary_vocabulary_idIdx: index("text_vocabulary_vocabulary_id_idx").on(table.vocabulary_id),
+  text_vocabulary_unique: uniqueIndex("text_vocabulary_unique").on(table.text_id, table.vocabulary_id),
+}));
+
+export type TextVocabulary = typeof textVocabulary.$inferSelect;
+export type InsertTextVocabulary = typeof textVocabulary.$inferInsert;
 
 /**
  * User reports for texts (level issues or content issues)

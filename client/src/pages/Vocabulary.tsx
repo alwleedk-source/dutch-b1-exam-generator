@@ -99,6 +99,11 @@ export default function Vocabulary() {
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="text-2xl font-bold">{word.word}</h3>
+                          {word.context && (
+                            <Badge variant="outline" className="text-xs">
+                              {word.context}
+                            </Badge>
+                          )}
                           {word.mastered && (
                             <Badge variant="default" className="gap-1">
                               <CheckCircle className="h-3 w-3" />

@@ -270,10 +270,13 @@ ${dutchText}
      * Zeer zeldzame of technische woorden
      * Eigennamen
 
-2. VERTALINGEN:
+2. CONTEXT EN VERTALINGEN:
+   - Bepaal de CONTEXT van het woord in deze tekst (bijv. "financial", "furniture", "medical", "education")
+   - Context moet kort en duidelijk zijn (1-2 woorden in het Engels)
    - Geef nauwkeurige vertalingen in Arabisch, Engels, Turks en Nederlands
    - Voor Nederlands: geef een korte definitie of synoniem
-   - Vertalingen moeten passen bij de context in de tekst
+   - Vertalingen moeten passen bij de SPECIFIEKE context in deze tekst
+   - Voorbeeld: "bank" in financiële context = "بنك", in meubelcontext = "مقعد"
 
 3. VOORBEELDZINNEN:
    - Gebruik de EXACTE zin uit de tekst waar het woord voorkomt
@@ -290,6 +293,7 @@ Respond in JSON format:
   "vocabulary": [
     {
       "dutch": "woord",
+      "context": "context_category",
       "arabic": "الترجمة",
       "english": "translation",
       "turkish": "çeviri",

@@ -211,6 +211,57 @@ export const appRouter = router({
           status: "in_progress",
         });
 
+        // Auto-extract vocabulary with context-aware shared vocabulary system
+        try {
+          console.log('[Vocabulary] Auto-extracting vocabulary...');
+          const vocabData = await gemini.extractVocabulary(input.dutch_text);
+          
+          let newWordsCount = 0;
+          let sharedWordsCount = 0;
+          
+          for (const word of vocabData.vocabulary) {
+            // Check if this word+context combination already exists
+            const existingVocab = await db.findVocabularyByWordAndContext(
+              word.dutch,
+              word.context || 'general'
+            );
+            
+            let vocabularyId;
+            
+            if (existingVocab) {
+              // Word+context exists, reuse it
+              vocabularyId = existingVocab.id;
+              sharedWordsCount++;
+              console.log(`[Vocabulary] Reusing existing: ${word.dutch} (${word.context})`);
+            } else {
+              // New word+context, create it
+              const newVocab = await db.createVocabulary({
+                dutchWord: word.dutch,
+                context: word.context || 'general',
+                dutchDefinition: word.dutch_definition,
+                wordType: word.word_type,
+                arabicTranslation: word.arabic,
+                englishTranslation: word.english,
+                turkishTranslation: word.turkish,
+                exampleSentence: word.example,
+                difficulty: word.difficulty,
+                sourceTextId: textId,
+              });
+              vocabularyId = newVocab[0].id;
+              newWordsCount++;
+              console.log(`[Vocabulary] Created new: ${word.dutch} (${word.context})`);
+            }
+            
+            // Link vocabulary to this text
+            await db.linkVocabularyToText(textId, vocabularyId);
+          }
+          
+          console.log(`[Vocabulary] Extraction complete: ${newWordsCount} new, ${sharedWordsCount} shared`);
+        } catch (error) {
+          console.error('[Vocabulary] Auto-extraction failed:', error);
+          // Don't fail the request if vocabulary extraction fails
+        }
+        
         // Notify admin about new text submission
         try {
           const { notifyOwner } = await import("./_core/notification");
