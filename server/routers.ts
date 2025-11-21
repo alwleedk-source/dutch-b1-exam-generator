@@ -20,11 +20,40 @@ export const appRouter = router({
   
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
-    logout: publicProcedure.mutation(({ ctx }) => {
-      const cookieOptions = getSessionCookieOptions(ctx.req);
-      // clearCookie needs exact same options as when cookie was set (without maxAge)
-      ctx.res.clearCookie(COOKIE_NAME, cookieOptions);
-      return { success: true } as const;
+    logout: publicProcedure.mutation(async ({ ctx }) => {
+      // Use req.logout() from Passport to properly destroy session
+      return new Promise((resolve, reject) => {
+        if (ctx.req.logout) {
+          ctx.req.logout((err) => {
+            if (err) {
+              console.error('[Logout] Error destroying session:', err);
+              reject(err);
+              return;
+            }
+            
+            // Also destroy the session completely
+            if (ctx.req.session) {
+              ctx.req.session.destroy((err) => {
+                if (err) {
+                  console.error('[Logout] Error destroying session store:', err);
+                }
+              });
+            }
+            
+            // Clear the cookie
+            const cookieOptions = getSessionCookieOptions(ctx.req);
+            ctx.res.clearCookie(COOKIE_NAME, cookieOptions);
+            
+            console.log('[Logout] Session destroyed successfully');
+            resolve({ success: true } as const);
+          });
+        } else {
+          // Fallback if req.logout is not available
+          const cookieOptions = getSessionCookieOptions(ctx.req);
+          ctx.res.clearCookie(COOKIE_NAME, cookieOptions);
+          resolve({ success: true } as const);
+        }
+      });
     }),
     updatePreferences: protectedProcedure
       .input(z.object({
