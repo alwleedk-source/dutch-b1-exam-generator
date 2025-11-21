@@ -11,6 +11,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Clock, FileText, Printer, Home, X, BookOpen } from "lucide-react";
 import { Link } from "wouter";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import InteractiveText from "@/components/InteractiveText";
 
 export default function TakeExam() {
   const { user } = useAuth();
@@ -187,23 +188,17 @@ export default function TakeExam() {
           <div className="prose prose-sm sm:prose-base md:prose-lg max-w-none">
             <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">{exam.title}</h2>
             {exam.formatted_html ? (
-              <div 
+              <InteractiveText
+                textId={exam.text_id}
+                content={exam.formatted_html}
                 className="formatted-text-container"
-                style={{ direction: 'ltr' }}
-                dangerouslySetInnerHTML={{ __html: exam.formatted_html }}
               />
             ) : (
-              <div 
+              <InteractiveText
+                textId={exam.text_id}
+                content={exam.dutch_text}
                 className="whitespace-pre-wrap leading-relaxed text-foreground"
-                style={{ 
-                  direction: 'ltr',
-                  columnCount: window.innerWidth >= 1024 && exam.dutch_text.length > 2000 ? 2 : 1,
-                  columnGap: '3rem',
-                  textAlign: window.innerWidth >= 640 ? 'justify' : 'left'
-                }}
-              >
-                {exam.dutch_text}
-              </div>
+              />
             )}
           </div>
         </Card>
