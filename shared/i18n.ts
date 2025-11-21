@@ -353,7 +353,7 @@ export const translations: Record<Language, Translations> = {
     confirm: "Bevestigen",
     close: "Sluiten",
     checkingDuplicate: "Controleren op dubbele tekst...",
-    generatingTitle: "Titel genereren met AI...",
+    generatingTitle: "Titel genereren...",
     creatingQuestions: "Examenvragen maken...",
     almostDone: "Bijna klaar...",
     examCreatedSuccessfully: "Examen succesvol aangemaakt!",
@@ -375,8 +375,8 @@ export const translations: Record<Language, Translations> = {
     minRead: "min lezen",
     
     // Progress bar for exam generation
-    processingWithAI: "Tekst verwerken met AI...",
-    processingWithGemini: "Gemini AI wordt gebruikt om de tekst volledig te verwerken",
+    processingWithAI: "Tekst verwerken...",
+    processingWithGemini: "De tekst wordt volledig verwerkt",
     progressLabel: "Voortgang",
     processingStatus: "Bezig met verwerken...",
     completedStatus: "✓ Voltooid",
@@ -568,7 +568,7 @@ export const translations: Record<Language, Translations> = {
     confirm: "تأكيد",
     close: "إغلاق",
     checkingDuplicate: "التحقق من النص المكرر...",
-    generatingTitle: "توليد العنوان بالذكاء الاصطناعي...",
+    generatingTitle: "توليد العنوان...",
     creatingQuestions: "إنشاء أسئلة الامتحان...",
     almostDone: "انتهى تقريباً...",
     examCreatedSuccessfully: "تم إنشاء الامتحان بنجاح!",
@@ -590,8 +590,8 @@ export const translations: Record<Language, Translations> = {
     minRead: "دقيقة قراءة",
     
     // Progress bar for exam generation
-    processingWithAI: "جاري معالجة النص بالذكاء الاصطناعي...",
-    processingWithGemini: "يتم استخدام Gemini AI لمعالجة النص بشكل كامل",
+    processingWithAI: "جاري معالجة النص...",
+    processingWithGemini: "يتم معالجة النص بشكل كامل",
     progressLabel: "التقدم",
     processingStatus: "جاري المعالجة...",
     completedStatus: "✓ تم",
@@ -783,7 +783,7 @@ export const translations: Record<Language, Translations> = {
     confirm: "Confirm",
     close: "Close",
     checkingDuplicate: "Checking for duplicate text...",
-    generatingTitle: "Generating title with AI...",
+    generatingTitle: "Generating title...",
     creatingQuestions: "Creating exam questions...",
     almostDone: "Almost done...",
     examCreatedSuccessfully: "Exam created successfully!",
@@ -805,8 +805,8 @@ export const translations: Record<Language, Translations> = {
     minRead: "min read",
     
     // Progress bar for exam generation
-    processingWithAI: "Processing text with AI...",
-    processingWithGemini: "Using Gemini AI to process the text completely",
+    processingWithAI: "Processing text...",
+    processingWithGemini: "Processing the text completely",
     progressLabel: "Progress",
     processingStatus: "Processing...",
     completedStatus: "✓ Done",
@@ -1020,8 +1020,8 @@ export const translations: Record<Language, Translations> = {
     minRead: "dakika okuma",
     
     // Progress bar for exam generation
-    processingWithAI: "Metin yapay zeka ile işleniyor...",
-    processingWithGemini: "Metni tamamen işlemek için Gemini AI kullanılıyor",
+    processingWithAI: "Metin işleniyor...",
+    processingWithGemini: "Metin tamamen işleniyor",
     progressLabel: "İlerleme",
     processingStatus: "İşleniyor...",
     completedStatus: "✓ Tamamlandı",
