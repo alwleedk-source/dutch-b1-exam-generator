@@ -220,10 +220,15 @@ export default function InteractiveText({ textId, content, className = "" }: Int
           cursor: pointer;
           border-bottom: 2px dotted #3b82f6;
           color: #2563eb;
-          font-weight: 500;
           transition: all 0.2s ease;
           user-select: none;
           display: inline;
+          /* Inherit all font properties from parent */
+          font-size: inherit;
+          font-weight: inherit;
+          font-family: inherit;
+          line-height: inherit;
+          letter-spacing: inherit;
         }
         
         .vocab-word:hover {
