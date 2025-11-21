@@ -26,17 +26,22 @@ export function useAuth(options?: UseAuthOptions) {
   });
 
   const logout = useCallback(async () => {
+    console.log("[Logout] Starting logout process...");
     try {
       // Clear local state immediately
+      console.log("[Logout] Clearing local state...");
       utils.auth.me.setData(undefined, null);
       
       // Clear localStorage
       if (typeof window !== "undefined") {
+        console.log("[Logout] Clearing localStorage...");
         localStorage.removeItem("manus-runtime-user-info");
       }
       
       // Call logout mutation
+      console.log("[Logout] Calling logout API...");
       await logoutMutation.mutateAsync();
+      console.log("[Logout] Logout API success");
       
     } catch (error: unknown) {
       console.error("Logout error:", error);
@@ -57,11 +62,13 @@ export function useAuth(options?: UseAuthOptions) {
       console.warn("Logout failed, but redirecting anyway");
     } finally {
       // Ensure state is cleared
+      console.log("[Logout] Finally block: clearing state...");
       utils.auth.me.setData(undefined, null);
       await utils.auth.me.invalidate();
       
       // Force redirect to home page
       if (typeof window !== "undefined") {
+        console.log("[Logout] Redirecting to home page...");
         // Use replace to prevent back button from returning to authenticated page
         window.location.replace("/");
       }

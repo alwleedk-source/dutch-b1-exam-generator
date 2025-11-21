@@ -14,12 +14,8 @@ export default function Dashboard() {
   const { t } = useLanguage();
   const [, setLocation] = useLocation();
   
-  // Redirect authenticated users to Create Exam page (main page)
-  useEffect(() => {
-    if (user) {
-      setLocation("/create-exam");
-    }
-  }, [user, setLocation]);
+  // Dashboard is now the main landing page after login
+  // Users can navigate to Create Exam via button
   
   const { data: stats, isLoading: statsLoading } = trpc.progress.getMyStats.useQuery();
   const { data: exams, isLoading: examsLoading } = trpc.exam.getMyExams.useQuery();
@@ -40,7 +36,12 @@ export default function Dashboard() {
           <h2 className="text-3xl font-bold mb-2">
             {t.welcomeBack}, {user.name || "Student"}! 👋
           </h2>
-          <p className="text-muted-foreground">Ready to practice today?</p>
+          <p className="text-muted-foreground text-lg">
+            Welkom bij je persoonlijke B1 Nederlands examen oefenplatform!
+          </p>
+          <p className="text-muted-foreground mt-2">
+            Maak examens, oefen met teksten, en verbeter je Nederlands.
+          </p>
         </div>
 
         {/* Stats Cards */}
