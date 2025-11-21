@@ -330,7 +330,11 @@ export default function AdminDashboard() {
                 </TableHeader>
                 <TableBody>
                   {allTexts?.map((text: any) => (
-                    <TableRow key={text.id}>
+                    <TableRow 
+                      key={text.id}
+                      className="cursor-pointer hover:bg-muted/50 transition-colors"
+                      onClick={() => setTextToView(text.id)}
+                    >
                       <TableCell>{text.id}</TableCell>
                       <TableCell>{text.title || `Text #${text.id}`}</TableCell>
                       <TableCell>
@@ -338,7 +342,7 @@ export default function AdminDashboard() {
                           {text.status}
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
                         <div className="flex gap-2">
                           <Button
                             size="sm"
