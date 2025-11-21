@@ -133,6 +133,44 @@ Respond in JSON format:
 }
 
 /**
+ * Clean Dutch text by removing headers, footers, and unrelated content
+ */
+export async function cleanDutchText(text: string): Promise<string> {
+  try {
+    const response = await generateWithGemini({
+      messages: [
+        {
+          role: "user",
+          parts: `Je bent een expert in het analyseren en opschonen van Nederlandse teksten.
+
+Analyseer de volgende tekst en verwijder:
+1. Kopteksten (headers) zoals paginanummers, datums, website namen
+2. Voetteksten (footers) zoals copyright, contact informatie
+3. Navigatie elementen
+4. Advertenties of niet-gerelateerde content
+5. Metadata (auteur, publicatiedatum, etc. aan het begin of einde)
+
+Behoud ALLEEN de hoofdinhoud van de tekst - de eigenlijke artikel, verhaal, of informatie.
+
+Tekst:
+${text}
+
+Respond ALLEEN met de opgeschoonde tekst, zonder uitleg of markdown formatting.`,
+        },
+      ],
+      responseFormat: "text",
+      temperature: 0.3,
+    });
+
+    return response.trim();
+  } catch (error) {
+    console.error("[Gemini AI] Error cleaning text:", error);
+    // Return original text if cleaning fails
+    return text;
+  }
+}
+
+/**
  * Generate exam questions from Dutch text (Staatsexamen NT2 style)
  */
 export async function generateExamQuestions(dutchText: string, questionCount: number = 10) {

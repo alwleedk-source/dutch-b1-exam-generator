@@ -484,8 +484,20 @@ export const appRouter = router({
         const userAnswers = JSON.parse(exam.user_answers);
 
         questions.forEach((q: any, idx: number) => {
-          const questionType = q.question_type || 'search';
-          const isCorrect = userAnswers[idx] === q.correct_answer;
+          // Map questionType from Gemini (camelCase) to our format (snake_case)
+          let questionType = q.question_type || q.questionType || 'search';
+          
+          // Normalize question type names
+          const typeMapping: Record<string, string> = {
+            'Main Idea': 'main_idea',
+            'Scanning': 'search',
+            'Sequencing': 'sequence',
+            'Inference': 'inference',
+            'Vocabulary': 'vocabulary',
+          };
+          
+          questionType = typeMapping[questionType] || questionType.toLowerCase().replace(/ /g, '_');
+          const isCorrect = userAnswers[idx] === q.correct_answer || userAnswers[idx] === q.correctAnswerIndex;
 
           if (questionTypeStats[questionType]) {
             questionTypeStats[questionType].total++;

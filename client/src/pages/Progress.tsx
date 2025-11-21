@@ -83,7 +83,7 @@ export default function Progress() {
             <div className="space-y-6">
               {skillCategories.map((skill) => {
                 const skillData = detailedAnalysis?.byQuestionType?.[skill.key];
-                const percentage = skillData ? (skillData.correct / skillData.total) * 100 : 0;
+                const percentage = skillData && skillData.total > 0 ? (skillData.correct / skillData.total) * 100 : 0;
                 const Icon = skill.icon;
 
                 return (

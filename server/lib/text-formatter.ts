@@ -15,18 +15,36 @@ export interface FormattedText {
 function isHeading(line: string): boolean {
   const trimmed = line.trim();
   
-  // Short lines (less than 60 chars)
-  if (trimmed.length > 60) return false;
+  // Empty line
+  if (!trimmed) return false;
   
-  // Ends with colon
+  // Too long to be a heading (more than 80 chars)
+  if (trimmed.length > 80) return false;
+  
+  const words = trimmed.split(/\s+/);
+  
+  // Too many words (more than 10)
+  if (words.length > 10) return false;
+  
+  // Ends with colon (strong indicator)
   if (trimmed.endsWith(':')) return true;
   
-  // All uppercase (at least 3 words)
-  const words = trimmed.split(/\s+/);
+  // All uppercase (at least 2 words)
   if (words.length >= 2 && trimmed === trimmed.toUpperCase()) return true;
   
-  // Starts with capital and no period at end (likely a heading)
-  if (/^[A-Z]/.test(trimmed) && !trimmed.endsWith('.') && words.length <= 8) return true;
+  // Short line (1-4 words) starting with capital, no period
+  if (words.length <= 4 && /^[A-Z]/.test(trimmed) && !trimmed.endsWith('.')) {
+    return true;
+  }
+  
+  // Medium line (5-10 words) starting with capital, no period, and relatively short
+  if (words.length <= 10 && /^[A-Z]/.test(trimmed) && !trimmed.endsWith('.') && trimmed.length < 60) {
+    // Check if it looks like a title (mostly capitalized words)
+    const capitalizedWords = words.filter(w => /^[A-Z]/.test(w)).length;
+    if (capitalizedWords >= words.length * 0.5) {
+      return true;
+    }
+  }
   
   return false;
 }
@@ -267,16 +285,51 @@ function formatArticleText(text: string, hasColumns: boolean): string {
   const className = hasColumns ? "formatted-text article-text columns-layout" : "formatted-text article-text";
   let html = `<div class="${className}">`;
   
-  // Split by double newlines (paragraphs)
-  const paragraphs = text.split(/\n\s*\n/);
+  // Split by double newlines OR single newlines followed by a heading-like line
+  const lines = text.split('\n');
+  let currentParagraph: string[] = [];
   
-  for (const para of paragraphs) {
-    const trimmed = para.trim();
-    if (!trimmed) continue;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
     
-    // Merge lines within paragraph (remove single newlines)
-    const merged = trimmed.replace(/\n/g, ' ').replace(/\s+/g, ' ');
+    // Skip very short lines (likely headers/footers)
+    if (line.length > 0 && line.length < 10 && !/^[A-Z]/.test(line)) {
+      continue;
+    }
     
+    // Empty line - end of paragraph
+    if (!line) {
+      if (currentParagraph.length > 0) {
+        const merged = currentParagraph.join(' ').replace(/\s+/g, ' ');
+        if (isHeading(merged)) {
+          html += `<h3 class="section-heading">${escapeHtml(merged)}</h3>`;
+        } else {
+          html += `<p>${escapeHtml(merged)}</p>`;
+        }
+        currentParagraph = [];
+      }
+      continue;
+    }
+    
+    // Check if this line is a heading
+    if (isHeading(line)) {
+      // Flush current paragraph
+      if (currentParagraph.length > 0) {
+        const merged = currentParagraph.join(' ').replace(/\s+/g, ' ');
+        html += `<p>${escapeHtml(merged)}</p>`;
+        currentParagraph = [];
+      }
+      // Add heading
+      html += `<h3 class="section-heading">${escapeHtml(line)}</h3>`;
+    } else {
+      // Add to current paragraph
+      currentParagraph.push(line);
+    }
+  }
+  
+  // Flush remaining paragraph
+  if (currentParagraph.length > 0) {
+    const merged = currentParagraph.join(' ').replace(/\s+/g, ' ');
     if (isHeading(merged)) {
       html += `<h3 class="section-heading">${escapeHtml(merged)}</h3>`;
     } else {
@@ -348,11 +401,12 @@ export function getFormattingCSS(): string {
     
     .formatted-text .section-heading {
       font-weight: 700;
-      font-size: 1.25em;
-      margin-top: 1.8em;
-      margin-bottom: 0.8em;
-      color: #2c3e50;
+      font-size: 1.15em;
+      margin-top: 1.5em;
+      margin-bottom: 0.6em;
+      color: #1a1a1a;
       line-height: 1.3;
+      font-family: inherit;
     }
     
     .formatted-text .section-heading:first-child {
