@@ -169,7 +169,7 @@ export default function Dashboard() {
             ) : (
               <div className="text-center py-8 text-muted-foreground">
                 <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No exams yet. Create your first exam to get started!</p>
+                <p>{t.noExamsYet}. {t.createFirstExam}!</p>
               </div>
             )}
           </CardContent>

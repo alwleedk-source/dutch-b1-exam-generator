@@ -87,6 +87,11 @@ export interface Translations {
   currentStreak: string;
   longestStreak: string;
   achievements: string;
+  totalQuestions: string;
+  correctlyAnswered: string;
+  performanceByType: string;
+  performanceByTypeDesc: string;
+  personalizedTips: string;
   
   // Vocabulary
   myVocabulary: string;
@@ -291,13 +296,18 @@ export const translations: Record<Language, Translations> = {
     
     // Progress
     myProgress: "Mijn Voortgang",
-    totalExams: "Totaal examens",
-    completedExams: "Voltooide examens",
-    averageScore: "Gemiddelde score",
-    totalTime: "Totale tijd",
-    currentStreak: "Huidige reeks",
-    longestStreak: "Langste reeks",
+    totalExams: "Totaal Examens",
+    completedExams: "Examens Afgerond",
+    averageScore: "Gemiddelde Score",
+    totalTime: "Totale Tijd",
+    currentStreak: "Huidige Reeks",
+    longestStreak: "Langste Reeks",
     achievements: "Prestaties",
+    totalQuestions: "Totaal Vragen",
+    correctlyAnswered: "Goed Beantwoord",
+    performanceByType: "Prestaties per Vraagtype",
+    performanceByTypeDesc: "Zie waar je sterk bent en waar je kunt verbeteren",
+    personalizedTips: "Gepersonaliseerde tips om je Nederlands te verbeteren",
     
     // Vocabulary
     myVocabulary: "Mijn Woordenschat",
@@ -508,6 +518,11 @@ export const translations: Record<Language, Translations> = {
     currentStreak: "السلسلة الحالية",
     longestStreak: "أطول سلسلة",
     achievements: "الإنجازات",
+    totalQuestions: "إجمالي الأسئلة",
+    correctlyAnswered: "الإجابات الصحيحة",
+    performanceByType: "الأداء حسب نوع السؤال",
+    performanceByTypeDesc: "انظر أين أنت قوي وأين يمكنك التحسين",
+    personalizedTips: "نصائح مخصصة لتحسين الهولندية",
     
     // Vocabulary
     myVocabulary: "مفرداتي",
@@ -711,13 +726,18 @@ export const translations: Record<Language, Translations> = {
     
     // Progress
     myProgress: "My Progress",
-    totalExams: "Total exams",
-    completedExams: "Completed exams",
-    averageScore: "Average score",
-    totalTime: "Total time",
-    currentStreak: "Current streak",
-    longestStreak: "Longest streak",
+    totalExams: "Total Exams",
+    completedExams: "Completed Exams",
+    averageScore: "Average Score",
+    totalTime: "Total Time",
+    currentStreak: "Current Streak",
+    longestStreak: "Longest Streak",
     achievements: "Achievements",
+    totalQuestions: "Total Questions",
+    correctlyAnswered: "Correctly Answered",
+    performanceByType: "Performance by Question Type",
+    performanceByTypeDesc: "See where you're strong and where you can improve",
+    personalizedTips: "Personalized tips to improve your Dutch",
     
     // Vocabulary
     myVocabulary: "My Vocabulary",
@@ -920,14 +940,19 @@ export const translations: Record<Language, Translations> = {
     added: "Eklendi",
     
     // Progress
-    myProgress: "İlerlemem",
-    totalExams: "Toplam sınavlar",
-    completedExams: "Tamamlanan sınavlar",
-    averageScore: "Ortalama puan",
-    totalTime: "Toplam süre",
-    currentStreak: "Mevcut seri",
-    longestStreak: "En uzun seri",
+    myProgress: "İlerleme",
+    totalExams: "Toplam Sınavlar",
+    completedExams: "Tamamlanan Sınavlar",
+    averageScore: "Ortalama Puan",
+    totalTime: "Toplam Süre",
+    currentStreak: "Mevcut Seri",
+    longestStreak: "En Uzun Seri",
     achievements: "Başarılar",
+    totalQuestions: "Toplam Sorular",
+    correctlyAnswered: "Doğru Cevaplanan",
+    performanceByType: "Soru Türüne Göre Performans",
+    performanceByTypeDesc: "Güçlü olduğunuz ve geliştirebileceğiniz alanları görün",
+    personalizedTips: "Hollandcanızı geliştirmek için kişiselleştirilmiş ipuçları",
     
     // Vocabulary
     myVocabulary: "Kelime Bilgim",

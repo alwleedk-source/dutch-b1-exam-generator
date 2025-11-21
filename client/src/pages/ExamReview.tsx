@@ -6,8 +6,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { BookOpen, CheckCircle, XCircle, AlertCircle, Home } from "lucide-react";
 import { Link, useParams } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function ExamReview() {
+  const { t } = useLanguage();
   const { user } = useAuth();
   const params = useParams();
   const examId = parseInt(params.id || "0");
@@ -91,9 +93,9 @@ export default function ExamReview() {
         <div className="max-w-4xl mx-auto">
           {/* Title */}
           <div className="mb-8">
-            <h2 className="text-3xl font-bold mb-2">Antwoorden bekijken</h2>
+            <h2 className="text-3xl font-bold mb-2">{t.examReview}</h2>
             <p className="text-muted-foreground">
-              Bekijk je antwoorden en leer van je fouten
+              {t.reviewAnswers}
             </p>
           </div>
 

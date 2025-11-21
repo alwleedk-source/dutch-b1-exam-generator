@@ -170,9 +170,9 @@ export default function MyExams() {
             <Card>
               <CardContent className="py-12 text-center">
                 <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Nog geen examens</h3>
+                <h3 className="text-xl font-semibold mb-2">{t.noExamsYet}</h3>
                 <p className="text-muted-foreground mb-4">
-                  Begin met oefenen door je eerste examen te maken
+                  {t.createFirstExam}
                 </p>
                 <Link href="/create-exam">
                   <Button>{t.createFirstExam || "Maak je eerste examen"}</Button>
@@ -288,7 +288,7 @@ export default function MyExams() {
                 <Card>
                   <CardContent className="py-12 text-center">
                     <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">Geen examens gevonden</p>
+                    <p className="text-muted-foreground">{t.noExamsYet}</p>
                   </CardContent>
                 </Card>
               ) : (

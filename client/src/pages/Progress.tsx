@@ -4,8 +4,10 @@ import { Progress as ProgressBar } from "@/components/ui/progress";
 import { trpc } from "@/lib/trpc";
 import { AppHeader } from "@/components/AppHeader";
 import { TrendingUp, TrendingDown, CheckCircle, XCircle, Target, BookOpen } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Progress() {
+  const { t } = useLanguage();
   const { user } = useAuth();
   const { data: stats } = trpc.progress.getMyStats.useQuery(undefined, { enabled: !!user });
   const { data: detailedAnalysis } = trpc.progress.getDetailedAnalysis.useQuery(undefined, { enabled: !!user });
@@ -33,13 +35,13 @@ export default function Progress() {
     <div className="min-h-screen bg-gradient-bg">
       <AppHeader />
       <div className="max-w-7xl mx-auto p-4 sm:p-8">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">Jouw Voortgang (Your Progress)</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">{t.myProgress}</h1>
         
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm text-muted-foreground">Examens Afgerond</CardTitle>
+              <CardTitle className="text-sm text-muted-foreground">{t.completedExams}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-3xl sm:text-4xl font-bold">{stats?.examStats?.totalExams || 0}</p>
@@ -47,7 +49,7 @@ export default function Progress() {
           </Card>
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm text-muted-foreground">Gemiddelde Score</CardTitle>
+              <CardTitle className="text-sm text-muted-foreground">{t.averageScore}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className={`text-3xl sm:text-4xl font-bold ${getPerformanceColor(stats?.examStats?.averageScore || 0)}`}>
@@ -57,7 +59,7 @@ export default function Progress() {
           </Card>
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm text-muted-foreground">Totaal Vragen</CardTitle>
+              <CardTitle className="text-sm text-muted-foreground">{t.totalQuestions}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-3xl sm:text-4xl font-bold">{detailedAnalysis?.totalQuestions || 0}</p>
@@ -65,7 +67,7 @@ export default function Progress() {
           </Card>
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm text-muted-foreground">Goed Beantwoord</CardTitle>
+              <CardTitle className="text-sm text-muted-foreground">{t.correctlyAnswered}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-3xl sm:text-4xl font-bold text-green-600">{detailedAnalysis?.totalCorrect || 0}</p>
@@ -76,8 +78,8 @@ export default function Progress() {
         {/* Performance by Question Type */}
         <Card className="mb-6 sm:mb-8">
           <CardHeader>
-            <CardTitle className="text-lg sm:text-xl">Prestaties per Vraagtype</CardTitle>
-            <p className="text-sm text-muted-foreground">Zie waar je sterk bent en waar je kunt verbeteren</p>
+            <CardTitle className="text-lg sm:text-xl">{t.performanceByType}</CardTitle>
+            <p className="text-sm text-muted-foreground">{t.performanceByTypeDesc}</p>
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
@@ -156,8 +158,8 @@ export default function Progress() {
         {detailedAnalysis?.recommendations && detailedAnalysis.recommendations.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Aanbevelingen</CardTitle>
-              <p className="text-sm text-muted-foreground">Gepersonaliseerde tips om je Nederlands te verbeteren</p>
+              <CardTitle className="text-lg">{t.recommendations}</CardTitle>
+              <p className="text-sm text-muted-foreground">{t.personalizedTips}</p>
             </CardHeader>
             <CardContent>
               <ol className="space-y-2 list-decimal list-inside">

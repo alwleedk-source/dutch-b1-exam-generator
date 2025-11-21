@@ -44,8 +44,8 @@ export default function TakeExam() {
       <div className="min-h-screen flex items-center justify-center">
         <Card className="p-6 max-w-md">
           <div className="text-center">
-            <h2 className="text-xl font-semibold mb-2">Exam Not Found</h2>
-            <p className="text-muted-foreground mb-4">This exam does not exist or has been deleted.</p>
+            <h2 className="text-xl font-semibold mb-2">{t.examNotFound}</h2>
+            <p className="text-muted-foreground mb-4">{t.examNotFoundDesc}</p>
             <Button onClick={() => setLocation('/public-exams')}>Browse Exams</Button>
           </div>
         </Card>
