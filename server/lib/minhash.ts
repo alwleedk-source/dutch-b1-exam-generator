@@ -23,18 +23,25 @@ function hashString(str: string, seed: number): number {
 }
 
 /**
- * Tokenize text into shingles (n-grams)
+ * Tokenize text into shingles (word n-grams)
  * @param text - Input text
- * @param n - Shingle size (default: 3)
- * @returns Array of shingles
+ * @param n - Shingle size in words (default: 5)
+ * @returns Array of word shingles
  */
-function getShingles(text: string, n: number = 3): string[] {
-  // Normalize text: lowercase, remove extra spaces
-  const normalized = text.toLowerCase().replace(/\s+/g, ' ').trim();
+function getShingles(text: string, n: number = 5): string[] {
+  // Normalize text: lowercase, remove extra spaces and punctuation
+  const normalized = text.toLowerCase()
+    .replace(/[.,!?;:()\[\]{}"']/g, ' ') // Remove punctuation
+    .replace(/\s+/g, ' ') // Normalize spaces
+    .trim();
   
+  // Split into words
+  const words = normalized.split(' ').filter(w => w.length > 0);
+  
+  // Create word n-grams (shingles)
   const shingles: string[] = [];
-  for (let i = 0; i <= normalized.length - n; i++) {
-    shingles.push(normalized.substring(i, i + n));
+  for (let i = 0; i <= words.length - n; i++) {
+    shingles.push(words.slice(i, i + n).join(' '));
   }
   
   return shingles;
@@ -113,7 +120,8 @@ export function findSimilarTexts(
 }
 
 /**
- * Check if a text is duplicate (≥80% similar to existing texts)
+ * Check if a text is duplicate (≥95% similar to existing texts)
+ * Only rejects nearly identical texts, allows different texts even with common words
  * @param text - New text to check
  * @param existingTexts - Array of existing texts with signatures
  * @returns Object with isDuplicate flag and similar texts
@@ -127,7 +135,7 @@ export function checkDuplicate(
   similarTexts: Array<{ id: number; title: string; similarity: number }>;
 } {
   const signature = calculateMinHash(text);
-  const similarTexts = findSimilarTexts(signature, existingTexts, 0.8);
+  const similarTexts = findSimilarTexts(signature, existingTexts, 0.95);
   
   return {
     isDuplicate: similarTexts.length > 0,
