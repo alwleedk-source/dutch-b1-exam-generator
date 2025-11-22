@@ -988,6 +988,81 @@ export const appRouter = router({
 
         return { success: true };
       }),
+
+    addFromDictionary: protectedProcedure
+      .input(z.object({
+        word: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Get word from dictionary
+        const result = await db.query(
+          'SELECT * FROM b1_dictionary WHERE word = $1 LIMIT 1',
+          [input.word]
+        );
+        
+        if (result.rows.length === 0) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Word not found in dictionary" });
+        }
+        
+        const dictWord = result.rows[0];
+        
+        // Create vocabulary entry if it doesn't exist
+        let vocabEntry = await db.query(
+          'SELECT id FROM vocabulary WHERE "dutchWord" = $1 LIMIT 1',
+          [dictWord.word]
+        );
+        
+        let vocabularyId: number;
+        
+        if (vocabEntry.rows.length === 0) {
+          // Create new vocabulary entry
+          const newVocab = await db.createVocabulary({
+            text_id: null, // Dictionary words don't belong to a specific text
+            dutchWord: dictWord.word,
+            dutchDefinition: dictWord.definition_nl || '',
+            wordType: dictWord.word_type || 'unknown',
+            arabicTranslation: dictWord.translation_ar || '',
+            englishTranslation: dictWord.translation_en || '',
+            turkishTranslation: dictWord.translation_tr || '',
+            exampleSentence: dictWord.example_nl || '',
+            difficulty: 'B1',
+          });
+          vocabularyId = newVocab.id;
+        } else {
+          vocabularyId = vocabEntry.rows[0].id;
+        }
+        
+        // Check if user already has this word
+        const existingUserVocab = await db.getUserVocabularyByVocabId(
+          ctx.user.id,
+          vocabularyId
+        );
+        
+        if (existingUserVocab) {
+          throw new TRPCError({ 
+            code: "CONFLICT", 
+            message: "You already have this word in your vocabulary" 
+          });
+        }
+        
+        // Add to user's vocabulary
+        await db.createUserVocabulary({
+          user_id: ctx.user.id,
+          vocabulary_id: vocabularyId,
+          status: "new" as const,
+          correct_count: 0,
+          incorrect_count: 0,
+          next_review_at: new Date(),
+          ease_factor: 2500,
+          interval: 0,
+          repetitions: 0,
+        });
+        
+        // Update user's vocabulary count
+        await db.updateUserVocabularyCount(ctx.user.id);
+        
+        return { success: true };
+      }),
   }),
 
   // Reporting
@@ -1172,6 +1247,41 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         await db.updateUserPreferences(ctx.user.id, input.language);
         return { success: true };
+      }),
+  }),
+
+  // Dictionary router
+  dictionary: router({
+    search: publicProcedure
+      .input(z.object({
+        query: z.string().optional(),
+        letter: z.string().optional(),
+        limit: z.number().default(50),
+      }))
+      .query(async ({ input }) => {
+        const { query, letter, limit } = input;
+        
+        let sql = 'SELECT * FROM b1_dictionary WHERE 1=1';
+        const params: any[] = [];
+        let paramIndex = 1;
+
+        if (query && query.length >= 2) {
+          sql += ` AND word ILIKE $${paramIndex}`;
+          params.push(`%${query}%`);
+          paramIndex++;
+        }
+
+        if (letter) {
+          sql += ` AND word ILIKE $${paramIndex}`;
+          params.push(`${letter}%`);
+          paramIndex++;
+        }
+
+        sql += ` ORDER BY word ASC LIMIT $${paramIndex}`;
+        params.push(limit);
+
+        const result = await db.query(sql, params);
+        return result.rows;
       }),
   }),
 });

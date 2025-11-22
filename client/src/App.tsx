@@ -11,6 +11,7 @@ import CreateExam from "./pages/CreateExam";
 import TakeExam from "./pages/TakeExam";
 import Progress from "./pages/Progress";
 import Vocabulary from "./pages/Vocabulary";
+import Dictionary from "./pages/Dictionary";
 import AdminDashboard from "./pages/AdminDashboard";
 import Leaderboard from "./pages/Leaderboard";
 import Achievements from "./pages/Achievements";
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/exam/:id/review" component={ExamReview} />
       <Route path="/progress" component={Progress} />
       <Route path="/vocabulary" component={Vocabulary} />
+      <Route path="/dictionary" component={Dictionary} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/leaderboard" component={Leaderboard} />
       <Route path="/achievements" component={Achievements} />
