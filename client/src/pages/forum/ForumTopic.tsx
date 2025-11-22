@@ -151,8 +151,8 @@ export default function ForumTopic() {
     }
     
     reportMutation.mutate({
-      contentType: reportContentType,
-      contentId: reportContentId,
+      topicId: reportContentType === "topic" ? reportContentId : undefined,
+      postId: reportContentType === "post" ? reportContentId : undefined,
       reason: reportReason,
     });
   };
