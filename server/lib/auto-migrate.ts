@@ -53,6 +53,15 @@ export async function autoMigrate() {
     } else {
       console.log("[Auto-Migrate] ✅ b1_dictionary table already exists");
       
+      // Add audio columns if they don't exist (migration for existing tables)
+      console.log("[Auto-Migrate] Checking for audio columns...");
+      await db.execute(sql`
+        ALTER TABLE "b1_dictionary" 
+        ADD COLUMN IF NOT EXISTS "audio_url" text,
+        ADD COLUMN IF NOT EXISTS "audio_key" varchar(255);
+      `);
+      console.log("[Auto-Migrate] ✅ audio columns ensured");
+      
       // Check if table is empty
       const count = await db.execute(sql`SELECT COUNT(*) as count FROM b1_dictionary`);
       const wordCount = parseInt(count[0]?.count || '0');
