@@ -238,6 +238,25 @@ export const forumRouter = router({
         });
       }
       
+      // Check cooldown (2 minutes between topics)
+      const lastTopic = await database
+        .select({ created_at: forumTopics.created_at })
+        .from(forumTopics)
+        .where(eq(forumTopics.user_id, ctx.user.id))
+        .orderBy(desc(forumTopics.created_at))
+        .limit(1);
+      
+      if (lastTopic.length > 0) {
+        const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
+        if (lastTopic[0].created_at > twoMinutesAgo) {
+          const waitSeconds = Math.ceil((lastTopic[0].created_at.getTime() + 120000 - Date.now()) / 1000);
+          throw new TRPCError({ 
+            code: "TOO_MANY_REQUESTS", 
+            message: `Please wait ${waitSeconds} seconds before creating another topic.` 
+          });
+        }
+      }
+      
       // Check rate limit
       const userCreatedAt = ctx.user.created_at || new Date();
       const isNew = isNewUser(userCreatedAt);
@@ -249,6 +268,41 @@ export const forumRouter = router({
         throw new TRPCError({ 
           code: "TOO_MANY_REQUESTS", 
           message: `Rate limit exceeded. You can create maximum ${maxTopics} topics per hour.` 
+        });
+      }
+      
+      // Validate content
+      if (input.title.length < 5) {
+        throw new TRPCError({ 
+          code: "BAD_REQUEST", 
+          message: "Topic title must be at least 5 characters long." 
+        });
+      }
+      
+      if (input.content.length < 20) {
+        throw new TRPCError({ 
+          code: "BAD_REQUEST", 
+          message: "Topic content must be at least 20 characters long." 
+        });
+      }
+      
+      // Check for duplicate title in same category (last 24 hours)
+      const duplicateTitle = await database
+        .select()
+        .from(forumTopics)
+        .where(
+          and(
+            eq(forumTopics.category_id, input.categoryId),
+            eq(forumTopics.title, input.title),
+            gte(forumTopics.created_at, new Date(Date.now() - 24 * 60 * 60 * 1000))
+          )
+        )
+        .limit(1);
+      
+      if (duplicateTitle.length > 0) {
+        throw new TRPCError({ 
+          code: "BAD_REQUEST", 
+          message: "A topic with this title already exists in this category. Please use a different title." 
         });
       }
       
@@ -298,6 +352,25 @@ export const forumRouter = router({
         throw new TRPCError({ code: "FORBIDDEN", message: "This topic is locked" });
       }
       
+      // Check cooldown (30 seconds between posts)
+      const lastPost = await database
+        .select({ created_at: forumPosts.created_at })
+        .from(forumPosts)
+        .where(eq(forumPosts.user_id, ctx.user.id))
+        .orderBy(desc(forumPosts.created_at))
+        .limit(1);
+      
+      if (lastPost.length > 0) {
+        const thirtySecondsAgo = new Date(Date.now() - 30 * 1000);
+        if (lastPost[0].created_at > thirtySecondsAgo) {
+          const waitSeconds = Math.ceil((lastPost[0].created_at.getTime() + 30000 - Date.now()) / 1000);
+          throw new TRPCError({ 
+            code: "TOO_MANY_REQUESTS", 
+            message: `Please wait ${waitSeconds} seconds before posting again.` 
+          });
+        }
+      }
+      
       // Check rate limit
       const userCreatedAt = ctx.user.created_at || new Date();
       const isNew = isNewUser(userCreatedAt);
@@ -309,6 +382,34 @@ export const forumRouter = router({
         throw new TRPCError({ 
           code: "TOO_MANY_REQUESTS", 
           message: `Rate limit exceeded. You can create maximum ${maxPosts} posts per hour.` 
+        });
+      }
+      
+      // Validate content length
+      if (input.content.length < 10) {
+        throw new TRPCError({ 
+          code: "BAD_REQUEST", 
+          message: "Post content must be at least 10 characters long." 
+        });
+      }
+      
+      // Check for duplicate content (same content in last 5 minutes)
+      const recentDuplicate = await database
+        .select()
+        .from(forumPosts)
+        .where(
+          and(
+            eq(forumPosts.user_id, ctx.user.id),
+            eq(forumPosts.content, input.content),
+            gte(forumPosts.created_at, new Date(Date.now() - 5 * 60 * 1000))
+          )
+        )
+        .limit(1);
+      
+      if (recentDuplicate.length > 0) {
+        throw new TRPCError({ 
+          code: "BAD_REQUEST", 
+          message: "You have already posted this exact content recently. Please avoid duplicate posts." 
         });
       }
       
@@ -691,7 +792,7 @@ export const forumRouter = router({
     .input(z.object({
       topicId: z.number().optional(),
       postId: z.number().optional(),
-      reason: z.enum(["spam", "inappropriate", "off_topic", "duplicate", "other"]),
+      reason: z.enum(["spam", "harassment", "inappropriate", "misinformation", "other"]),
       details: z.string().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
