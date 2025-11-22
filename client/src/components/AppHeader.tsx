@@ -18,7 +18,7 @@ import { NotificationsDropdown } from "./NotificationsDropdown";
  * Used across all authenticated pages
  */
 export function AppHeader() {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const { t } = useLanguage();
 
   return (
