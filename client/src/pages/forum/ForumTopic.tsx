@@ -3,10 +3,27 @@ import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ForumEditor } from "@/components/ForumEditor";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, ThumbsUp, ThumbsDown, Send, Edit, Trash2, Pin, Lock, EyeOff } from "lucide-react";
+import { truncateName } from "@/lib/utils";
+import { ArrowLeft, ThumbsUp, ThumbsDown, Send, Edit, Trash2, Pin, Lock, EyeOff, Flag } from "lucide-react";
 import { Link, useParams } from "wouter";
 import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
@@ -19,6 +36,10 @@ export default function ForumTopic() {
   
   const topicId = parseInt(id || "0");
   const [replyContent, setReplyContent] = useState("");
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
+  const [reportContentType, setReportContentType] = useState<"topic" | "post">("topic");
+  const [reportContentId, setReportContentId] = useState<number>(0);
+  const [reportReason, setReportReason] = useState<string>("");
   
   const utils = trpc.useUtils();
   const { data, isLoading } = trpc.forum.getTopic.useQuery({
@@ -94,6 +115,17 @@ export default function ForumTopic() {
     },
   });
   
+  const reportMutation = trpc.forum.reportContent.useMutation({
+    onSuccess: () => {
+      toast.success(t.reportSubmitted || "Report submitted successfully");
+      setReportDialogOpen(false);
+      setReportReason("");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+  
   const canEditOrDelete = (createdAt: string, userId: number) => {
     if (!user) return false;
     if (user.role === "moderator" || user.role === "admin") return true;
@@ -104,6 +136,25 @@ export default function ForumTopic() {
   };
   
   const isModerator = user && (user.role === "moderator" || user.role === "admin");
+  
+  const handleReportClick = (contentType: "topic" | "post", contentId: number) => {
+    setReportContentType(contentType);
+    setReportContentId(contentId);
+    setReportDialogOpen(true);
+  };
+  
+  const handleReportSubmit = () => {
+    if (!reportReason) {
+      toast.error(t.selectReportReason || "Please select a reason");
+      return;
+    }
+    
+    reportMutation.mutate({
+      contentType: reportContentType,
+      contentId: reportContentId,
+      reason: reportReason,
+    });
+  };
 
   const handleReply = () => {
     if (!replyContent.trim()) {
@@ -173,7 +224,7 @@ export default function ForumTopic() {
             </div>
             
             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-              <span>by {data.topic.user_name || "Unknown"}</span>
+              <span title={data.topic.user_name || "Unknown"}>by {truncateName(data.topic.user_name)}</span>
               <span>•</span>
               <span>
                 {data.topic.created_at && formatDistanceToNow(new Date(data.topic.created_at), { addSuffix: true })}
@@ -203,6 +254,17 @@ export default function ForumTopic() {
               >
                 <ThumbsDown className="h-4 w-4 mr-1" />
               </Button>
+              
+              {user && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleReportClick("topic", data.topic.id)}
+                >
+                  <Flag className="h-4 w-4 mr-1" />
+                  {t.report || "Report"}
+                </Button>
+              )}
               
               {canEditOrDelete(data.topic.created_at, data.topic.user_id) && (
                 <Button
@@ -269,7 +331,7 @@ export default function ForumTopic() {
             <Card key={post.id}>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                  <span className="font-medium">{post.user_name || "Unknown"}</span>
+                  <span className="font-medium" title={post.user_name || "Unknown"}>{truncateName(post.user_name)}</span>
                   <span>•</span>
                   <span>
                     {post.created_at && formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
@@ -291,6 +353,17 @@ export default function ForumTopic() {
                     <ThumbsUp className="h-4 w-4 mr-1" />
                     {post.upvote_count}
                   </Button>
+                  
+                  {user && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleReportClick("post", post.id)}
+                    >
+                      <Flag className="h-4 w-4 mr-1" />
+                      {t.report || "Report"}
+                    </Button>
+                  )}
                   
                   {canEditOrDelete(post.created_at, post.user_id) && (
                     <Button
@@ -347,6 +420,45 @@ export default function ForumTopic() {
           </Card>
         )}
       </main>
+      
+      {/* Report Dialog */}
+      <Dialog open={reportDialogOpen} onOpenChange={setReportDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t.reportContent || "Report Content"}</DialogTitle>
+            <DialogDescription>
+              {t.reportDescription || "Please select a reason for reporting this content."}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <Label>{t.reason || "Reason"}</Label>
+              <Select value={reportReason} onValueChange={setReportReason}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t.selectReason || "Select a reason"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="spam">{t.spam || "Spam"}</SelectItem>
+                  <SelectItem value="harassment">{t.harassment || "Harassment"}</SelectItem>
+                  <SelectItem value="inappropriate">{t.inappropriate || "Inappropriate Content"}</SelectItem>
+                  <SelectItem value="misinformation">{t.misinformation || "Misinformation"}</SelectItem>
+                  <SelectItem value="other">{t.other || "Other"}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setReportDialogOpen(false)}>
+              {t.cancel || "Cancel"}
+            </Button>
+            <Button onClick={handleReportSubmit} disabled={reportMutation.isPending}>
+              {t.submit || "Submit"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

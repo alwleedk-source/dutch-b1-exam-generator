@@ -334,6 +334,18 @@ export interface Translations {
   hide: string;
   unhide: string;
   hidden: string;
+  report: string;
+  reportContent: string;
+  reportDescription: string;
+  reportSubmitted: string;
+  selectReportReason: string;
+  reason: string;
+  selectReason: string;
+  spam: string;
+  harassment: string;
+  inappropriate: string;
+  misinformation: string;
+  other: string;
   topicPinToggled: string;
   topicLockToggled: string;
   topicHideToggled: string;
@@ -721,6 +733,18 @@ export const translations: Record<Language, Translations> = {
     hide: "Verbergen",
     unhide: "Tonen",
     hidden: "Verborgen",
+    report: "Rapporteren",
+    reportContent: "Inhoud rapporteren",
+    reportDescription: "Selecteer een reden voor het rapporteren van deze inhoud.",
+    reportSubmitted: "Rapport succesvol ingediend",
+    selectReportReason: "Selecteer een reden",
+    reason: "Reden",
+    selectReason: "Selecteer een reden",
+    spam: "Spam",
+    harassment: "Intimidatie",
+    inappropriate: "Ongepaste inhoud",
+    misinformation: "Desinformatie",
+    other: "Anders",
     topicPinToggled: "Onderwerp vastpinnen gewijzigd",
     topicLockToggled: "Onderwerp vergrendeling gewijzigd",
     topicHideToggled: "Onderwerp zichtbaarheid gewijzigd",
@@ -1106,6 +1130,18 @@ export const translations: Record<Language, Translations> = {
     hide: "إخفاء",
     unhide: "إظهار",
     hidden: "مخفي",
+    report: "تبليغ",
+    reportContent: "تبليغ عن محتوى",
+    reportDescription: "يرجى اختيار سبب التبليغ عن هذا المحتوى.",
+    reportSubmitted: "تم إرسال التبليغ بنجاح",
+    selectReportReason: "يرجى اختيار سبب",
+    reason: "السبب",
+    selectReason: "اختر سبباً",
+    spam: "رسائل مزعجة",
+    harassment: "مضايقة",
+    inappropriate: "محتوى غير لائق",
+    misinformation: "معلومات مضللة",
+    other: "أخرى",
     topicPinToggled: "تم تغيير تثبيت الموضوع",
     topicLockToggled: "تم تغيير إغلاق الموضوع",
     topicHideToggled: "تم تغيير إظهار الموضوع",
@@ -1491,6 +1527,18 @@ export const translations: Record<Language, Translations> = {
     hide: "Hide",
     unhide: "Unhide",
     hidden: "Hidden",
+    report: "Report",
+    reportContent: "Report Content",
+    reportDescription: "Please select a reason for reporting this content.",
+    reportSubmitted: "Report submitted successfully",
+    selectReportReason: "Please select a reason",
+    reason: "Reason",
+    selectReason: "Select a reason",
+    spam: "Spam",
+    harassment: "Harassment",
+    inappropriate: "Inappropriate Content",
+    misinformation: "Misinformation",
+    other: "Other",
     topicPinToggled: "Topic pin toggled",
     topicLockToggled: "Topic lock toggled",
     topicHideToggled: "Topic visibility toggled",
@@ -1877,6 +1925,18 @@ export const translations: Record<Language, Translations> = {
     hide: "Gizle",
     unhide: "Göster",
     hidden: "Gizli",
+    report: "Bildir",
+    reportContent: "İçeriği Bildir",
+    reportDescription: "Lütfen bu içeriği bildirmek için bir neden seçin.",
+    reportSubmitted: "Rapor başarıyla gönderildi",
+    selectReportReason: "Lütfen bir neden seçin",
+    reason: "Neden",
+    selectReason: "Bir neden seçin",
+    spam: "Spam",
+    harassment: "Taciz",
+    inappropriate: "Uygunsuz İçerik",
+    misinformation: "Yanlış Bilgi",
+    other: "Diğer",
     topicPinToggled: "Konu sabitleme değiştirildi",
     topicLockToggled: "Konu kilitleme değiştirildi",
     topicHideToggled: "Konu görünürlüğü değiştirildi",

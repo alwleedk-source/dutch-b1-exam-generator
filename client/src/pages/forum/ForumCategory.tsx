@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
+import { truncateName } from "@/lib/utils";
 import { ArrowLeft, MessageSquare, Pin, Lock, ThumbsUp, Eye, Plus, EyeOff } from "lucide-react";
 import { Link, useParams } from "wouter";
 import { formatDistanceToNow } from "date-fns";
@@ -86,7 +87,7 @@ export default function ForumCategory() {
                         </div>
                         
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span>by {topic.user_name || "Unknown"}</span>
+                          <span title={topic.user_name || "Unknown"}>by {truncateName(topic.user_name)}</span>
                           <span>•</span>
                           <span>
                             {topic.created_at && formatDistanceToNow(new Date(topic.created_at), { addSuffix: true })}
