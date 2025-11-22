@@ -43,14 +43,28 @@ export default function Dictionary() {
 
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
-  const playAudio = async (word: string) => {
+  const playAudio = async (audioUrl: string | null, word: string) => {
     try {
-      const utterance = new SpeechSynthesisUtterance(word);
-      utterance.lang = "nl-NL";
-      utterance.rate = 0.8;
-      speechSynthesis.speak(utterance);
+      if (audioUrl) {
+        // Use R2 audio if available
+        const audio = new Audio(audioUrl);
+        await audio.play();
+      } else {
+        // Fallback to Web Speech API
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = "nl-NL";
+        utterance.rate = 0.8;
+        speechSynthesis.speak(utterance);
+      }
     } catch (error) {
       console.error("Audio playback failed:", error);
+      // If R2 audio fails, try Web Speech API as fallback
+      if (audioUrl) {
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = "nl-NL";
+        utterance.rate = 0.8;
+        speechSynthesis.speak(utterance);
+      }
     }
   };
 
@@ -127,7 +141,7 @@ export default function Dictionary() {
                 <h3 className="text-xl font-bold text-gray-900">{word.word}</h3>
                 <div className="flex gap-2">
                   <button
-                    onClick={() => playAudio(word.word)}
+                    onClick={() => playAudio(word.audio_url, word.word)}
                     className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
                     title="Play audio"
                   >
