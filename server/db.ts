@@ -1,4 +1,4 @@
-import { eq, desc, and, sql, or, gte } from "drizzle-orm";
+import { eq, desc, and, sql, or, gte, ilike } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import {
@@ -20,6 +20,7 @@ import {
   InsertReport,
   achievements,
   InsertAchievement,
+  b1Dictionary,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -1117,4 +1118,40 @@ export async function getVocabularyByWord(word: string) {
     .limit(1);
 
   return result[0] || null;
+}
+
+/**
+ * Search B1 dictionary
+ */
+export async function searchDictionary(options: {
+  query?: string;
+  letter?: string;
+  limit?: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  let queryBuilder = db.select().from(b1Dictionary);
+
+  // Apply filters
+  const conditions = [];
+  
+  if (options.query && options.query.length >= 2) {
+    conditions.push(ilike(b1Dictionary.word, `%${options.query}%`));
+  }
+  
+  if (options.letter) {
+    conditions.push(ilike(b1Dictionary.word, `${options.letter}%`));
+  }
+
+  if (conditions.length > 0) {
+    queryBuilder = queryBuilder.where(and(...conditions));
+  }
+
+  // Apply limit and ordering
+  const result = await queryBuilder
+    .orderBy(b1Dictionary.word)
+    .limit(options.limit || 50);
+
+  return result;
 }

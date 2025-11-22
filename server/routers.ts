@@ -1260,29 +1260,11 @@ export const appRouter = router({
         limit: z.number().default(50),
       }))
       .query(async ({ input }) => {
-        const { query, letter, limit } = input;
-        
-        let sql = 'SELECT * FROM b1_dictionary WHERE 1=1';
-        const params: any[] = [];
-        let paramIndex = 1;
-
-        if (query && query.length >= 2) {
-          sql += ` AND word ILIKE $${paramIndex}`;
-          params.push(`%${query}%`);
-          paramIndex++;
-        }
-
-        if (letter) {
-          sql += ` AND word ILIKE $${paramIndex}`;
-          params.push(`${letter}%`);
-          paramIndex++;
-        }
-
-        sql += ` ORDER BY word ASC LIMIT $${paramIndex}`;
-        params.push(limit);
-
-        const result = await db.query(sql, params);
-        return result.rows;
+        return await db.searchDictionary({
+          query: input.query,
+          letter: input.letter,
+          limit: input.limit,
+        });
       }),
   }),
 });
