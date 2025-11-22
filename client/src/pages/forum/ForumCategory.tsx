@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
 import { truncateName } from "@/lib/utils";
+import { UserAvatar } from "@/components/UserAvatar";
 import { ArrowLeft, MessageSquare, Pin, Lock, ThumbsUp, Eye, Plus, EyeOff } from "lucide-react";
 import { Link, useParams } from "wouter";
 import { formatDistanceToNow } from "date-fns";
@@ -86,8 +87,9 @@ export default function ForumCategory() {
                           </h3>
                         </div>
                         
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span title={topic.user_name || "Unknown"}>by {truncateName(topic.user_name)}</span>
+                        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                          <UserAvatar name={topic.user_name} size="sm" />
+                          <span title={topic.user_name || "Unknown"}>{truncateName(topic.user_name)}</span>
                           <span>•</span>
                           <span>
                             {topic.created_at && formatDistanceToNow(new Date(topic.created_at), { addSuffix: true })}

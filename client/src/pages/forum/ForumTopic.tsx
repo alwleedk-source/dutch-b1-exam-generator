@@ -23,6 +23,7 @@ import { ForumEditor } from "@/components/ForumEditor";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
 import { truncateName } from "@/lib/utils";
+import { UserAvatar } from "@/components/UserAvatar";
 import { ArrowLeft, ThumbsUp, ThumbsDown, Send, Edit, Trash2, Pin, Lock, EyeOff, Flag } from "lucide-react";
 import { Link, useParams } from "wouter";
 import { formatDistanceToNow } from "date-fns";
@@ -223,8 +224,9 @@ export default function ForumTopic() {
               )}
             </div>
             
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-              <span title={data.topic.user_name || "Unknown"}>by {truncateName(data.topic.user_name)}</span>
+            <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4">
+              <UserAvatar name={data.topic.user_name} size="sm" />
+              <span title={data.topic.user_name || "Unknown"}>{truncateName(data.topic.user_name)}</span>
               <span>•</span>
               <span>
                 {data.topic.created_at && formatDistanceToNow(new Date(data.topic.created_at), { addSuffix: true })}
@@ -330,7 +332,8 @@ export default function ForumTopic() {
           {data.posts.map((post) => (
             <Card key={post.id}>
               <CardContent className="pt-6">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
+                <div className="flex items-center gap-3 text-sm text-muted-foreground mb-3">
+                  <UserAvatar name={post.user_name} size="sm" />
                   <span className="font-medium" title={post.user_name || "Unknown"}>{truncateName(post.user_name)}</span>
                   <span>•</span>
                   <span>
