@@ -335,6 +335,21 @@ export interface Translations {
   pageNotFoundDesc: string;
   goHome: string;
   
+  // Exam Timer
+  practiceMode: string;
+  examMode: string;
+  timeRemaining: string;
+  timeUp: string;
+  timeWarning: string;
+  minutesRemaining: string;
+  chooseMode: string;
+  practiceModeDesc: string;
+  examModeDesc: string;
+  timerStarted: string;
+  timerPaused: string;
+  pauseTimer: string;
+  resumeTimer: string;
+  
   // Forum
   forumTitle: string;
   forumDescription: string;
@@ -659,8 +674,8 @@ export const translations: Record<Language, Translations> = {
     benefit1Desc: "Train jezelf om Nederlandse teksten sneller en beter te begrijpen",
     benefit2Title: "Bereid je voor op het Staatsexamen",
     benefit2Desc: "Oefen met vragen die identiek zijn aan het officiële inburgeringsexamen",
-    benefit3Title: "Leer in je Eigen Tempo",
-    benefit3Desc: "Geen tijdslimiet - neem de tijd die je nodig hebt voor elk examen",
+    benefit3Title: "Tijdmanagement Training",
+    benefit3Desc: "Oefen met realistische tijdslimieten zoals het officiële examen (2.8 minuten per vraag)",
     benefit4Title: "Volg je Voortgang",
     benefit4Desc: "Zie je scores verbeteren en identificeer je sterke en zwakke punten",
     benefit5Title: "Meertalige Ondersteuning",
@@ -791,6 +806,21 @@ export const translations: Record<Language, Translations> = {
     pageNotFound: "Pagina Niet Gevonden",
     pageNotFoundDesc: "De pagina die je zoekt bestaat niet.",
     goHome: "Naar Home",
+    
+    // Exam Timer
+    practiceMode: "Oefenmodus",
+    examMode: "Examenmodus",
+    timeRemaining: "Resterende tijd",
+    timeUp: "Tijd is op!",
+    timeWarning: "Waarschuwing: Nog maar 5 minuten!",
+    minutesRemaining: "minuten resterend",
+    chooseMode: "Kies je modus",
+    practiceModeDesc: "Geen tijdslimiet - neem de tijd om te leren",
+    examModeDesc: "Realistische tijdslimiet zoals het officiële examen",
+    timerStarted: "Timer gestart",
+    timerPaused: "Timer gepauzeerd",
+    pauseTimer: "Pauzeer Timer",
+    resumeTimer: "Hervat Timer",
     
     // Forum
     forumTitle: "Community Forum",
@@ -1106,8 +1136,8 @@ export const translations: Record<Language, Translations> = {
     benefit1Desc: "درّب نفسل على فهم النصوص الهولندية بشكل أسرع وأفضل",
     benefit2Title: "استعد لامتحان Staatsexamen",
     benefit2Desc: "تدرّب على أسئلة مطابقة تماماً لامتحان الاندماج الرسمي",
-    benefit3Title: "تعلّم بوتيرتك الخاصة",
-    benefit3Desc: "لا يوجد حد زمني - خذ الوقت الذي تحتاجه لكل امتحان",
+    benefit3Title: "التدرب على إدارة الوقت",
+    benefit3Desc: "تدرّب مع حدود زمنية واقعية مثل الامتحان الرسمي (2.8 دقيقة لكل سؤال)",
     benefit4Title: "تابع تقدّمك",
     benefit4Desc: "شاهد تحسّن درجاتك وحدّد نقاط قوتك وضعفك",
     benefit5Title: "دعم متعدد اللغات",
@@ -1236,6 +1266,21 @@ export const translations: Record<Language, Translations> = {
     pageNotFound: "الصفحة غير موجودة",
     pageNotFoundDesc: "الصفحة التي تبحث عنها غير موجودة.",
     goHome: "العودة للرئيسية",
+    
+    // Exam Timer
+    practiceMode: "وضع التدريب",
+    examMode: "وضع الامتحان",
+    timeRemaining: "الوقت المتبقي",
+    timeUp: "انتهى الوقت!",
+    timeWarning: "تحذير: لم يتبق سوى 5 دقائق!",
+    minutesRemaining: "دقيقة متبقية",
+    chooseMode: "اختر الوضع",
+    practiceModeDesc: "بدون حد زمني - خذ وقتك للتعلّم",
+    examModeDesc: "حد زمني واقعي مثل الامتحان الرسمي",
+    timerStarted: "بدأ المؤقت",
+    timerPaused: "تم إيقاف المؤقت",
+    pauseTimer: "إيقاف المؤقت",
+    resumeTimer: "استئناف المؤقت",
     
     // Forum
     forumTitle: "مجتمع المنتدى",
@@ -1551,8 +1596,8 @@ export const translations: Record<Language, Translations> = {
     benefit1Desc: "Train yourself to understand Dutch texts faster and better",
     benefit2Title: "Prepare for Staatsexamen",
     benefit2Desc: "Practice with questions identical to the official integration exam",
-    benefit3Title: "Learn at Your Own Pace",
-    benefit3Desc: "No time limit - take the time you need for each exam",
+    benefit3Title: "Time Management Training",
+    benefit3Desc: "Practice with realistic time limits like the official exam (2.8 minutes per question)",
     benefit4Title: "Track Your Progress",
     benefit4Desc: "See your scores improve and identify your strengths and weaknesses",
     benefit5Title: "Multilingual Support",
@@ -1682,6 +1727,21 @@ export const translations: Record<Language, Translations> = {
     pageNotFound: "Page Not Found",
     pageNotFoundDesc: "The page you're looking for doesn't exist.",
     goHome: "Go Home",
+    
+    // Exam Timer
+    practiceMode: "Practice Mode",
+    examMode: "Exam Mode",
+    timeRemaining: "Time Remaining",
+    timeUp: "Time's Up!",
+    timeWarning: "Warning: Only 5 minutes left!",
+    minutesRemaining: "minutes remaining",
+    chooseMode: "Choose Your Mode",
+    practiceModeDesc: "No time limit - take your time to learn",
+    examModeDesc: "Realistic time limit like the official exam",
+    timerStarted: "Timer started",
+    timerPaused: "Timer paused",
+    pauseTimer: "Pause Timer",
+    resumeTimer: "Resume Timer",
     
     // Forum
     forumTitle: "Community Forum",
@@ -1997,8 +2057,8 @@ export const translations: Record<Language, Translations> = {
     benefit1Desc: "Hollandaca metinleri daha hızlı ve daha iyi anlamak için kendinizi eğitin",
     benefit2Title: "Staatsexamen'e Hazırlan",
     benefit2Desc: "Resmi entegrasyon sınavıyla aynı sorularla pratik yapın",
-    benefit3Title: "Kendi Hızınızda Öğrenin",
-    benefit3Desc: "Zaman sınırı yok - her sınav için ihtiyaç duyduğunuz zamanı ayırın",
+    benefit3Title: "Zaman Yönetimi Eğitimi",
+    benefit3Desc: "Resmi sınav gibi gerçekçi zaman sınırlarıyla pratik yapın (soru başına 2.8 dakika)",
     benefit4Title: "İlerlemenizi Takip Edin",
     benefit4Desc: "Puanlarınızın iyileştiğini görün ve güçlü ve zayıf yönlerinizi belirleyin",
     benefit5Title: "Çok Dilli Destek",
@@ -2129,6 +2189,21 @@ export const translations: Record<Language, Translations> = {
     pageNotFound: "Sayfa Bulunamadı",
     pageNotFoundDesc: "Aradığınız sayfa mevcut değil.",
     goHome: "Ana Sayfaya Dön",
+    
+    // Exam Timer
+    practiceMode: "Alıştırma Modu",
+    examMode: "Sınav Modu",
+    timeRemaining: "Kalan Süre",
+    timeUp: "Süre Doldu!",
+    timeWarning: "Uyarı: Sadece 5 dakika kaldı!",
+    minutesRemaining: "dakika kaldı",
+    chooseMode: "Modunuzu Seçin",
+    practiceModeDesc: "Zaman sınırı yok - öğrenmek için zamanınızı ayırın",
+    examModeDesc: "Resmi sınav gibi gerçekçi zaman sınırı",
+    timerStarted: "Zamanlayıcı başlatıldı",
+    timerPaused: "Zamanlayıcı duraklatıldı",
+    pauseTimer: "Zamanlayıcıyı Duraklat",
+    resumeTimer: "Zamanlayıcıyı Devam Ettir",
     
     // Forum
     forumTitle: "Topluluk Forumu",
