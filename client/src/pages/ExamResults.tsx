@@ -67,9 +67,10 @@ export default function ExamResults() {
   const totalQuestions = examData.total_questions || 0;
   const passed = scorePercentage >= 60;
 
-  // Parse performance analysis if available
+  /  // Parse performance analysis if available
   let performanceAnalysis: any = null;
   let recommendations: string[] = [];
+  let skillAnalysis: any = null;
   
   try {
     if (typeof examData.performance_analysis === 'string') {
@@ -77,15 +78,35 @@ export default function ExamResults() {
     } else {
       performanceAnalysis = examData.performance_analysis;
     }
-    
     if (typeof examData.recommendations === 'string') {
       recommendations = JSON.parse(examData.recommendations);
     } else if (Array.isArray(examData.recommendations)) {
       recommendations = examData.recommendations;
     }
+    if (typeof examData.skill_analysis === 'string') {
+      skillAnalysis = JSON.parse(examData.skill_analysis);
+    } else {
+      skillAnalysis = examData.skill_analysis;
+    }
   } catch (e) {
     console.error('Error parsing performance data:', e);
   }
+  
+  // Skill icons and names
+  const skillIcons: Record<string, string> = {
+    hoofdgedachte: '🎯',
+    zoeken: '🔍',
+    volgorde: '📋',
+    conclusie: '💡',
+    woordenschat: '📚',
+  };
+  
+  const skillColors: Record<string, string> = {
+    excellent: 'bg-green-500',
+    good: 'bg-blue-500',
+    needs_improvement: 'bg-yellow-500',
+    weak: 'bg-red-500',
+  }; }
 
   return (
     <div className="min-h-screen bg-gradient-bg">
@@ -134,6 +155,114 @@ export default function ExamResults() {
               </div>
             </CardContent>
           </Card>
+
+          {/* NT2 Skill Analysis */}
+          {skillAnalysis && skillAnalysis.bySkill && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5" />
+                  NT2 Lezen I - Vaardighedenanalyse
+                </CardTitle>
+                <CardDescription>
+                  Jouw prestaties per leesvaardighed
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Skills Grid */}
+                <div className="grid gap-4">
+                  {skillAnalysis.bySkill.map((skill: any) => {
+                    const icon = skillIcons[skill.skillType] || '📚';
+                    const colorClass = skillColors[skill.level] || 'bg-gray-500';
+                    
+                    return (
+                      <div key={skill.skillType} className="p-4 rounded-lg border bg-card">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <div className="text-2xl">{icon}</div>
+                            <div>
+                              <h4 className="font-semibold">{skill.skillName}</h4>
+                              <p className="text-sm text-muted-foreground">
+                                {skill.correct}/{skill.total} correct
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-2xl font-bold">{skill.percentage}%</div>
+                            <div className={`text-xs font-medium px-2 py-1 rounded-full ${colorClass} text-white mt-1`}>
+                              {skill.level === 'excellent' && 'Uitstekend'}
+                              {skill.level === 'good' && 'Goed'}
+                              {skill.level === 'needs_improvement' && 'Verbetering nodig'}
+                              {skill.level === 'weak' && 'Zwak'}
+                            </div>
+                          </div>
+                        </div>
+                        <Progress 
+                          value={skill.percentage} 
+                          className="h-2"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+                
+                {/* Strengths and Weaknesses */}
+                {(skillAnalysis.strengths.length > 0 || skillAnalysis.weaknesses.length > 0) && (
+                  <div className="grid md:grid-cols-2 gap-4 pt-4 border-t">
+                    {skillAnalysis.strengths.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold text-green-600 mb-2 flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4" />
+                          Sterke punten
+                        </h4>
+                        <ul className="space-y-1">
+                          {skillAnalysis.strengths.map((skillType: string) => (
+                            <li key={skillType} className="text-sm flex items-center gap-2">
+                              <span>{skillIcons[skillType]}</span>
+                              <span>{skillAnalysis.bySkill.find((s: any) => s.skillType === skillType)?.skillName}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {skillAnalysis.weaknesses.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold text-red-600 mb-2 flex items-center gap-2">
+                          <XCircle className="h-4 w-4" />
+                          Zwakke punten
+                        </h4>
+                        <ul className="space-y-1">
+                          {skillAnalysis.weaknesses.map((skillType: string) => (
+                            <li key={skillType} className="text-sm flex items-center gap-2">
+                              <span>{skillIcons[skillType]}</span>
+                              <span>{skillAnalysis.bySkill.find((s: any) => s.skillType === skillType)?.skillName}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Skill-based Recommendations */}
+                {skillAnalysis.recommendations && skillAnalysis.recommendations.length > 0 && (
+                  <div className="pt-4 border-t">
+                    <h4 className="font-semibold mb-3">Aanbevelingen voor verbetering</h4>
+                    <ul className="space-y-2">
+                      {skillAnalysis.recommendations.map((rec: string, index: number) => (
+                        <li key={index} className="flex items-start gap-2 text-sm">
+                          <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-xs font-semibold text-primary">{index + 1}</span>
+                          </div>
+                          <span>{rec}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           {/* Performance Analysis */}
           {performanceAnalysis && (

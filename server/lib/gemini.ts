@@ -236,20 +236,77 @@ export async function generateExamQuestions(dutchText: string, questionCount: nu
 Tekst:
 ${dutchText}
 
-=== OFFICIËLE NT2 EXAMENNORMEN ===
+=== OFFICIËLE NT2 LEZEN I - 5 KERNVAARDIGHEDEN ===
 
-1. VRAAGTYPEN EN VERDELING (volg deze percentages nauwkeurig):
-   - Directe detailvragen (60%): Informatie die expliciet in de tekst staat
-     * "Hoeveel...?", "Wanneer...?", "Wat is de functie van...?"
-     * "Waarover kun je meer informatie vinden?"
-   - Inferentievragen (30%): Vereisen begrip en verbinding van informatie
-     * "Waarom is het belangrijk dat...?"
-     * "Wat kun je concluderen uit...?"
-     * "Wat is het doel van...?"
-   - Analytische vragen (10%): Vereisen kritisch denken
-     * "Wat vindt [persoon] van...?"
-     * "Wat is het verschil tussen...?"
-     * "Welk argument wordt genoemd?"
+Elke vraag moet PRECIES één van deze 5 vaardigheden testen:
+
+1. **HOOFDGEDACHTE (Main Idea)** - 15-20% van de vragen
+   Wat het test: Begrip van het algemene doel, thema of hoofdboodschap
+   Voorbeeldvragen:
+   - "Wat is het doel van deze tekst?"
+   - "Voor wie is deze tekst bedoeld?"
+   - "Waar gaat de tekst over?"
+   - "Wat is de hoofdgedachte?"
+   Kenmerken:
+   - Vereist begrip van de tekst als geheel
+   - Niet over specifieke details
+   - Test globaal begrip
+
+2. **ZOEKEN (Search/Scanning)** - 30-35% van de vragen
+   Wat het test: Vermogen om snel specifieke informatie te vinden
+   Voorbeeldvragen:
+   - "Hoeveel kost...?"
+   - "Wanneer begint...?"
+   - "Waar kun je meer informatie vinden?"
+   - "Wat is het telefoonnummer van...?"
+   - "Welke voorwaarde geldt?"
+   Kenmerken:
+   - Antwoord staat expliciet in de tekst
+   - Vereist scannen op zoekwoorden
+   - Test informatiezoekvaardigheden
+
+3. **VOLGORDE (Sequence/Order)** - 10-15% van de vragen
+   Wat het test: Begrip van de volgorde van stappen, gebeurtenissen of procedures
+   Voorbeeldvragen:
+   - "In welke volgorde moet je...?"
+   - "Wat moet je eerst doen?"
+   - "Wat gebeurt er na...?"
+   - "Welke stap komt voor...?"
+   Kenmerken:
+   - Test logisch denken
+   - Vaak in instructieteksten
+   - Vereist begrip van procesverloop
+
+4. **CONCLUSIE (Inference/Conclusion)** - 20-25% van de vragen
+   Wat het test: Vermogen om conclusies te trekken en impliciete informatie te begrijpen
+   Voorbeeldvragen:
+   - "Wat kun je concluderen uit...?"
+   - "Waarom is ... belangrijk?"
+   - "Wat bedoelt de schrijver met...?"
+   - "Wat is de reden dat...?"
+   Kenmerken:
+   - Antwoord niet direct vermeld
+   - Vereist "tussen de regels lezen"
+   - Test kritisch denken
+
+5. **WOORDENSCHAT (Vocabulary in Context)** - 15-20% van de vragen
+   Wat het test: Begrip van woordbetekenissen op basis van context
+   Voorbeeldvragen:
+   - "Wat betekent het woord '...' in deze context?"
+   - "Welk woord heeft dezelfde betekenis als '...'?"
+   - "Wat wordt bedoeld met '...'?"
+   Kenmerken:
+   - Test contextueel begrip
+   - Niet over woordenboekdefinities
+   - Vereist begrip van hoe woorden in zinnen functioneren
+
+VERDELING VAN ${questionCount} VRAGEN:
+- Als ${questionCount} = 4-5: 1 Hoofdgedachte, 2 Zoeken, 1 Volgorde/Conclusie, 1 Woordenschat
+- Als ${questionCount} = 6-8: 1-2 Hoofdgedachte, 2-3 Zoeken, 1 Volgorde, 2 Conclusie, 1 Woordenschat
+- Als ${questionCount} = 9-12: 2 Hoofdgedachte, 3-4 Zoeken, 1-2 Volgorde, 2-3 Conclusie, 2 Woordenschat
+- Als ${questionCount} = 13-15: 2-3 Hoofdgedachte, 4-5 Zoeken, 2 Volgorde, 3-4 Conclusie, 2-3 Woordenschat
+
+ZORG ERVOOR dat elke vraag EXACT één skillType heeft en volg de percentages!
 
 2. VRAAGFORMULERING (gebruik officiële NT2 formuleringen):
    - "Wat is...?", "Waarom...?", "Hoeveel...?"
@@ -292,7 +349,7 @@ Respond in JSON format:
       "question": "Vraag tekst in het Nederlands",
       "options": ["Optie A", "Optie B", "Optie C", "Optie D"],
       "correctAnswerIndex": 0,
-      "questionType": "detail" | "inference" | "analytical",
+      "skillType": "hoofdgedachte" | "zoeken" | "volgorde" | "conclusie" | "woordenschat",
       "difficulty": "easy" | "medium" | "hard",
       "explanation": "Waarom dit het correcte antwoord is",
       "evidence": "De exacte zin uit de tekst die het antwoord bewijst"
@@ -466,17 +523,21 @@ Genereer een korte, beschrijvende titel (max 60 karakters) die het hoofdonderwer
 
 Genereer ${questionCount} meerkeuzevragen op basis van de OPGESCHOONDE tekst (Staatsexamen NT2 Lezen I B1 stijl).
 
-**VRAAGTYPEN EN VERDELING (volg officiële NT2 normen):**
-- Directe detailvragen (60%): Informatie die expliciet in de tekst staat
-  * "Hoeveel...?", "Wanneer...?", "Wat is de functie van...?"
-  * "Waarover kun je meer informatie vinden?"
-- Inferentievragen (30%): Vereisen begrip en verbinding van informatie
-  * "Waarom is het belangrijk dat...?"
-  * "Wat kun je concluderen uit...?"
-  * "Wat is het doel van...?"
-- Analytische vragen (10%): Vereisen kritisch denken
-  * "Wat vindt [persoon] van...?"
-  * "Wat is het verschil tussen...?"
+**NT2 LEZEN I - 5 KERNVAARDIGHEDEN:**
+
+Elke vraag moet PRECIES één van deze 5 vaardigheden testen:
+
+1. HOOFDGEDACHTE (15-20%): "Wat is het doel van de tekst?", "Voor wie is deze tekst?"
+2. ZOEKEN (30-35%): "Hoeveel...?", "Wanneer...?", "Waar kun je informatie vinden?"
+3. VOLGORDE (10-15%): "In welke volgorde...?", "Wat moet je eerst doen?"
+4. CONCLUSIE (20-25%): "Wat kun je concluderen...?", "Waarom is ... belangrijk?"
+5. WOORDENSCHAT (15-20%): "Wat betekent '...' in deze context?"
+
+VERDELING VAN ${questionCount} VRAGEN:
+- 4-5 vragen: 1 Hoofdgedachte, 2 Zoeken, 1 Volgorde/Conclusie, 1 Woordenschat
+- 6-8 vragen: 1-2 Hoofdgedachte, 2-3 Zoeken, 1 Volgorde, 2 Conclusie, 1 Woordenschat
+- 9-12 vragen: 2 Hoofdgedachte, 3-4 Zoeken, 1-2 Volgorde, 2-3 Conclusie, 2 Woordenschat
+- 13-15 vragen: 2-3 Hoofdgedachte, 4-5 Zoeken, 2 Volgorde, 3-4 Conclusie, 2-3 Woordenschat
 
 **VRAAGFORMULERING (gebruik officiële NT2 formuleringen):**
 - "Wat is...?", "Waarom...?", "Hoeveel...?"
@@ -558,7 +619,7 @@ Respond in JSON format:
       "question": "Vraag tekst in het Nederlands",
       "options": ["...", "...", "..."],
       "correctAnswerIndex": 0,
-      "questionType": "Main Idea" | "Scanning" | "Sequencing" | "Inference" | "Vocabulary",
+      "skillType": "hoofdgedachte" | "zoeken" | "volgorde" | "conclusie" | "woordenschat",
       "difficulty": "easy" | "medium" | "hard",
       "explanation": "Waarom dit het correcte antwoord is (in het Nederlands)",
       "evidence": "De exacte zin of alinea uit de tekst die het correcte antwoord bewijst"

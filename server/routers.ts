@@ -521,6 +521,11 @@ export const appRouter = router({
         const staatsexamen_score = calculateStaatsexamenScore(correctCount);
         const performanceAnalysis = analyzePerformanceByType(questions, input.answers);
         const recommendations = generateRecommendations(performanceAnalysis);
+        
+        // Calculate skill-based analysis
+        const { analyzeSkillPerformance } = await import("./lib/skillAnalysis");
+        const userAnswerIndices = input.answers.map(ans => ans.charCodeAt(0) - 65); // A->0, B->1, etc.
+        const skillAnalysis = analyzeSkillPerformance(questions, userAnswerIndices);
 
         // Update exam
         await db.updateExam(input.examId, {
@@ -528,6 +533,7 @@ export const appRouter = router({
           correct_answers: correctCount,
           score_percentage,
           staatsexamen_score,
+          skill_analysis: JSON.stringify(skillAnalysis),
           performance_analysis: JSON.stringify(performanceAnalysis),
           recommendations: JSON.stringify(recommendations),
           completed_at: new Date(),
@@ -552,6 +558,7 @@ export const appRouter = router({
           total_questions: questions.length,
           score_percentage,
           staatsexamen_score,
+          skillAnalysis,
           performanceAnalysis,
           recommendations,
         };
