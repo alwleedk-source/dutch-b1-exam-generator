@@ -20,7 +20,7 @@ export function ReviewModal({ open, onOpenChange, wordId, onComplete }: ReviewMo
   const [showDefinition, setShowDefinition] = useState(false);
   const [playingAudio, setPlayingAudio] = useState(false);
 
-  const { data: allVocabulary } = trpc.vocabulary.getUserVocabularyProgress.useQuery(
+  const { data: allVocabulary } = trpc.vocabulary.getMyVocabularyProgress.useQuery(
     undefined,
     { enabled: open }
   );
