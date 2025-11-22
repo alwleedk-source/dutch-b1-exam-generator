@@ -218,8 +218,8 @@ export default function InteractiveText({ textId, content, className = "" }: Int
         
         .vocab-word {
           cursor: pointer;
-          border-bottom: 2px dotted #3b82f6;
-          color: #2563eb;
+          border-bottom: 2px dotted currentColor;
+          color: inherit;
           transition: all 0.2s ease;
           user-select: none;
           display: inline;
@@ -232,8 +232,9 @@ export default function InteractiveText({ textId, content, className = "" }: Int
         }
         
         .vocab-word:hover {
-          background-color: #dbeafe;
-          border-bottom-color: #1d4ed8;
+          background-color: #f3f4f6;
+          border-bottom-style: solid;
+          border-bottom-width: 2px;
         }
         
         .vocab-tooltip {
