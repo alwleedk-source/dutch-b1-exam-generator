@@ -2,6 +2,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { ForumEditor } from "@/components/ForumEditor";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
@@ -161,7 +162,15 @@ export default function ForumTopic() {
         {/* Topic */}
         <Card className="mb-6">
           <CardContent className="pt-6">
-            <h1 className="text-2xl font-bold mb-4">{data.topic.title}</h1>
+            <div className="flex items-center gap-2 mb-4 flex-wrap">
+              <h1 className="text-2xl font-bold">{data.topic.title}</h1>
+              {data.topic.is_hidden && (
+                <Badge variant="outline" className="border-orange-500 text-orange-600">
+                  <EyeOff className="h-3 w-3 mr-1" />
+                  {t.hidden || "Hidden"}
+                </Badge>
+              )}
+            </div>
             
             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
               <span>by {data.topic.user_name || "Unknown"}</span>

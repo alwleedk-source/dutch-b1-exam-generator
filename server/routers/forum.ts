@@ -109,7 +109,7 @@ export const forumRouter = router({
       page: z.number().default(1),
       limit: z.number().default(20),
     }))
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
       const offset = (input.page - 1) * input.limit;
       
       const topics = await database
@@ -121,6 +121,7 @@ export const forumRouter = router({
           user_name: users.name,
           is_pinned: forumTopics.is_pinned,
           is_locked: forumTopics.is_locked,
+          is_hidden: forumTopics.is_hidden,
           view_count: forumTopics.view_count,
           reply_count: forumTopics.reply_count,
           upvote_count: forumTopics.upvote_count,
@@ -132,7 +133,10 @@ export const forumRouter = router({
         .where(
           and(
             eq(forumTopics.category_id, input.categoryId),
-            eq(forumTopics.is_hidden, false)
+            // Show hidden topics to moderators and admins
+            ctx.user && (ctx.user.role === "moderator" || ctx.user.role === "admin")
+              ? undefined
+              : eq(forumTopics.is_hidden, false)
           )
         )
         .orderBy(desc(forumTopics.is_pinned), desc(forumTopics.last_post_at))
@@ -149,7 +153,7 @@ export const forumRouter = router({
       page: z.number().default(1),
       limit: z.number().default(20),
     }))
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
       // Get topic
       const topic = await database
         .select({
@@ -160,6 +164,7 @@ export const forumRouter = router({
           user_name: users.name,
           is_pinned: forumTopics.is_pinned,
           is_locked: forumTopics.is_locked,
+          is_hidden: forumTopics.is_hidden,
           view_count: forumTopics.view_count,
           reply_count: forumTopics.reply_count,
           upvote_count: forumTopics.upvote_count,
@@ -171,6 +176,11 @@ export const forumRouter = router({
         .limit(1);
       
       if (topic.length === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Topic not found" });
+      }
+      
+      // Check if topic is hidden and user is not moderator/admin
+      if (topic[0].is_hidden && (!ctx.user || (ctx.user.role !== "moderator" && ctx.user.role !== "admin"))) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Topic not found" });
       }
       
@@ -196,7 +206,10 @@ export const forumRouter = router({
         .where(
           and(
             eq(forumPosts.topic_id, input.topicId),
-            eq(forumPosts.is_hidden, false)
+            // Show hidden posts to moderators and admins
+            ctx.user && (ctx.user.role === "moderator" || ctx.user.role === "admin")
+              ? undefined
+              : eq(forumPosts.is_hidden, false)
           )
         )
         .orderBy(forumPosts.created_at)

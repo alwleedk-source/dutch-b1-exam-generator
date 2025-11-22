@@ -2,9 +2,10 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, MessageSquare, Pin, Lock, ThumbsUp, Eye, Plus } from "lucide-react";
+import { ArrowLeft, MessageSquare, Pin, Lock, ThumbsUp, Eye, Plus, EyeOff } from "lucide-react";
 import { Link, useParams } from "wouter";
 import { formatDistanceToNow } from "date-fns";
 
@@ -66,12 +67,18 @@ export default function ForumCategory() {
                   <CardContent className="pt-6">
                     <div className="flex items-start gap-4">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center gap-2 mb-2 flex-wrap">
                           {topic.is_pinned && (
                             <Pin className="h-4 w-4 text-blue-600" />
                           )}
                           {topic.is_locked && (
                             <Lock className="h-4 w-4 text-gray-600" />
+                          )}
+                          {topic.is_hidden && (
+                            <Badge variant="outline" className="border-orange-500 text-orange-600">
+                              <EyeOff className="h-3 w-3 mr-1" />
+                              {t.hidden || "Hidden"}
+                            </Badge>
                           )}
                           <h3 className="text-lg font-semibold hover:text-primary">
                             {topic.title}

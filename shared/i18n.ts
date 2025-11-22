@@ -333,6 +333,7 @@ export interface Translations {
   unlock: string;
   hide: string;
   unhide: string;
+  hidden: string;
   topicPinToggled: string;
   topicLockToggled: string;
   topicHideToggled: string;
@@ -719,6 +720,7 @@ export const translations: Record<Language, Translations> = {
     unlock: "Ontgrendelen",
     hide: "Verbergen",
     unhide: "Tonen",
+    hidden: "Verborgen",
     topicPinToggled: "Onderwerp vastpinnen gewijzigd",
     topicLockToggled: "Onderwerp vergrendeling gewijzigd",
     topicHideToggled: "Onderwerp zichtbaarheid gewijzigd",
@@ -1103,6 +1105,7 @@ export const translations: Record<Language, Translations> = {
     unlock: "فتح",
     hide: "إخفاء",
     unhide: "إظهار",
+    hidden: "مخفي",
     topicPinToggled: "تم تغيير تثبيت الموضوع",
     topicLockToggled: "تم تغيير إغلاق الموضوع",
     topicHideToggled: "تم تغيير إظهار الموضوع",
@@ -1487,6 +1490,7 @@ export const translations: Record<Language, Translations> = {
     unlock: "Unlock",
     hide: "Hide",
     unhide: "Unhide",
+    hidden: "Hidden",
     topicPinToggled: "Topic pin toggled",
     topicLockToggled: "Topic lock toggled",
     topicHideToggled: "Topic visibility toggled",
@@ -1872,6 +1876,7 @@ export const translations: Record<Language, Translations> = {
     unlock: "Kilidi Aç",
     hide: "Gizle",
     unhide: "Göster",
+    hidden: "Gizli",
     topicPinToggled: "Konu sabitleme değiştirildi",
     topicLockToggled: "Konu kilitleme değiştirildi",
     topicHideToggled: "Konu görünürlüğü değiştirildi",
