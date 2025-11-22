@@ -21,6 +21,10 @@ import MyExams from "./pages/MyExams";
 import PublicExams from "./pages/PublicExams";
 import ExamResults from "./pages/ExamResults";
 import ExamReview from "./pages/ExamReview";
+import ForumHome from "./pages/forum/ForumHome";
+import ForumCategory from "./pages/forum/ForumCategory";
+import ForumTopic from "./pages/forum/ForumTopic";
+import NewTopic from "./pages/forum/NewTopic";
 import LanguageSelector from "./components/LanguageSelector";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useState, useEffect } from "react";
@@ -44,6 +48,10 @@ function Router() {
       <Route path="/review" component={ReviewPractice} />
       <Route path="/my-exams" component={MyExams} />
       <Route path="/public-exams" component={PublicExams} />
+      <Route path="/forum" component={ForumHome} />
+      <Route path="/forum/category/:id" component={ForumCategory} />
+      <Route path="/forum/topic/:id" component={ForumTopic} />
+      <Route path="/forum/new-topic" component={NewTopic} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

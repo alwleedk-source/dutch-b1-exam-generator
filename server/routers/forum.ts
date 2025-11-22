@@ -1,0 +1,545 @@
+import { router, publicProcedure, protectedProcedure } from "../_core/trpc";
+import { z } from "zod";
+import { TRPCError } from "@trpc/server";
+import { db as database } from "../db";
+import { 
+  forumCategories, 
+  forumTopics, 
+  forumPosts, 
+  forumVotes,
+  forumNotifications,
+  forumModerators,
+  forumReports,
+  forumRateLimits,
+  users
+} from "../../drizzle/schema";
+import { eq, desc, and, sql, gte } from "drizzle-orm";
+
+// Moderator or Admin procedure
+const moderatorProcedure = protectedProcedure.use(async ({ ctx, next }) => {
+  // Check if user is admin or moderator
+  const isModerator = await database
+    .select()
+    .from(forumModerators)
+    .where(eq(forumModerators.user_id, ctx.user.id))
+    .limit(1);
+  
+  if (ctx.user.role !== "admin" && isModerator.length === 0) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Moderator access required" });
+  }
+  
+  return next({ ctx });
+});
+
+// Admin-only procedure
+const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (ctx.user.role !== "admin") {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+  }
+  return next({ ctx });
+});
+
+// Rate limiting helper
+async function checkRateLimit(
+  userId: number, 
+  actionType: string, 
+  maxActions: number, 
+  windowMinutes: number
+): Promise<boolean> {
+  const windowStart = new Date(Date.now() - windowMinutes * 60 * 1000);
+  
+  const limits = await database
+    .select()
+    .from(forumRateLimits)
+    .where(
+      and(
+        eq(forumRateLimits.user_id, userId),
+        eq(forumRateLimits.action_type, actionType),
+        gte(forumRateLimits.window_start, windowStart)
+      )
+    );
+  
+  const totalActions = limits.reduce((sum, limit) => sum + limit.action_count, 0);
+  
+  if (totalActions >= maxActions) {
+    return false; // Rate limit exceeded
+  }
+  
+  // Record this action
+  const windowEnd = new Date(Date.now() + windowMinutes * 60 * 1000);
+  await database.insert(forumRateLimits).values({
+    user_id: userId,
+    action_type: actionType,
+    action_count: 1,
+    window_start: new Date(),
+    window_end: windowEnd,
+  });
+  
+  return true;
+}
+
+// Check if user is new (< 7 days)
+function isNewUser(createdAt: Date): boolean {
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  return createdAt > sevenDaysAgo;
+}
+
+export const forumRouter = router({
+  // Get all categories
+  getCategories: publicProcedure.query(async () => {
+    return await database
+      .select()
+      .from(forumCategories)
+      .where(eq(forumCategories.is_active, true))
+      .orderBy(forumCategories.sort_order);
+  }),
+
+  // Get topics by category
+  getTopicsByCategory: publicProcedure
+    .input(z.object({
+      categoryId: z.number(),
+      page: z.number().default(1),
+      limit: z.number().default(20),
+    }))
+    .query(async ({ input }) => {
+      const offset = (input.page - 1) * input.limit;
+      
+      const topics = await database
+        .select({
+          id: forumTopics.id,
+          title: forumTopics.title,
+          content: forumTopics.content,
+          user_id: forumTopics.user_id,
+          user_name: users.name,
+          is_pinned: forumTopics.is_pinned,
+          is_locked: forumTopics.is_locked,
+          view_count: forumTopics.view_count,
+          reply_count: forumTopics.reply_count,
+          upvote_count: forumTopics.upvote_count,
+          last_post_at: forumTopics.last_post_at,
+          created_at: forumTopics.created_at,
+        })
+        .from(forumTopics)
+        .leftJoin(users, eq(forumTopics.user_id, users.id))
+        .where(
+          and(
+            eq(forumTopics.category_id, input.categoryId),
+            eq(forumTopics.is_hidden, false)
+          )
+        )
+        .orderBy(desc(forumTopics.is_pinned), desc(forumTopics.last_post_at))
+        .limit(input.limit)
+        .offset(offset);
+      
+      return topics;
+    }),
+
+  // Get single topic with posts
+  getTopic: publicProcedure
+    .input(z.object({
+      topicId: z.number(),
+      page: z.number().default(1),
+      limit: z.number().default(20),
+    }))
+    .query(async ({ input }) => {
+      // Get topic
+      const topic = await database
+        .select({
+          id: forumTopics.id,
+          title: forumTopics.title,
+          content: forumTopics.content,
+          user_id: forumTopics.user_id,
+          user_name: users.name,
+          is_pinned: forumTopics.is_pinned,
+          is_locked: forumTopics.is_locked,
+          view_count: forumTopics.view_count,
+          reply_count: forumTopics.reply_count,
+          upvote_count: forumTopics.upvote_count,
+          created_at: forumTopics.created_at,
+        })
+        .from(forumTopics)
+        .leftJoin(users, eq(forumTopics.user_id, users.id))
+        .where(eq(forumTopics.id, input.topicId))
+        .limit(1);
+      
+      if (topic.length === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Topic not found" });
+      }
+      
+      // Increment view count
+      await database
+        .update(forumTopics)
+        .set({ view_count: sql`${forumTopics.view_count} + 1` })
+        .where(eq(forumTopics.id, input.topicId));
+      
+      // Get posts
+      const offset = (input.page - 1) * input.limit;
+      const posts = await database
+        .select({
+          id: forumPosts.id,
+          content: forumPosts.content,
+          user_id: forumPosts.user_id,
+          user_name: users.name,
+          upvote_count: forumPosts.upvote_count,
+          created_at: forumPosts.created_at,
+        })
+        .from(forumPosts)
+        .leftJoin(users, eq(forumPosts.user_id, users.id))
+        .where(
+          and(
+            eq(forumPosts.topic_id, input.topicId),
+            eq(forumPosts.is_hidden, false)
+          )
+        )
+        .orderBy(forumPosts.created_at)
+        .limit(input.limit)
+        .offset(offset);
+      
+      return {
+        topic: topic[0],
+        posts,
+      };
+    }),
+
+  // Create new topic
+  createTopic: protectedProcedure
+    .input(z.object({
+      categoryId: z.number(),
+      title: z.string().min(5).max(255),
+      content: z.string().min(20).max(10000),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      // Check if user is banned
+      if (ctx.user.is_banned) {
+        throw new TRPCError({ 
+          code: "FORBIDDEN", 
+          message: `You have been banned. Reason: ${ctx.user.ban_reason || "Violation of community guidelines"}` 
+        });
+      }
+      
+      // Check rate limit
+      const userCreatedAt = ctx.user.created_at || new Date();
+      const isNew = isNewUser(userCreatedAt);
+      const maxTopics = isNew ? 3 : 5;
+      const windowMinutes = 60;
+      
+      const canCreate = await checkRateLimit(ctx.user.id, "create_topic", maxTopics, windowMinutes);
+      if (!canCreate) {
+        throw new TRPCError({ 
+          code: "TOO_MANY_REQUESTS", 
+          message: `Rate limit exceeded. You can create maximum ${maxTopics} topics per hour.` 
+        });
+      }
+      
+      // Create topic
+      const [topic] = await database
+        .insert(forumTopics)
+        .values({
+          category_id: input.categoryId,
+          user_id: ctx.user.id,
+          title: input.title,
+          content: input.content,
+          last_post_at: new Date(),
+          last_post_user_id: ctx.user.id,
+        })
+        .returning();
+      
+      return topic;
+    }),
+
+  // Create post (reply)
+  createPost: protectedProcedure
+    .input(z.object({
+      topicId: z.number(),
+      content: z.string().min(10).max(10000),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      // Check if user is banned
+      if (ctx.user.is_banned) {
+        throw new TRPCError({ 
+          code: "FORBIDDEN", 
+          message: `You have been banned. Reason: ${ctx.user.ban_reason || "Violation of community guidelines"}` 
+        });
+      }
+      
+      // Check if topic exists and is not locked
+      const topic = await database
+        .select()
+        .from(forumTopics)
+        .where(eq(forumTopics.id, input.topicId))
+        .limit(1);
+      
+      if (topic.length === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Topic not found" });
+      }
+      
+      if (topic[0].is_locked) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "This topic is locked" });
+      }
+      
+      // Check rate limit
+      const userCreatedAt = ctx.user.created_at || new Date();
+      const isNew = isNewUser(userCreatedAt);
+      const maxPosts = isNew ? 10 : 20;
+      const windowMinutes = 60;
+      
+      const canCreate = await checkRateLimit(ctx.user.id, "create_post", maxPosts, windowMinutes);
+      if (!canCreate) {
+        throw new TRPCError({ 
+          code: "TOO_MANY_REQUESTS", 
+          message: `Rate limit exceeded. You can create maximum ${maxPosts} posts per hour.` 
+        });
+      }
+      
+      // Create post
+      const [post] = await database
+        .insert(forumPosts)
+        .values({
+          topic_id: input.topicId,
+          user_id: ctx.user.id,
+          content: input.content,
+        })
+        .returning();
+      
+      // Update topic stats
+      await database
+        .update(forumTopics)
+        .set({
+          reply_count: sql`${forumTopics.reply_count} + 1`,
+          last_post_at: new Date(),
+          last_post_user_id: ctx.user.id,
+        })
+        .where(eq(forumTopics.id, input.topicId));
+      
+      // Create notification for topic author
+      if (topic[0].user_id !== ctx.user.id) {
+        await database.insert(forumNotifications).values({
+          user_id: topic[0].user_id,
+          notification_type: "reply_to_topic",
+          topic_id: input.topicId,
+          post_id: post.id,
+          from_user_id: ctx.user.id,
+        });
+      }
+      
+      return post;
+    }),
+
+  // Vote on topic or post
+  vote: protectedProcedure
+    .input(z.object({
+      topicId: z.number().optional(),
+      postId: z.number().optional(),
+      voteType: z.enum(["upvote", "downvote"]),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      if (!input.topicId && !input.postId) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Either topicId or postId is required" });
+      }
+      
+      // Check if already voted
+      const existingVote = await database
+        .select()
+        .from(forumVotes)
+        .where(
+          and(
+            eq(forumVotes.user_id, ctx.user.id),
+            input.topicId ? eq(forumVotes.topic_id, input.topicId) : sql`true`,
+            input.postId ? eq(forumVotes.post_id, input.postId) : sql`true`
+          )
+        )
+        .limit(1);
+      
+      if (existingVote.length > 0) {
+        // Remove old vote
+        await database
+          .delete(forumVotes)
+          .where(eq(forumVotes.id, existingVote[0].id));
+        
+        // Update counts
+        if (input.topicId) {
+          const field = existingVote[0].vote_type === "upvote" ? "upvote_count" : "downvote_count";
+          await database
+            .update(forumTopics)
+            .set({ [field]: sql`${forumTopics[field]} - 1` })
+            .where(eq(forumTopics.id, input.topicId));
+        } else if (input.postId) {
+          const field = existingVote[0].vote_type === "upvote" ? "upvote_count" : "downvote_count";
+          await database
+            .update(forumPosts)
+            .set({ [field]: sql`${forumPosts[field]} - 1` })
+            .where(eq(forumPosts.id, input.postId));
+        }
+        
+        // If same vote type, just remove (toggle off)
+        if (existingVote[0].vote_type === input.voteType) {
+          return { success: true, action: "removed" };
+        }
+      }
+      
+      // Add new vote
+      await database.insert(forumVotes).values({
+        user_id: ctx.user.id,
+        topic_id: input.topicId,
+        post_id: input.postId,
+        vote_type: input.voteType,
+      });
+      
+      // Update counts
+      if (input.topicId) {
+        const field = input.voteType === "upvote" ? "upvote_count" : "downvote_count";
+        await database
+          .update(forumTopics)
+          .set({ [field]: sql`${forumTopics[field]} + 1` })
+          .where(eq(forumTopics.id, input.topicId));
+      } else if (input.postId) {
+        const field = input.voteType === "upvote" ? "upvote_count" : "downvote_count";
+        await database
+          .update(forumPosts)
+          .set({ [field]: sql`${forumPosts[field]} + 1` })
+          .where(eq(forumPosts.id, input.postId));
+      }
+      
+      return { success: true, action: "added" };
+    }),
+
+  // Get user notifications
+  getNotifications: protectedProcedure.query(async ({ ctx }) => {
+    return await database
+      .select({
+        id: forumNotifications.id,
+        notification_type: forumNotifications.notification_type,
+        topic_id: forumNotifications.topic_id,
+        post_id: forumNotifications.post_id,
+        from_user_name: users.name,
+        is_read: forumNotifications.is_read,
+        created_at: forumNotifications.created_at,
+      })
+      .from(forumNotifications)
+      .leftJoin(users, eq(forumNotifications.from_user_id, users.id))
+      .where(eq(forumNotifications.user_id, ctx.user.id))
+      .orderBy(desc(forumNotifications.created_at))
+      .limit(50);
+  }),
+
+  // Mark notification as read
+  markNotificationRead: protectedProcedure
+    .input(z.object({ notificationId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      await database
+        .update(forumNotifications)
+        .set({ is_read: true })
+        .where(
+          and(
+            eq(forumNotifications.id, input.notificationId),
+            eq(forumNotifications.user_id, ctx.user.id)
+          )
+        );
+      
+      return { success: true };
+    }),
+
+  // Report content
+  reportContent: protectedProcedure
+    .input(z.object({
+      topicId: z.number().optional(),
+      postId: z.number().optional(),
+      reason: z.enum(["spam", "inappropriate", "off_topic", "duplicate", "other"]),
+      details: z.string().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      await database.insert(forumReports).values({
+        reporter_user_id: ctx.user.id,
+        topic_id: input.topicId,
+        post_id: input.postId,
+        reason: input.reason,
+        details: input.details,
+      });
+      
+      // Check if 3+ reports, auto-hide
+      const reports = await database
+        .select()
+        .from(forumReports)
+        .where(
+          input.topicId 
+            ? eq(forumReports.topic_id, input.topicId)
+            : eq(forumReports.post_id, input.postId!)
+        );
+      
+      if (reports.length >= 3) {
+        if (input.topicId) {
+          await database
+            .update(forumTopics)
+            .set({ is_hidden: true })
+            .where(eq(forumTopics.id, input.topicId));
+        } else if (input.postId) {
+          await database
+            .update(forumPosts)
+            .set({ is_hidden: true })
+            .where(eq(forumPosts.id, input.postId));
+        }
+      }
+      
+      return { success: true };
+    }),
+
+  // Admin/Moderator: Ban user
+  banUser: moderatorProcedure
+    .input(z.object({
+      userId: z.number(),
+      reason: z.string(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      await database
+        .update(users)
+        .set({
+          is_banned: true,
+          banned_at: new Date(),
+          banned_by: ctx.user.id,
+          ban_reason: input.reason,
+        })
+        .where(eq(users.id, input.userId));
+      
+      return { success: true };
+    }),
+
+  // Admin: Unban user
+  unbanUser: adminProcedure
+    .input(z.object({ userId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      await database
+        .update(users)
+        .set({
+          is_banned: false,
+          banned_at: null,
+          banned_by: null,
+          ban_reason: null,
+        })
+        .where(eq(users.id, input.userId));
+      
+      return { success: true };
+    }),
+
+  // Admin: Add moderator
+  addModerator: adminProcedure
+    .input(z.object({ userId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      await database.insert(forumModerators).values({
+        user_id: input.userId,
+        assigned_by: ctx.user.id,
+      });
+      
+      return { success: true };
+    }),
+
+  // Admin: Remove moderator
+  removeModerator: adminProcedure
+    .input(z.object({ userId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      await database
+        .delete(forumModerators)
+        .where(eq(forumModerators.user_id, input.userId));
+      
+      return { success: true };
+    }),
+});

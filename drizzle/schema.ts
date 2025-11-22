@@ -23,6 +23,12 @@ export const users = pgTable("users", {
   longest_streak: integer("longest_streak").default(0).notNull(),
   last_activity_date: timestamp("last_activity_date"),
   
+  // Forum ban status
+  is_banned: boolean("is_banned").default(false).notNull(),
+  banned_at: timestamp("banned_at"),
+  banned_by: integer("banned_by"),
+  ban_reason: text("ban_reason"),
+  
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
   last_signed_in: timestamp("last_signed_in").defaultNow().notNull(),
@@ -334,3 +340,184 @@ export const b1Dictionary = pgTable("b1_dictionary", {
 
 export type B1DictionaryEntry = typeof b1Dictionary.$inferSelect;
 export type InsertB1DictionaryEntry = typeof b1Dictionary.$inferInsert;
+
+/**
+ * ============================================
+ * FORUM SYSTEM
+ * ============================================
+ */
+
+/**
+ * Forum categories (language-based sections)
+ */
+export const forumCategories = pgTable("forum_categories", {
+  id: serial("id").primaryKey(),
+  name_key: varchar("name_key", { length: 100 }).notNull(), // Translation key
+  language: varchar("language", { length: 10 }).notNull(), // ar, en, tr, nl
+  category_type: varchar("category_type", { length: 50 }).notNull(), // exams_tips, experiences, questions
+  description_key: varchar("description_key", { length: 255 }), // Translation key
+  icon: varchar("icon", { length: 50 }), // Icon name
+  sort_order: integer("sort_order").default(0).notNull(),
+  is_active: boolean("is_active").default(true).notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type ForumCategory = typeof forumCategories.$inferSelect;
+export type InsertForumCategory = typeof forumCategories.$inferInsert;
+
+/**
+ * Forum topics (threads)
+ */
+export const forumTopics = pgTable("forum_topics", {
+  id: serial("id").primaryKey(),
+  category_id: integer("category_id").references(() => forumCategories.id, { onDelete: "cascade" }).notNull(),
+  user_id: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content").notNull(), // Rich text HTML
+  
+  // Status
+  is_pinned: boolean("is_pinned").default(false).notNull(),
+  is_locked: boolean("is_locked").default(false).notNull(),
+  is_hidden: boolean("is_hidden").default(false).notNull(), // Hidden by moderators
+  
+  // Statistics
+  view_count: integer("view_count").default(0).notNull(),
+  reply_count: integer("reply_count").default(0).notNull(),
+  upvote_count: integer("upvote_count").default(0).notNull(),
+  downvote_count: integer("downvote_count").default(0).notNull(),
+  
+  // Last activity
+  last_post_at: timestamp("last_post_at"),
+  last_post_user_id: integer("last_post_user_id").references(() => users.id),
+  
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type ForumTopic = typeof forumTopics.$inferSelect;
+export type InsertForumTopic = typeof forumTopics.$inferInsert;
+
+/**
+ * Forum posts (replies)
+ */
+export const forumPosts = pgTable("forum_posts", {
+  id: serial("id").primaryKey(),
+  topic_id: integer("topic_id").references(() => forumTopics.id, { onDelete: "cascade" }).notNull(),
+  user_id: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  
+  content: text("content").notNull(), // Rich text HTML
+  
+  // Status
+  is_hidden: boolean("is_hidden").default(false).notNull(),
+  
+  // Statistics
+  upvote_count: integer("upvote_count").default(0).notNull(),
+  downvote_count: integer("downvote_count").default(0).notNull(),
+  
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type ForumPost = typeof forumPosts.$inferSelect;
+export type InsertForumPost = typeof forumPosts.$inferInsert;
+
+/**
+ * Forum votes (upvote/downvote for topics and posts)
+ */
+export const forumVotes = pgTable("forum_votes", {
+  id: serial("id").primaryKey(),
+  user_id: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  
+  // Can vote on either topic or post
+  topic_id: integer("topic_id").references(() => forumTopics.id, { onDelete: "cascade" }),
+  post_id: integer("post_id").references(() => forumPosts.id, { onDelete: "cascade" }),
+  
+  vote_type: varchar("vote_type", { length: 10 }).notNull(), // upvote, downvote
+  
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type ForumVote = typeof forumVotes.$inferSelect;
+export type InsertForumVote = typeof forumVotes.$inferInsert;
+
+/**
+ * Forum notifications
+ */
+export const forumNotifications = pgTable("forum_notifications", {
+  id: serial("id").primaryKey(),
+  user_id: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  
+  notification_type: varchar("notification_type", { length: 50 }).notNull(), // reply_to_topic, reply_to_post, mention, new_topic_in_language
+  
+  // References
+  topic_id: integer("topic_id").references(() => forumTopics.id, { onDelete: "cascade" }),
+  post_id: integer("post_id").references(() => forumPosts.id, { onDelete: "cascade" }),
+  from_user_id: integer("from_user_id").references(() => users.id, { onDelete: "cascade" }),
+  
+  is_read: boolean("is_read").default(false).notNull(),
+  
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type ForumNotification = typeof forumNotifications.$inferSelect;
+export type InsertForumNotification = typeof forumNotifications.$inferInsert;
+
+/**
+ * Forum moderators
+ */
+export const forumModerators = pgTable("forum_moderators", {
+  id: serial("id").primaryKey(),
+  user_id: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull().unique(),
+  assigned_by: integer("assigned_by").references(() => users.id),
+  assigned_at: timestamp("assigned_at").defaultNow().notNull(),
+});
+
+export type ForumModerator = typeof forumModerators.$inferSelect;
+export type InsertForumModerator = typeof forumModerators.$inferInsert;
+
+/**
+ * Forum reports (spam/inappropriate content)
+ */
+export const forumReports = pgTable("forum_reports", {
+  id: serial("id").primaryKey(),
+  reporter_user_id: integer("reporter_user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  
+  // Can report topic or post
+  topic_id: integer("topic_id").references(() => forumTopics.id, { onDelete: "cascade" }),
+  post_id: integer("post_id").references(() => forumPosts.id, { onDelete: "cascade" }),
+  
+  reason: varchar("reason", { length: 50 }).notNull(), // spam, inappropriate, off_topic, duplicate, other
+  details: text("details"),
+  
+  status: varchar("status", { length: 20 }).default("pending").notNull(), // pending, resolved, dismissed
+  resolved_by: integer("resolved_by").references(() => users.id),
+  resolved_at: timestamp("resolved_at"),
+  
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type ForumReport = typeof forumReports.$inferSelect;
+export type InsertForumReport = typeof forumReports.$inferInsert;
+
+/**
+ * Forum rate limits (spam protection)
+ */
+export const forumRateLimits = pgTable("forum_rate_limits", {
+  id: serial("id").primaryKey(),
+  user_id: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  
+  action_type: varchar("action_type", { length: 50 }).notNull(), // create_topic, create_post, vote
+  action_count: integer("action_count").default(1).notNull(),
+  
+  window_start: timestamp("window_start").defaultNow().notNull(),
+  window_end: timestamp("window_end").notNull(),
+});
+
+export type ForumRateLimit = typeof forumRateLimits.$inferSelect;
+export type InsertForumRateLimit = typeof forumRateLimits.$inferInsert;
+
+/**
+ * User ban status (added to users table via migration)
+ * Fields: is_banned, banned_at, banned_by, ban_reason
+ */

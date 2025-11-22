@@ -275,6 +275,44 @@ export interface Translations {
   pageNotFound: string;
   pageNotFoundDesc: string;
   goHome: string;
+  
+  // Forum
+  forumTitle: string;
+  forumDescription: string;
+  createNewTopic: string;
+  backToForum: string;
+  topics: string;
+  noTopicsYet: string;
+  createFirstTopic: string;
+  replies: string;
+  postReply: string;
+  writeYourReply: string;
+  posting: string;
+  replyPosted: string;
+  replyCannotBeEmpty: string;
+  topicNotFound: string;
+  loginToReply: string;
+  loginToCreateTopic: string;
+  createTopic: string;
+  topicTitle: string;
+  enterTopicTitle: string;
+  content: string;
+  writeYourTopic: string;
+  creating: string;
+  topicCreated: string;
+  fillAllFields: string;
+  category: string;
+  selectCategory: string;
+  characters: string;
+  forumLoginPrompt: string;
+  
+  // Forum categories
+  "forum.category.exams_tips": string;
+  "forum.category.exams_tips_desc": string;
+  "forum.category.experiences": string;
+  "forum.category.experiences_desc": string;
+  "forum.category.questions": string;
+  "forum.category.questions_desc": string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -550,6 +588,44 @@ export const translations: Record<Language, Translations> = {
     pageNotFound: "Pagina Niet Gevonden",
     pageNotFoundDesc: "De pagina die je zoekt bestaat niet.",
     goHome: "Naar Home",
+    
+    // Forum
+    forumTitle: "Community Forum",
+    forumDescription: "Discussieer, deel ervaringen en stel vragen",
+    createNewTopic: "Nieuw Onderwerp",
+    backToForum: "Terug naar Forum",
+    topics: "Onderwerpen",
+    noTopicsYet: "Nog geen onderwerpen. Wees de eerste om een discussie te starten!",
+    createFirstTopic: "Maak Eerste Onderwerp",
+    replies: "Reacties",
+    postReply: "Plaats Reactie",
+    writeYourReply: "Schrijf je reactie...",
+    posting: "Plaatsen...",
+    replyPosted: "Reactie succesvol geplaatst!",
+    replyCannotBeEmpty: "Reactie kan niet leeg zijn",
+    topicNotFound: "Onderwerp niet gevonden",
+    loginToReply: "Log in om te reageren",
+    loginToCreateTopic: "Log in om een onderwerp aan te maken",
+    createTopic: "Maak Onderwerp",
+    topicTitle: "Onderwerp Titel",
+    enterTopicTitle: "Voer een beschrijvende titel in...",
+    content: "Inhoud",
+    writeYourTopic: "Schrijf je onderwerp...",
+    creating: "Aanmaken...",
+    topicCreated: "Onderwerp succesvol aangemaakt!",
+    fillAllFields: "Vul alle velden in",
+    category: "Categorie",
+    selectCategory: "Selecteer een categorie",
+    characters: "tekens",
+    forumLoginPrompt: "Log in om onderwerpen aan te maken en deel te nemen aan discussies",
+    
+    // Forum categories
+    "forum.category.exams_tips": "Examens & Tips",
+    "forum.category.exams_tips_desc": "Deel tips en strategieën voor het B1 examen",
+    "forum.category.experiences": "Persoonlijke Ervaringen",
+    "forum.category.experiences_desc": "Deel je ervaringen met het leren van Nederlands",
+    "forum.category.questions": "Vragen & Antwoorden",
+    "forum.category.questions_desc": "Stel vragen en help anderen",
   },
   
   ar: {

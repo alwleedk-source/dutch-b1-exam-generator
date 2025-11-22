@@ -6,6 +6,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import * as db from "./db";
 import * as gemini from "./lib/gemini";
+import { forumRouter } from "./routers/forum";
 
 // Admin-only procedure
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -1399,6 +1400,9 @@ export const appRouter = router({
         });
       }),
   }),
+
+  // Forum router
+  forum: forumRouter,
 });
 
 export type AppRouter = typeof appRouter;
