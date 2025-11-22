@@ -172,11 +172,12 @@ export default function InteractiveText({ textId, content, className = "" }: Int
         Array.from(node.childNodes).forEach(child => {
           const processedChild = processNode(child);
           if (processedChild.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+            // Append fragment children directly without cloning to preserve structure
             Array.from((processedChild as DocumentFragment).childNodes).forEach(fragChild => {
-              newElement.appendChild(fragChild.cloneNode(true));
+              newElement.appendChild(fragChild);
             });
           } else {
-            newElement.appendChild(processedChild.cloneNode(true));
+            newElement.appendChild(processedChild);
           }
         });
         return newElement;
@@ -190,11 +191,12 @@ export default function InteractiveText({ textId, content, className = "" }: Int
     Array.from(tempDiv.childNodes).forEach(child => {
       const processedChild = processNode(child);
       if (processedChild.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+        // Append fragment children directly to preserve wrapper structure
         Array.from((processedChild as DocumentFragment).childNodes).forEach(fragChild => {
-          processedDiv.appendChild(fragChild.cloneNode(true));
+          processedDiv.appendChild(fragChild);
         });
       } else {
-        processedDiv.appendChild(processedChild.cloneNode(true));
+        processedDiv.appendChild(processedChild);
       }
     });
     
