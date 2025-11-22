@@ -136,10 +136,16 @@ export default function InteractiveText({ textId, content, className = "" }: Int
             span.textContent = word;
             
             const translation = getTranslation(vocabWord);
+            
+            // Debug: log if translation is empty
+            if (!translation || translation.trim() === '') {
+              console.warn(`[InteractiveText] Empty translation for word:`, vocabWord);
+            }
+            
             const tooltip = document.createElement('div');
             tooltip.className = 'vocab-tooltip';
             tooltip.innerHTML = `
-              <div class="tooltip-translation">${translation}</div>
+              <div class="tooltip-translation">${translation || vocabWord.word}</div>
               <div class="tooltip-hint">💾 Double-click to save</div>
             `;
             
