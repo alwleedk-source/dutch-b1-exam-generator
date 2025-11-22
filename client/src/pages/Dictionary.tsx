@@ -16,7 +16,7 @@ export default function Dictionary() {
 
   const addToVocabularyMutation = trpc.vocabulary.addFromDictionary.useMutation({
     onSuccess: () => {
-      alert(t("dictionary.addedToVocabulary"));
+      alert("Word added to your vocabulary!");
     },
   });
 
@@ -37,8 +37,8 @@ export default function Dictionary() {
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">{t("dictionary.title")}</h1>
-        <p className="text-gray-600">{t("dictionary.subtitle")}</p>
+        <h1 className="text-3xl font-bold mb-2">B1 Dictionary</h1>
+        <p className="text-gray-600">Search and explore Dutch B1 vocabulary with translations</p>
       </div>
 
       {/* Search Bar */}
@@ -49,7 +49,7 @@ export default function Dictionary() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t("dictionary.searchPlaceholder")}
+            placeholder="Search for a word..."
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -65,7 +65,7 @@ export default function Dictionary() {
               : "bg-gray-200 text-gray-700 hover:bg-gray-300"
           }`}
         >
-          {t("dictionary.all")}
+          All
         </button>
         {alphabet.map((letter) => (
           <button
@@ -91,7 +91,7 @@ export default function Dictionary() {
 
       {words && words.length === 0 && (
         <div className="text-center py-12 text-gray-500">
-          {t("dictionary.noResults")}
+          No results found. Try a different search or letter.
         </div>
       )}
 
@@ -106,7 +106,7 @@ export default function Dictionary() {
                   <button
                     onClick={() => playAudio(word.word)}
                     className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
-                    title={t("dictionary.playAudio")}
+                    title="Play audio"
                   >
                     <Volume2 size={20} />
                   </button>
@@ -114,7 +114,7 @@ export default function Dictionary() {
                     onClick={() => addToVocabularyMutation.mutate({ word: word.word })}
                     disabled={addToVocabularyMutation.isPending}
                     className="p-2 text-green-600 hover:bg-green-50 rounded-full transition-colors disabled:opacity-50"
-                    title={t("dictionary.addToMyVocabulary")}
+                    title="Add to my vocabulary"
                   >
                     {addToVocabularyMutation.isPending ? (
                       <Loader2 className="animate-spin" size={20} />
