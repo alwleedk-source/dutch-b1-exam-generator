@@ -119,7 +119,16 @@ Taak: Lees de volgende Nederlandse tekst zorgvuldig en analyseer deze op:
 **Originele tekst:**
 ${text}
 
-**Geef ALLEEN de gecorrigeerde en opgemaakte tekst terug, zonder uitleg, opmerkingen of markdown formatting.**`,
+**BELANGRIJK - Structuur en Tussenkoppen:**
+- Voeg duidelijke tussenkoppen toe waar de tekst van onderwerp verandert
+- Gebruik het volgende formaat voor tussenkoppen:
+  * Plaats elke tussenkop op een nieuwe regel
+  * Begin de tussenkop met "## " (twee hashes en een spatie)
+  * Bijvoorbeeld: "## Wat is dagelijkse rijtijd?"
+  * Voeg 3-6 tussenkoppen toe afhankelijk van de tekstlengte (ongeveer 1 tussenkop per 200-300 woorden)
+- Zorg dat de tekst goed gestructureerd is met duidelijke secties
+
+**Geef ALLEEN de gecorrigeerde en opgemaakte tekst terug met tussenkoppen in ## formaat, zonder uitleg of opmerkingen.**`,
       },
     ],
     temperature: 0.3, // Lower temperature for more accurate corrections

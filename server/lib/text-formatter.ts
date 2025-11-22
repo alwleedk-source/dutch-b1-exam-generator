@@ -18,6 +18,9 @@ function isHeading(line: string): boolean {
   // Empty line
   if (!trimmed) return false;
   
+  // Markdown heading (## Heading)
+  if (/^##\s+/.test(trimmed)) return true;
+  
   // Roman numeral section markers (I, II, III, IV, V, etc.)
   if (/^[IVX]+\s/.test(trimmed)) return true;
   
@@ -193,7 +196,8 @@ function formatInstructionText(text: string): string {
           html += `<p>${escapeHtml(currentParagraph)}</p>`;
           currentParagraph = "";
         }
-        html += `<h3 class="section-heading">${escapeHtml(trimmed)}</h3>`;
+        const headingText = trimmed.replace(/^##\s+/, '');
+        html += `<h3 class="section-heading">${escapeHtml(headingText)}</h3>`;
       } else {
         if (currentParagraph) {
           currentParagraph += " " + trimmed;
@@ -259,7 +263,8 @@ function formatListText(text: string): string {
           html += `<p>${escapeHtml(currentParagraph)}</p>`;
           currentParagraph = "";
         }
-        html += `<h3 class="section-heading">${escapeHtml(trimmed)}</h3>`;
+        const headingText = trimmed.replace(/^##\s+/, '');
+        html += `<h3 class="section-heading">${escapeHtml(headingText)}</h3>`;
       } else {
         if (currentParagraph) {
           currentParagraph += " " + trimmed;
@@ -335,8 +340,9 @@ function formatArticleText(text: string, hasColumns: boolean): string {
           html += `<p>${escapeHtml(merged)}</p>`;
           currentParagraph = [];
         }
-        // Add heading
-        html += `<h3 class="section-heading">${escapeHtml(line)}</h3>`;
+        // Add heading (remove ## markdown if present)
+        const headingText = line.replace(/^##\s+/, '');
+        html += `<h3 class="section-heading">${escapeHtml(headingText)}</h3>`;
       } else {
         // Add to current paragraph
         currentParagraph.push(line);
@@ -374,7 +380,8 @@ function formatPlainText(text: string): string {
     const merged = trimmed.replace(/\n/g, ' ').replace(/\s+/g, ' ');
     
     if (isHeading(merged)) {
-      html += `<h3 class="section-heading">${escapeHtml(merged)}</h3>`;
+      const headingText = merged.replace(/^##\s+/, '');
+      html += `<h3 class="section-heading">${escapeHtml(headingText)}</h3>`;
     } else {
       html += `<p>${escapeHtml(merged)}</p>`;
     }
@@ -419,10 +426,10 @@ export function getFormattingCSS(): string {
     
     .formatted-text .section-heading {
       font-weight: 700;
-      font-size: 1.15em;
-      margin-top: 1.5em;
-      margin-bottom: 0.6em;
-      color: #1a1a1a;
+      font-size: 1.2em;
+      margin-top: 1.8em;
+      margin-bottom: 0.8em;
+      color: #01689b;
       line-height: 1.3;
       font-family: inherit;
     }
