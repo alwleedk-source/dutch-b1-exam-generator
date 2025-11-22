@@ -776,4 +776,118 @@ export const forumRouter = router({
       
       return { success: true };
     }),
+  
+  // Moderator: Pin/Unpin topic
+  togglePinTopic: moderatorProcedure
+    .input(z.object({ topicId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const topic = await database
+        .select({ is_pinned: forumTopics.is_pinned })
+        .from(forumTopics)
+        .where(eq(forumTopics.id, input.topicId))
+        .limit(1);
+      
+      if (topic.length === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Topic not found" });
+      }
+      
+      await database
+        .update(forumTopics)
+        .set({ is_pinned: !topic[0].is_pinned })
+        .where(eq(forumTopics.id, input.topicId));
+      
+      return { success: true, is_pinned: !topic[0].is_pinned };
+    }),
+  
+  // Moderator: Lock/Unlock topic
+  toggleLockTopic: moderatorProcedure
+    .input(z.object({ topicId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const topic = await database
+        .select({ is_locked: forumTopics.is_locked })
+        .from(forumTopics)
+        .where(eq(forumTopics.id, input.topicId))
+        .limit(1);
+      
+      if (topic.length === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Topic not found" });
+      }
+      
+      await database
+        .update(forumTopics)
+        .set({ is_locked: !topic[0].is_locked })
+        .where(eq(forumTopics.id, input.topicId));
+      
+      return { success: true, is_locked: !topic[0].is_locked };
+    }),
+  
+  // Moderator: Hide/Unhide topic
+  toggleHideTopic: moderatorProcedure
+    .input(z.object({ topicId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const topic = await database
+        .select({ is_hidden: forumTopics.is_hidden })
+        .from(forumTopics)
+        .where(eq(forumTopics.id, input.topicId))
+        .limit(1);
+      
+      if (topic.length === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Topic not found" });
+      }
+      
+      await database
+        .update(forumTopics)
+        .set({ is_hidden: !topic[0].is_hidden })
+        .where(eq(forumTopics.id, input.topicId));
+      
+      return { success: true, is_hidden: !topic[0].is_hidden };
+    }),
+  
+  // Moderator: Get all reports
+  getReports: moderatorProcedure
+    .input(z.object({
+      status: z.enum(["pending", "resolved", "all"]).optional().default("pending"),
+      limit: z.number().optional().default(50),
+    }))
+    .query(async ({ ctx, input }) => {
+      const reports = await database
+        .select({
+          id: forumReports.id,
+          reporter_user_id: forumReports.reporter_user_id,
+          reporter_name: users.name,
+          topic_id: forumReports.topic_id,
+          post_id: forumReports.post_id,
+          reason: forumReports.reason,
+          details: forumReports.details,
+          status: forumReports.status,
+          created_at: forumReports.created_at,
+        })
+        .from(forumReports)
+        .leftJoin(users, eq(forumReports.reporter_user_id, users.id))
+        .where(
+          input.status === "all" 
+            ? sql`true` 
+            : eq(forumReports.status, input.status)
+        )
+        .orderBy(desc(forumReports.created_at))
+        .limit(input.limit);
+      
+      return reports;
+    }),
+  
+  // Moderator: Resolve report
+  resolveReport: moderatorProcedure
+    .input(z.object({ reportId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      await database
+        .update(forumReports)
+        .set({
+          status: "resolved",
+          resolved_by: ctx.user.id,
+          resolved_at: new Date(),
+        })
+        .where(eq(forumReports.id, input.reportId));
+      
+      return { success: true };
+    }),
 });

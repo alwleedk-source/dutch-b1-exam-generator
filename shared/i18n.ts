@@ -310,6 +310,46 @@ export interface Translations {
   upvotedYourTopic: string;
   upvotedYourPost: string;
   
+  // Moderator
+  moderatorPanel: string;
+  moderatorPanelDesc: string;
+  moderatorAccessRequired: string;
+  reportsManagement: string;
+  reportsManagementDesc: string;
+  userManagement: string;
+  userManagementDesc: string;
+  reportResolved: string;
+  pending: string;
+  resolved: string;
+  all: string;
+  noReports: string;
+  reportedBy: string;
+  unknown: string;
+  viewTopic: string;
+  resolve: string;
+  pin: string;
+  unpin: string;
+  lock: string;
+  unlock: string;
+  hide: string;
+  unhide: string;
+  topicPinToggled: string;
+  topicLockToggled: string;
+  topicHideToggled: string;
+  moderatorTools: string;
+  moderatorToolPin: string;
+  moderatorToolLock: string;
+  moderatorToolHide: string;
+  moderatorToolDelete: string;
+  moderatorToolReports: string;
+  moderatorToolBan: string;
+  moderatorToolModerators: string;
+  reportReasonSpam: string;
+  reportReasonHarassment: string;
+  reportReasonInappropriate: string;
+  reportReasonMisinformation: string;
+  reportReasonOther: string;
+  
   // Forum categories
   category_exams_tips: string;
   category_exams_tips_desc: string;
@@ -631,6 +671,46 @@ export const translations: Record<Language, Translations> = {
     upvotedYourTopic: "heeft je onderwerp geliket",
     upvotedYourPost: "heeft je reactie geliket",
     
+    // Moderator
+    moderatorPanel: "Moderatorpaneel",
+    moderatorPanelDesc: "Beheer foruminhoud en gebruikers",
+    moderatorAccessRequired: "Moderatortoegang vereist",
+    reportsManagement: "Meldingenbeheer",
+    reportsManagementDesc: "Bekijk en los gebruikersmeldingen op",
+    userManagement: "Gebruikersbeheer",
+    userManagementDesc: "Ban/ontban gebruikers en beheer moderators",
+    reportResolved: "Melding opgelost",
+    pending: "In behandeling",
+    resolved: "Opgelost",
+    all: "Alle",
+    noReports: "Geen meldingen gevonden",
+    reportedBy: "Gemeld door",
+    unknown: "Onbekend",
+    viewTopic: "Bekijk onderwerp",
+    resolve: "Oplossen",
+    pin: "Vastpinnen",
+    unpin: "Losmaken",
+    lock: "Vergrendelen",
+    unlock: "Ontgrendelen",
+    hide: "Verbergen",
+    unhide: "Tonen",
+    topicPinToggled: "Onderwerp vastpinnen gewijzigd",
+    topicLockToggled: "Onderwerp vergrendeling gewijzigd",
+    topicHideToggled: "Onderwerp zichtbaarheid gewijzigd",
+    moderatorTools: "Moderatortools",
+    moderatorToolPin: "Pin/ontpin onderwerpen om ze bovenaan te houden",
+    moderatorToolLock: "Vergrendel/ontgrendel onderwerpen om nieuwe reacties te voorkomen",
+    moderatorToolHide: "Verberg/toon onderwerpen om ze uit het publieke zicht te verwijderen",
+    moderatorToolDelete: "Verwijder onderwerpen en berichten op elk moment",
+    moderatorToolReports: "Bekijk en los gebruikersmeldingen op",
+    moderatorToolBan: "Ban/ontban gebruikers (alleen admin)",
+    moderatorToolModerators: "Voeg moderators toe/verwijder ze (alleen admin)",
+    reportReasonSpam: "Spam",
+    reportReasonHarassment: "Intimidatie",
+    reportReasonInappropriate: "Ongepaste inhoud",
+    reportReasonMisinformation: "Desinformatie",
+    reportReasonOther: "Overig",
+    
     // Forum categories
     category_exams_tips: "Examens & Tips",
     category_exams_tips_desc: "Deel tips en strategieën voor het B1 examen",
@@ -949,6 +1029,46 @@ export const translations: Record<Language, Translations> = {
     repliedToYourTopic: "رد على موضوعك",
     upvotedYourTopic: "أعجب بموضوعك",
     upvotedYourPost: "أعجب بردك",
+    
+    // Moderator
+    moderatorPanel: "لوحة المشرفين",
+    moderatorPanelDesc: "إدارة محتوى المجتمع والمستخدمين",
+    moderatorAccessRequired: "يتطلب صلاحية مشرف",
+    reportsManagement: "إدارة التبليغات",
+    reportsManagementDesc: "مراجعة وحل التبليغات",
+    userManagement: "إدارة المستخدمين",
+    userManagementDesc: "حظر/إلغاء حظر المستخدمين وإدارة المشرفين",
+    reportResolved: "تم حل التبليغ",
+    pending: "قيد المعالجة",
+    resolved: "تم الحل",
+    all: "الكل",
+    noReports: "لا توجد تبليغات",
+    reportedBy: "بلغ بواسطة",
+    unknown: "غير معروف",
+    viewTopic: "عرض الموضوع",
+    resolve: "حل",
+    pin: "تثبيت",
+    unpin: "إلغاء التثبيت",
+    lock: "إغلاق",
+    unlock: "فتح",
+    hide: "إخفاء",
+    unhide: "إظهار",
+    topicPinToggled: "تم تغيير تثبيت الموضوع",
+    topicLockToggled: "تم تغيير إغلاق الموضوع",
+    topicHideToggled: "تم تغيير إظهار الموضوع",
+    moderatorTools: "أدوات المشرف",
+    moderatorToolPin: "تثبيت/إلغاء تثبيت المواضيع لإبقائها في الأعلى",
+    moderatorToolLock: "إغلاق/فتح المواضيع لمنع الردود الجديدة",
+    moderatorToolHide: "إخفاء/إظهار المواضيع لإزالتها من العرض العام",
+    moderatorToolDelete: "حذف المواضيع والردود في أي وقت",
+    moderatorToolReports: "مراجعة وحل التبليغات",
+    moderatorToolBan: "حظر/إلغاء حظر المستخدمين (الإداريون فقط)",
+    moderatorToolModerators: "إضافة/إزالة المشرفين (الإداريون فقط)",
+    reportReasonSpam: "رسائل مزعجة",
+    reportReasonHarassment: "مضايقة",
+    reportReasonInappropriate: "محتوى غير لائق",
+    reportReasonMisinformation: "معلومات خاطئة",
+    reportReasonOther: "أخرى",
     
     // Forum categories
     category_exams_tips: "نصائح وإرشادات الامتحان",
@@ -1269,6 +1389,46 @@ export const translations: Record<Language, Translations> = {
     upvotedYourTopic: "upvoted your topic",
     upvotedYourPost: "upvoted your post",
     
+    // Moderator
+    moderatorPanel: "Moderator Panel",
+    moderatorPanelDesc: "Manage forum content and users",
+    moderatorAccessRequired: "Moderator access required",
+    reportsManagement: "Reports Management",
+    reportsManagementDesc: "Review and resolve user reports",
+    userManagement: "User Management",
+    userManagementDesc: "Ban/unban users and manage moderators",
+    reportResolved: "Report resolved",
+    pending: "Pending",
+    resolved: "Resolved",
+    all: "All",
+    noReports: "No reports found",
+    reportedBy: "Reported by",
+    unknown: "Unknown",
+    viewTopic: "View Topic",
+    resolve: "Resolve",
+    pin: "Pin",
+    unpin: "Unpin",
+    lock: "Lock",
+    unlock: "Unlock",
+    hide: "Hide",
+    unhide: "Unhide",
+    topicPinToggled: "Topic pin toggled",
+    topicLockToggled: "Topic lock toggled",
+    topicHideToggled: "Topic visibility toggled",
+    moderatorTools: "Moderator Tools",
+    moderatorToolPin: "Pin/Unpin topics to keep them at the top",
+    moderatorToolLock: "Lock/Unlock topics to prevent new replies",
+    moderatorToolHide: "Hide/Unhide topics to remove from public view",
+    moderatorToolDelete: "Delete topics and posts at any time",
+    moderatorToolReports: "Review and resolve user reports",
+    moderatorToolBan: "Ban/Unban users (Admin only)",
+    moderatorToolModerators: "Add/Remove moderators (Admin only)",
+    reportReasonSpam: "Spam",
+    reportReasonHarassment: "Harassment",
+    reportReasonInappropriate: "Inappropriate content",
+    reportReasonMisinformation: "Misinformation",
+    reportReasonOther: "Other",
+    
     // Forum categories
     category_exams_tips: "Exams & Tips",
     category_exams_tips_desc: "Share tips and strategies for the B1 exam",
@@ -1588,6 +1748,46 @@ export const translations: Record<Language, Translations> = {
     repliedToYourTopic: "konunuza yanıt verdi",
     upvotedYourTopic: "konunuzu beğendi",
     upvotedYourPost: "yanıtınızı beğendi",
+    
+    // Moderator
+    moderatorPanel: "Moderator Paneli",
+    moderatorPanelDesc: "Forum içeriğini ve kullanıcıları yönetin",
+    moderatorAccessRequired: "Moderator erişimi gerekli",
+    reportsManagement: "Rapor Yönetimi",
+    reportsManagementDesc: "Kullanıcı raporlarını inceleyin ve çözün",
+    userManagement: "Kullanıcı Yönetimi",
+    userManagementDesc: "Kullanıcıları yasaklayın/yasak kaldırın ve moderatorleri yönetin",
+    reportResolved: "Rapor çözüldü",
+    pending: "Beklemede",
+    resolved: "Çözüldü",
+    all: "Tümü",
+    noReports: "Rapor bulunamadı",
+    reportedBy: "Raporlayan",
+    unknown: "Bilinmeyen",
+    viewTopic: "Konuyu Görüntüle",
+    resolve: "Çöz",
+    pin: "Sabitle",
+    unpin: "Sabitliği Kaldır",
+    lock: "Kilitle",
+    unlock: "Kilidi Aç",
+    hide: "Gizle",
+    unhide: "Göster",
+    topicPinToggled: "Konu sabitleme değiştirildi",
+    topicLockToggled: "Konu kilitleme değiştirildi",
+    topicHideToggled: "Konu görünürlüğü değiştirildi",
+    moderatorTools: "Moderator Araçları",
+    moderatorToolPin: "Konuları üstte tutmak için sabitleyin/sabitliği kaldırın",
+    moderatorToolLock: "Yeni yanıtları önlemek için konuları kilitleyin/kilidi açın",
+    moderatorToolHide: "Herkese açık görünümden kaldırmak için konuları gizleyin/gösterin",
+    moderatorToolDelete: "Konuları ve gönderileri istediğiniz zaman silin",
+    moderatorToolReports: "Kullanıcı raporlarını inceleyin ve çözün",
+    moderatorToolBan: "Kullanıcıları yasaklayın/yasak kaldırın (Sadece Admin)",
+    moderatorToolModerators: "Moderatorleri ekleyin/kaldırın (Sadece Admin)",
+    reportReasonSpam: "Spam",
+    reportReasonHarassment: "Taciz",
+    reportReasonInappropriate: "Uygunsuz içerik",
+    reportReasonMisinformation: "Yanlış bilgi",
+    reportReasonOther: "Diğer",
     
     // Forum categories
     category_exams_tips: "Sınavlar ve İpuçları",

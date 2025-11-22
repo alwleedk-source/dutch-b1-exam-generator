@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { BookOpen, Menu, LogOut, FileText, BookMarked, TrendingUp, Library, Plus, MessageSquare } from "lucide-react";
+import { BookOpen, Menu, LogOut, FileText, BookMarked, TrendingUp, Library, Plus, MessageSquare, Shield } from "lucide-react";
 import { Link } from "wouter";
 import {
   DropdownMenu,
@@ -58,6 +58,14 @@ export function AppHeader() {
                 {t.forumTitle || "Forum"}
               </Button>
             </Link>
+            {(user?.role === "moderator" || user?.role === "admin") && (
+              <Link href="/forum/moderator">
+                <Button variant="ghost" size="sm">
+                  <Shield className="h-4 w-4 mr-1" />
+                  {t.moderatorPanel || "Moderator"}
+                </Button>
+              </Link>
+            )}
             <NotificationsDropdown />
             <LanguageSwitcher />
             <Button variant="ghost" size="sm" onClick={logout}>

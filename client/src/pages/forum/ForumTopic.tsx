@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ForumEditor } from "@/components/ForumEditor";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, ThumbsUp, ThumbsDown, Send, Edit, Trash2 } from "lucide-react";
+import { ArrowLeft, ThumbsUp, ThumbsDown, Send, Edit, Trash2, Pin, Lock, EyeOff } from "lucide-react";
 import { Link, useParams } from "wouter";
 import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
@@ -63,6 +63,36 @@ export default function ForumTopic() {
     },
   });
   
+  const togglePinMutation = trpc.forum.togglePinTopic.useMutation({
+    onSuccess: () => {
+      toast.success(t.topicPinToggled || "Topic pin toggled");
+      utils.forum.getTopic.invalidate({ topicId });
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+  
+  const toggleLockMutation = trpc.forum.toggleLockTopic.useMutation({
+    onSuccess: () => {
+      toast.success(t.topicLockToggled || "Topic lock toggled");
+      utils.forum.getTopic.invalidate({ topicId });
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+  
+  const toggleHideMutation = trpc.forum.toggleHideTopic.useMutation({
+    onSuccess: () => {
+      toast.success(t.topicHideToggled || "Topic visibility toggled");
+      utils.forum.getTopic.invalidate({ topicId });
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+  
   const canEditOrDelete = (createdAt: string, userId: number) => {
     if (!user) return false;
     if (user.role === "moderator" || user.role === "admin") return true;
@@ -71,6 +101,8 @@ export default function ForumTopic() {
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     return new Date(createdAt) > fiveMinutesAgo;
   };
+  
+  const isModerator = user && (user.role === "moderator" || user.role === "admin");
 
   const handleReply = () => {
     if (!replyContent.trim()) {
@@ -164,19 +196,53 @@ export default function ForumTopic() {
               </Button>
               
               {canEditOrDelete(data.topic.created_at, data.topic.user_id) && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (confirm(t.confirmDelete || "Are you sure you want to delete this topic?")) {
+                      deleteTopicMutation.mutate({ topicId });
+                    }
+                  }}
+                  disabled={deleteTopicMutation.isPending}
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  {t.delete}
+                </Button>
+              )}
+              
+              {isModerator && (
                 <>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => {
-                      if (confirm(t.confirmDelete || "Are you sure you want to delete this topic?")) {
-                        deleteTopicMutation.mutate({ topicId });
-                      }
-                    }}
-                    disabled={deleteTopicMutation.isPending}
+                    onClick={() => togglePinMutation.mutate({ topicId })}
+                    disabled={togglePinMutation.isPending}
+                    className={data.topic.is_pinned ? 'bg-primary/10' : ''}
                   >
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    {t.delete}
+                    <Pin className="h-4 w-4 mr-1" />
+                    {data.topic.is_pinned ? (t.unpin || "Unpin") : (t.pin || "Pin")}
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => toggleLockMutation.mutate({ topicId })}
+                    disabled={toggleLockMutation.isPending}
+                    className={data.topic.is_locked ? 'bg-destructive/10' : ''}
+                  >
+                    <Lock className="h-4 w-4 mr-1" />
+                    {data.topic.is_locked ? (t.unlock || "Unlock") : (t.lock || "Lock")}
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => toggleHideMutation.mutate({ topicId })}
+                    disabled={toggleHideMutation.isPending}
+                  >
+                    <EyeOff className="h-4 w-4 mr-1" />
+                    {data.topic.is_hidden ? (t.unhide || "Unhide") : (t.hide || "Hide")}
                   </Button>
                 </>
               )}
