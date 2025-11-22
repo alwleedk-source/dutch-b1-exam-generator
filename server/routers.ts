@@ -1091,7 +1091,15 @@ export const appRouter = router({
             audioUrl: dictWord.audio_url || null,
             audioKey: dictWord.audio_key || null,
           });
-          // createVocabulary returns an array
+          
+          // createVocabulary returns an array - ensure it's not empty
+          if (!newVocab || newVocab.length === 0) {
+            throw new TRPCError({ 
+              code: "INTERNAL_SERVER_ERROR", 
+              message: "Failed to create vocabulary entry" 
+            });
+          }
+          
           vocabularyId = newVocab[0].id;
         } else {
           vocabularyId = existingVocab.id;
