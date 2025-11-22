@@ -206,9 +206,18 @@ async function createB1DictionaryTable(db: any) {
       "example_nl" text,
       "word_type" varchar(50),
       "frequency_rank" integer,
+      "audio_url" text,
+      "audio_key" varchar(255),
       "created_at" timestamp DEFAULT now() NOT NULL,
       "updated_at" timestamp DEFAULT now() NOT NULL
     );
+  `);
+  
+  // Add audio columns if table already exists (migration)
+  await db.execute(sql`
+    ALTER TABLE "b1_dictionary" 
+    ADD COLUMN IF NOT EXISTS "audio_url" text,
+    ADD COLUMN IF NOT EXISTS "audio_key" varchar(255);
   `);
 
   // Create indexes

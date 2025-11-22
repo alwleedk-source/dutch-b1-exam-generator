@@ -321,6 +321,10 @@ export const b1Dictionary = pgTable("b1_dictionary", {
   word_type: varchar("word_type", { length: 50 }), // noun, verb, adjective, etc.
   frequency_rank: integer("frequency_rank"), // 1-5000
   
+  // Audio
+  audio_url: text("audio_url"), // Cloudflare R2 URL
+  audio_key: varchar("audio_key", { length: 255 }), // R2 key for reference
+  
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({

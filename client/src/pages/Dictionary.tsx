@@ -6,9 +6,29 @@ import { Search, Volume2, Plus, Loader2 } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 
 export default function Dictionary() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
+  
+  // Get preferred translation based on user language
+  const getPreferredTranslation = (word: any) => {
+    switch(language) {
+      case 'ar': return word.translation_ar;
+      case 'en': return word.translation_en;
+      case 'tr': return word.translation_tr;
+      default: return word.translation_en || word.translation_ar || word.translation_tr;
+    }
+  };
+  
+  const getTranslationLabel = () => {
+    switch(language) {
+      case 'ar': return 'الترجمة';
+      case 'en': return 'Translation';
+      case 'tr': return 'Çeviri';
+      case 'nl': return 'Vertaling';
+      default: return 'Translation';
+    }
+  };
 
   const { data: words, isLoading } = trpc.dictionary.search.useQuery(
     { query: searchQuery, letter: selectedLetter },
@@ -135,27 +155,38 @@ export default function Dictionary() {
                 </div>
               )}
 
-              {/* Translations */}
-              <div className="space-y-2">
-                {word.translation_ar && (
-                  <div>
-                    <span className="text-xs font-semibold text-gray-500">AR:</span>
-                    <span className="text-sm text-gray-700 ml-2">{word.translation_ar}</span>
-                  </div>
-                )}
-                {word.translation_en && (
-                  <div>
-                    <span className="text-xs font-semibold text-gray-500">EN:</span>
-                    <span className="text-sm text-gray-700 ml-2">{word.translation_en}</span>
-                  </div>
-                )}
-                {word.translation_tr && (
-                  <div>
-                    <span className="text-xs font-semibold text-gray-500">TR:</span>
-                    <span className="text-sm text-gray-700 ml-2">{word.translation_tr}</span>
-                  </div>
-                )}
-              </div>
+              {/* Primary Translation (based on user language) */}
+              {getPreferredTranslation(word) && (
+                <div className="mb-3">
+                  <span className="text-xs font-semibold text-gray-500 uppercase">{getTranslationLabel()}:</span>
+                  <p className="text-base font-medium text-gray-900 mt-1">{getPreferredTranslation(word)}</p>
+                </div>
+              )}
+              
+              {/* Other Translations (collapsed) */}
+              <details className="text-sm">
+                <summary className="cursor-pointer text-gray-500 hover:text-gray-700">Other translations</summary>
+                <div className="space-y-1 mt-2 pl-2">
+                  {word.translation_ar && language !== 'ar' && (
+                    <div>
+                      <span className="text-xs font-semibold text-gray-500">AR:</span>
+                      <span className="text-sm text-gray-700 ml-2">{word.translation_ar}</span>
+                    </div>
+                  )}
+                  {word.translation_en && language !== 'en' && (
+                    <div>
+                      <span className="text-xs font-semibold text-gray-500">EN:</span>
+                      <span className="text-sm text-gray-700 ml-2">{word.translation_en}</span>
+                    </div>
+                  )}
+                  {word.translation_tr && language !== 'tr' && (
+                    <div>
+                      <span className="text-xs font-semibold text-gray-500">TR:</span>
+                      <span className="text-sm text-gray-700 ml-2">{word.translation_tr}</span>
+                    </div>
+                  )}
+                </div>
+              </details>
             </div>
           ))}
         </div>

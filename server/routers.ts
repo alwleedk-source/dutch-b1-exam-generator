@@ -733,6 +733,29 @@ export const appRouter = router({
         word: z.string(),
       }))
       .mutation(async ({ input }) => {
+        // 1. Check if audio already exists for this vocabulary entry
+        const vocab = await db.getVocabularyById(input.vocabId);
+        if (vocab?.audioUrl) {
+          return { audioUrl: vocab.audioUrl, audioKey: vocab.audioKey || '' };
+        }
+        
+        // 2. Check if word exists in dictionary with audio
+        const dictionaryEntry = await db.getDictionaryWord(input.word);
+        if (dictionaryEntry?.audio_url) {
+          // Use dictionary audio
+          await db.updateVocabularyAudio(input.vocabId, dictionaryEntry.audio_url, dictionaryEntry.audio_key || '');
+          return { audioUrl: dictionaryEntry.audio_url, audioKey: dictionaryEntry.audio_key || '' };
+        }
+        
+        // 3. Check if any other vocabulary entry has audio for this word
+        const existingVocab = await db.getVocabularyByWord(input.word);
+        if (existingVocab?.audioUrl && existingVocab.id !== input.vocabId) {
+          // Reuse existing audio
+          await db.updateVocabularyAudio(input.vocabId, existingVocab.audioUrl, existingVocab.audioKey || '');
+          return { audioUrl: existingVocab.audioUrl, audioKey: existingVocab.audioKey || '' };
+        }
+        
+        // 4. Generate new audio only if none exists
         const { generateDutchSpeech } = await import("./lib/tts");
         const { audioUrl, audioKey } = await generateDutchSpeech(input.word);
         await db.updateVocabularyAudio(input.vocabId, audioUrl, audioKey);
@@ -757,25 +780,64 @@ export const appRouter = router({
 
         // Extract vocabulary with Gemini AI
         const vocabData = await gemini.extractVocabulary(text.dutch_text);
+        const { generateDutchSpeech } = await import("./lib/tts");
 
-        // Save vocabulary
+        let newWords = 0;
+        let existingWords = 0;
+        let fromDictionary = 0;
+
+        // Process each word with deduplication and dictionary integration
         for (const word of vocabData.vocabulary) {
-          await db.createVocabulary({
-            text_id: input.text_id,
-            dutchWord: word.dutch,
-            dutchDefinition: word.dutch_definition,
-            wordType: word.word_type,
-            arabicTranslation: word.arabic,
-            englishTranslation: word.english,
-            turkishTranslation: word.turkish,
-            exampleSentence: word.example,
-            difficulty: word.difficulty,
-          });
+          // 1. Check if word exists in dictionary
+          const dictionaryEntry = await db.getDictionaryWord(word.dutch);
+          
+          // 2. Check if word already exists in vocabulary
+          let vocabEntry = await db.getVocabularyByWord(word.dutch);
+          
+          if (!vocabEntry) {
+            // 3. Word is new - create it
+            const vocabData = {
+              dutchWord: word.dutch,
+              dutchDefinition: word.dutch_definition || dictionaryEntry?.definition_nl || null,
+              wordType: word.word_type || dictionaryEntry?.word_type || null,
+              arabicTranslation: word.arabic || dictionaryEntry?.translation_ar || null,
+              englishTranslation: word.english || dictionaryEntry?.translation_en || null,
+              turkishTranslation: word.turkish || dictionaryEntry?.translation_tr || null,
+              exampleSentence: word.example || null,
+              difficulty: word.difficulty || 'B1',
+              audioUrl: dictionaryEntry?.audio_url || null,
+              audioKey: dictionaryEntry?.audio_key || null,
+            };
+            
+            const result = await db.createVocabulary(vocabData);
+            vocabEntry = result[0];
+            newWords++;
+            
+            // 4. Generate audio if not from dictionary
+            if (!dictionaryEntry?.audio_url) {
+              try {
+                const { audioUrl, audioKey } = await generateDutchSpeech(word.dutch);
+                await db.updateVocabularyAudio(vocabEntry.id, audioUrl, audioKey);
+              } catch (error) {
+                console.error(`Failed to generate audio for "${word.dutch}":`, error);
+              }
+            } else {
+              fromDictionary++;
+            }
+          } else {
+            existingWords++;
+          }
+          
+          // 5. Link vocabulary to text (many-to-many)
+          await db.linkVocabularyToText(input.text_id, vocabEntry.id);
         }
 
         return {
           success: true,
           vocabularyCount: vocabData.vocabulary.length,
+          newWords,
+          existingWords,
+          fromDictionary,
         };
       }),
 
