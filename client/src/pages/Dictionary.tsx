@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { trpc } from "../lib/trpc";
-import { useI18n } from "../hooks/useI18n";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Search, Volume2, Plus, Loader2 } from "lucide-react";
 
 export default function Dictionary() {
-  const { t } = useI18n();
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
 
