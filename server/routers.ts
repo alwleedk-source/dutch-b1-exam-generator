@@ -1080,17 +1080,19 @@ export const appRouter = router({
         if (!existingVocab) {
           // Create new vocabulary entry
           const newVocab = await db.createVocabulary({
-            text_id: null, // Dictionary words don't belong to a specific text
             dutchWord: dictWord.word,
-            dutchDefinition: dictWord.definition_nl || '',
-            wordType: dictWord.word_type || 'unknown',
-            arabicTranslation: dictWord.translation_ar || '',
-            englishTranslation: dictWord.translation_en || '',
-            turkishTranslation: dictWord.translation_tr || '',
-            exampleSentence: dictWord.example_nl || '',
+            dutchDefinition: dictWord.definition_nl || null,
+            wordType: dictWord.word_type || null,
+            arabicTranslation: dictWord.translation_ar || null,
+            englishTranslation: dictWord.translation_en || null,
+            turkishTranslation: dictWord.translation_tr || null,
+            exampleSentence: dictWord.example_nl || null,
             difficulty: 'B1',
+            audioUrl: dictWord.audio_url || null,
+            audioKey: dictWord.audio_key || null,
           });
-          vocabularyId = newVocab.id;
+          // createVocabulary returns an array
+          vocabularyId = newVocab[0].id;
         } else {
           vocabularyId = existingVocab.id;
         }
