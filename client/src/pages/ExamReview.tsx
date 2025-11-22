@@ -18,11 +18,11 @@ export default function ExamReview() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-bg">
-        <Card>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-bg px-4">
+        <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Niet ingelogd</CardTitle>
-            <CardDescription>Log in om je examen te bekijken</CardDescription>
+            <CardTitle>{t.notAuthenticated}</CardTitle>
+            <CardDescription>{t.pleaseLogin}</CardDescription>
           </CardHeader>
         </Card>
       </div>
@@ -31,10 +31,10 @@ export default function ExamReview() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-bg">
-        <Card>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-bg px-4">
+        <Card className="w-full max-w-md">
           <CardContent className="py-12">
-            <p className="text-center text-muted-foreground">Laden...</p>
+            <p className="text-center text-muted-foreground">{t.loading}</p>
           </CardContent>
         </Card>
       </div>
@@ -43,17 +43,17 @@ export default function ExamReview() {
 
   if (error || !exam) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-bg">
-        <Card>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-bg px-4">
+        <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Examen niet gevonden</CardTitle>
-            <CardDescription>Dit examen bestaat niet of is verwijderd.</CardDescription>
+            <CardTitle>{t.examNotFound}</CardTitle>
+            <CardDescription>{t.examNotFoundDesc}</CardDescription>
           </CardHeader>
           <CardContent>
             <Link href="/my-exams">
-              <Button>
+              <Button className="w-full sm:w-auto">
                 <Home className="h-4 w-4 mr-2" />
-                Terug naar mijn examens
+                {t.myExams}
               </Button>
             </Link>
           </CardContent>
@@ -64,15 +64,15 @@ export default function ExamReview() {
 
   if (exam.status !== 'completed') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-bg">
-        <Card>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-bg px-4">
+        <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Examen niet afgerond</CardTitle>
-            <CardDescription>Je moet het examen eerst afronden om de antwoorden te bekijken.</CardDescription>
+            <CardTitle>{t.examNotCompleted}</CardTitle>
+            <CardDescription>{t.examNotCompletedDesc}</CardDescription>
           </CardHeader>
           <CardContent>
             <Link href={`/exam/${examId}`}>
-              <Button>Ga naar examen</Button>
+              <Button className="w-full sm:w-auto">{t.takeExam}</Button>
             </Link>
           </CardContent>
         </Card>
@@ -89,31 +89,35 @@ export default function ExamReview() {
       <AppHeader />
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-6 sm:py-8">
         <div className="max-w-4xl mx-auto">
           {/* Title */}
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold mb-2">{t.examReview}</h2>
-            <p className="text-muted-foreground">
-              {t.reviewAnswers}
+          <div className="mb-6 sm:mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2">{t.examReview || "Exam Review"}</h2>
+            <p className="text-sm sm:text-base text-muted-foreground">
+              {t.reviewAnswers || "Review your answers"}
             </p>
           </div>
 
           {/* Score Summary */}
-          <Card className="mb-8">
-            <CardContent className="py-6">
-              <div className="flex items-center justify-between">
+          <Card className="mb-6 sm:mb-8">
+            <CardContent className="py-4 sm:py-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Jouw score</p>
-                  <p className="text-3xl font-bold">{exam.score_percentage}%</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-1">{t.score || "Your score"}</p>
+                  <p className="text-2xl sm:text-3xl font-bold">{exam.score_percentage}%</p>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm text-muted-foreground mb-1">Resultaat</p>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span className="font-semibold">{exam.correct_answers} goed</span>
-                    <XCircle className="h-5 w-5 text-red-500 ml-2" />
-                    <span className="font-semibold">{exam.total_questions - exam.correct_answers} fout</span>
+                <div className="w-full sm:w-auto sm:text-right">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-1 sm:mb-2">{t.correctAnswers || "Result"}</p>
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
+                      <span className="text-sm sm:text-base font-semibold">{exam.correct_answers} {t.correct}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <XCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-500" />
+                      <span className="text-sm sm:text-base font-semibold">{exam.total_questions - exam.correct_answers} {t.incorrect}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -121,7 +125,7 @@ export default function ExamReview() {
           </Card>
 
           {/* Questions Review */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {questions.map((q: any, index: number) => {
               const userAnswer = userAnswers[index];
               const correctAnswer = String.fromCharCode(65 + (q.correctAnswerIndex || 0)); // 0->A, 1->B, etc.
@@ -129,24 +133,24 @@ export default function ExamReview() {
 
               return (
                 <Card key={index} className={`border-2 ${isCorrect ? 'border-green-500/30' : 'border-red-500/30'}`}>
-                  <CardHeader>
-                    <div className="flex items-start gap-3">
+                  <CardHeader className="pb-3 sm:pb-6">
+                    <div className="flex items-start gap-2 sm:gap-3">
                       {isCorrect ? (
-                        <CheckCircle className="h-6 w-6 text-green-500 flex-shrink-0 mt-1" />
+                        <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-500 flex-shrink-0 mt-0.5 sm:mt-1" />
                       ) : (
-                        <XCircle className="h-6 w-6 text-red-500 flex-shrink-0 mt-1" />
+                        <XCircle className="h-5 w-5 sm:h-6 sm:w-6 text-red-500 flex-shrink-0 mt-0.5 sm:mt-1" />
                       )}
-                      <div className="flex-1">
-                        <CardTitle className="text-lg mb-2">
-                          Vraag {index + 1}
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-base sm:text-lg mb-1 sm:mb-2">
+                          {t.question || "Question"} {index + 1}
                         </CardTitle>
-                        <CardDescription className="text-base text-foreground">
+                        <CardDescription className="text-sm sm:text-base text-foreground break-words">
                           {q.question}
                         </CardDescription>
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-0">
                     {/* Options */}
                     <div className="space-y-2 mb-4">
                       {q.options.map((option: string, optIndex: number) => {
@@ -157,7 +161,7 @@ export default function ExamReview() {
                         return (
                           <div
                             key={optIndex}
-                            className={`p-3 rounded-lg border-2 ${
+                            className={`p-2.5 sm:p-3 rounded-lg border-2 ${
                               isCorrectOption
                                 ? 'border-green-500 bg-green-500/10'
                                 : isUserAnswer
@@ -165,14 +169,14 @@ export default function ExamReview() {
                                 : 'border-border'
                             }`}
                           >
-                            <div className="flex items-center gap-2">
-                              <span className="font-semibold">{optionLetter}.</span>
-                              <span>{option}</span>
+                            <div className="flex items-start gap-2">
+                              <span className="font-semibold text-sm sm:text-base flex-shrink-0">{optionLetter}.</span>
+                              <span className="text-sm sm:text-base break-words flex-1">{option}</span>
                               {isCorrectOption && (
-                                <CheckCircle className="h-4 w-4 text-green-500 ml-auto" />
+                                <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
                               )}
                               {isUserAnswer && !isCorrectOption && (
-                                <XCircle className="h-4 w-4 text-red-500 ml-auto" />
+                                <XCircle className="h-4 w-4 text-red-500 flex-shrink-0" />
                               )}
                             </div>
                           </div>
@@ -183,37 +187,37 @@ export default function ExamReview() {
                     {/* User's Answer */}
                     {!isCorrect && (
                       <Alert className="mb-4 border-red-500/30 bg-red-500/5">
-                        <AlertCircle className="h-4 w-4 text-red-500" />
-                        <AlertDescription>
-                          <strong>Jouw antwoord:</strong> {userAnswer || 'Niet beantwoord'}
+                        <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0" />
+                        <AlertDescription className="text-xs sm:text-sm">
+                          <strong>{t.yourAnswer || "Your answer"}:</strong> {userAnswer || (t.notAnswered || "Not answered")}
                           <br />
-                          <strong>Correct antwoord:</strong> {correctAnswer}
+                          <strong>{t.correctAnswer || "Correct answer"}:</strong> {correctAnswer}
                         </AlertDescription>
                       </Alert>
                     )}
 
                     {/* Explanation */}
                     {q.explanation && (
-                      <div className="p-4 rounded-lg bg-blue-500/5 border border-blue-500/20 mb-4">
-                        <p className="text-sm font-semibold text-blue-700 dark:text-blue-400 mb-2">
-                          💡 Uitleg
+                      <div className="p-3 sm:p-4 rounded-lg bg-blue-500/5 border border-blue-500/20 mb-4">
+                        <p className="text-xs sm:text-sm font-semibold text-blue-700 dark:text-blue-400 mb-1.5 sm:mb-2">
+                          💡 {t.explanation || "Explanation"}
                         </p>
-                        <p className="text-sm">{q.explanation}</p>
+                        <p className="text-xs sm:text-sm break-words">{q.explanation}</p>
                       </div>
                     )}
 
                     {/* Evidence from Text */}
                     {q.evidence && (
-                      <div className="p-4 rounded-lg bg-purple-500/5 border border-purple-500/20">
-                        <p className="text-sm font-semibold text-purple-700 dark:text-purple-400 mb-2">
-                          📖 Bewijs uit de tekst
+                      <div className="p-3 sm:p-4 rounded-lg bg-purple-500/5 border border-purple-500/20">
+                        <p className="text-xs sm:text-sm font-semibold text-purple-700 dark:text-purple-400 mb-1.5 sm:mb-2">
+                          📖 {t.evidenceFromText || "Evidence from text"}
                         </p>
-                        <p className="text-sm italic">"{q.evidence}"</p>
+                        <p className="text-xs sm:text-sm italic break-words">"{q.evidence}"</p>
                       </div>
                     )}
 
                     {/* Question Metadata */}
-                    <div className="mt-4 pt-4 border-t flex items-center gap-4 text-xs text-muted-foreground">
+                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                       <span className="px-2 py-1 rounded bg-muted">
                         {q.questionType || 'Unknown'}
                       </span>
@@ -228,22 +232,22 @@ export default function ExamReview() {
           </div>
 
           {/* Bottom Actions */}
-          <div className="mt-8 flex gap-4 justify-center">
+          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
             <Link href={`/exam/${examId}/results`}>
-              <Button variant="outline">
-                Bekijk resultaten
+              <Button variant="outline" className="w-full sm:w-auto">
+                {t.viewResults || "View results"}
               </Button>
             </Link>
             <Link href={`/study/${exam.text_id}`}>
-              <Button variant="outline">
+              <Button variant="outline" className="w-full sm:w-auto">
                 <BookOpen className="h-4 w-4 mr-2" />
-                Bestudeer tekst
+                {t.studyText || "Study text"}
               </Button>
             </Link>
             <Link href="/my-exams">
-              <Button>
+              <Button className="w-full sm:w-auto">
                 <Home className="h-4 w-4 mr-2" />
-                Mijn examens
+                {t.myExams}
               </Button>
             </Link>
           </div>

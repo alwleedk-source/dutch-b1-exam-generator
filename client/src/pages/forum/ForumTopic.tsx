@@ -203,7 +203,7 @@ export default function ForumTopic() {
     <div className="min-h-screen bg-gradient-bg">
       <AppHeader />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-6 sm:py-8">
         <Link href="/forum">
           <Button variant="ghost" size="sm" className="mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -212,10 +212,10 @@ export default function ForumTopic() {
         </Link>
 
         {/* Topic */}
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2 mb-4 flex-wrap">
-              <h1 className="text-2xl font-bold">{data.topic.title}</h1>
+        <Card className="mb-4 sm:mb-6">
+          <CardContent className="pt-4 sm:pt-6 px-4 sm:px-6">
+            <div className="flex items-start gap-2 mb-4 flex-wrap">
+              <h1 className="text-xl sm:text-2xl font-bold break-words flex-1">{data.topic.title}</h1>
               {data.topic.is_hidden && (
                 <Badge variant="outline" className="border-orange-500 text-orange-600">
                   <EyeOff className="h-3 w-3 mr-1" />
@@ -224,28 +224,29 @@ export default function ForumTopic() {
               )}
             </div>
             
-            <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground mb-4">
               <UserAvatar name={data.topic.user_name} size="sm" />
               <span title={data.topic.user_name || "Unknown"}>{truncateName(data.topic.user_name)}</span>
               <span>•</span>
-              <span>
+              <span className="text-xs sm:text-sm">
                 {data.topic.created_at && formatDistanceToNow(new Date(data.topic.created_at), { addSuffix: true })}
               </span>
             </div>
             
             <div 
-              className="prose dark:prose-invert max-w-none mb-4"
+              className="prose prose-sm sm:prose dark:prose-invert max-w-none mb-4 break-words"
               dangerouslySetInnerHTML={{ __html: data.topic.content }}
             />
             
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleVote("upvote")}
                 disabled={!user}
+                className="text-xs sm:text-sm"
               >
-                <ThumbsUp className="h-4 w-4 mr-1" />
+                <ThumbsUp className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 {data.topic.upvote_count}
               </Button>
               <Button
@@ -253,8 +254,9 @@ export default function ForumTopic() {
                 size="sm"
                 onClick={() => handleVote("downvote")}
                 disabled={!user}
+                className="text-xs sm:text-sm px-2 sm:px-3"
               >
-                <ThumbsDown className="h-4 w-4 mr-1" />
+                <ThumbsDown className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
               
               {user && (
@@ -262,9 +264,10 @@ export default function ForumTopic() {
                   variant="outline"
                   size="sm"
                   onClick={() => handleReportClick("topic", data.topic.id)}
+                  className="text-xs sm:text-sm"
                 >
-                  <Flag className="h-4 w-4 mr-1" />
-                  {t.report || "Report"}
+                  <Flag className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                  <span className="hidden xs:inline">{t.report || "Report"}</span>
                 </Button>
               )}
               
@@ -278,9 +281,10 @@ export default function ForumTopic() {
                     }
                   }}
                   disabled={deleteTopicMutation.isPending}
+                  className="text-xs sm:text-sm"
                 >
-                  <Trash2 className="h-4 w-4 mr-1" />
-                  {t.delete}
+                  <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                  <span className="hidden xs:inline">{t.delete}</span>
                 </Button>
               )}
               
@@ -291,10 +295,10 @@ export default function ForumTopic() {
                     size="sm"
                     onClick={() => togglePinMutation.mutate({ topicId })}
                     disabled={togglePinMutation.isPending}
-                    className={data.topic.is_pinned ? 'bg-primary/10' : ''}
+                    className={`text-xs sm:text-sm ${data.topic.is_pinned ? 'bg-primary/10' : ''}`}
                   >
-                    <Pin className="h-4 w-4 mr-1" />
-                    {data.topic.is_pinned ? (t.unpin || "Unpin") : (t.pin || "Pin")}
+                    <Pin className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">{data.topic.is_pinned ? (t.unpin || "Unpin") : (t.pin || "Pin")}</span>
                   </Button>
                   
                   <Button
@@ -302,10 +306,10 @@ export default function ForumTopic() {
                     size="sm"
                     onClick={() => toggleLockMutation.mutate({ topicId })}
                     disabled={toggleLockMutation.isPending}
-                    className={data.topic.is_locked ? 'bg-destructive/10' : ''}
+                    className={`text-xs sm:text-sm ${data.topic.is_locked ? 'bg-destructive/10' : ''}`}
                   >
-                    <Lock className="h-4 w-4 mr-1" />
-                    {data.topic.is_locked ? (t.unlock || "Unlock") : (t.lock || "Lock")}
+                    <Lock className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">{data.topic.is_locked ? (t.unlock || "Unlock") : (t.lock || "Lock")}</span>
                   </Button>
                   
                   <Button
@@ -313,9 +317,10 @@ export default function ForumTopic() {
                     size="sm"
                     onClick={() => toggleHideMutation.mutate({ topicId })}
                     disabled={toggleHideMutation.isPending}
+                    className="text-xs sm:text-sm"
                   >
-                    <EyeOff className="h-4 w-4 mr-1" />
-                    {data.topic.is_hidden ? (t.unhide || "Unhide") : (t.hide || "Hide")}
+                    <EyeOff className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">{data.topic.is_hidden ? (t.unhide || "Unhide") : (t.hide || "Hide")}</span>
                   </Button>
                 </>
               )}
@@ -324,36 +329,37 @@ export default function ForumTopic() {
         </Card>
 
         {/* Replies */}
-        <div className="space-y-4 mb-6">
-          <h2 className="text-xl font-semibold">
+        <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
+          <h2 className="text-lg sm:text-xl font-semibold">
             {t.replies || "Replies"} ({data.posts.length})
           </h2>
           
           {data.posts.map((post) => (
             <Card key={post.id}>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-3 text-sm text-muted-foreground mb-3">
+              <CardContent className="pt-4 sm:pt-6 px-4 sm:px-6">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground mb-3">
                   <UserAvatar name={post.user_name} size="sm" />
                   <span className="font-medium" title={post.user_name || "Unknown"}>{truncateName(post.user_name)}</span>
                   <span>•</span>
-                  <span>
+                  <span className="text-xs sm:text-sm">
                     {post.created_at && formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
                   </span>
                 </div>
                 
                 <div 
-                  className="prose dark:prose-invert max-w-none mb-3"
+                  className="prose prose-sm sm:prose dark:prose-invert max-w-none mb-3 break-words"
                   dangerouslySetInnerHTML={{ __html: post.content }}
                 />
                 
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => handleVote("upvote", post.id)}
                     disabled={!user}
+                    className="text-xs sm:text-sm"
                   >
-                    <ThumbsUp className="h-4 w-4 mr-1" />
+                    <ThumbsUp className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                     {post.upvote_count}
                   </Button>
                   
@@ -362,9 +368,10 @@ export default function ForumTopic() {
                       variant="outline"
                       size="sm"
                       onClick={() => handleReportClick("post", post.id)}
+                      className="text-xs sm:text-sm"
                     >
-                      <Flag className="h-4 w-4 mr-1" />
-                      {t.report || "Report"}
+                      <Flag className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                      <span className="hidden xs:inline">{t.report || "Report"}</span>
                     </Button>
                   )}
                   
@@ -378,9 +385,10 @@ export default function ForumTopic() {
                         }
                       }}
                       disabled={deletePostMutation.isPending}
+                      className="text-xs sm:text-sm"
                     >
-                      <Trash2 className="h-4 w-4 mr-1" />
-                      {t.delete}
+                      <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                      <span className="hidden xs:inline">{t.delete}</span>
                     </Button>
                   )}
                 </div>
@@ -392,8 +400,8 @@ export default function ForumTopic() {
         {/* Reply Form */}
         {user ? (
           <Card>
-            <CardContent className="pt-6">
-              <h3 className="text-lg font-semibold mb-4">
+            <CardContent className="pt-4 sm:pt-6 px-4 sm:px-6">
+              <h3 className="text-base sm:text-lg font-semibold mb-4">
                 {t.postReply || "Post a Reply"}
               </h3>
               
