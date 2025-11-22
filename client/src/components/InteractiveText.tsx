@@ -222,39 +222,35 @@ export default function InteractiveText({ textId, content, className = "" }: Int
     return () => document.removeEventListener('click', handleClick);
   }, [textId]);
   
-  // Dynamic tooltip positioning
+  // Dynamic tooltip positioning using fixed positioning
   useEffect(() => {
     const adjustTooltipPosition = (wrapper: HTMLElement) => {
       const tooltip = wrapper.querySelector('.vocab-tooltip') as HTMLElement;
       if (!tooltip) return;
       
       const wrapperRect = wrapper.getBoundingClientRect();
-      const tooltipRect = tooltip.getBoundingClientRect();
       
-      // Check if tooltip would overflow on the right
-      const overflowRight = wrapperRect.left + tooltipRect.width / 2 > window.innerWidth;
-      // Check if tooltip would overflow on the left
-      const overflowLeft = wrapperRect.left - tooltipRect.width / 2 < 0;
+      // Position tooltip using fixed positioning relative to viewport
+      const tooltipWidth = tooltip.offsetWidth || 200; // Estimate if not rendered
+      const tooltipHeight = tooltip.offsetHeight || 60;
       
-      // Reset positioning
-      tooltip.style.left = '';
-      tooltip.style.right = '';
-      tooltip.style.transform = '';
+      // Calculate center position
+      let left = wrapperRect.left + (wrapperRect.width / 2);
+      const top = wrapperRect.top - tooltipHeight - 8;
       
-      if (overflowRight) {
-        // Align to right edge
-        tooltip.style.left = 'auto';
-        tooltip.style.right = '0';
-        tooltip.style.transform = 'translateY(-8px)';
-      } else if (overflowLeft) {
-        // Align to left edge
-        tooltip.style.left = '0';
-        tooltip.style.transform = 'translateY(-8px)';
-      } else {
-        // Center (default)
-        tooltip.style.left = '50%';
-        tooltip.style.transform = 'translateX(-50%) translateY(-8px)';
+      // Adjust if would overflow right
+      if (left + tooltipWidth / 2 > window.innerWidth - 10) {
+        left = window.innerWidth - tooltipWidth - 10;
       }
+      // Adjust if would overflow left
+      else if (left - tooltipWidth / 2 < 10) {
+        left = tooltipWidth / 2 + 10;
+      }
+      
+      // Apply positioning
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top = `${top}px`;
+      tooltip.style.transform = 'translateX(-50%)';
     };
     
     const handleMouseEnter = (e: Event) => {
@@ -280,6 +276,9 @@ export default function InteractiveText({ textId, content, className = "" }: Int
         .vocab-word-wrapper {
           position: relative;
           display: inline;
+          /* Ensure wrapper doesn't affect layout or cause line breaks */
+          white-space: normal;
+          word-wrap: normal;
         }
         
         .vocab-word {
@@ -304,10 +303,7 @@ export default function InteractiveText({ textId, content, className = "" }: Int
         }
         
         .vocab-tooltip {
-          position: absolute;
-          bottom: 100%;
-          left: 50%;
-          transform: translateX(-50%) translateY(-8px);
+          position: fixed;
           background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
           color: white;
           padding: 10px 14px;
@@ -315,12 +311,14 @@ export default function InteractiveText({ textId, content, className = "" }: Int
           opacity: 0;
           pointer-events: none;
           transition: opacity 0.2s ease;
-          z-index: 1000;
+          z-index: 10000;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
           white-space: nowrap;
           min-width: 100px;
           max-width: 300px;
+          /* Fixed positioning - won't affect layout at all */
+          width: max-content;
         }
         
         .vocab-word-wrapper:hover .vocab-tooltip {
