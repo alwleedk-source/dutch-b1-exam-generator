@@ -4,6 +4,7 @@ import { trpc } from "../lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Search, Volume2, Plus, Loader2 } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
+import { toast } from "sonner";
 
 export default function Dictionary() {
   const { t, language } = useLanguage();
@@ -37,7 +38,14 @@ export default function Dictionary() {
 
   const addToVocabularyMutation = trpc.vocabulary.addFromDictionary.useMutation({
     onSuccess: () => {
-      alert("Word added to your vocabulary!");
+      toast.success("✅ تمت إضافة الكلمة إلى مفرداتك!");
+    },
+    onError: (error) => {
+      if (error.message.includes("already have")) {
+        toast.info("ℹ️ هذه الكلمة موجودة بالفعل في مفرداتك");
+      } else {
+        toast.error("❌ فشل في إضافة الكلمة: " + error.message);
+      }
     },
   });
 
