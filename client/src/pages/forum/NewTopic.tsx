@@ -22,6 +22,7 @@ export default function NewTopic() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [categoryId, setCategoryId] = useState<string>("");
+  const [categoryFromUrl, setCategoryFromUrl] = useState<string | null>(null);
   
   const { data: categories } = trpc.forum.getCategories.useQuery();
   
@@ -33,6 +34,7 @@ export default function NewTopic() {
     const urlCategory = new URLSearchParams(searchParams).get("category");
     if (urlCategory) {
       setCategoryId(urlCategory);
+      setCategoryFromUrl(urlCategory);
     }
   }, [searchParams]);
   
@@ -97,22 +99,38 @@ export default function NewTopic() {
             </h1>
             
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Category */}
-              <div>
-                <Label htmlFor="category">{t.category || "Category"}</Label>
-                <Select value={categoryId} onValueChange={setCategoryId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t.selectCategory || "Select a category"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {filteredCategories.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id.toString()}>
-                        {cat.icon} {t[cat.name_key as keyof typeof t] || cat.name_key}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {/* Category - only show if not coming from a category page */}
+              {!categoryFromUrl && (
+                <div>
+                  <Label htmlFor="category">{t.category || "Category"}</Label>
+                  <Select value={categoryId} onValueChange={setCategoryId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t.selectCategory || "Select a category"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filteredCategories.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.id.toString()}>
+                          {cat.icon} {t[cat.name_key as keyof typeof t] || cat.name_key}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              
+              {/* Show selected category as read-only if coming from category page */}
+              {categoryFromUrl && (
+                <div>
+                  <Label>{t.category || "Category"}</Label>
+                  <div className="flex items-center gap-2 p-3 bg-muted rounded-md">
+                    {filteredCategories.find(cat => cat.id.toString() === categoryFromUrl)?.icon}
+                    <span className="font-medium">
+                      {filteredCategories.find(cat => cat.id.toString() === categoryFromUrl) && 
+                        t[filteredCategories.find(cat => cat.id.toString() === categoryFromUrl)!.name_key as keyof typeof t]}
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {/* Title */}
               <div>
