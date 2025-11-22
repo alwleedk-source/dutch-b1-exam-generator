@@ -5,14 +5,15 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-async function generateDictionaryAudio() {
+async function generateDictionaryAudio(limit?: number) {
   try {
     console.log("🎵 Starting dictionary audio generation...");
     
     // Get all words from dictionary
-    const result = await pool.query(
-      `SELECT id, word FROM b1_dictionary ORDER BY frequency_rank ASC NULLS LAST`
-    );
+    const query = limit 
+      ? `SELECT id, word FROM b1_dictionary ORDER BY frequency_rank ASC NULLS LAST LIMIT ${limit}`
+      : `SELECT id, word FROM b1_dictionary ORDER BY frequency_rank ASC NULLS LAST`;
+    const result = await pool.query(query);
     
     const words = result.rows;
     console.log(`📚 Found ${words.length} words in dictionary`);
@@ -77,4 +78,11 @@ async function generateDictionaryAudio() {
   }
 }
 
-generateDictionaryAudio();
+// Get limit from command line argument
+const limit = process.argv[2] ? parseInt(process.argv[2]) : undefined;
+
+if (limit) {
+  console.log(`🎯 Limiting to first ${limit} words for testing`);
+}
+
+generateDictionaryAudio(limit);
