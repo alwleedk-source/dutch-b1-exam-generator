@@ -349,6 +349,7 @@ export interface Translations {
   timerPaused: string;
   pauseTimer: string;
   resumeTimer: string;
+  noTimeLimit: string;
   
   // Forum
   forumTitle: string;
@@ -821,6 +822,7 @@ export const translations: Record<Language, Translations> = {
     timerPaused: "Timer gepauzeerd",
     pauseTimer: "Pauzeer Timer",
     resumeTimer: "Hervat Timer",
+    noTimeLimit: "Geen tijdslimiet",
     
     // Forum
     forumTitle: "Community Forum",
@@ -1281,6 +1283,7 @@ export const translations: Record<Language, Translations> = {
     timerPaused: "تم إيقاف المؤقت",
     pauseTimer: "إيقاف المؤقت",
     resumeTimer: "استئناف المؤقت",
+    noTimeLimit: "بدون حد زمني",
     
     // Forum
     forumTitle: "مجتمع المنتدى",
@@ -1742,6 +1745,7 @@ export const translations: Record<Language, Translations> = {
     timerPaused: "Timer paused",
     pauseTimer: "Pause Timer",
     resumeTimer: "Resume Timer",
+    noTimeLimit: "No time limit",
     
     // Forum
     forumTitle: "Community Forum",
@@ -2204,6 +2208,7 @@ export const translations: Record<Language, Translations> = {
     timerPaused: "Zamanlayıcı duraklatıldı",
     pauseTimer: "Zamanlayıcıyı Duraklat",
     resumeTimer: "Zamanlayıcıyı Devam Ettir",
+    noTimeLimit: "Zaman sınırı yok",
     
     // Forum
     forumTitle: "Topluluk Forumu",

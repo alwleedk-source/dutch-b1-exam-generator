@@ -127,6 +127,11 @@ export const exams = pgTable("exams", {
   completed_at: timestamp("completed_at"),
   time_spent_minutes: integer("time_spent_minutes"),
   
+  // Timer System
+  exam_mode: varchar("exam_mode", { length: 20 }).default("practice"), // "practice" or "exam"
+  time_limit_minutes: integer("time_limit_minutes"), // Time limit for exam mode
+  timer_paused_at: timestamp("timer_paused_at"), // When timer was paused (practice mode only)
+  
   // Status
   status: varchar("status", { length: 50 }).default("in_progress").notNull(),
   
