@@ -555,7 +555,7 @@ export async function updateUserVocabularyCount(user_id: number) {
     SELECT COUNT(*) as count FROM "user_vocabulary" WHERE "user_id" = ${user_id}
   `);
   
-  const count = result.rows[0]?.count || 0;
+  const count = result?.rows?.[0]?.count || 0;
   
   // Update user stats
   await db
