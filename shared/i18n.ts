@@ -411,8 +411,6 @@ export const translations: Record<Language, Translations> = {
     myVocabulary: "Mijn Woordenschat",
     newWords: "Nieuwe woorden",
     learning: "Aan het leren",
-    mastered: "Beheerst",
-    reviewNow: "Nu herhalen",
     
     // Reporting
     reportIssue: "Probleem Melden",
@@ -723,8 +721,6 @@ export const translations: Record<Language, Translations> = {
     myVocabulary: "مفرداتي",
     newWords: "كلمات جديدة",
     learning: "قيد التعلم",
-    mastered: "متقن",
-    reviewNow: "مراجعة الآن",
     
     // Reporting
     reportIssue: "الإبلاغ عن مشكلة",
@@ -996,8 +992,6 @@ export const translations: Record<Language, Translations> = {
     myVocabulary: "My Vocabulary",
     newWords: "New words",
     learning: "Learning",
-    mastered: "Mastered",
-    reviewNow: "Review now",
     
     // Reporting
     reportIssue: "Report Issue",
@@ -1269,8 +1263,6 @@ export const translations: Record<Language, Translations> = {
     myVocabulary: "Kelime Bilgim",
     newWords: "Yeni kelimeler",
     learning: "Öğreniliyor",
-    mastered: "Öğrenildi",
-    reviewNow: "Şimdi gözden geçir",
     
     // Reporting
     reportIssue: "Sorun Bildir",
