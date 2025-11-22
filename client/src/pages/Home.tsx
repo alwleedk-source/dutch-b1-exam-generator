@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { getLoginUrl } from "@/const";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { BookOpen, Brain, Globe, TrendingUp, Sparkles, Zap, Target, Award, CheckCircle, FileText, MessageSquare, BarChart } from "lucide-react";
+import { BookOpen, Brain, Globe, TrendingUp, Sparkles, Zap, Target, Award, CheckCircle, FileText, MessageSquare, BarChart, Languages, Repeat } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -185,7 +185,7 @@ export default function Home() {
                 color: "text-chart-3",
               },
               {
-                icon: BookOpen,
+                icon: Languages,
                 title: t.feature8Title,
                 desc: t.feature8Desc,
                 color: "text-chart-4",
@@ -240,7 +240,7 @@ export default function Home() {
                 desc: t.benefit5Desc,
               },
               {
-                icon: Sparkles,
+                icon: Repeat,
                 title: t.benefit6Title,
                 desc: t.benefit6Desc,
               },

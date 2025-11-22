@@ -640,7 +640,7 @@ export const translations: Record<Language, Translations> = {
     staatsexamenPrep: "Staatsexamen Voorbereiding",
     officialExamFormat: "Officieel Examenformaat",
     masterDutchReading: "Beheers Nederlands Lezen voor het Staatsexamen",
-    comprehensivePreparation: "Uitgebreide voorbereiding op het officiële inburgeringsexamen met AI-gegenereerde vragen",
+    comprehensivePreparation: "Oefen met vragen op hetzelfde niveau en in dezelfde stijl als het officiële Staatsexamen",
     whyChooseUs: "Waarom voor ons kiezen?",
     keyFeatures: "Belangrijkste Kenmerken",
     
@@ -651,8 +651,8 @@ export const translations: Record<Language, Translations> = {
     feature6Desc: "Voeg je eigen Nederlandse teksten toe (tot 10.100 tekens) en genereer direct examens",
     feature7Title: "Gedetailleerde Uitleg",
     feature7Desc: "Krijg uitgebreide uitleg bij elk antwoord om je begrip te verbeteren",
-    feature8Title: "Woordenschat Opbouw",
-    feature8Desc: "Automatische extractie van belangrijke woorden met vertalingen en context",
+    feature8Title: "B1 Woordenboek & Vertaling",
+    feature8Desc: "Klik op elk woord voor directe vertaling en voeg toe aan je persoonlijke B1 woordenboek",
     
     // Benefits
     benefit1Title: "Verbeter je Leesvaardigheid",
@@ -665,8 +665,8 @@ export const translations: Record<Language, Translations> = {
     benefit4Desc: "Zie je scores verbeteren en identificeer je sterke en zwakke punten",
     benefit5Title: "Meertalige Ondersteuning",
     benefit5Desc: "Interface beschikbaar in Nederlands, Arabisch, Engels en Turks",
-    benefit6Title: "AI-Powered Learning",
-    benefit6Desc: "Gebruik de kracht van kunstmatige intelligentie voor gepersonaliseerd leren",
+    benefit6Title: "Woordenschat Memorisatie",
+    benefit6Desc: "Bouw je B1 woordenschat op met spaced repetition systeem en persoonlijk woordenboek",
     
     // How it works - Detailed steps
     step1Title: "Voeg Nederlandse Tekst Toe",
@@ -1087,7 +1087,7 @@ export const translations: Record<Language, Translations> = {
     staatsexamenPrep: "التحضير لامتحان Staatsexamen",
     officialExamFormat: "نفس صيغة الامتحان الرسمي",
     masterDutchReading: "أتقن قراءة الهولندية لامتحان Staatsexamen",
-    comprehensivePreparation: "تحضير شامل لامتحان الاندماج الرسمي مع أسئلة مولدة بالذكاء الاصطناعي",
+    comprehensivePreparation: "تدرّب على أسئلة بنفس مستوى الصعوبة والطريقة مثل امتحان Staatsexamen الرسمي",
     whyChooseUs: "لماذا تختارنا؟",
     keyFeatures: "الميزات الرئيسية",
     
@@ -1098,8 +1098,8 @@ export const translations: Record<Language, Translations> = {
     feature6Desc: "أضف نصوصك الهولندية الخاصة (حتى 10,100 حرف) واحصل على امتحانات فورية",
     feature7Title: "شرح تفصيلي",
     feature7Desc: "احصل على شرح مفصّل لكل إجابة لتحسين فهمك",
-    feature8Title: "بناء المفردات",
-    feature8Desc: "استخراج تلقائي للكلمات المهمة مع الترجمات والسياق",
+    feature8Title: "قاموس B1 والترجمة",
+    feature8Desc: "اضغط على أي كلمة للحصول على الترجمة الفورية وأضفها إلى قاموسك الشخصي لمستوى B1",
     
     // Benefits
     benefit1Title: "حسّن مهارة القراءة",
@@ -1112,8 +1112,8 @@ export const translations: Record<Language, Translations> = {
     benefit4Desc: "شاهد تحسّن درجاتك وحدّد نقاط قوتك وضعفك",
     benefit5Title: "دعم متعدد اللغات",
     benefit5Desc: "الواجهة متوفرة بالهولندية، العربية، الإنجليزية والتركية",
-    benefit6Title: "تعلّم مدعوم بالذكاء الاصطناعي",
-    benefit6Desc: "استخدم قوة الذكاء الاصطناعي للتعلّم المخصص",
+    benefit6Title: "حفظ المفردات",
+    benefit6Desc: "ابنِ مفرداتك لمستوى B1 مع نظام التكرار المتباعد وقاموسك الشخصي",
     
     // How it works - Detailed steps
     step1Title: "أضف نصاً هولندياً",
@@ -1532,7 +1532,7 @@ export const translations: Record<Language, Translations> = {
     staatsexamenPrep: "Staatsexamen Preparation",
     officialExamFormat: "Official Exam Format",
     masterDutchReading: "Master Dutch Reading for Staatsexamen",
-    comprehensivePreparation: "Comprehensive preparation for the official integration exam with AI-generated questions",
+    comprehensivePreparation: "Practice with questions at the same difficulty level and format as the official Staatsexamen",
     whyChooseUs: "Why Choose Us?",
     keyFeatures: "Key Features",
     
@@ -1543,8 +1543,8 @@ export const translations: Record<Language, Translations> = {
     feature6Desc: "Add your own Dutch texts (up to 10,100 characters) and generate instant exams",
     feature7Title: "Detailed Explanations",
     feature7Desc: "Get comprehensive explanations for each answer to improve your understanding",
-    feature8Title: "Vocabulary Building",
-    feature8Desc: "Automatic extraction of important words with translations and context",
+    feature8Title: "B1 Dictionary & Translation",
+    feature8Desc: "Click any word for instant translation and add it to your personal B1 dictionary",
     
     // Benefits
     benefit1Title: "Improve Reading Skills",
@@ -1557,8 +1557,8 @@ export const translations: Record<Language, Translations> = {
     benefit4Desc: "See your scores improve and identify your strengths and weaknesses",
     benefit5Title: "Multilingual Support",
     benefit5Desc: "Interface available in Dutch, Arabic, English, and Turkish",
-    benefit6Title: "AI-Powered Learning",
-    benefit6Desc: "Harness the power of artificial intelligence for personalized learning",
+    benefit6Title: "Vocabulary Memorization",
+    benefit6Desc: "Build your B1 vocabulary with spaced repetition system and personal dictionary",
     
     // How it works - Detailed steps
     step1Title: "Add Dutch Text",
@@ -1978,7 +1978,7 @@ export const translations: Record<Language, Translations> = {
     staatsexamenPrep: "Staatsexamen Hazırlığı",
     officialExamFormat: "Resmi Sınav Formatı",
     masterDutchReading: "Staatsexamen için Hollandaca Okumada Ustalaş",
-    comprehensivePreparation: "Yapay zeka tarafından oluşturulan sorularla resmi entegrasyon sınavına kapsamlı hazırlık",
+    comprehensivePreparation: "Resmi Staatsexamen ile aynı zorluk seviyesi ve formatta sorularla pratik yapın",
     whyChooseUs: "Neden Bizi Seçmelisiniz?",
     keyFeatures: "Temel Özellikler",
     
@@ -1989,8 +1989,8 @@ export const translations: Record<Language, Translations> = {
     feature6Desc: "Kendi Hollandaca metinlerinizi ekleyin (10.100 karaktere kadar) ve anında sınavlar oluşturun",
     feature7Title: "Ayrıntılı Açıklamalar",
     feature7Desc: "Anlayışınızı geliştirmek için her yanıt için kapsamlı açıklamalar alın",
-    feature8Title: "Kelime Bilgisi Oluşturma",
-    feature8Desc: "Önemli kelimelerin çeviriler ve bağlamla otomatik çıkarılması",
+    feature8Title: "B1 Sözlük & Çeviri",
+    feature8Desc: "Anlık çeviri için herhangi bir kelimeye tıklayın ve kişisel B1 sözlüğünüze ekleyin",
     
     // Benefits
     benefit1Title: "Okuma Becerilerini Geliştir",
@@ -2003,8 +2003,8 @@ export const translations: Record<Language, Translations> = {
     benefit4Desc: "Puanlarınızın iyileştiğini görün ve güçlü ve zayıf yönlerinizi belirleyin",
     benefit5Title: "Çok Dilli Destek",
     benefit5Desc: "Arayüz Hollandaca, Arapça, İngilizce ve Türkçe olarak kullanılabilir",
-    benefit6Title: "Yapay Zeka Destekli Öğrenme",
-    benefit6Desc: "Kişiselleştirilmiş öğrenme için yapay zeka gücünden yararlanın",
+    benefit6Title: "Kelime Ezberlemesi",
+    benefit6Desc: "Aralıklı tekrar sistemi ve kişisel sözlük ile B1 kelime bilginizi geliştirin",
     
     // How it works - Detailed steps
     step1Title: "Hollandaca Metin Ekle",
