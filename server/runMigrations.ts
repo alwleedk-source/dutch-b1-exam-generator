@@ -9,7 +9,8 @@ async function runMigrations() {
   
   const migrations = [
     "004_add_ban_columns.sql",
-    "005_add_forum_tables.sql"
+    "005_add_forum_tables.sql",
+    "006_add_timer_fields.sql"
   ];
   
   for (const migrationFile of migrations) {
