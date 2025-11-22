@@ -170,6 +170,60 @@ export interface Translations {
   goToDashboard: string;
   words: string;
   minRead: string;
+  remaining: string;
+  characters: string;
+  
+  // Homepage - New comprehensive translations
+  staatsexamenPrep: string;
+  officialExamFormat: string;
+  masterDutchReading: string;
+  comprehensivePreparation: string;
+  whyChooseUs: string;
+  keyFeatures: string;
+  
+  // Features - Detailed
+  feature5Title: string;
+  feature5Desc: string;
+  feature6Title: string;
+  feature6Desc: string;
+  feature7Title: string;
+  feature7Desc: string;
+  feature8Title: string;
+  feature8Desc: string;
+  
+  // Benefits
+  benefit1Title: string;
+  benefit1Desc: string;
+  benefit2Title: string;
+  benefit2Desc: string;
+  benefit3Title: string;
+  benefit3Desc: string;
+  benefit4Title: string;
+  benefit4Desc: string;
+  benefit5Title: string;
+  benefit5Desc: string;
+  benefit6Title: string;
+  benefit6Desc: string;
+  
+  // How it works - Detailed steps
+  step1Title: string;
+  step1Desc: string;
+  step2Title: string;
+  step2Desc: string;
+  step3Title: string;
+  step3Desc: string;
+  step4Title: string;
+  step4Desc: string;
+  
+  // CTA
+  readyToStart: string;
+  joinLearners: string;
+  startLearningNow: string;
+  
+  // Stats
+  languagesSupported: string;
+  aiPowered: string;
+  levelFocus: string;
   
   // Progress bar for exam generation
   processingWithAI: string;
@@ -579,6 +633,60 @@ export const translations: Record<Language, Translations> = {
     goToDashboard: "Naar Dashboard",
     words: "woorden",
     minRead: "min lezen",
+    remaining: "Resterend",
+    characters: "tekens",
+    
+    // Homepage - New comprehensive translations
+    staatsexamenPrep: "Staatsexamen Voorbereiding",
+    officialExamFormat: "Officieel Examenformaat",
+    masterDutchReading: "Beheers Nederlands Lezen voor het Staatsexamen",
+    comprehensivePreparation: "Uitgebreide voorbereiding op het officiële inburgeringsexamen met AI-gegenereerde vragen",
+    whyChooseUs: "Waarom voor ons kiezen?",
+    keyFeatures: "Belangrijkste Kenmerken",
+    
+    // Features - Detailed
+    feature5Title: "Staatsexamen-stijl Vragen",
+    feature5Desc: "Oefen met vragen die exact hetzelfde formaat hebben als het officiële staatsexamen",
+    feature6Title: "Onbeperkte Oefenteksten",
+    feature6Desc: "Voeg je eigen Nederlandse teksten toe (tot 10.100 tekens) en genereer direct examens",
+    feature7Title: "Gedetailleerde Uitleg",
+    feature7Desc: "Krijg uitgebreide uitleg bij elk antwoord om je begrip te verbeteren",
+    feature8Title: "Woordenschat Opbouw",
+    feature8Desc: "Automatische extractie van belangrijke woorden met vertalingen en context",
+    
+    // Benefits
+    benefit1Title: "Verbeter je Leesvaardigheid",
+    benefit1Desc: "Train jezelf om Nederlandse teksten sneller en beter te begrijpen",
+    benefit2Title: "Bereid je voor op het Staatsexamen",
+    benefit2Desc: "Oefen met vragen die identiek zijn aan het officiële inburgeringsexamen",
+    benefit3Title: "Leer in je Eigen Tempo",
+    benefit3Desc: "Geen tijdslimiet - neem de tijd die je nodig hebt voor elk examen",
+    benefit4Title: "Volg je Voortgang",
+    benefit4Desc: "Zie je scores verbeteren en identificeer je sterke en zwakke punten",
+    benefit5Title: "Meertalige Ondersteuning",
+    benefit5Desc: "Interface beschikbaar in Nederlands, Arabisch, Engels en Turks",
+    benefit6Title: "AI-Powered Learning",
+    benefit6Desc: "Gebruik de kracht van kunstmatige intelligentie voor gepersonaliseerd leren",
+    
+    // How it works - Detailed steps
+    step1Title: "Voeg Nederlandse Tekst Toe",
+    step1Desc: "Plak, upload of scan elke Nederlandse tekst op B1-niveau (2.000-10.100 tekens)",
+    step2Title: "AI Genereert Vragen",
+    step2Desc: "Ons systeem maakt automatisch begripsvragen in staatsexamen-stijl",
+    step3Title: "Doe het Examen",
+    step3Desc: "Beantwoord de vragen en krijg direct feedback met gedetailleerde uitleg",
+    step4Title: "Leer en Verbeter",
+    step4Desc: "Bekijk je resultaten, leer nieuwe woorden en volg je voortgang in de tijd",
+    
+    // CTA
+    readyToStart: "Klaar om te beginnen?",
+    joinLearners: "Sluit je aan bij duizenden leerlingen die zich voorbereiden op hun Nederlands inburgeringsexamen",
+    startLearningNow: "Begin Nu met Leren",
+    
+    // Stats
+    languagesSupported: "Talen",
+    aiPowered: "AI-Aangedreven",
+    levelFocus: "Niveau Focus",
     
     // Progress bar for exam generation
     processingWithAI: "Tekst verwerken...",
@@ -972,6 +1080,60 @@ export const translations: Record<Language, Translations> = {
     goToDashboard: "الذهاب إلى لوحة التحكم",
     words: "كلمات",
     minRead: "دقيقة قراءة",
+    remaining: "متبقي",
+    characters: "حرف",
+    
+    // Homepage - New comprehensive translations
+    staatsexamenPrep: "التحضير لامتحان Staatsexamen",
+    officialExamFormat: "نفس صيغة الامتحان الرسمي",
+    masterDutchReading: "أتقن قراءة الهولندية لامتحان Staatsexamen",
+    comprehensivePreparation: "تحضير شامل لامتحان الاندماج الرسمي مع أسئلة مولدة بالذكاء الاصطناعي",
+    whyChooseUs: "لماذا تختارنا؟",
+    keyFeatures: "الميزات الرئيسية",
+    
+    // Features - Detailed
+    feature5Title: "أسئلة بنفس نمط Staatsexamen",
+    feature5Desc: "تدرّب على أسئلة بنفس الصيغة التي تأتي في الامتحان الرسمي",
+    feature6Title: "نصوص تدريب غير محدودة",
+    feature6Desc: "أضف نصوصك الهولندية الخاصة (حتى 10,100 حرف) واحصل على امتحانات فورية",
+    feature7Title: "شرح تفصيلي",
+    feature7Desc: "احصل على شرح مفصّل لكل إجابة لتحسين فهمك",
+    feature8Title: "بناء المفردات",
+    feature8Desc: "استخراج تلقائي للكلمات المهمة مع الترجمات والسياق",
+    
+    // Benefits
+    benefit1Title: "حسّن مهارة القراءة",
+    benefit1Desc: "درّب نفسل على فهم النصوص الهولندية بشكل أسرع وأفضل",
+    benefit2Title: "استعد لامتحان Staatsexamen",
+    benefit2Desc: "تدرّب على أسئلة مطابقة تماماً لامتحان الاندماج الرسمي",
+    benefit3Title: "تعلّم بوتيرتك الخاصة",
+    benefit3Desc: "لا يوجد حد زمني - خذ الوقت الذي تحتاجه لكل امتحان",
+    benefit4Title: "تابع تقدّمك",
+    benefit4Desc: "شاهد تحسّن درجاتك وحدّد نقاط قوتك وضعفك",
+    benefit5Title: "دعم متعدد اللغات",
+    benefit5Desc: "الواجهة متوفرة بالهولندية، العربية، الإنجليزية والتركية",
+    benefit6Title: "تعلّم مدعوم بالذكاء الاصطناعي",
+    benefit6Desc: "استخدم قوة الذكاء الاصطناعي للتعلّم المخصص",
+    
+    // How it works - Detailed steps
+    step1Title: "أضف نصاً هولندياً",
+    step1Desc: "الصق أو ارفع أو امسح أي نص هولندي بمستوى B1 (2,000-10,100 حرف)",
+    step2Title: "الذكاء الاصطناعي يولد الأسئلة",
+    step2Desc: "نظامنا ينشئ تلقائياً أسئلة فهم بنمط Staatsexamen",
+    step3Title: "قم بحل الامتحان",
+    step3Desc: "أجب على الأسئلة واحصل على ملاحظات فورية مع شرح مفصّل",
+    step4Title: "تعلّم وتحسّن",
+    step4Desc: "اطلع على نتائجك، تعلّم كلمات جديدة وتابع تقدّمك بمرور الوقت",
+    
+    // CTA
+    readyToStart: "هل أنت جاهز للبدء؟",
+    joinLearners: "انضم إلى آلاف المتعلمين الذين يستعدون لامتحان الاندماج الهولندي",
+    startLearningNow: "ابدأ التعلّم الآن",
+    
+    // Stats
+    languagesSupported: "لغات",
+    aiPowered: "مدعوم بالذكاء الاصطناعي",
+    levelFocus: "التركيز على المستوى",
     
     // Progress bar for exam generation
     processingWithAI: "جاري معالجة النص...",
@@ -1363,6 +1525,60 @@ export const translations: Record<Language, Translations> = {
     goToDashboard: "Go to Dashboard",
     words: "words",
     minRead: "min read",
+    remaining: "Remaining",
+    characters: "characters",
+    
+    // Homepage - New comprehensive translations
+    staatsexamenPrep: "Staatsexamen Preparation",
+    officialExamFormat: "Official Exam Format",
+    masterDutchReading: "Master Dutch Reading for Staatsexamen",
+    comprehensivePreparation: "Comprehensive preparation for the official integration exam with AI-generated questions",
+    whyChooseUs: "Why Choose Us?",
+    keyFeatures: "Key Features",
+    
+    // Features - Detailed
+    feature5Title: "Staatsexamen-Style Questions",
+    feature5Desc: "Practice with questions that match the exact format of the official staatsexamen",
+    feature6Title: "Unlimited Practice Texts",
+    feature6Desc: "Add your own Dutch texts (up to 10,100 characters) and generate instant exams",
+    feature7Title: "Detailed Explanations",
+    feature7Desc: "Get comprehensive explanations for each answer to improve your understanding",
+    feature8Title: "Vocabulary Building",
+    feature8Desc: "Automatic extraction of important words with translations and context",
+    
+    // Benefits
+    benefit1Title: "Improve Reading Skills",
+    benefit1Desc: "Train yourself to understand Dutch texts faster and better",
+    benefit2Title: "Prepare for Staatsexamen",
+    benefit2Desc: "Practice with questions identical to the official integration exam",
+    benefit3Title: "Learn at Your Own Pace",
+    benefit3Desc: "No time limit - take the time you need for each exam",
+    benefit4Title: "Track Your Progress",
+    benefit4Desc: "See your scores improve and identify your strengths and weaknesses",
+    benefit5Title: "Multilingual Support",
+    benefit5Desc: "Interface available in Dutch, Arabic, English, and Turkish",
+    benefit6Title: "AI-Powered Learning",
+    benefit6Desc: "Harness the power of artificial intelligence for personalized learning",
+    
+    // How it works - Detailed steps
+    step1Title: "Add Dutch Text",
+    step1Desc: "Paste, upload, or scan any Dutch text at B1 level (2,000-10,100 characters)",
+    step2Title: "AI Generates Questions",
+    step2Desc: "Our system automatically creates comprehension questions in staatsexamen style",
+    step3Title: "Take the Exam",
+    step3Desc: "Answer the questions and get instant feedback with detailed explanations",
+    step4Title: "Learn and Improve",
+    step4Desc: "Review your results, learn new words, and track your progress over time",
+    
+    // CTA
+    readyToStart: "Ready to Get Started?",
+    joinLearners: "Join thousands of learners preparing for their Dutch integration exam",
+    startLearningNow: "Start Learning Now",
+    
+    // Stats
+    languagesSupported: "Languages",
+    aiPowered: "AI-Powered",
+    levelFocus: "Level Focus",
     
     // Progress bar for exam generation
     processingWithAI: "Processing text...",
@@ -1755,6 +1971,60 @@ export const translations: Record<Language, Translations> = {
     goToDashboard: "Kontrol Paneline Git",
     words: "kelime",
     minRead: "dakika okuma",
+    remaining: "Kalan",
+    characters: "karakter",
+    
+    // Homepage - New comprehensive translations
+    staatsexamenPrep: "Staatsexamen Hazırlığı",
+    officialExamFormat: "Resmi Sınav Formatı",
+    masterDutchReading: "Staatsexamen için Hollandaca Okumada Ustalaş",
+    comprehensivePreparation: "Yapay zeka tarafından oluşturulan sorularla resmi entegrasyon sınavına kapsamlı hazırlık",
+    whyChooseUs: "Neden Bizi Seçmelisiniz?",
+    keyFeatures: "Temel Özellikler",
+    
+    // Features - Detailed
+    feature5Title: "Staatsexamen Tarzı Sorular",
+    feature5Desc: "Resmi staatsexamen ile aynı formatta sorularla pratik yapın",
+    feature6Title: "Sınırsız Alıştırma Metinleri",
+    feature6Desc: "Kendi Hollandaca metinlerinizi ekleyin (10.100 karaktere kadar) ve anında sınavlar oluşturun",
+    feature7Title: "Ayrıntılı Açıklamalar",
+    feature7Desc: "Anlayışınızı geliştirmek için her yanıt için kapsamlı açıklamalar alın",
+    feature8Title: "Kelime Bilgisi Oluşturma",
+    feature8Desc: "Önemli kelimelerin çeviriler ve bağlamla otomatik çıkarılması",
+    
+    // Benefits
+    benefit1Title: "Okuma Becerilerini Geliştir",
+    benefit1Desc: "Hollandaca metinleri daha hızlı ve daha iyi anlamak için kendinizi eğitin",
+    benefit2Title: "Staatsexamen'e Hazırlan",
+    benefit2Desc: "Resmi entegrasyon sınavıyla aynı sorularla pratik yapın",
+    benefit3Title: "Kendi Hızınızda Öğrenin",
+    benefit3Desc: "Zaman sınırı yok - her sınav için ihtiyaç duyduğunuz zamanı ayırın",
+    benefit4Title: "İlerlemenizi Takip Edin",
+    benefit4Desc: "Puanlarınızın iyileştiğini görün ve güçlü ve zayıf yönlerinizi belirleyin",
+    benefit5Title: "Çok Dilli Destek",
+    benefit5Desc: "Arayüz Hollandaca, Arapça, İngilizce ve Türkçe olarak kullanılabilir",
+    benefit6Title: "Yapay Zeka Destekli Öğrenme",
+    benefit6Desc: "Kişiselleştirilmiş öğrenme için yapay zeka gücünden yararlanın",
+    
+    // How it works - Detailed steps
+    step1Title: "Hollandaca Metin Ekle",
+    step1Desc: "B1 seviyesinde herhangi bir Hollandaca metni yapıştırın, yükleyin veya tarayın (2.000-10.100 karakter)",
+    step2Title: "Yapay Zeka Sorular Oluşturur",
+    step2Desc: "Sistemimiz otomatik olarak staatsexamen tarzında anlaşılma soruları oluşturur",
+    step3Title: "Sınavı Çöz",
+    step3Desc: "Soruları yanıtlayın ve ayrıntılı açıklamalarla anında geri bildirim alın",
+    step4Title: "Öğren ve Geliş",
+    step4Desc: "Sonuçlarınızı inceleyin, yeni kelimeler öğrenin ve zaman içinde ilerlemenizi takip edin",
+    
+    // CTA
+    readyToStart: "Başlamaya Hazır mısınız?",
+    joinLearners: "Hollanda entegrasyon sınavına hazırlanan binlerce öğrenciye katılın",
+    startLearningNow: "Şimdi Öğrenmeye Başla",
+    
+    // Stats
+    languagesSupported: "Diller",
+    aiPowered: "Yapay Zeka Destekli",
+    levelFocus: "Seviye Odak",
     
     // Progress bar for exam generation
     processingWithAI: "Metin işleniyor...",

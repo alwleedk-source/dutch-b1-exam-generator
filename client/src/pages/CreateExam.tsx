@@ -319,11 +319,18 @@ export default function CreateExam() {
                     placeholder="Plak of typ hier Nederlandse tekst... (Paste or type Dutch text here)"
                     onImagePaste={handleImagePaste}
                   />
-                  <div className="flex justify-between text-sm text-muted-foreground mt-2">
-                    <span>{countWords(dutchText)} words • {estimateReadingTime(dutchText)} min read</span>
-                    <span className={dutchText.length > 10000 ? 'text-red-500 font-semibold' : ''}>
-                      {dutchText.length} / 10,000 characters
-                    </span>
+                  <div className="flex flex-col gap-1 text-sm text-muted-foreground mt-2">
+                    <div className="flex justify-between">
+                      <span>{countWords(dutchText)} words • {estimateReadingTime(dutchText)} min read</span>
+                      <span className={dutchText.length > 10100 ? 'text-red-500 font-semibold' : ''}>
+                        {dutchText.length} / 10,100 characters
+                      </span>
+                    </div>
+                    <div className="flex justify-end">
+                      <span className={dutchText.length > 10100 ? 'text-red-500 font-semibold' : dutchText.length > 9000 ? 'text-orange-500' : 'text-green-600'}>
+                        {t.remaining || "Remaining"}: {(10100 - dutchText.length).toLocaleString()} {t.characters || "characters"}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
