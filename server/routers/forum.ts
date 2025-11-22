@@ -1,7 +1,9 @@
 import { router, publicProcedure, protectedProcedure } from "../_core/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { db as database } from "../db";
+import { getDb } from "../db";
+
+const database = await getDb();
 import { 
   forumCategories, 
   forumTopics, 

@@ -137,6 +137,8 @@ export interface Translations {
   success: string;
   confirm: string;
   close: string;
+  correct: string;
+  incorrect: string;
   checkingDuplicate: string;
   generatingTitle: string;
   creatingQuestions: string;
@@ -206,7 +208,6 @@ export interface Translations {
   failedToSaveWord: string;
   archive: string;
   restore: string;
-  delete: string;
   mastered: string;
   confirmDelete: string;
   confirmArchive: string;
@@ -223,13 +224,10 @@ export interface Translations {
   medium: string;
   easy: string;
   previous: string;
-  next: string;
   reset: string;
   selectCorrectTranslation: string;
   practiceComplete: string;
   audioError: string;
-  correct: string;
-  incorrect: string;
   
   // Review mode
   reviewMode: string;
@@ -237,7 +235,6 @@ export interface Translations {
   startPractice: string;
   showDefinition: string;
   hideDefinition: string;
-  close: string;
   
   // Exam Results page
   examNotFound: string;
@@ -258,8 +255,6 @@ export interface Translations {
   examReview: string;
   yourAnswer: string;
   correctAnswer: string;
-  correct: string;
-  incorrect: string;
   
   // Progress page
   noProgressYet: string;
@@ -448,6 +443,8 @@ export const translations: Record<Language, Translations> = {
     success: "Succes",
     confirm: "Bevestigen",
     close: "Sluiten",
+    correct: "Correct",
+    incorrect: "Onjuist",
     checkingDuplicate: "Controleren op dubbele tekst...",
     generatingTitle: "Titel genereren...",
     creatingQuestions: "Examenvragen maken...",
@@ -517,7 +514,6 @@ export const translations: Record<Language, Translations> = {
     failedToSaveWord: "Opslaan mislukt",
     archive: "Archiveren",
     restore: "Herstellen",
-    delete: "Verwijderen",
     mastered: "Beheerst",
     confirmDelete: "Weet je zeker dat je dit woord wilt verwijderen?",
     confirmArchive: "Dit woord archiveren? Het verschijnt niet vaak in oefeningen.",
@@ -534,13 +530,10 @@ export const translations: Record<Language, Translations> = {
     medium: "Gemiddeld",
     easy: "Makkelijk",
     previous: "Vorige",
-    next: "Volgende",
     reset: "Opnieuw",
     selectCorrectTranslation: "Selecteer de juiste vertaling:",
     practiceComplete: "Oefening voltooid",
     audioError: "Kan audio niet afspelen",
-    correct: "Correct",
-    incorrect: "Onjuist",
     
     // Review mode
     reviewMode: "Herzienmodus",
@@ -548,7 +541,6 @@ export const translations: Record<Language, Translations> = {
     startPractice: "Start Oefening",
     showDefinition: "Toon Nederlandse Definitie",
     hideDefinition: "Verberg Definitie",
-    close: "Sluiten",
     
     // Exam Results page
     examNotFound: "Examen Niet Gevonden",
@@ -569,8 +561,6 @@ export const translations: Record<Language, Translations> = {
     examReview: "Examen Beoordeling",
     yourAnswer: "Jouw Antwoord",
     correctAnswer: "Correct Antwoord",
-    correct: "Correct",
-    incorrect: "Onjuist",
     
     // Progress page
     noProgressYet: "Nog geen voortgang",
@@ -758,6 +748,8 @@ export const translations: Record<Language, Translations> = {
     success: "نجاح",
     confirm: "تأكيد",
     close: "إغلاق",
+    correct: "صحيح",
+    incorrect: "خطأ",
     checkingDuplicate: "التحقق من النص المكرر...",
     generatingTitle: "توليد العنوان...",
     creatingQuestions: "إنشاء أسئلة الامتحان...",
@@ -826,7 +818,6 @@ export const translations: Record<Language, Translations> = {
     failedToSaveWord: "فشل حفظ الكلمة",
     archive: "أرشفة",
     restore: "استعادة",
-    delete: "حذف",
     mastered: "متقنة",
     confirmDelete: "هل أنت متأكد من حذف هذه الكلمة؟",
     confirmArchive: "أرشفة هذه الكلمة؟ لن تظهر كثيراً في التدريب.",
@@ -843,13 +834,10 @@ export const translations: Record<Language, Translations> = {
     medium: "متوسط",
     easy: "سهل",
     previous: "السابق",
-    next: "التالي",
     reset: "إعادة",
     selectCorrectTranslation: "اختر الترجمة الصحيحة:",
     practiceComplete: "اكتمل التدريب",
     audioError: "فشل تشغيل الصوت",
-    correct: "صحيح",
-    incorrect: "خطأ",
     
     // Review mode
     reviewMode: "وضع المراجعة",
@@ -857,7 +845,6 @@ export const translations: Record<Language, Translations> = {
     startPractice: "بدء التدريب",
     showDefinition: "إظهار الشرح بالهولندية",
     hideDefinition: "إخفاء الشرح",
-    close: "إغلاق",
     
     // Exam Results page
     examNotFound: "الامتحان غير موجود",
@@ -878,8 +865,6 @@ export const translations: Record<Language, Translations> = {
     examReview: "مراجعة الامتحان",
     yourAnswer: "إجابتك",
     correctAnswer: "الإجابة الصحيحة",
-    correct: "صحيح",
-    incorrect: "خطأ",
     
     // Progress page
     noProgressYet: "لا يوجد تقدم بعد",
@@ -1029,6 +1014,8 @@ export const translations: Record<Language, Translations> = {
     success: "Success",
     confirm: "Confirm",
     close: "Close",
+    correct: "Correct",
+    incorrect: "Incorrect",
     checkingDuplicate: "Checking for duplicate text...",
     generatingTitle: "Generating title...",
     creatingQuestions: "Creating exam questions...",
@@ -1097,7 +1084,6 @@ export const translations: Record<Language, Translations> = {
     failedToSaveWord: "Failed to save word",
     archive: "Archive",
     restore: "Restore",
-    delete: "Delete",
     mastered: "Mastered",
     confirmDelete: "Are you sure you want to delete this word?",
     confirmArchive: "Archive this word? It won't appear in practice often.",
@@ -1114,13 +1100,10 @@ export const translations: Record<Language, Translations> = {
     medium: "Medium",
     easy: "Easy",
     previous: "Previous",
-    next: "Next",
     reset: "Reset",
     selectCorrectTranslation: "Select the correct translation:",
     practiceComplete: "Practice complete",
     audioError: "Failed to play audio",
-    correct: "Correct",
-    incorrect: "Incorrect",
     
     // Review mode
     reviewMode: "Review Mode",
@@ -1128,7 +1111,6 @@ export const translations: Record<Language, Translations> = {
     startPractice: "Start Practice",
     showDefinition: "Show Dutch Definition",
     hideDefinition: "Hide Definition",
-    close: "Close",
     
     // Exam Results page
     examNotFound: "Exam Not Found",
@@ -1149,8 +1131,6 @@ export const translations: Record<Language, Translations> = {
     examReview: "Exam Review",
     yourAnswer: "Your Answer",
     correctAnswer: "Correct Answer",
-    correct: "Correct",
-    incorrect: "Incorrect",
     
     // Progress page
     noProgressYet: "No progress yet",
@@ -1300,6 +1280,8 @@ export const translations: Record<Language, Translations> = {
     success: "Başarılı",
     confirm: "Onayla",
     close: "Kapat",
+    correct: "Doğru",
+    incorrect: "Yanlış",
     checkingDuplicate: "Yinelenen metin kontrol ediliyor...",
     generatingTitle: "Yapay zeka ile başlık oluşturuluyor...",
     creatingQuestions: "Sınav soruları oluşturuluyor...",
@@ -1369,7 +1351,6 @@ export const translations: Record<Language, Translations> = {
     failedToSaveWord: "Kelime kaydedilemedi",
     archive: "Arşivle",
     restore: "Geri Yükle",
-    delete: "Sil",
     mastered: "Uzmanlaştı",
     confirmDelete: "Bu kelimeyi silmek istediğinizden emin misiniz?",
     confirmArchive: "Bu kelimeyi arşivle? Pratikte sık görünmeyecek.",
@@ -1386,13 +1367,10 @@ export const translations: Record<Language, Translations> = {
     medium: "Orta",
     easy: "Kolay",
     previous: "Önceki",
-    next: "Sonraki",
     reset: "Sıfırla",
     selectCorrectTranslation: "Doğru çeviriyi seçin:",
     practiceComplete: "Pratik tamamlandı",
     audioError: "Ses çalınamadı",
-    correct: "Doğru",
-    incorrect: "Yanlış",
     
     // Review mode
     reviewMode: "Gözden Geçirme Modu",
@@ -1400,7 +1378,6 @@ export const translations: Record<Language, Translations> = {
     startPractice: "Pratik Başlat",
     showDefinition: "Hollandaca Tanımı Göster",
     hideDefinition: "Tanımı Gizle",
-    close: "Kapat",
     
     // Exam Results page
     examNotFound: "Sınav Bulunamadı",
@@ -1421,8 +1398,6 @@ export const translations: Record<Language, Translations> = {
     examReview: "Sınav İncelemesi",
     yourAnswer: "Cevabınız",
     correctAnswer: "Doğru Cevap",
-    correct: "Doğru",
-    incorrect: "Yanlış",
     
     // Progress page
     noProgressYet: "Henüz ilerleme yok",
