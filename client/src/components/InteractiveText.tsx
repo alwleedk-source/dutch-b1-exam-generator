@@ -142,14 +142,10 @@ export default function InteractiveText({ textId, content, className = "" }: Int
             const escapedTranslation = escapeHtml(translation || vocabWord.word);
             const escapedVocabWord = escapeHtml(vocabWord.word);
             
-            // Build wrapper with tooltip inside as a single HTML string
+            // Build wrapper WITHOUT tooltip for testing
             htmlParts.push(
-              `<span class="vocab-word-wrapper" data-word="${escapedVocabWord}">` +
+              `<span class="vocab-word-wrapper" data-word="${escapedVocabWord}" title="${escapedTranslation}">` +
                 `<span class="vocab-word">${escapedWord}</span>` +
-                `<div class="vocab-tooltip">` +
-                  `<div class="tooltip-translation">${escapedTranslation}</div>` +
-                  `<div class="tooltip-hint">💾 Double-click to save</div>` +
-                `</div>` +
               `</span>`
             );
           } else {
