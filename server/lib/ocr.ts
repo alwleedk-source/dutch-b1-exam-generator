@@ -1,11 +1,11 @@
 import { createWorker } from 'tesseract.js';
 
-const MAX_TEXT_LENGTH = 6000;
+const MAX_TEXT_LENGTH = 10100;
 
 /**
  * Extract Dutch text from an image using Tesseract OCR
  * @param imageBuffer - Image buffer or base64 string
- * @returns Extracted text (max 6000 characters)
+ * @returns Extracted text (max 10,100 characters)
  */
 export async function extractTextFromImage(imageBuffer: Buffer | string): Promise<{
   text: string;
@@ -20,7 +20,7 @@ export async function extractTextFromImage(imageBuffer: Buffer | string): Promis
     let extractedText = data.text.trim();
     let isTruncated = false;
     
-    // Enforce 6000 character limit
+    // Enforce 10,100 character limit
     if (extractedText.length > MAX_TEXT_LENGTH) {
       extractedText = extractedText.substring(0, MAX_TEXT_LENGTH);
       isTruncated = true;

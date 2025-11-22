@@ -228,6 +228,17 @@ export async function getTextsByUser(user_id: number) {
     .orderBy(desc(texts.created_at));
 }
 
+export async function getUserTextsCreatedAfter(user_id: number, date: Date) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(texts)
+    .where(and(eq(texts.created_by, user_id), gte(texts.created_at, date)))
+    .orderBy(desc(texts.created_at));
+}
+
 export async function getApprovedTexts() {
   const db = await getDb();
   if (!db) return [];

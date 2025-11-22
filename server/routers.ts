@@ -131,12 +131,33 @@ export const appRouter = router({
       .input(z.object({
         dutch_text: z.string()
           .min(2000, "Text must be at least 2000 characters for quality exam generation")
-          .max(6000, "Text must not exceed 6000 characters"),
+          .max(10100, "Text must not exceed 10,100 characters"),
         title: z.string().optional(),
         source: z.enum(["paste", "upload", "scan"]).default("paste"),
       }))
       .mutation(async ({ ctx, input }) => {
         const { calculateMinHash } = await import("./lib/minhash");
+        
+        // Check daily limit for non-admin users
+        const user = await db.getUserById(ctx.user.id);
+        if (user?.role !== 'admin') {
+          // Get texts created today by this user
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const textsToday = await db.getUserTextsCreatedAfter(ctx.user.id, today);
+          
+          if (textsToday.length >= 2) {
+            throw new TRPCError({
+              code: "TOO_MANY_REQUESTS",
+              message: "Daily limit reached: You can only create 2 texts per day. Upgrade to admin for unlimited access."
+            });
+          }
+        }
+        
+        // Calculate dynamic question count based on text length
+        const { calculateQuestionCount } = await import("./lib/questionCount");
+        const questionCount = calculateQuestionCount(input.dutch_text.length);
+        console.log(`[Text Creation] Calculated question count: ${questionCount} for ${input.dutch_text.length} characters`);
         
         // ✨ OPTIMIZED: Process text completely in ONE Gemini API call (saves 80% tokens!)
         console.log('[Text Creation] Processing text with unified Gemini call...');
@@ -146,7 +167,7 @@ export const appRouter = router({
         let vocabData: any;
         
         try {
-          const result = await gemini.processTextComplete(input.dutch_text);
+          const result = await gemini.processTextComplete(input.dutch_text, questionCount);
           cleanedText = result.cleanedText;
           finalTitle = input.title || result.title; // Use provided title if available
           examData = { questions: result.questions };
@@ -175,7 +196,7 @@ export const appRouter = router({
           }
           
           try {
-            examData = await gemini.generateExamQuestions(cleanedText);
+            examData = await gemini.generateExamQuestions(cleanedText, questionCount);
           } catch (e: any) {
             throw new TRPCError({ 
               code: "INTERNAL_SERVER_ERROR", 

@@ -231,61 +231,80 @@ export async function generateExamQuestions(dutchText: string, questionCount: nu
     messages: [
       {
         role: "user",
-        parts: `Je bent een expert in het maken van Staatsexamen NT2 Lezen I (B1) vragen. Genereer ${questionCount} meerkeuzevragen op basis van de volgende Nederlandse tekst.
+        parts: `Je bent een expert in het maken van Staatsexamen NT2 Lezen I (B1) vragen. Genereer ${questionCount} meerkeuzevragen op basis van de volgende Nederlandse tekst, volgens de officiële NT2 examennormen.
 
 Tekst:
 ${dutchText}
 
-=== BELANGRIJKE INSTRUCTIES ===
+=== OFFICIËLE NT2 EXAMENNORMEN ===
 
-1. VRAAGTYPEN EN VERDELING:
-   - Hoofdidee vragen (20%): "Wat is het doel van de tekst?", "Voor wie is deze tekst bedoeld?"
-   - Scannen naar details (30%): "Waarover kun je meer informatie vinden?", "Hoeveel kost...?"
-   - Volgorde/Sequencing (10%): "In welke volgorde moet je...?", "Wat moet je eerst doen?"
-   - Inferentie/Conclusie (15%): "Wat kun je concluderen uit...?", "Waarom is ... belangrijk?"
-   - Woordenschat in context (25%): "Wat betekent het woord '...' in deze context?"
+1. VRAAGTYPEN EN VERDELING (volg deze percentages nauwkeurig):
+   - Directe detailvragen (60%): Informatie die expliciet in de tekst staat
+     * "Hoeveel...?", "Wanneer...?", "Wat is de functie van...?"
+     * "Waarover kun je meer informatie vinden?"
+   - Inferentievragen (30%): Vereisen begrip en verbinding van informatie
+     * "Waarom is het belangrijk dat...?"
+     * "Wat kun je concluderen uit...?"
+     * "Wat is het doel van...?"
+   - Analytische vragen (10%): Vereisen kritisch denken
+     * "Wat vindt [persoon] van...?"
+     * "Wat is het verschil tussen...?"
+     * "Welk argument wordt genoemd?"
 
-2. VRAAGFORMULERING:
-   - Gebruik typische Staatsexamen formuleringen zoals:
-     * "volgens de tekst" (volgens de tekst)
-     * "In welke volgorde..." (volgorde vragen)
-     * "Waarover kun je..." (scannen vragen)
-     * "Wat is het doel van..." (hoofdidee)
-   - Vragen moeten ALTIJD in het Nederlands zijn
-   - Vermijd vage of dubbelzinnige formuleringen
+2. VRAAGFORMULERING (gebruik officiële NT2 formuleringen):
+   - "Wat is...?", "Waarom...?", "Hoeveel...?"
+   - "Welke uitspraak klopt?"
+   - "Wat wordt er gezegd over...?"
+   - "Volgens de tekst..."
+   - Vragen moeten helder en ondubbelzinnig zijn
+   - Gebruik woorden uit de tekst zelf
 
-3. ANTWOORDOPTIES:
-   - Elke vraag heeft PRECIES 3 opties (A, B, C) of 4 opties (A, B, C, D)
-   - Gebruik realistische afleidingsopties (distractors) die:
-     * Deels waar lijken maar niet volledig correct zijn
-     * Informatie uit andere delen van de tekst bevatten
-     * Logisch klinken maar niet het beste antwoord zijn
-   - Het correcte antwoord moet ALTIJD direct of indirect in de tekst te vinden zijn
+3. ANTWOORDOPTIES (4 opties per vraag: A, B, C, D):
+   - Eén correct antwoord: direct ondersteund door de tekst
+   - Drie plausibele distractors:
+     * Type 1: Gedeeltelijk correct maar onvolledig
+     * Type 2: Bevat informatie uit de tekst maar beantwoordt verkeerde vraag
+     * Type 3: Logisch maar niet vermeld in de tekst
+   - Alle opties moeten vergelijkbare lengte hebben
+   - Geen overduidelijk foute opties
+   - Geen patronen (bijv. altijd C correct)
 
 4. MOEILIJKHEIDSGRAAD:
-   - Mix van gemakkelijke (40%), middel (40%) en moeilijke (20%) vragen
-   - Moeilijke vragen vereisen:
-     * Het combineren van informatie uit verschillende paragrafen
-     * Het lezen tussen de regels
-     * Het begrijpen van impliciete betekenissen
+   - Gemakkelijk (60%): Antwoord staat duidelijk in de tekst
+   - Middel (30%): Vereist begrip en verbinding van informatie
+   - Moeilijk (10%): Vereist kritisch denken en analyse
 
-5. OUTPUT FORMAAT:
+5. TEKSTDEKKING:
+   - Verdeel vragen gelijkmatig over de hele tekst
+   - Elke sectie/paragraaf moet getest worden
+   - Geen twee vragen over exact dezelfde informatie
+
+6. B1 NIVEAU:
+   - Gebruik vocabulaire passend bij B1
+   - Geen te complexe zinnen
+   - Bekende onderwerpen (werk, onderwijs, dagelijks leven)
+
+7. OUTPUT FORMAAT:
 Respond in JSON format:
 {
   "questions": [
     {
       "question": "Vraag tekst in het Nederlands",
-      "options": ["...", "...", "..."],
+      "options": ["Optie A", "Optie B", "Optie C", "Optie D"],
       "correctAnswerIndex": 0,
-      "questionType": "Main Idea" | "Scanning" | "Sequencing" | "Inference" | "Vocabulary",
+      "questionType": "detail" | "inference" | "analytical",
       "difficulty": "easy" | "medium" | "hard",
-      "explanation": "Waarom dit het correcte antwoord is (in het Nederlands)",
-      "evidence": "De exacte zin of alinea uit de tekst die het correcte antwoord bewijst"
+      "explanation": "Waarom dit het correcte antwoord is",
+      "evidence": "De exacte zin uit de tekst die het antwoord bewijst"
     }
   ]
 }
 
-Zorg ervoor dat de vragen de tekst grondig testen en dat studenten de hele tekst moeten lezen om alle vragen correct te beantwoorden.`,
+ZORG ERVOOR:
+- Vragen testen begrip van de hele tekst
+- Elke vraag heeft PRECIES 4 opties
+- Antwoorden zijn duidelijk correct of incorrect
+- Volg de officiële NT2 Lezen I examennormen nauwkeurig`,
       },
     ],
     responseFormat: "json",
@@ -447,36 +466,44 @@ Genereer een korte, beschrijvende titel (max 60 karakters) die het hoofdonderwer
 
 Genereer ${questionCount} meerkeuzevragen op basis van de OPGESCHOONDE tekst (Staatsexamen NT2 Lezen I B1 stijl).
 
-**VRAAGTYPEN EN VERDELING:**
-- Hoofdidee vragen (20%): "Wat is het doel van de tekst?", "Voor wie is deze tekst bedoeld?"
-- Scannen naar details (30%): "Waarover kun je meer informatie vinden?", "Hoeveel kost...?"
-- Volgorde/Sequencing (10%): "In welke volgorde moet je...?", "Wat moet je eerst doen?"
-- Inferentie/Conclusie (15%): "Wat kun je concluderen uit...?", "Waarom is ... belangrijk?"
-- Woordenschat in context (25%): "Wat betekent het woord '...' in deze context?"
+**VRAAGTYPEN EN VERDELING (volg officiële NT2 normen):**
+- Directe detailvragen (60%): Informatie die expliciet in de tekst staat
+  * "Hoeveel...?", "Wanneer...?", "Wat is de functie van...?"
+  * "Waarover kun je meer informatie vinden?"
+- Inferentievragen (30%): Vereisen begrip en verbinding van informatie
+  * "Waarom is het belangrijk dat...?"
+  * "Wat kun je concluderen uit...?"
+  * "Wat is het doel van...?"
+- Analytische vragen (10%): Vereisen kritisch denken
+  * "Wat vindt [persoon] van...?"
+  * "Wat is het verschil tussen...?"
 
-**VRAAGFORMULERING:**
-- Gebruik typische Staatsexamen formuleringen zoals:
-  * "volgens de tekst" (volgens de tekst)
-  * "In welke volgorde..." (volgorde vragen)
-  * "Waarover kun je..." (scannen vragen)
-  * "Wat is het doel van..." (hoofdidee)
-- Vragen moeten ALTIJD in het Nederlands zijn
-- Vermijd vage of dubbelzinnige formuleringen
+**VRAAGFORMULERING (gebruik officiële NT2 formuleringen):**
+- "Wat is...?", "Waarom...?", "Hoeveel...?"
+- "Welke uitspraak klopt?"
+- "Wat wordt er gezegd over...?"
+- "Volgens de tekst..."
+- Vragen moeten helder en ondubbelzinnig zijn
+- Gebruik woorden uit de tekst zelf
 
-**ANTWOORDOPTIES:**
-- Elke vraag heeft PRECIES 3 opties (A, B, C) of 4 opties (A, B, C, D)
-- Gebruik realistische afleidingsopties (distractors) die:
-  * Deels waar lijken maar niet volledig correct zijn
-  * Informatie uit andere delen van de tekst bevatten
-  * Logisch klinken maar niet het beste antwoord zijn
-- Het correcte antwoord moet ALTIJD direct of indirect in de tekst te vinden zijn
+**ANTWOORDOPTIES (ALTIJD 4 opties: A, B, C, D):**
+- Eén correct antwoord: direct ondersteund door de tekst
+- Drie plausibele distractors:
+  * Type 1: Gedeeltelijk correct maar onvolledig
+  * Type 2: Bevat informatie uit de tekst maar beantwoordt verkeerde vraag
+  * Type 3: Logisch maar niet vermeld in de tekst
+- Alle opties moeten vergelijkbare lengte hebben
+- Geen overduidelijk foute opties
 
 **MOEILIJKHEIDSGRAAD:**
-- Mix van gemakkelijke (40%), middel (40%) en moeilijke (20%) vragen
-- Moeilijke vragen vereisen:
-  * Het combineren van informatie uit verschillende paragrafen
-  * Het lezen tussen de regels
-  * Het begrijpen van impliciete betekenissen
+- Gemakkelijk (60%): Antwoord staat duidelijk in de tekst
+- Middel (30%): Vereist begrip en verbinding van informatie
+- Moeilijk (10%): Vereist kritisch denken en analyse
+
+**TEKSTDEKKING:**
+- Verdeel vragen gelijkmatig over de hele tekst
+- Test elke sectie/paragraaf
+- Geen twee vragen over exact dezelfde informatie
 
 === TAAK 4: WOORDENSCHAT EXTRAHEREN ===
 
