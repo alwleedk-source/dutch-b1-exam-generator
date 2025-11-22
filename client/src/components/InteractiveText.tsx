@@ -79,18 +79,26 @@ export default function InteractiveText({ textId, content, className = "" }: Int
   
   // Get translation based on preferred language
   const getTranslation = (vocabWord: VocabularyWord): string => {
+    let translation = '';
+    
     switch (preferredLanguage) {
       case 'ar':
-        return vocabWord.arabic || vocabWord.english;
+        translation = vocabWord.arabic || vocabWord.english || vocabWord.turkish || vocabWord.dutchDefinition;
+        break;
       case 'en':
-        return vocabWord.english || vocabWord.arabic;
+        translation = vocabWord.english || vocabWord.arabic || vocabWord.turkish || vocabWord.dutchDefinition;
+        break;
       case 'tr':
-        return vocabWord.turkish || vocabWord.english;
+        translation = vocabWord.turkish || vocabWord.english || vocabWord.arabic || vocabWord.dutchDefinition;
+        break;
       case 'nl':
-        return vocabWord.dutchDefinition || '';
+        translation = vocabWord.dutchDefinition || vocabWord.english || vocabWord.arabic;
+        break;
       default:
-        return vocabWord.english || vocabWord.arabic;
+        translation = vocabWord.english || vocabWord.arabic || vocabWord.turkish || vocabWord.dutchDefinition;
     }
+    
+    return translation || vocabWord.word; // Fallback to the word itself if no translation
   };
   
   // Process content and wrap vocabulary words
