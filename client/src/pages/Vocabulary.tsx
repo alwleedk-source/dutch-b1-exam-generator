@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { 
   Loader2, Volume2, Star, CheckCircle, BookOpen, 
   Search, Filter, ArrowUpDown, Grid3x3, List,
-  Play, Trophy, Trash2, Archive, ArchiveRestore, Award
+  Play, Trophy, Trash2, Archive, ArchiveRestore, Award, Eye
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -17,6 +17,7 @@ import { NotAuthenticatedPage } from "@/components/NotAuthenticatedPage";
 import { Link } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { PracticeModal } from "@/components/PracticeModal";
+import { ReviewModal } from "@/components/ReviewModal";
 import {
   Select,
   SelectContent,
@@ -39,6 +40,8 @@ export default function Vocabulary() {
   const [searchQuery, setSearchQuery] = useState('');
   const [practiceModalOpen, setPracticeModalOpen] = useState(false);
   const [practiceWordId, setPracticeWordId] = useState<number | undefined>();
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviewWordId, setReviewWordId] = useState<number | undefined>();
   
   // Get user's preferred language
   const preferredLanguage = user?.preferred_language || localStorage.getItem('preferredLanguage') || 'en';
@@ -331,6 +334,29 @@ export default function Vocabulary() {
                 </Button>
               </div>
             </div>
+
+            {/* Action Buttons */}
+            {stats.total > 0 && (
+              <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                <Button
+                  onClick={() => setReviewModalOpen(true)}
+                  className="flex-1"
+                  variant="outline"
+                  size="lg"
+                >
+                  <Eye className="h-5 w-5 mr-2" />
+                  {t.simpleReview || "Simple Review"}
+                </Button>
+                <Button
+                  onClick={() => setPracticeModalOpen(true)}
+                  className="flex-1"
+                  size="lg"
+                >
+                  <Play className="h-5 w-5 mr-2" />
+                  {t.startPractice || "Start Practice"}
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Vocabulary List */}
@@ -532,6 +558,16 @@ export default function Vocabulary() {
         onComplete={() => {
           refetch();
           setPracticeModalOpen(false);
+        }}
+      />
+
+      {/* Review Modal */}
+      <ReviewModal
+        open={reviewModalOpen}
+        onOpenChange={setReviewModalOpen}
+        wordId={reviewWordId}
+        onComplete={() => {
+          setReviewModalOpen(false);
         }}
       />
     </div>

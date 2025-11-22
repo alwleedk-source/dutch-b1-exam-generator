@@ -228,6 +228,14 @@ export interface Translations {
   correct: string;
   incorrect: string;
   
+  // Review mode
+  reviewMode: string;
+  simpleReview: string;
+  startPractice: string;
+  showDefinition: string;
+  hideDefinition: string;
+  close: string;
+  
   // Exam Results page
   examNotFound: string;
   examNotFoundDesc: string;
@@ -492,6 +500,14 @@ export const translations: Record<Language, Translations> = {
     correct: "Correct",
     incorrect: "Onjuist",
     
+    // Review mode
+    reviewMode: "Herzienmodus",
+    simpleReview: "Eenvoudige Herziening",
+    startPractice: "Start Oefening",
+    showDefinition: "Toon Nederlandse Definitie",
+    hideDefinition: "Verberg Definitie",
+    close: "Sluiten",
+    
     // Exam Results page
     examNotFound: "Examen Niet Gevonden",
     examNotFoundDesc: "Dit examen bestaat niet of is verwijderd.",
@@ -753,6 +769,14 @@ export const translations: Record<Language, Translations> = {
     audioError: "فشل تشغيل الصوت",
     correct: "صحيح",
     incorrect: "خطأ",
+    
+    // Review mode
+    reviewMode: "وضع المراجعة",
+    simpleReview: "مراجعة بسيطة",
+    startPractice: "بدء التدريب",
+    showDefinition: "إظهار الشرح بالهولندية",
+    hideDefinition: "إخفاء الشرح",
+    close: "إغلاق",
     
     // Exam Results page
     examNotFound: "الامتحان غير موجود",
@@ -1016,6 +1040,14 @@ export const translations: Record<Language, Translations> = {
     correct: "Correct",
     incorrect: "Incorrect",
     
+    // Review mode
+    reviewMode: "Review Mode",
+    simpleReview: "Simple Review",
+    startPractice: "Start Practice",
+    showDefinition: "Show Dutch Definition",
+    hideDefinition: "Hide Definition",
+    close: "Close",
+    
     // Exam Results page
     examNotFound: "Exam Not Found",
     examNotFoundDesc: "This exam does not exist or has been deleted.",
@@ -1278,6 +1310,14 @@ export const translations: Record<Language, Translations> = {
     audioError: "Ses çalınamadı",
     correct: "Doğru",
     incorrect: "Yanlış",
+    
+    // Review mode
+    reviewMode: "Gözden Geçirme Modu",
+    simpleReview: "Basit Gözden Geçirme",
+    startPractice: "Pratik Başlat",
+    showDefinition: "Hollandaca Tanımı Göster",
+    hideDefinition: "Tanımı Gizle",
+    close: "Kapat",
     
     // Exam Results page
     examNotFound: "Sınav Bulunamadı",
