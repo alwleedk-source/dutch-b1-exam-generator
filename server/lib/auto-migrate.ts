@@ -38,6 +38,34 @@ export async function autoMigrate() {
       console.log("[Auto-Migrate] ✅ user_vocabulary table already exists");
     }
 
+    // Check if b1_dictionary table exists
+    const b1DictionaryExists = await checkTableExists(db, "b1_dictionary");
+    
+    if (!b1DictionaryExists) {
+      console.log("[Auto-Migrate] Creating b1_dictionary table...");
+      await createB1DictionaryTable(db);
+      console.log("[Auto-Migrate] ✅ b1_dictionary table created");
+      
+      // Import dictionary data
+      console.log("[Auto-Migrate] Importing dictionary data...");
+      await importDictionaryData(db);
+      console.log("[Auto-Migrate] ✅ dictionary data imported");
+    } else {
+      console.log("[Auto-Migrate] ✅ b1_dictionary table already exists");
+      
+      // Check if table is empty
+      const count = await db.execute(sql`SELECT COUNT(*) as count FROM b1_dictionary`);
+      const wordCount = parseInt(count[0]?.count || '0');
+      
+      if (wordCount === 0) {
+        console.log("[Auto-Migrate] Dictionary table is empty, importing data...");
+        await importDictionaryData(db);
+        console.log("[Auto-Migrate] ✅ dictionary data imported");
+      } else {
+        console.log(`[Auto-Migrate] ✅ dictionary has ${wordCount} words`);
+      }
+    }
+
     console.log("[Auto-Migrate] Auto-migration completed successfully");
   } catch (error) {
     console.error("[Auto-Migrate] Error during auto-migration:", error);
@@ -163,4 +191,80 @@ async function createUserVocabularyTable(db: any) {
   await db.execute(sql`
     CREATE INDEX IF NOT EXISTS "user_vocabulary_vocabulary_id_idx" ON "user_vocabulary" USING btree ("vocabulary_id");
   `);
+}
+
+
+async function createB1DictionaryTable(db: any) {
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS "b1_dictionary" (
+      "id" serial PRIMARY KEY,
+      "word" varchar(255) NOT NULL UNIQUE,
+      "translation_ar" text,
+      "translation_en" text,
+      "translation_tr" text,
+      "definition_nl" text,
+      "example_nl" text,
+      "word_type" varchar(50),
+      "frequency_rank" integer,
+      "created_at" timestamp DEFAULT now() NOT NULL,
+      "updated_at" timestamp DEFAULT now() NOT NULL
+    );
+  `);
+
+  // Create indexes
+  await db.execute(sql`
+    CREATE INDEX IF NOT EXISTS "b1_dictionary_word_idx" ON "b1_dictionary" USING btree ("word");
+  `);
+
+  await db.execute(sql`
+    CREATE INDEX IF NOT EXISTS "b1_dictionary_frequency_rank_idx" ON "b1_dictionary" USING btree ("frequency_rank");
+  `);
+}
+
+
+async function importDictionaryData(db: any) {
+  try {
+    // Import fs module
+    const fs = await import('fs');
+    const path = await import('path');
+    
+    // Load dictionary data from JSON file
+    const dictionaryPath = path.join(process.cwd(), 'data', 'b1_dictionary.json');
+    
+    if (!fs.existsSync(dictionaryPath)) {
+      console.error(`[Auto-Migrate] Dictionary file not found at ${dictionaryPath}`);
+      return;
+    }
+    
+    const data = JSON.parse(fs.readFileSync(dictionaryPath, 'utf8'));
+    console.log(`[Auto-Migrate] Loaded ${data.length} words from dictionary`);
+    
+    // Import in batches
+    const batchSize = 100;
+    let imported = 0;
+    
+    for (let i = 0; i < data.length; i += batchSize) {
+      const batch = data.slice(i, i + batchSize);
+      
+      for (const entry of batch) {
+        try {
+          await db.execute(sql`
+            INSERT INTO b1_dictionary (word, translation_ar, translation_en, translation_tr, definition_nl, frequency_rank)
+            VALUES (${entry.word}, ${entry.translation_ar || null}, ${entry.translation_en || null}, ${entry.translation_tr || null}, ${entry.definition_nl || null}, ${entry.frequency_rank || null})
+            ON CONFLICT (word) DO NOTHING
+          `);
+          imported++;
+        } catch (err) {
+          console.error(`[Auto-Migrate] Failed to import "${entry.word}":`, err);
+        }
+      }
+      
+      console.log(`[Auto-Migrate] Progress: ${imported}/${data.length}`);
+    }
+    
+    console.log(`[Auto-Migrate] Successfully imported ${imported} words`);
+  } catch (error) {
+    console.error("[Auto-Migrate] Error importing dictionary data:", error);
+    throw error;
+  }
 }
