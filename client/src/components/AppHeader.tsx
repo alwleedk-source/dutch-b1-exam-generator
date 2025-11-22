@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { BookOpen, Menu, LogOut, FileText, BookMarked, TrendingUp, Library, Plus, MessageSquare, Bell } from "lucide-react";
+import { BookOpen, Menu, LogOut, FileText, BookMarked, TrendingUp, Library, Plus, MessageSquare } from "lucide-react";
 import { Link } from "wouter";
 import {
   DropdownMenu,
@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { NotificationsDropdown } from "./NotificationsDropdown";
 
 /**
  * Shared application header with navigation
@@ -57,9 +58,7 @@ export function AppHeader() {
                 {t.forumTitle || "Forum"}
               </Button>
             </Link>
-            <Button variant="ghost" size="icon" title={t.notifications || "Notifications"}>
-              <Bell className="h-5 w-5" />
-            </Button>
+            <NotificationsDropdown />
             <LanguageSwitcher />
             <Button variant="ghost" size="sm" onClick={logout}>
               {t.logout || "Logout"}

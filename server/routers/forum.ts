@@ -400,12 +400,49 @@ export const forumRouter = router({
           .update(forumTopics)
           .set({ [field]: sql`${forumTopics[field]} + 1` })
           .where(eq(forumTopics.id, input.topicId));
+        
+        // Create notification for upvote only
+        if (input.voteType === "upvote") {
+          const topic = await database
+            .select({ user_id: forumTopics.user_id })
+            .from(forumTopics)
+            .where(eq(forumTopics.id, input.topicId))
+            .limit(1);
+          
+          if (topic.length > 0 && topic[0].user_id !== ctx.user.id) {
+            await database.insert(forumNotifications).values({
+              user_id: topic[0].user_id,
+              notification_type: "upvote_topic",
+              topic_id: input.topicId,
+              from_user_id: ctx.user.id,
+            });
+          }
+        }
       } else if (input.postId) {
         const field = input.voteType === "upvote" ? "upvote_count" : "downvote_count";
         await database
           .update(forumPosts)
           .set({ [field]: sql`${forumPosts[field]} + 1` })
           .where(eq(forumPosts.id, input.postId));
+        
+        // Create notification for upvote only
+        if (input.voteType === "upvote") {
+          const post = await database
+            .select({ user_id: forumPosts.user_id, topic_id: forumPosts.topic_id })
+            .from(forumPosts)
+            .where(eq(forumPosts.id, input.postId))
+            .limit(1);
+          
+          if (post.length > 0 && post[0].user_id !== ctx.user.id) {
+            await database.insert(forumNotifications).values({
+              user_id: post[0].user_id,
+              notification_type: "upvote_post",
+              topic_id: post[0].topic_id,
+              post_id: input.postId,
+              from_user_id: ctx.user.id,
+            });
+          }
+        }
       }
       
       return { success: true, action: "added" };
@@ -445,6 +482,33 @@ export const forumRouter = router({
         );
       
       return { success: true };
+    }),
+  
+  // Mark all notifications as read
+  markAllNotificationsRead: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      await database
+        .update(forumNotifications)
+        .set({ is_read: true })
+        .where(eq(forumNotifications.user_id, ctx.user.id));
+      
+      return { success: true };
+    }),
+  
+  // Get unread notifications count
+  getUnreadCount: protectedProcedure
+    .query(async ({ ctx }) => {
+      const result = await database
+        .select({ count: sql<number>`count(*)` })
+        .from(forumNotifications)
+        .where(
+          and(
+            eq(forumNotifications.user_id, ctx.user.id),
+            eq(forumNotifications.is_read, false)
+          )
+        );
+      
+      return { count: Number(result[0]?.count || 0) };
     }),
 
   // Update topic (within 5 minutes)

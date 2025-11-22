@@ -303,6 +303,12 @@ export interface Translations {
   topicDeleted: string;
   postDeleted: string;
   notifications: string;
+  noNotifications: string;
+  markAllRead: string;
+  someone: string;
+  repliedToYourTopic: string;
+  upvotedYourTopic: string;
+  upvotedYourPost: string;
   
   // Forum categories
   category_exams_tips: string;
@@ -618,6 +624,12 @@ export const translations: Record<Language, Translations> = {
     topicDeleted: "Onderwerp verwijderd",
     postDeleted: "Reactie verwijderd",
     notifications: "Meldingen",
+    noNotifications: "Geen meldingen",
+    markAllRead: "Alles als gelezen markeren",
+    someone: "Iemand",
+    repliedToYourTopic: "heeft op je onderwerp gereageerd",
+    upvotedYourTopic: "heeft je onderwerp geliket",
+    upvotedYourPost: "heeft je reactie geliket",
     
     // Forum categories
     category_exams_tips: "Examens & Tips",
@@ -931,6 +943,12 @@ export const translations: Record<Language, Translations> = {
     topicDeleted: "تم حذف الموضوع",
     postDeleted: "تم حذف الرد",
     notifications: "التنبيهات",
+    noNotifications: "لا توجد تنبيهات",
+    markAllRead: "تحديد الكل كمقروء",
+    someone: "شخص ما",
+    repliedToYourTopic: "رد على موضوعك",
+    upvotedYourTopic: "أعجب بموضوعك",
+    upvotedYourPost: "أعجب بردك",
     
     // Forum categories
     category_exams_tips: "نصائح وإرشادات الامتحان",
@@ -1244,6 +1262,12 @@ export const translations: Record<Language, Translations> = {
     topicDeleted: "Topic deleted",
     postDeleted: "Post deleted",
     notifications: "Notifications",
+    noNotifications: "No notifications",
+    markAllRead: "Mark all read",
+    someone: "Someone",
+    repliedToYourTopic: "replied to your topic",
+    upvotedYourTopic: "upvoted your topic",
+    upvotedYourPost: "upvoted your post",
     
     // Forum categories
     category_exams_tips: "Exams & Tips",
@@ -1558,6 +1582,12 @@ export const translations: Record<Language, Translations> = {
     topicDeleted: "Konu silindi",
     postDeleted: "Yanıt silindi",
     notifications: "Bildirimler",
+    noNotifications: "Bildirim yok",
+    markAllRead: "Tümünü okundu işaretle",
+    someone: "Birisi",
+    repliedToYourTopic: "konunuza yanıt verdi",
+    upvotedYourTopic: "konunuzu beğendi",
+    upvotedYourPost: "yanıtınızı beğendi",
     
     // Forum categories
     category_exams_tips: "Sınavlar ve İpuçları",
