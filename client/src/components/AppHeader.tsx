@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { BookOpen, Menu, LogOut, FileText, BookMarked, TrendingUp, Library, Plus } from "lucide-react";
+import { BookOpen, Menu, LogOut, FileText, BookMarked, TrendingUp, Library, Plus, MessageSquare, Bell } from "lucide-react";
 import { Link } from "wouter";
 import {
   DropdownMenu,
@@ -51,6 +51,15 @@ export function AppHeader() {
             <Link href="/dictionary">
               <Button variant="ghost" size="sm">{t.dictionary || "Dictionary"}</Button>
             </Link>
+            <Link href="/forum">
+              <Button variant="ghost" size="sm">
+                <MessageSquare className="h-4 w-4 mr-1" />
+                {t.forumTitle || "Forum"}
+              </Button>
+            </Link>
+            <Button variant="ghost" size="icon" title={t.notifications || "Notifications"}>
+              <Bell className="h-5 w-5" />
+            </Button>
             <LanguageSwitcher />
             <Button variant="ghost" size="sm" onClick={logout}>
               {t.logout || "Logout"}
@@ -101,6 +110,12 @@ export function AppHeader() {
                   <DropdownMenuItem>
                     <BookOpen className="mr-2 h-4 w-4" />
                     {t.dictionary || "Dictionary"}
+                  </DropdownMenuItem>
+                </Link>
+                <Link href="/forum">
+                  <DropdownMenuItem>
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    {t.forumTitle || "Forum"}
                   </DropdownMenuItem>
                 </Link>
                 <DropdownMenuSeparator />

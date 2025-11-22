@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, ThumbsUp, ThumbsDown, Send } from "lucide-react";
+import { ArrowLeft, ThumbsUp, ThumbsDown, Send, Edit, Trash2 } from "lucide-react";
 import { Link, useParams } from "wouter";
 import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
@@ -42,6 +42,35 @@ export default function ForumTopic() {
       utils.forum.getTopic.invalidate({ topicId });
     },
   });
+  
+  const deleteTopicMutation = trpc.forum.deleteTopic.useMutation({
+    onSuccess: () => {
+      toast.success(t.topicDeleted || "Topic deleted successfully");
+      window.location.href = "/forum";
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+  
+  const deletePostMutation = trpc.forum.deletePost.useMutation({
+    onSuccess: () => {
+      toast.success(t.postDeleted || "Post deleted successfully");
+      utils.forum.getTopic.invalidate({ topicId });
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+  
+  const canEditOrDelete = (createdAt: string, userId: number) => {
+    if (!user) return false;
+    if (user.role === "moderator" || user.role === "admin") return true;
+    if (user.id !== userId) return false;
+    
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    return new Date(createdAt) > fiveMinutesAgo;
+  };
 
   const handleReply = () => {
     if (!replyContent.trim()) {
@@ -133,6 +162,24 @@ export default function ForumTopic() {
               >
                 <ThumbsDown className="h-4 w-4 mr-1" />
               </Button>
+              
+              {canEditOrDelete(data.topic.created_at, data.topic.user_id) && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (confirm(t.confirmDelete || "Are you sure you want to delete this topic?")) {
+                        deleteTopicMutation.mutate({ topicId });
+                      }
+                    }}
+                    disabled={deleteTopicMutation.isPending}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    {t.delete}
+                  </Button>
+                </>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -169,6 +216,22 @@ export default function ForumTopic() {
                     <ThumbsUp className="h-4 w-4 mr-1" />
                     {post.upvote_count}
                   </Button>
+                  
+                  {canEditOrDelete(post.created_at, post.user_id) && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        if (confirm(t.confirmDelete || "Are you sure you want to delete this post?")) {
+                          deletePostMutation.mutate({ postId: post.id });
+                        }
+                      }}
+                      disabled={deletePostMutation.isPending}
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      {t.delete}
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>

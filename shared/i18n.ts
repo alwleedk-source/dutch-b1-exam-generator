@@ -300,8 +300,17 @@ export interface Translations {
   selectCategory: string;
   characters: string;
   forumLoginPrompt: string;
+  topicDeleted: string;
+  postDeleted: string;
+  notifications: string;
   
   // Forum categories
+  category_exams_tips: string;
+  category_exams_tips_desc: string;
+  category_experiences: string;
+  category_experiences_desc: string;
+  category_questions: string;
+  category_questions_desc: string;
   "forum.category.exams_tips": string;
   "forum.category.exams_tips_desc": string;
   "forum.category.experiences": string;
@@ -606,8 +615,17 @@ export const translations: Record<Language, Translations> = {
     selectCategory: "Selecteer een categorie",
     characters: "tekens",
     forumLoginPrompt: "Log in om onderwerpen aan te maken en deel te nemen aan discussies",
+    topicDeleted: "Onderwerp verwijderd",
+    postDeleted: "Reactie verwijderd",
+    notifications: "Meldingen",
     
     // Forum categories
+    category_exams_tips: "Examens & Tips",
+    category_exams_tips_desc: "Deel tips en strategieën voor het B1 examen",
+    category_experiences: "Persoonlijke Ervaringen",
+    category_experiences_desc: "Deel je ervaringen met het leren van Nederlands",
+    category_questions: "Vragen & Antwoorden",
+    category_questions_desc: "Stel vragen en help anderen",
     "forum.category.exams_tips": "Examens & Tips",
     "forum.category.exams_tips_desc": "Deel tips en strategieën voor het B1 examen",
     "forum.category.experiences": "Persoonlijke Ervaringen",
@@ -880,6 +898,53 @@ export const translations: Record<Language, Translations> = {
     pageNotFound: "الصفحة غير موجودة",
     pageNotFoundDesc: "الصفحة التي تبحث عنها غير موجودة.",
     goHome: "العودة للرئيسية",
+    
+    // Forum
+    forumTitle: "مجتمع المنتدى",
+    forumDescription: "ناقش وشارك التجارب واطرح الأسئلة",
+    createNewTopic: "موضوع جديد",
+    backToForum: "العودة للمنتدى",
+    topics: "مواضيع",
+    noTopicsYet: "لا توجد مواضيع بعد. كن أول من يبدأ نقاشًا!",
+    createFirstTopic: "أنشئ أول موضوع",
+    replies: "الردود",
+    postReply: "نشر رد",
+    writeYourReply: "اكتب ردك...",
+    posting: "جاري النشر...",
+    replyPosted: "تم نشر الرد بنجاح!",
+    replyCannotBeEmpty: "لا يمكن أن يكون الرد فارغًا",
+    topicNotFound: "الموضوع غير موجود",
+    loginToReply: "سجل الدخول للرد",
+    loginToCreateTopic: "سجل الدخول لإنشاء موضوع",
+    createTopic: "إنشاء موضوع",
+    topicTitle: "عنوان الموضوع",
+    enterTopicTitle: "أدخل عنوانًا وصفيًا...",
+    content: "المحتوى",
+    writeYourTopic: "اكتب موضوعك...",
+    creating: "جاري الإنشاء...",
+    topicCreated: "تم إنشاء الموضوع بنجاح!",
+    fillAllFields: "املأ جميع الحقول",
+    category: "الفئة",
+    selectCategory: "اختر فئة",
+    characters: "حرف",
+    forumLoginPrompt: "سجل الدخول لإنشاء مواضيع والمشاركة في النقاشات",
+    topicDeleted: "تم حذف الموضوع",
+    postDeleted: "تم حذف الرد",
+    notifications: "التنبيهات",
+    
+    // Forum categories
+    category_exams_tips: "نصائح وإرشادات الامتحان",
+    category_exams_tips_desc: "شارك نصائح واستراتيجيات لامتحان B1",
+    category_experiences: "تجارب شخصية",
+    category_experiences_desc: "شارك تجربتك في تعلم الهولندية",
+    category_questions: "أسئلة وأجوبة",
+    category_questions_desc: "اطرح الأسئلة وساعد الآخرين",
+    "forum.category.exams_tips": "نصائح وإرشادات الامتحان",
+    "forum.category.exams_tips_desc": "شارك نصائح واستراتيجيات لامتحان B1",
+    "forum.category.experiences": "تجارب شخصية",
+    "forum.category.experiences_desc": "شارك تجربتك في تعلم الهولندية",
+    "forum.category.questions": "أسئلة وأجوبة",
+    "forum.category.questions_desc": "اطرح الأسئلة وساعد الآخرين",
   },
   
   en: {
@@ -1146,6 +1211,53 @@ export const translations: Record<Language, Translations> = {
     pageNotFound: "Page Not Found",
     pageNotFoundDesc: "The page you're looking for doesn't exist.",
     goHome: "Go Home",
+    
+    // Forum
+    forumTitle: "Community Forum",
+    forumDescription: "Discuss, share experiences and ask questions",
+    createNewTopic: "New Topic",
+    backToForum: "Back to Forum",
+    topics: "Topics",
+    noTopicsYet: "No topics yet. Be the first to start a discussion!",
+    createFirstTopic: "Create First Topic",
+    replies: "Replies",
+    postReply: "Post Reply",
+    writeYourReply: "Write your reply...",
+    posting: "Posting...",
+    replyPosted: "Reply posted successfully!",
+    replyCannotBeEmpty: "Reply cannot be empty",
+    topicNotFound: "Topic not found",
+    loginToReply: "Log in to reply",
+    loginToCreateTopic: "Log in to create a topic",
+    createTopic: "Create Topic",
+    topicTitle: "Topic Title",
+    enterTopicTitle: "Enter a descriptive title...",
+    content: "Content",
+    writeYourTopic: "Write your topic...",
+    creating: "Creating...",
+    topicCreated: "Topic created successfully!",
+    fillAllFields: "Fill all fields",
+    category: "Category",
+    selectCategory: "Select a category",
+    characters: "characters",
+    forumLoginPrompt: "Log in to create topics and participate in discussions",
+    topicDeleted: "Topic deleted",
+    postDeleted: "Post deleted",
+    notifications: "Notifications",
+    
+    // Forum categories
+    category_exams_tips: "Exams & Tips",
+    category_exams_tips_desc: "Share tips and strategies for the B1 exam",
+    category_experiences: "Personal Experiences",
+    category_experiences_desc: "Share your experience learning Dutch",
+    category_questions: "Questions & Answers",
+    category_questions_desc: "Ask questions and help others",
+    "forum.category.exams_tips": "Exams & Tips",
+    "forum.category.exams_tips_desc": "Share tips and strategies for the B1 exam",
+    "forum.category.experiences": "Personal Experiences",
+    "forum.category.experiences_desc": "Share your experience learning Dutch",
+    "forum.category.questions": "Questions & Answers",
+    "forum.category.questions_desc": "Ask questions and help others",
   },
   
   tr: {
@@ -1413,6 +1525,53 @@ export const translations: Record<Language, Translations> = {
     pageNotFound: "Sayfa Bulunamadı",
     pageNotFoundDesc: "Aradığınız sayfa mevcut değil.",
     goHome: "Ana Sayfaya Dön",
+    
+    // Forum
+    forumTitle: "Topluluk Forumu",
+    forumDescription: "Tartışın, deneyimleri paylaşın ve sorular sorun",
+    createNewTopic: "Yeni Konu",
+    backToForum: "Foruma Dön",
+    topics: "Konular",
+    noTopicsYet: "Henüz konu yok. Tartışmayı başlatan ilk kişi olun!",
+    createFirstTopic: "İlk Konuyu Oluştur",
+    replies: "Yanıtlar",
+    postReply: "Yanıt Gönder",
+    writeYourReply: "Yanıtınızı yazın...",
+    posting: "Gönderiliyor...",
+    replyPosted: "Yanıt başarıyla gönderildi!",
+    replyCannotBeEmpty: "Yanıt boş olamaz",
+    topicNotFound: "Konu bulunamadı",
+    loginToReply: "Yanıtlamak için giriş yapın",
+    loginToCreateTopic: "Konu oluşturmak için giriş yapın",
+    createTopic: "Konu Oluştur",
+    topicTitle: "Konu Başlığı",
+    enterTopicTitle: "Açıklayıcı bir başlık girin...",
+    content: "İçerik",
+    writeYourTopic: "Konunuzu yazın...",
+    creating: "Oluşturuluyor...",
+    topicCreated: "Konu başarıyla oluşturuldu!",
+    fillAllFields: "Tüm alanları doldurun",
+    category: "Kategori",
+    selectCategory: "Bir kategori seçin",
+    characters: "karakter",
+    forumLoginPrompt: "Konu oluşturmak ve tartışmalara katılmak için giriş yapın",
+    topicDeleted: "Konu silindi",
+    postDeleted: "Yanıt silindi",
+    notifications: "Bildirimler",
+    
+    // Forum categories
+    category_exams_tips: "Sınavlar ve İpuçları",
+    category_exams_tips_desc: "B1 sınavı için ipuçları ve stratejileri paylaşın",
+    category_experiences: "Kişisel Deneyimler",
+    category_experiences_desc: "Hollandaca öğrenme deneyiminizi paylaşın",
+    category_questions: "Sorular ve Cevaplar",
+    category_questions_desc: "Sorular sorun ve başkalarına yardım edin",
+    "forum.category.exams_tips": "Sınavlar ve İpuçları",
+    "forum.category.exams_tips_desc": "B1 sınavı için ipuçları ve stratejileri paylaşın",
+    "forum.category.experiences": "Kişisel Deneyimler",
+    "forum.category.experiences_desc": "Hollandaca öğrenme deneyiminizi paylaşın",
+    "forum.category.questions": "Sorular ve Cevaplar",
+    "forum.category.questions_desc": "Sorular sorun ve başkalarına yardım edin",
   },
 };
 

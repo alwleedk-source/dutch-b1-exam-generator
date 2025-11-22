@@ -1,4 +1,4 @@
-import { db as database } from "./db";
+import { getDb } from "./db";
 import { forumCategories } from "../drizzle/schema";
 
 const categories = [
@@ -25,10 +25,11 @@ const categories = [
 
 async function seed() {
   console.log("Seeding forum categories...");
+  const db = await getDb();
   
   for (const category of categories) {
     try {
-      await database.insert(forumCategories).values(category);
+      await db.insert(forumCategories).values(category);
       console.log(`✅ Added: ${category.language} - ${category.category_type}`);
     } catch (error: any) {
       if (error.code === '23505') { // Duplicate key
