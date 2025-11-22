@@ -1126,11 +1126,15 @@ export const appRouter = router({
           vocabularyId = existingVocab.id;
         }
         
+        console.log('[addFromDictionary] vocabularyId:', vocabularyId);
+        
         // Check if user already has this word
+        console.log('[addFromDictionary] Checking if user already has word...');
         const existingUserVocab = await db.getUserVocabularyByVocabId(
           ctx.user.id,
           vocabularyId
         );
+        console.log('[addFromDictionary] existingUserVocab:', existingUserVocab);
         
         if (existingUserVocab) {
           throw new TRPCError({ 
@@ -1140,7 +1144,8 @@ export const appRouter = router({
         }
         
         // Add to user's vocabulary
-        await db.createUserVocabulary({
+        console.log('[addFromDictionary] Adding to user vocabulary...');
+        const userVocabResult = await db.createUserVocabulary({
           user_id: ctx.user.id,
           vocabulary_id: vocabularyId,
           status: "new" as const,
@@ -1151,11 +1156,15 @@ export const appRouter = router({
           interval: 0,
           repetitions: 0,
         });
+        console.log('[addFromDictionary] User vocabulary created:', userVocabResult);
         
         // Update user's vocabulary count
+        console.log('[addFromDictionary] Updating user vocabulary count...');
         await db.updateUserVocabularyCount(ctx.user.id);
+        console.log('[addFromDictionary] User vocabulary count updated');
         
-        return { success: true };
+        console.log('[addFromDictionary] Successfully added word to user vocabulary');
+        return { success: true, vocabularyId };
       }),
   }),
 
