@@ -149,6 +149,29 @@ export default function InteractiveText({ textId, content, className = "" }: Int
               <div class="tooltip-hint">💾 Double-click to save</div>
             `;
             
+            // Add hover event to position tooltip dynamically
+            wrapper.addEventListener('mouseenter', (e) => {
+              const rect = wrapper.getBoundingClientRect();
+              const tooltipRect = tooltip.getBoundingClientRect();
+              
+              // Position above the word by default
+              let top = rect.top - tooltipRect.height - 8;
+              let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+              
+              // Adjust if tooltip goes off-screen
+              if (left < 10) left = 10;
+              if (left + tooltipRect.width > window.innerWidth - 10) {
+                left = window.innerWidth - tooltipRect.width - 10;
+              }
+              if (top < 10) {
+                // Show below if not enough space above
+                top = rect.bottom + 8;
+              }
+              
+              tooltip.style.top = `${top}px`;
+              tooltip.style.left = `${left}px`;
+            });
+            
             wrapper.appendChild(span);
             wrapper.appendChild(tooltip);
             fragment.appendChild(wrapper);
@@ -252,10 +275,9 @@ export default function InteractiveText({ textId, content, className = "" }: Int
         }
         
         .vocab-tooltip {
-          position: absolute;
-          bottom: 100%;
-          left: 50%;
-          transform: translateX(-50%) translateY(-8px);
+          position: fixed;
+          bottom: auto;
+          left: auto;
           background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
           color: white;
           padding: 10px 14px;
@@ -268,11 +290,11 @@ export default function InteractiveText({ textId, content, className = "" }: Int
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
           white-space: nowrap;
           min-width: 100px;
+          max-width: 300px;
         }
         
         .vocab-word-wrapper:hover .vocab-tooltip {
           opacity: 1;
-          transform: translateX(-50%) translateY(-4px);
         }
         
         .tooltip-translation {
