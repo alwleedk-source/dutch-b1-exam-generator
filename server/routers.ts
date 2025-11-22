@@ -1004,26 +1004,18 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         // Get word from dictionary
-        const result = await db.query(
-          'SELECT * FROM b1_dictionary WHERE word = $1 LIMIT 1',
-          [input.word]
-        );
+        const dictWord = await db.getDictionaryWord(input.word);
         
-        if (result.rows.length === 0) {
+        if (!dictWord) {
           throw new TRPCError({ code: "NOT_FOUND", message: "Word not found in dictionary" });
         }
         
-        const dictWord = result.rows[0];
-        
-        // Create vocabulary entry if it doesn't exist
-        let vocabEntry = await db.query(
-          'SELECT id FROM vocabulary WHERE "dutchWord" = $1 LIMIT 1',
-          [dictWord.word]
-        );
+        // Check if vocabulary entry exists
+        const existingVocab = await db.getVocabularyByWord(dictWord.word);
         
         let vocabularyId: number;
         
-        if (vocabEntry.rows.length === 0) {
+        if (!existingVocab) {
           // Create new vocabulary entry
           const newVocab = await db.createVocabulary({
             text_id: null, // Dictionary words don't belong to a specific text
@@ -1038,7 +1030,7 @@ export const appRouter = router({
           });
           vocabularyId = newVocab.id;
         } else {
-          vocabularyId = vocabEntry.rows[0].id;
+          vocabularyId = existingVocab.id;
         }
         
         // Check if user already has this word

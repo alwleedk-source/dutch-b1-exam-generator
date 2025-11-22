@@ -1086,3 +1086,35 @@ export async function deleteText(textId: number) {
   // Delete the text
   await db.delete(texts).where(eq(texts.id, textId));
 }
+
+/**
+ * Get a word from B1 dictionary
+ */
+export async function getDictionaryWord(word: string) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db
+    .select()
+    .from(b1Dictionary)
+    .where(eq(b1Dictionary.word, word))
+    .limit(1);
+
+  return result[0] || null;
+}
+
+/**
+ * Get vocabulary entry by Dutch word
+ */
+export async function getVocabularyByWord(word: string) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db
+    .select()
+    .from(vocabulary)
+    .where(eq(vocabulary.dutchWord, word))
+    .limit(1);
+
+  return result[0] || null;
+}

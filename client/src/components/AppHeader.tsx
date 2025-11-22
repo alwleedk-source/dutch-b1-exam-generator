@@ -48,6 +48,9 @@ export function AppHeader() {
             <Link href="/vocabulary">
               <Button variant="ghost" size="sm">{t.vocabulary || "Vocabulary"}</Button>
             </Link>
+            <Link href="/dictionary">
+              <Button variant="ghost" size="sm">{t.dictionary || "Dictionary"}</Button>
+            </Link>
             <LanguageSwitcher />
             <Button variant="ghost" size="sm" onClick={logout}>
               {t.logout || "Logout"}
@@ -92,6 +95,12 @@ export function AppHeader() {
                   <DropdownMenuItem>
                     <Library className="mr-2 h-4 w-4" />
                     {t.vocabulary || "Vocabulary"}
+                  </DropdownMenuItem>
+                </Link>
+                <Link href="/dictionary">
+                  <DropdownMenuItem>
+                    <BookOpen className="mr-2 h-4 w-4" />
+                    {t.dictionary || "Dictionary"}
                   </DropdownMenuItem>
                 </Link>
                 <DropdownMenuSeparator />
