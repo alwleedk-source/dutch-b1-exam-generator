@@ -2,7 +2,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
+import { ForumEditor } from "@/components/ForumEditor";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
 import { ArrowLeft, ThumbsUp, ThumbsDown, Send, Edit, Trash2 } from "lucide-react";
@@ -246,11 +246,10 @@ export default function ForumTopic() {
                 {t.postReply || "Post a Reply"}
               </h3>
               
-              <Textarea
+              <ForumEditor
                 value={replyContent}
-                onChange={(e) => setReplyContent(e.target.value)}
+                onChange={setReplyContent}
                 placeholder={t.writeYourReply || "Write your reply..."}
-                rows={5}
                 className="mb-4"
               />
               

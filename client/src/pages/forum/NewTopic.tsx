@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { ForumEditor } from "@/components/ForumEditor";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
@@ -133,13 +133,11 @@ export default function NewTopic() {
               {/* Content */}
               <div>
                 <Label htmlFor="content">{t.content || "Content"}</Label>
-                <Textarea
-                  id="content"
+                <ForumEditor
                   value={content}
-                  onChange={(e) => setContent(e.target.value)}
+                  onChange={setContent}
                   placeholder={t.writeYourTopic || "Write your topic content..."}
-                  rows={12}
-                  required
+                  className="mt-2"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
                   {content.length}/10000 {t.characters || "characters"}
