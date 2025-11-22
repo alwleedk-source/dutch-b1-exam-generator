@@ -114,7 +114,7 @@ export const exams = pgTable("exams", {
   correct_answers: integer("correct_answers"),
   score_percentage: integer("score_percentage"),
   staatsexamen_score: integer("staatsexamen_score"), // Official Staatsexamen score (276-740)
-  skill_analysis: text("skill_analysis"), // JSON object with performance per skill type
+  // skill_analysis: text("skill_analysis"), // JSON object with performance per skill type - TEMPORARILY DISABLED until migration
   
   // Timing
   started_at: timestamp("started_at").defaultNow().notNull(),
