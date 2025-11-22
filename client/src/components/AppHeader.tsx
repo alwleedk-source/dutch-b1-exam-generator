@@ -74,7 +74,7 @@ export function AppHeader() {
           </nav>
 
           {/* Mobile Navigation */}
-          <div className="flex md:hidden items-center gap-2">
+          <div className="flex md:hidden items-center gap-1.5">
             <LanguageSwitcher />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -125,6 +125,14 @@ export function AppHeader() {
                     {t.forumTitle || "Forum"}
                   </DropdownMenuItem>
                 </Link>
+                {(user?.role === "moderator" || user?.role === "admin") && (
+                  <Link href="/forum/moderator">
+                    <DropdownMenuItem>
+                      <Shield className="mr-2 h-4 w-4" />
+                      {t.moderatorPanel || "Moderator"}
+                    </DropdownMenuItem>
+                  </Link>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={logout}>
                   <LogOut className="mr-2 h-4 w-4" />

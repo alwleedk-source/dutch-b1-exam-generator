@@ -120,37 +120,37 @@ export default function ExamResults() {
           <Card>
             <CardHeader className="text-center pb-4">
               <div className="flex justify-center mb-4">
-                <div className={`h-32 w-32 rounded-full ${passed ? 'bg-green-500/10' : 'bg-yellow-500/10'} flex items-center justify-center`}>
+                <div className={`h-24 w-24 sm:h-32 sm:w-32 rounded-full ${passed ? 'bg-green-500/10' : 'bg-yellow-500/10'} flex items-center justify-center`}>
                   <div className="text-center">
-                    <div className="text-5xl font-bold" style={{ color: passed ? '#22c55e' : '#eab308' }}>
+                    <div className="text-4xl sm:text-5xl font-bold" style={{ color: passed ? '#22c55e' : '#eab308' }}>
                       {scorePercentage}%
                     </div>
                   </div>
                 </div>
               </div>
-              <CardTitle className="text-2xl mb-2">
-                Jouw resultaat
+              <CardTitle className="text-xl sm:text-2xl mb-2">
+                {t.yourResult || "Your Result"}
               </CardTitle>
-              <CardDescription className="text-base">
+              <CardDescription className="text-sm sm:text-base px-4">
                 {passed 
-                  ? 'Goed gedaan! Blijf oefenen om je vaardigheden te verbeteren'
-                  : 'Blijf oefenen, je bent op de goede weg!'}
+                  ? (t.examPassedMessage || "Well done! Keep practicing to improve your skills")
+                  : (t.examFailedMessage || "Keep practicing, you're on the right track!")}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {/* Basic Stats */}
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center p-4 rounded-lg bg-green-500/5">
-                  <div className="text-3xl font-bold text-green-500 mb-1">{correctAnswers}</div>
-                  <p className="text-sm text-muted-foreground">Goed</p>
+              <div className="grid grid-cols-3 gap-2 sm:gap-4">
+                <div className="text-center p-2 sm:p-4 rounded-lg bg-green-500/5">
+                  <div className="text-2xl sm:text-3xl font-bold text-green-500 mb-1">{correctAnswers}</div>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{t.correct || "Correct"}</p>
                 </div>
-                <div className="text-center p-4 rounded-lg bg-red-500/5">
-                  <div className="text-3xl font-bold text-red-500 mb-1">{totalQuestions - correctAnswers}</div>
-                  <p className="text-sm text-muted-foreground">Fout</p>
+                <div className="text-center p-2 sm:p-4 rounded-lg bg-red-500/5">
+                  <div className="text-2xl sm:text-3xl font-bold text-red-500 mb-1">{totalQuestions - correctAnswers}</div>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{t.incorrect || "Incorrect"}</p>
                 </div>
-                <div className="text-center p-4 rounded-lg bg-primary/5">
-                  <div className="text-3xl font-bold text-primary mb-1">{totalQuestions}</div>
-                  <p className="text-sm text-muted-foreground">Totaal</p>
+                <div className="text-center p-2 sm:p-4 rounded-lg bg-primary/5">
+                  <div className="text-2xl sm:text-3xl font-bold text-primary mb-1">{totalQuestions}</div>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{t.total || "Total"}</p>
                 </div>
               </div>
             </CardContent>

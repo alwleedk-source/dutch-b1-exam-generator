@@ -19,11 +19,29 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   
   // Get initial language from user preference, localStorage, or default to English
   const [language, setLanguageState] = useState<Language>(() => {
-    if (user?.preferred_language) {
-      return user.preferred_language as Language;
+    try {
+      // Priority 1: localStorage (most recent user choice) - try multiple keys
+      const saved = localStorage.getItem(LANGUAGE_KEY) || localStorage.getItem("lang");
+      if (saved && ["nl", "ar", "en", "tr"].includes(saved)) {
+        return saved as Language;
+      }
+      
+      // Priority 2: User preference from database
+      if (user?.preferred_language) {
+        return user.preferred_language as Language;
+      }
+      
+      // Priority 3: Browser language
+      const browserLang = navigator.language.split("-")[0];
+      if (["nl", "ar", "en", "tr"].includes(browserLang)) {
+        return browserLang as Language;
+      }
+    } catch (error) {
+      console.error("Error reading language preference:", error);
     }
-    const saved = localStorage.getItem(LANGUAGE_KEY);
-    return (saved as Language) || "en";
+    
+    // Default: English
+    return "en";
   });
 
   const [t, setT] = useState<Translations>(() => getTranslations(language));
@@ -41,7 +59,16 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   // Update translations when language changes
   useEffect(() => {
     setT(getTranslations(language));
-    localStorage.setItem(LANGUAGE_KEY, language);
+    
+    // Save to localStorage with multiple keys for reliability
+    try {
+      localStorage.setItem(LANGUAGE_KEY, language);
+      localStorage.setItem("lang", language);
+      // Also save with timestamp to detect stale data
+      localStorage.setItem("lang_timestamp", Date.now().toString());
+    } catch (error) {
+      console.error("Failed to persist language:", error);
+    }
     
     // Update HTML dir attribute for RTL languages
     document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
@@ -57,7 +84,35 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
-    localStorage.setItem(LANGUAGE_KEY, lang);
+    
+    // Save to localStorage immediately (multiple times for reliability)
+    try {
+      localStorage.setItem(LANGUAGE_KEY, lang);
+      localStorage.setItem("lang", lang);
+      localStorage.setItem("lang_timestamp", Date.now().toString());
+      
+      // Force a storage event
+      window.dispatchEvent(new StorageEvent("storage", {
+        key: LANGUAGE_KEY,
+        newValue: lang,
+        url: window.location.href
+      }));
+      
+      // Additional verification - read back to ensure it was saved
+      const verified = localStorage.getItem(LANGUAGE_KEY);
+      if (verified !== lang) {
+        console.warn("Language save verification failed, retrying...");
+        localStorage.setItem(LANGUAGE_KEY, lang);
+      }
+    } catch (error) {
+      console.error("Failed to save language to localStorage:", error);
+      // Try using sessionStorage as fallback
+      try {
+        sessionStorage.setItem(LANGUAGE_KEY, lang);
+      } catch (e) {
+        console.error("SessionStorage fallback also failed:", e);
+      }
+    }
     
     // Sync with database if user is logged in
     if (user) {
