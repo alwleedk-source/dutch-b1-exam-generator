@@ -39,6 +39,7 @@ export interface Translations {
   
   // Text creation
   createNewExam: string;
+  browsePublicExams: string;
   pasteText: string;
   uploadFile: string;
   scanImage: string;
@@ -201,6 +202,8 @@ export interface Translations {
   wordArchived: string;
   wordUnarchived: string;
   markedAsMastered: string;
+  wordSavedToVocabulary: string;
+  failedToSaveWord: string;
   archive: string;
   restore: string;
   delete: string;
@@ -311,6 +314,7 @@ export const translations: Record<Language, Translations> = {
     
     // Text creation
     createNewExam: "Examen Aanmaken",
+    browsePublicExams: "Openbare Examens Bekijken",
     pasteText: "Tekst Plakken",
     uploadFile: "Bestand Uploaden",
     scanImage: "Afbeelding Scannen",
@@ -473,6 +477,8 @@ export const translations: Record<Language, Translations> = {
     wordArchived: "Woord gearchiveerd",
     wordUnarchived: "Woord hersteld",
     markedAsMastered: "Gemarkeerd als beheerst",
+    wordSavedToVocabulary: "Woord opgeslagen in woordenschat!",
+    failedToSaveWord: "Opslaan mislukt",
     archive: "Archiveren",
     restore: "Herstellen",
     delete: "Verwijderen",
@@ -582,6 +588,7 @@ export const translations: Record<Language, Translations> = {
     
     // Text creation
     createNewExam: "إنشاء امتحان جديد",
+    browsePublicExams: "تصفح الامتحانات العامة",
     pasteText: "لصق النص",
     uploadFile: "رفع ملف",
     scanImage: "مسح صورة",
@@ -743,6 +750,8 @@ export const translations: Record<Language, Translations> = {
     wordArchived: "تم أرشفة الكلمة",
     wordUnarchived: "تم استعادة الكلمة",
     markedAsMastered: "تم وضع علامة متقنة",
+    wordSavedToVocabulary: "تم حفظ الكلمة في مفرداتك!",
+    failedToSaveWord: "فشل حفظ الكلمة",
     archive: "أرشفة",
     restore: "استعادة",
     delete: "حذف",
@@ -852,6 +861,7 @@ export const translations: Record<Language, Translations> = {
     
     // Text creation
     createNewExam: "Create New Exam",
+    browsePublicExams: "Browse Public Exams",
     pasteText: "Paste Text",
     uploadFile: "Upload File",
     scanImage: "Scan Image",
@@ -1013,6 +1023,8 @@ export const translations: Record<Language, Translations> = {
     wordArchived: "Word archived",
     wordUnarchived: "Word restored",
     markedAsMastered: "Marked as mastered",
+    wordSavedToVocabulary: "Word saved to vocabulary!",
+    failedToSaveWord: "Failed to save word",
     archive: "Archive",
     restore: "Restore",
     delete: "Delete",
@@ -1122,6 +1134,7 @@ export const translations: Record<Language, Translations> = {
     
     // Text creation
     createNewExam: "Yeni Sınav Oluştur",
+    browsePublicExams: "Genel Sınavlara Göz At",
     pasteText: "Metin Yapıştır",
     uploadFile: "Dosya Yükle",
     scanImage: "Görüntü Tara",
@@ -1284,6 +1297,8 @@ export const translations: Record<Language, Translations> = {
     wordArchived: "Kelime arşivlendi",
     wordUnarchived: "Kelime geri yüklendi",
     markedAsMastered: "Uzmanlaştı olarak işaretlendi",
+    wordSavedToVocabulary: "Kelime kelime dağarcığına kaydedildi!",
+    failedToSaveWord: "Kelime kaydedilemedi",
     archive: "Arşivle",
     restore: "Geri Yükle",
     delete: "Sil",

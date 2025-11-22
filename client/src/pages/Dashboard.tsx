@@ -4,7 +4,7 @@ import { NotAuthenticatedPage } from "@/components/NotAuthenticatedPage";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { BookOpen, TrendingUp, Target, Flame, Plus } from "lucide-react";
+import { BookOpen, TrendingUp, Target, Flame, Plus, Globe } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useEffect } from "react";
@@ -107,12 +107,18 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Create New Exam Button */}
-        <div className="mb-8">
+        {/* Action Buttons */}
+        <div className="mb-8 flex flex-col sm:flex-row gap-4">
           <Link href="/create-exam">
-            <Button size="lg" className="w-full md:w-auto gap-2 shadow-glow">
+            <Button size="lg" className="w-full sm:w-auto gap-2 shadow-glow">
               <Plus className="h-5 w-5" />
               {t.createNewExam}
+            </Button>
+          </Link>
+          <Link href="/public-exams">
+            <Button size="lg" variant="outline" className="w-full sm:w-auto gap-2 border-2 hover:bg-blue-50 dark:hover:bg-blue-950">
+              <Globe className="h-5 w-5" />
+              {t.browsePublicExams}
             </Button>
           </Link>
         </div>

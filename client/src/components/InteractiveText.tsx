@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface InteractiveTextProps {
   textId: number;
@@ -22,6 +23,7 @@ interface VocabularyWord {
  */
 export default function InteractiveText({ textId, content, className = "" }: InteractiveTextProps) {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [vocabulary, setVocabulary] = useState<Map<string, VocabularyWord>>(new Map());
   const [preferredLanguage, setPreferredLanguage] = useState<string>('en');
   const tooltipRef = useRef<HTMLDivElement>(null);
@@ -29,10 +31,10 @@ export default function InteractiveText({ textId, content, className = "" }: Int
   // Mutation to save word to vocabulary
   const saveWordMutation = trpc.vocabulary.saveWordFromText.useMutation({
     onSuccess: () => {
-      toast.success('Word saved to vocabulary!');
+      toast.success(t.wordSavedToVocabulary);
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to save word');
+      toast.error(error.message || t.failedToSaveWord);
     },
   });
   
