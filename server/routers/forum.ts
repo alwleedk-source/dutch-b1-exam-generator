@@ -796,10 +796,18 @@ export const forumRouter = router({
       details: z.string().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
+      // Validate that either topicId or postId is provided
+      if (!input.topicId && !input.postId) {
+        throw new TRPCError({ 
+          code: "BAD_REQUEST", 
+          message: "Either topicId or postId must be provided" 
+        });
+      }
+      
       await database.insert(forumReports).values({
         reporter_user_id: ctx.user.id,
-        topic_id: input.topicId,
-        post_id: input.postId,
+        topic_id: input.topicId || null,
+        post_id: input.postId || null,
         reason: input.reason,
         details: input.details,
       });
@@ -811,7 +819,7 @@ export const forumRouter = router({
         .where(
           input.topicId 
             ? eq(forumReports.topic_id, input.topicId)
-            : eq(forumReports.post_id, input.postId!)
+            : eq(forumReports.post_id, input.postId)
         );
       
       if (reports.length >= 3) {
