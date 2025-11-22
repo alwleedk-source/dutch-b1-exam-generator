@@ -533,7 +533,7 @@ export const appRouter = router({
           correct_answers: correctCount,
           score_percentage,
           staatsexamen_score,
-          skill_analysis: JSON.stringify(skillAnalysis),
+          // skill_analysis: JSON.stringify(skillAnalysis), // TODO: Enable after migration
           performance_analysis: JSON.stringify(performanceAnalysis),
           recommendations: JSON.stringify(recommendations),
           completed_at: new Date(),

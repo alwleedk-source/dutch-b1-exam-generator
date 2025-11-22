@@ -1,4 +1,5 @@
-import { boolean, index, integer, pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { boolean, index, integer, pgTable, serial, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 /**
  * Core user table backing auth flow.
@@ -295,3 +296,37 @@ export const achievements = pgTable("achievements", {
 
 export type Achievement = typeof achievements.$inferSelect;
 export type InsertAchievement = typeof achievements.$inferInsert;
+
+/**
+ * B1 Dictionary - Complete vocabulary list with translations
+ */
+export const b1Dictionary = pgTable("b1_dictionary", {
+  id: serial("id").primaryKey(),
+  
+  // Dutch word
+  word: varchar("word", { length: 255 }).notNull().unique(),
+  
+  // Translations
+  translation_ar: text("translation_ar"), // Arabic
+  translation_en: text("translation_en"), // English
+  translation_tr: text("translation_tr"), // Turkish
+  
+  // Dutch definition
+  definition_nl: text("definition_nl"), // Dutch explanation
+  
+  // Example sentence (optional)
+  example_nl: text("example_nl"),
+  
+  // Metadata
+  word_type: varchar("word_type", { length: 50 }), // noun, verb, adjective, etc.
+  frequency_rank: integer("frequency_rank"), // 1-5000
+  
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  b1Dictionary_wordIdx: index("b1_dictionary_word_idx").on(table.word),
+  b1Dictionary_frequencyRankIdx: index("b1_dictionary_frequency_rank_idx").on(table.frequency_rank),
+}));
+
+export type B1DictionaryEntry = typeof b1Dictionary.$inferSelect;
+export type InsertB1DictionaryEntry = typeof b1Dictionary.$inferInsert;
