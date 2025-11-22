@@ -147,10 +147,10 @@ export const appRouter = router({
           today.setHours(0, 0, 0, 0);
           const textsToday = await db.getUserTextsCreatedAfter(ctx.user.id, today);
           
-          if (textsToday.length >= 2) {
+          if (textsToday.length >= 3) {
             throw new TRPCError({
               code: "TOO_MANY_REQUESTS",
-              message: "Daily limit reached: You can only create 2 texts per day. Upgrade to admin for unlimited access."
+              message: "Daily limit reached: You can only create 3 texts per day. Upgrade to admin for unlimited access."
             });
           }
         }

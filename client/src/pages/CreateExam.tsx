@@ -321,8 +321,8 @@ export default function CreateExam() {
                   />
                   <div className="flex justify-between text-sm text-muted-foreground mt-2">
                     <span>{countWords(dutchText)} words • {estimateReadingTime(dutchText)} min read</span>
-                    <span className={dutchText.length > 6000 ? 'text-red-500 font-semibold' : ''}>
-                      {dutchText.length} / 6000 characters
+                    <span className={dutchText.length > 10000 ? 'text-red-500 font-semibold' : ''}>
+                      {dutchText.length} / 10,000 characters
                     </span>
                   </div>
                 </div>
