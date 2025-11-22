@@ -1081,6 +1081,7 @@ export const appRouter = router({
           // Create new vocabulary entry
           const newVocab = await db.createVocabulary({
             dutchWord: dictWord.word,
+            context: null,
             dutchDefinition: dictWord.definition_nl || null,
             wordType: dictWord.word_type || null,
             arabicTranslation: dictWord.translation_ar || null,
@@ -1088,6 +1089,7 @@ export const appRouter = router({
             turkishTranslation: dictWord.translation_tr || null,
             exampleSentence: dictWord.example_nl || null,
             difficulty: 'B1',
+            frequency: 1,
             audioUrl: dictWord.audio_url || null,
             audioKey: dictWord.audio_key || null,
           });
