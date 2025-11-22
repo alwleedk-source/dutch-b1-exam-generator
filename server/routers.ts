@@ -825,6 +825,28 @@ export const appRouter = router({
               fromDictionary++;
             }
           } else {
+            // Word exists - check if we need to backfill missing translations from dictionary
+            if (dictionaryEntry) {
+              const needsUpdate = 
+                (!vocabEntry.arabicTranslation && dictionaryEntry.translation_ar) ||
+                (!vocabEntry.englishTranslation && dictionaryEntry.translation_en) ||
+                (!vocabEntry.turkishTranslation && dictionaryEntry.translation_tr) ||
+                (!vocabEntry.dutchDefinition && dictionaryEntry.definition_nl) ||
+                (!vocabEntry.audioUrl && dictionaryEntry.audio_url);
+              
+              if (needsUpdate) {
+                await db.updateVocabulary(vocabEntry.id, {
+                  arabicTranslation: vocabEntry.arabicTranslation || dictionaryEntry.translation_ar || null,
+                  englishTranslation: vocabEntry.englishTranslation || dictionaryEntry.translation_en || null,
+                  turkishTranslation: vocabEntry.turkishTranslation || dictionaryEntry.translation_tr || null,
+                  dutchDefinition: vocabEntry.dutchDefinition || dictionaryEntry.definition_nl || null,
+                  audioUrl: vocabEntry.audioUrl || dictionaryEntry.audio_url || null,
+                  audioKey: vocabEntry.audioKey || dictionaryEntry.audio_key || null,
+                  wordType: vocabEntry.wordType || dictionaryEntry.word_type || null,
+                });
+                console.log(`[extractVocabulary] Backfilled translations for: ${word.dutch}`);
+              }
+            }
             existingWords++;
           }
           

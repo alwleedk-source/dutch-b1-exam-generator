@@ -544,6 +544,16 @@ export async function updateVocabularyAudio(vocabId: number, audioUrl: string, a
     .where(eq(vocabulary.id, vocabId));
 }
 
+export async function updateVocabulary(vocabId: number, data: Partial<typeof vocabulary.$inferInsert>) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db
+    .update(vocabulary)
+    .set({ ...data, updated_at: new Date() })
+    .where(eq(vocabulary.id, vocabId));
+}
+
 // ==================== USER VOCABULARY FUNCTIONS ====================
 
 export async function updateUserVocabularyCount(user_id: number) {
