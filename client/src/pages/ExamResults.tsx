@@ -67,7 +67,7 @@ export default function ExamResults() {
   const totalQuestions = examData.total_questions || 0;
   const passed = scorePercentage >= 60;
 
-  /  // Parse performance analysis if available
+  // Parse performance analysis if available
   let performanceAnalysis: any = null;
   let recommendations: string[] = [];
   let skillAnalysis: any = null;
@@ -106,7 +106,7 @@ export default function ExamResults() {
     good: 'bg-blue-500',
     needs_improvement: 'bg-yellow-500',
     weak: 'bg-red-500',
-  }; }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-bg">
