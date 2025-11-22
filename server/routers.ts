@@ -1079,30 +1079,49 @@ export const appRouter = router({
         
         if (!existingVocab) {
           // Create new vocabulary entry
-          const newVocab = await db.createVocabulary({
-            dutchWord: dictWord.word,
-            context: null,
-            dutchDefinition: dictWord.definition_nl || null,
-            wordType: dictWord.word_type || null,
-            arabicTranslation: dictWord.translation_ar || null,
-            englishTranslation: dictWord.translation_en || null,
-            turkishTranslation: dictWord.translation_tr || null,
-            exampleSentence: dictWord.example_nl || null,
-            difficulty: 'B1',
-            frequency: 1,
-            audioUrl: dictWord.audio_url || null,
-            audioKey: dictWord.audio_key || null,
-          });
-          
-          // createVocabulary returns an array - ensure it's not empty
-          if (!newVocab || newVocab.length === 0) {
-            throw new TRPCError({ 
-              code: "INTERNAL_SERVER_ERROR", 
-              message: "Failed to create vocabulary entry" 
+          try {
+            const newVocab = await db.createVocabulary({
+              dutchWord: dictWord.word,
+              context: null,
+              dutchDefinition: dictWord.definition_nl || null,
+              wordType: dictWord.word_type || null,
+              arabicTranslation: dictWord.translation_ar || null,
+              englishTranslation: dictWord.translation_en || null,
+              turkishTranslation: dictWord.translation_tr || null,
+              exampleSentence: dictWord.example_nl || null,
+              difficulty: 'B1',
+              frequency: 1,
+              audioUrl: dictWord.audio_url || null,
+              audioKey: dictWord.audio_key || null,
+            });
+            
+            console.log('[addFromDictionary] createVocabulary result:', newVocab);
+            
+            // createVocabulary returns an array - ensure it's not empty
+            if (!newVocab || newVocab.length === 0) {
+              console.error('[addFromDictionary] createVocabulary returned empty array');
+              throw new TRPCError({ 
+                code: "INTERNAL_SERVER_ERROR", 
+                message: "Failed to create vocabulary entry - empty result" 
+              });
+            }
+            
+            if (!newVocab[0] || !newVocab[0].id) {
+              console.error('[addFromDictionary] createVocabulary result missing id:', newVocab[0]);
+              throw new TRPCError({ 
+                code: "INTERNAL_SERVER_ERROR", 
+                message: "Failed to create vocabulary entry - missing id" 
+              });
+            }
+            
+            vocabularyId = newVocab[0].id;
+          } catch (error) {
+            console.error('[addFromDictionary] Error creating vocabulary:', error);
+            throw error instanceof TRPCError ? error : new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: `Failed to create vocabulary: ${error instanceof Error ? error.message : 'Unknown error'}`
             });
           }
-          
-          vocabularyId = newVocab[0].id;
         } else {
           vocabularyId = existingVocab.id;
         }
