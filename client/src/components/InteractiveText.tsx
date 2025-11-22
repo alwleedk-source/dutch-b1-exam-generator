@@ -19,7 +19,6 @@ interface VocabularyWord {
 
 /**
  * Interactive text component with hover translations
- * Rewritten to use React state instead of DOM manipulation
  */
 export default function InteractiveText({ textId, content, className = "" }: InteractiveTextProps) {
   const { user } = useAuth();
@@ -98,28 +97,39 @@ export default function InteractiveText({ textId, content, className = "" }: Int
         translation = vocabWord.english || vocabWord.arabic || vocabWord.turkish || vocabWord.dutchDefinition;
     }
     
-    return translation || vocabWord.word; // Fallback to the word itself if no translation
+    return translation || vocabWord.word;
   };
   
-  // Process content and wrap vocabulary words
-  // Using useMemo to avoid re-processing on every render
+  // Escape HTML special characters
+  const escapeHtml = (text: string): string => {
+    const map: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+  };
+  
+  // Process content and wrap vocabulary words using string replacement
   const processedContent = useMemo(() => {
     if (vocabulary.size === 0) {
       return content;
     }
     
-    // Create a temporary div to parse HTML
+    // Parse HTML content
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = content;
     
-    // Function to process text nodes recursively
-    const processNode = (node: Node): Node => {
-      if (node.nodeType === Node.TEXT_NODE) {
-        const text = node.textContent || '';
+    // Process text nodes recursively using string replacement
+    const processTextNode = (node: Node): void => {
+      if (node.nodeType === Node.TEXT_NODE && node.textContent) {
+        const text = node.textContent;
         const words = text.split(/(\s+|[.,!?;:])/);
         
         let hasVocab = false;
-        const fragment = document.createDocumentFragment();
+        let htmlParts: string[] = [];
         
         words.forEach(word => {
           const normalized = word.toLowerCase().replace(/[.,!?;:]/g, '');
@@ -127,80 +137,54 @@ export default function InteractiveText({ textId, content, className = "" }: Int
           
           if (vocabWord && word.trim().length > 0) {
             hasVocab = true;
-            const wrapper = document.createElement('span');
-            wrapper.className = 'vocab-word-wrapper';
-            wrapper.setAttribute('data-word', vocabWord.word);
-            
-            const span = document.createElement('span');
-            span.className = 'vocab-word';
-            span.textContent = word;
-            
             const translation = getTranslation(vocabWord);
+            const escapedWord = escapeHtml(word);
+            const escapedTranslation = escapeHtml(translation || vocabWord.word);
+            const escapedVocabWord = escapeHtml(vocabWord.word);
             
-            // Debug: log if translation is empty
-            if (!translation || translation.trim() === '') {
-              console.warn(`[InteractiveText] Empty translation for word:`, vocabWord);
-            }
-            
-            const tooltip = document.createElement('div');
-            tooltip.className = 'vocab-tooltip';
-            tooltip.innerHTML = `
-              <div class="tooltip-translation">${translation || vocabWord.word}</div>
-              <div class="tooltip-hint">💾 Double-click to save</div>
-            `;
-            
-            wrapper.appendChild(span);
-            wrapper.appendChild(tooltip);
-            fragment.appendChild(wrapper);
+            // Build wrapper with tooltip inside as a single HTML string
+            htmlParts.push(
+              `<span class="vocab-word-wrapper" data-word="${escapedVocabWord}">` +
+                `<span class="vocab-word">${escapedWord}</span>` +
+                `<div class="vocab-tooltip">` +
+                  `<div class="tooltip-translation">${escapedTranslation}</div>` +
+                  `<div class="tooltip-hint">💾 Double-click to save</div>` +
+                `</div>` +
+              `</span>`
+            );
           } else {
-            fragment.appendChild(document.createTextNode(word));
+            htmlParts.push(escapeHtml(word));
           }
         });
         
-        return hasVocab ? fragment : node;
+        if (hasVocab) {
+          // Replace text node with HTML
+          const span = document.createElement('span');
+          span.innerHTML = htmlParts.join('');
+          node.parentNode?.replaceChild(span, node);
+          
+          // Unwrap the span to keep only its children
+          while (span.firstChild) {
+            span.parentNode?.insertBefore(span.firstChild, span);
+          }
+          span.parentNode?.removeChild(span);
+        }
       } else if (node.nodeType === Node.ELEMENT_NODE) {
         const element = node as Element;
         // Skip script, style, and already processed vocab words
-        if (element.tagName === 'SCRIPT' || 
-            element.tagName === 'STYLE' || 
-            element.classList.contains('vocab-word-wrapper')) {
-          return node;
+        if (element.tagName !== 'SCRIPT' && 
+            element.tagName !== 'STYLE' && 
+            !element.classList.contains('vocab-word-wrapper')) {
+          // Process child nodes
+          Array.from(node.childNodes).forEach(child => processTextNode(child));
         }
-        
-        // Process child nodes
-        const newElement = element.cloneNode(false) as Element;
-        Array.from(node.childNodes).forEach(child => {
-          const processedChild = processNode(child);
-          if (processedChild.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-            // Append fragment children directly without cloning to preserve structure
-            Array.from((processedChild as DocumentFragment).childNodes).forEach(fragChild => {
-              newElement.appendChild(fragChild);
-            });
-          } else {
-            newElement.appendChild(processedChild);
-          }
-        });
-        return newElement;
       }
-      
-      return node;
     };
     
-    // Process all child nodes
-    const processedDiv = document.createElement('div');
-    Array.from(tempDiv.childNodes).forEach(child => {
-      const processedChild = processNode(child);
-      if (processedChild.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-        // Append fragment children directly to preserve wrapper structure
-        Array.from((processedChild as DocumentFragment).childNodes).forEach(fragChild => {
-          processedDiv.appendChild(fragChild);
-        });
-      } else {
-        processedDiv.appendChild(processedChild);
-      }
-    });
+    // Process all nodes
+    Array.from(tempDiv.childNodes).forEach(child => processTextNode(child));
     
-    return processedDiv.innerHTML;
+    return tempDiv.innerHTML;
   }, [content, vocabulary, preferredLanguage]);
   
   // Handle clicks on vocab words
@@ -233,7 +217,7 @@ export default function InteractiveText({ textId, content, className = "" }: Int
       const wrapperRect = wrapper.getBoundingClientRect();
       
       // Position tooltip using fixed positioning relative to viewport
-      const tooltipWidth = tooltip.offsetWidth || 200; // Estimate if not rendered
+      const tooltipWidth = tooltip.offsetWidth || 200;
       const tooltipHeight = tooltip.offsetHeight || 60;
       
       // Calculate center position
@@ -278,9 +262,6 @@ export default function InteractiveText({ textId, content, className = "" }: Int
         .vocab-word-wrapper {
           position: relative;
           display: inline;
-          /* Ensure wrapper doesn't affect layout or cause line breaks */
-          white-space: normal;
-          word-wrap: normal;
         }
         
         .vocab-word {
@@ -290,7 +271,6 @@ export default function InteractiveText({ textId, content, className = "" }: Int
           transition: all 0.2s ease;
           user-select: none;
           display: inline;
-          /* Inherit all font properties from parent */
           font-size: inherit;
           font-weight: inherit;
           font-family: inherit;
@@ -319,7 +299,6 @@ export default function InteractiveText({ textId, content, className = "" }: Int
           white-space: nowrap;
           min-width: 100px;
           max-width: 300px;
-          /* Fixed positioning - won't affect layout at all */
           width: max-content;
         }
         
@@ -360,18 +339,8 @@ export default function InteractiveText({ textId, content, className = "" }: Int
         /* Mobile: show tooltip below */
         @media (max-width: 640px) {
           .vocab-tooltip {
-            bottom: auto;
-            top: 100%;
-            transform: translateX(-50%) translateY(8px);
             white-space: normal;
             max-width: 250px;
-          }
-          
-          .vocab-tooltip::after {
-            top: auto;
-            bottom: 100%;
-            border-top-color: transparent;
-            border-bottom-color: #1e293b;
           }
         }
       `}</style>
