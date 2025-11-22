@@ -836,6 +836,15 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         // Get the vocabulary entry for this word from this text
         const vocabList = await db.getVocabularyByTextId(input.textId);
+        
+        // Check if vocabulary list is empty or undefined
+        if (!vocabList || vocabList.length === 0) {
+          throw new TRPCError({ 
+            code: "NOT_FOUND", 
+            message: "No vocabulary found for this text. Please extract vocabulary first." 
+          });
+        }
+        
         const vocabEntry = vocabList.find((v: any) => 
           v.dutchWord.toLowerCase() === input.dutchWord.toLowerCase()
         );
