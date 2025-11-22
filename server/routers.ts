@@ -1145,18 +1145,26 @@ export const appRouter = router({
         
         // Add to user's vocabulary
         console.log('[addFromDictionary] Adding to user vocabulary...');
-        const userVocabResult = await db.createUserVocabulary({
-          user_id: ctx.user.id,
-          vocabulary_id: vocabularyId,
-          status: "new" as const,
-          correct_count: 0,
-          incorrect_count: 0,
-          next_review_at: new Date(),
-          ease_factor: 2500,
-          interval: 0,
-          repetitions: 0,
-        });
-        console.log('[addFromDictionary] User vocabulary created:', userVocabResult);
+        try {
+          const userVocabResult = await db.createUserVocabulary({
+            user_id: ctx.user.id,
+            vocabulary_id: vocabularyId,
+            status: "new" as const,
+            correct_count: 0,
+            incorrect_count: 0,
+            next_review_at: new Date(),
+            ease_factor: 2500,
+            interval: 0,
+            repetitions: 0,
+          });
+          console.log('[addFromDictionary] User vocabulary created:', userVocabResult);
+        } catch (error) {
+          console.error('[addFromDictionary] Error in createUserVocabulary:', error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: `Failed to add word to user vocabulary: ${error instanceof Error ? error.message : 'Unknown error'}`
+          });
+        }
         
         // Update user's vocabulary count
         console.log('[addFromDictionary] Updating user vocabulary count...');
