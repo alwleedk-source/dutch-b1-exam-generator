@@ -350,6 +350,8 @@ export interface Translations {
   pauseTimer: string;
   resumeTimer: string;
   noTimeLimit: string;
+  pleaseAnswerAll: string;
+  officialExamFormat: string;
   
   // Forum
   forumTitle: string;
@@ -823,6 +825,8 @@ export const translations: Record<Language, Translations> = {
     pauseTimer: "Pauzeer Timer",
     resumeTimer: "Hervat Timer",
     noTimeLimit: "Geen tijdslimiet",
+    pleaseAnswerAll: "Beantwoord alle vragen",
+    officialExamFormat: "Officieel examenformaat",
     
     // Forum
     forumTitle: "Community Forum",
@@ -1284,6 +1288,8 @@ export const translations: Record<Language, Translations> = {
     pauseTimer: "إيقاف المؤقت",
     resumeTimer: "استئناف المؤقت",
     noTimeLimit: "بدون حد زمني",
+    pleaseAnswerAll: "يرجى الإجابة على جميع الأسئلة",
+    officialExamFormat: "صيغة الامتحان الرسمي",
     
     // Forum
     forumTitle: "مجتمع المنتدى",
@@ -1746,6 +1752,8 @@ export const translations: Record<Language, Translations> = {
     pauseTimer: "Pause Timer",
     resumeTimer: "Resume Timer",
     noTimeLimit: "No time limit",
+    pleaseAnswerAll: "Please answer all questions",
+    officialExamFormat: "Official exam format",
     
     // Forum
     forumTitle: "Community Forum",
@@ -2209,6 +2217,8 @@ export const translations: Record<Language, Translations> = {
     pauseTimer: "Zamanlayıcıyı Duraklat",
     resumeTimer: "Zamanlayıcıyı Devam Ettir",
     noTimeLimit: "Zaman sınırı yok",
+    pleaseAnswerAll: "Lütfen tüm soruları cevaplayın",
+    officialExamFormat: "Resmi sınav formatı",
     
     // Forum
     forumTitle: "Topluluk Forumu",

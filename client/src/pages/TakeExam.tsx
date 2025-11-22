@@ -12,6 +12,8 @@ import { Clock, FileText, Printer, Home, X, BookOpen } from "lucide-react";
 import { Link } from "wouter";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import InteractiveText from "@/components/InteractiveText";
+import ExamModeSelector from "@/components/ExamModeSelector";
+import ExamTimer from "@/components/ExamTimer";
 
 export default function TakeExam() {
   const { user } = useAuth();
@@ -21,6 +23,8 @@ export default function TakeExam() {
   const examId = params.id ? parseInt(params.id) : null;
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [startTime] = useState(Date.now());
+  const [examMode, setExamMode] = useState<"practice" | "exam" | null>(null);
+  const [hasStarted, setHasStarted] = useState(false);
   
   const { data: examData, error: examError, isLoading: examLoading } = trpc.exam.getExamDetails.useQuery(
     { examId: examId! }, 
@@ -67,6 +71,23 @@ export default function TakeExam() {
   const answeredCount = Object.keys(answers).length;
   const allAnswered = answeredCount === questions.length;
   
+  // Calculate time limit based on question count
+  const timeLimitMinutes = Math.round(questions.length * 2.8 + Math.round((exam.dutch_text?.length || 0) / 5 / 150));
+  
+  const handleModeSelected = (mode: "practice" | "exam") => {
+    setExamMode(mode);
+    setHasStarted(true);
+    toast.success(t.timerStarted);
+  };
+  
+  const handleTimeUp = () => {
+    if (allAnswered) {
+      handleSubmit();
+    } else {
+      toast.error(`${t.timeUp} - ${t.pleaseAnswerAll}`);
+    }
+  };
+  
   const handleSubmit = () => {
     if (!allAnswered) {
       toast.error(`Please answer all questions (${answeredCount}/${questions.length} answered)`);
@@ -80,6 +101,17 @@ export default function TakeExam() {
       time_spent_minutes: timeSpentMinutes,
     });
   };
+  
+  // Show mode selector if exam hasn't started
+  if (!hasStarted) {
+    return (
+      <ExamModeSelector
+        questionCount={questions.length}
+        timeLimitMinutes={timeLimitMinutes}
+        onModeSelected={handleModeSelected}
+      />
+    );
+  }
   
   return (
     <>
@@ -116,6 +148,15 @@ export default function TakeExam() {
                   {answeredCount} / {questions.length} vragen beantwoord
                 </p>
               </div>
+            </div>
+
+            {/* Timer - Desktop */}
+            <div className="hidden lg:block flex-shrink-0">
+              <ExamTimer
+                mode={examMode!}
+                timeLimitMinutes={timeLimitMinutes}
+                onTimeUp={handleTimeUp}
+              />
             </div>
 
             {/* Mobile Progress */}
@@ -202,6 +243,17 @@ export default function TakeExam() {
             )}
           </div>
         </Card>
+
+        {/* Timer - Mobile */}
+        <div className="lg:hidden mb-4 sm:mb-6">
+          <Card className="p-4">
+            <ExamTimer
+              mode={examMode!}
+              timeLimitMinutes={timeLimitMinutes}
+              onTimeUp={handleTimeUp}
+            />
+          </Card>
+        </div>
 
         {/* Questions Section */}
         <div className="space-y-4 sm:space-y-6">

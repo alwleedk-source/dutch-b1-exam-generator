@@ -156,9 +156,10 @@ export const appRouter = router({
         }
         
         // Calculate dynamic question count based on text length
-        const { calculateQuestionCount } = await import("./lib/questionCount");
+        const { calculateQuestionCount, calculateExamTime } = await import("./lib/questionCount");
         const questionCount = calculateQuestionCount(input.dutch_text.length);
-        console.log(`[Text Creation] Calculated question count: ${questionCount} for ${input.dutch_text.length} characters`);
+        const examTimeMinutes = calculateExamTime(input.dutch_text.length, questionCount);
+        console.log(`[Text Creation] Calculated question count: ${questionCount}, exam time: ${examTimeMinutes} minutes for ${input.dutch_text.length} characters`);
         
         // ✨ OPTIMIZED: Process text completely in ONE Gemini API call (saves 80% tokens!)
         console.log('[Text Creation] Processing text with unified Gemini call...');
@@ -253,12 +254,14 @@ export const appRouter = router({
 
         const textId = result[0].id;
 
-        // Create exam record
+        // Create exam record with time limit
         const examResult = await db.createExam({
           user_id: ctx.user.id,
           text_id: textId,
           questions: JSON.stringify(examData.questions),
           total_questions: examData.questions.length,
+          time_limit_minutes: examTimeMinutes,
+          exam_mode: "practice", // Default mode, user can choose when starting
           status: "in_progress",
         });
 
