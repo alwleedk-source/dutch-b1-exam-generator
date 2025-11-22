@@ -890,4 +890,62 @@ export const forumRouter = router({
       
       return { success: true };
     }),
+  
+  // Admin: Get all users with stats
+  getAllUsers: adminProcedure
+    .input(z.object({
+      search: z.string().optional(),
+      limit: z.number().optional().default(50),
+    }))
+    .query(async ({ ctx, input }) => {
+      // Get users
+      const usersQuery = database
+        .select({
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          role: users.role,
+          is_banned: users.is_banned,
+          banned_at: users.banned_at,
+          banned_by: users.banned_by,
+          ban_reason: users.ban_reason,
+          created_at: users.created_at,
+        })
+        .from(users);
+      
+      const allUsers = await usersQuery.limit(input.limit);
+      
+      // Get moderators list
+      const moderatorsList = await database
+        .select({ user_id: forumModerators.user_id })
+        .from(forumModerators);
+      
+      const moderatorIds = new Set(moderatorsList.map(m => m.user_id));
+      
+      // Add isModerator flag
+      const usersWithFlags = allUsers.map(user => ({
+        ...user,
+        isModerator: moderatorIds.has(user.id),
+      }));
+      
+      return usersWithFlags;
+    }),
+  
+  // Admin: Get moderators list
+  getModerators: adminProcedure
+    .query(async ({ ctx }) => {
+      const moderators = await database
+        .select({
+          id: forumModerators.id,
+          user_id: forumModerators.user_id,
+          user_name: users.name,
+          user_email: users.email,
+          assigned_at: forumModerators.assigned_at,
+          assigned_by: forumModerators.assigned_by,
+        })
+        .from(forumModerators)
+        .leftJoin(users, eq(forumModerators.user_id, users.id));
+      
+      return moderators;
+    }),
 });

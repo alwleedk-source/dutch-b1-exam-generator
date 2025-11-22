@@ -350,6 +350,31 @@ export interface Translations {
   reportReasonMisinformation: string;
   reportReasonOther: string;
   
+  // User Management
+  adminAccessRequired: string;
+  backToModeratorPanel: string;
+  noUsers: string;
+  status: string;
+  joined: string;
+  actions: string;
+  admin: string;
+  moderator: string;
+  banned: string;
+  unban: string;
+  ban: string;
+  removeModerator: string;
+  addModerator: string;
+  banUser: string;
+  banUserDescription: string;
+  reason: string;
+  enterBanReason: string;
+  cancel: string;
+  userBanned: string;
+  userUnbanned: string;
+  moderatorAdded: string;
+  moderatorRemoved: string;
+  banReasonRequired: string;
+  
   // Forum categories
   category_exams_tips: string;
   category_exams_tips_desc: string;
@@ -711,6 +736,31 @@ export const translations: Record<Language, Translations> = {
     reportReasonMisinformation: "Desinformatie",
     reportReasonOther: "Overig",
     
+    // User Management
+    adminAccessRequired: "Admin toegang vereist",
+    backToModeratorPanel: "Terug naar Moderatorpaneel",
+    noUsers: "Geen gebruikers gevonden",
+    status: "Status",
+    joined: "Lid sinds",
+    actions: "Acties",
+    admin: "Admin",
+    moderator: "Moderator",
+    banned: "Verbannen",
+    unban: "Ontbannen",
+    ban: "Verbannen",
+    removeModerator: "Moderator verwijderen",
+    addModerator: "Moderator toevoegen",
+    banUser: "Gebruiker verbannen",
+    banUserDescription: "Geef een reden op voor het verbannen van deze gebruiker.",
+    reason: "Reden",
+    enterBanReason: "Voer verbanningsreden in...",
+    cancel: "Annuleren",
+    userBanned: "Gebruiker succesvol verbannen",
+    userUnbanned: "Gebruiker succesvol ontbannen",
+    moderatorAdded: "Moderator succesvol toegevoegd",
+    moderatorRemoved: "Moderator succesvol verwijderd",
+    banReasonRequired: "Verbanningsreden is verplicht",
+    
     // Forum categories
     category_exams_tips: "Examens & Tips",
     category_exams_tips_desc: "Deel tips en strategieën voor het B1 examen",
@@ -1069,6 +1119,31 @@ export const translations: Record<Language, Translations> = {
     reportReasonInappropriate: "محتوى غير لائق",
     reportReasonMisinformation: "معلومات خاطئة",
     reportReasonOther: "أخرى",
+    
+    // User Management
+    adminAccessRequired: "يتطلب صلاحية إداري",
+    backToModeratorPanel: "العودة إلى لوحة المشرفين",
+    noUsers: "لا يوجد مستخدمون",
+    status: "الحالة",
+    joined: "تاريخ الانضمام",
+    actions: "الإجراءات",
+    admin: "إداري",
+    moderator: "مشرف",
+    banned: "محظور",
+    unban: "إلغاء الحظر",
+    ban: "حظر",
+    removeModerator: "إزالة مشرف",
+    addModerator: "إضافة مشرف",
+    banUser: "حظر مستخدم",
+    banUserDescription: "يرجى تقديم سبب لحظر هذا المستخدم.",
+    reason: "السبب",
+    enterBanReason: "أدخل سبب الحظر...",
+    cancel: "إلغاء",
+    userBanned: "تم حظر المستخدم بنجاح",
+    userUnbanned: "تم إلغاء حظر المستخدم بنجاح",
+    moderatorAdded: "تم إضافة المشرف بنجاح",
+    moderatorRemoved: "تم إزالة المشرف بنجاح",
+    banReasonRequired: "سبب الحظر مطلوب",
     
     // Forum categories
     category_exams_tips: "نصائح وإرشادات الامتحان",
@@ -1429,6 +1504,31 @@ export const translations: Record<Language, Translations> = {
     reportReasonMisinformation: "Misinformation",
     reportReasonOther: "Other",
     
+    // User Management
+    adminAccessRequired: "Admin access required",
+    backToModeratorPanel: "Back to Moderator Panel",
+    noUsers: "No users found",
+    status: "Status",
+    joined: "Joined",
+    actions: "Actions",
+    admin: "Admin",
+    moderator: "Moderator",
+    banned: "Banned",
+    unban: "Unban",
+    ban: "Ban",
+    removeModerator: "Remove Moderator",
+    addModerator: "Add Moderator",
+    banUser: "Ban User",
+    banUserDescription: "Please provide a reason for banning this user.",
+    reason: "Reason",
+    enterBanReason: "Enter ban reason...",
+    cancel: "Cancel",
+    userBanned: "User banned successfully",
+    userUnbanned: "User unbanned successfully",
+    moderatorAdded: "Moderator added successfully",
+    moderatorRemoved: "Moderator removed successfully",
+    banReasonRequired: "Ban reason is required",
+    
     // Forum categories
     category_exams_tips: "Exams & Tips",
     category_exams_tips_desc: "Share tips and strategies for the B1 exam",
@@ -1788,6 +1888,31 @@ export const translations: Record<Language, Translations> = {
     reportReasonInappropriate: "Uygunsuz içerik",
     reportReasonMisinformation: "Yanlış bilgi",
     reportReasonOther: "Diğer",
+    
+    // User Management
+    adminAccessRequired: "Admin erişimi gerekli",
+    backToModeratorPanel: "Moderator Paneline Dön",
+    noUsers: "Kullanıcı bulunamadı",
+    status: "Durum",
+    joined: "Katıldı",
+    actions: "İşlemler",
+    admin: "Admin",
+    moderator: "Moderator",
+    banned: "Yasaklı",
+    unban: "Yasak Kaldır",
+    ban: "Yasakla",
+    removeModerator: "Moderatoru Kaldır",
+    addModerator: "Moderator Ekle",
+    banUser: "Kullanıcıyı Yasakla",
+    banUserDescription: "Lütfen bu kullanıcıyı yasaklama nedeni belirtin.",
+    reason: "Neden",
+    enterBanReason: "Yasaklama nedenini girin...",
+    cancel: "İptal",
+    userBanned: "Kullanıcı başarıyla yasaklandı",
+    userUnbanned: "Kullanıcı yasağı başarıyla kaldırıldı",
+    moderatorAdded: "Moderator başarıyla eklendi",
+    moderatorRemoved: "Moderator başarıyla kaldırıldı",
+    banReasonRequired: "Yasaklama nedeni gerekli",
     
     // Forum categories
     category_exams_tips: "Sınavlar ve İpuçları",

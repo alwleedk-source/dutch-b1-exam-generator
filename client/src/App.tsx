@@ -27,6 +27,7 @@ import ForumTopic from "./pages/forum/ForumTopic";
 import NewTopic from "./pages/forum/NewTopic";
 import ForumReports from "./pages/forum/ForumReports";
 import ModeratorPanel from "./pages/forum/ModeratorPanel";
+import UserManagement from "./pages/forum/UserManagement";
 import LanguageSelector from "./components/LanguageSelector";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useState, useEffect } from "react";
@@ -56,6 +57,7 @@ function Router() {
       <Route path="/forum/new-topic" component={NewTopic} />
       <Route path="/forum/reports" component={ForumReports} />
       <Route path="/forum/moderator" component={ModeratorPanel} />
+      <Route path="/forum/users" component={UserManagement} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
