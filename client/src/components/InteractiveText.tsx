@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
@@ -24,6 +24,7 @@ export default function InteractiveText({ textId, content, className = "" }: Int
   const { user } = useAuth();
   const [vocabulary, setVocabulary] = useState<Map<string, VocabularyWord>>(new Map());
   const [preferredLanguage, setPreferredLanguage] = useState<string>('en');
+  const tooltipRef = useRef<HTMLDivElement>(null);
   
   // Mutation to save word to vocabulary
   const saveWordMutation = trpc.vocabulary.saveWordFromText.useMutation({
@@ -112,7 +113,7 @@ export default function InteractiveText({ textId, content, className = "" }: Int
     return text.replace(/[&<>"']/g, m => map[m]);
   };
   
-  // Process content and wrap vocabulary words using string replacement
+  // Process content and wrap vocabulary words
   const processedContent = useMemo(() => {
     if (vocabulary.size === 0) {
       return content;
@@ -142,9 +143,9 @@ export default function InteractiveText({ textId, content, className = "" }: Int
             const escapedTranslation = escapeHtml(translation || vocabWord.word);
             const escapedVocabWord = escapeHtml(vocabWord.word);
             
-            // Build wrapper WITHOUT tooltip for testing
+            // Build wrapper WITHOUT tooltip (tooltip is separate, outside wrapper)
             htmlParts.push(
-              `<span class="vocab-word-wrapper" data-word="${escapedVocabWord}" title="${escapedTranslation}">` +
+              `<span class="vocab-word-wrapper" data-word="${escapedVocabWord}" data-translation="${escapedTranslation}">` +
                 `<span class="vocab-word">${escapedWord}</span>` +
               `</span>`
             );
@@ -204,50 +205,55 @@ export default function InteractiveText({ textId, content, className = "" }: Int
     return () => document.removeEventListener('click', handleClick);
   }, [textId]);
   
-  // Dynamic tooltip positioning using fixed positioning
+  // Handle tooltip positioning on hover
   useEffect(() => {
-    const adjustTooltipPosition = (wrapper: HTMLElement) => {
-      const tooltip = wrapper.querySelector('.vocab-tooltip') as HTMLElement;
-      if (!tooltip) return;
-      
-      const wrapperRect = wrapper.getBoundingClientRect();
-      
-      // Position tooltip using fixed positioning relative to viewport
-      const tooltipWidth = tooltip.offsetWidth || 200;
-      const tooltipHeight = tooltip.offsetHeight || 60;
-      
-      // Calculate center position
-      let left = wrapperRect.left + (wrapperRect.width / 2);
-      const top = wrapperRect.top - tooltipHeight - 8;
-      
-      // Adjust if would overflow right
-      if (left + tooltipWidth / 2 > window.innerWidth - 10) {
-        left = window.innerWidth - tooltipWidth - 10;
-      }
-      // Adjust if would overflow left
-      else if (left - tooltipWidth / 2 < 10) {
-        left = tooltipWidth / 2 + 10;
-      }
-      
-      // Apply positioning
-      tooltip.style.left = `${left}px`;
-      tooltip.style.top = `${top}px`;
-      tooltip.style.transform = 'translateX(-50%)';
-    };
+    const tooltip = tooltipRef.current;
+    if (!tooltip) return;
     
     const handleMouseEnter = (e: Event) => {
       const wrapper = e.currentTarget as HTMLElement;
-      adjustTooltipPosition(wrapper);
+      const translation = wrapper.getAttribute('data-translation') || '';
+      
+      // Update tooltip content
+      const translationDiv = tooltip.querySelector('.tooltip-translation');
+      if (translationDiv) {
+        translationDiv.textContent = translation;
+      }
+      
+      // Position tooltip
+      const wrapperRect = wrapper.getBoundingClientRect();
+      const tooltipWidth = tooltip.offsetWidth || 200;
+      const tooltipHeight = tooltip.offsetHeight || 60;
+      
+      let left = wrapperRect.left + (wrapperRect.width / 2);
+      const top = wrapperRect.top - tooltipHeight - 8;
+      
+      // Adjust if would overflow
+      if (left + tooltipWidth / 2 > window.innerWidth - 10) {
+        left = window.innerWidth - tooltipWidth / 2 - 10;
+      } else if (left - tooltipWidth / 2 < 10) {
+        left = tooltipWidth / 2 + 10;
+      }
+      
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top = `${top}px`;
+      tooltip.style.opacity = '1';
+    };
+    
+    const handleMouseLeave = () => {
+      tooltip.style.opacity = '0';
     };
     
     const wrappers = document.querySelectorAll('.vocab-word-wrapper');
     wrappers.forEach(wrapper => {
       wrapper.addEventListener('mouseenter', handleMouseEnter);
+      wrapper.addEventListener('mouseleave', handleMouseLeave);
     });
     
     return () => {
       wrappers.forEach(wrapper => {
         wrapper.removeEventListener('mouseenter', handleMouseEnter);
+        wrapper.removeEventListener('mouseleave', handleMouseLeave);
       });
     };
   }, [processedContent]);
@@ -256,7 +262,6 @@ export default function InteractiveText({ textId, content, className = "" }: Int
     <>
       <style>{`
         .vocab-word-wrapper {
-          position: relative;
           display: inline;
         }
         
@@ -280,7 +285,7 @@ export default function InteractiveText({ textId, content, className = "" }: Int
           border-bottom-width: 2px;
         }
         
-        .vocab-tooltip {
+        .global-vocab-tooltip {
           position: fixed;
           background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
           color: white;
@@ -295,11 +300,7 @@ export default function InteractiveText({ textId, content, className = "" }: Int
           white-space: nowrap;
           min-width: 100px;
           max-width: 300px;
-          width: max-content;
-        }
-        
-        .vocab-word-wrapper:hover .vocab-tooltip {
-          opacity: 1;
+          transform: translateX(-50%);
         }
         
         .tooltip-translation {
@@ -321,8 +322,7 @@ export default function InteractiveText({ textId, content, className = "" }: Int
           margin-top: 2px;
         }
         
-        /* Arrow */
-        .vocab-tooltip::after {
+        .global-vocab-tooltip::after {
           content: "";
           position: absolute;
           top: 100%;
@@ -332,14 +332,19 @@ export default function InteractiveText({ textId, content, className = "" }: Int
           border-top-color: #1e293b;
         }
         
-        /* Mobile: show tooltip below */
         @media (max-width: 640px) {
-          .vocab-tooltip {
+          .global-vocab-tooltip {
             white-space: normal;
             max-width: 250px;
           }
         }
       `}</style>
+      
+      {/* Single global tooltip */}
+      <div ref={tooltipRef} className="global-vocab-tooltip">
+        <div className="tooltip-translation"></div>
+        <div className="tooltip-hint">💾 Double-click to save</div>
+      </div>
       
       <div 
         className={className}
