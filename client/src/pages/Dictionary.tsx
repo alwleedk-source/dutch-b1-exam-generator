@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { trpc } from "../lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Search, Volume2, Plus, Loader2 } from "lucide-react";
+import { AppHeader } from "@/components/AppHeader";
 
 export default function Dictionary() {
   const { t } = useLanguage();
@@ -34,7 +35,9 @@ export default function Dictionary() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="min-h-screen bg-gradient-bg">
+      <AppHeader />
+      <main className="container mx-auto px-4 py-8 max-w-6xl">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">B1 Dictionary</h1>
@@ -157,6 +160,7 @@ export default function Dictionary() {
           ))}
         </div>
       )}
+      </main>
     </div>
   );
 }

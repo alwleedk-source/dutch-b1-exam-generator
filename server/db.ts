@@ -1134,18 +1134,14 @@ export async function searchDictionary(options: {
   let queryBuilder = db.select().from(b1Dictionary);
 
   // Apply filters
-  const conditions = [];
+  // If both query and letter are provided, use query (search takes precedence)
+  // If only letter is provided, filter by letter
+  // If only query is provided, search by query
   
   if (options.query && options.query.length >= 2) {
-    conditions.push(ilike(b1Dictionary.word, `%${options.query}%`));
-  }
-  
-  if (options.letter) {
-    conditions.push(ilike(b1Dictionary.word, `${options.letter}%`));
-  }
-
-  if (conditions.length > 0) {
-    queryBuilder = queryBuilder.where(and(...conditions));
+    queryBuilder = queryBuilder.where(ilike(b1Dictionary.word, `%${options.query}%`));
+  } else if (options.letter) {
+    queryBuilder = queryBuilder.where(ilike(b1Dictionary.word, `${options.letter}%`));
   }
 
   // Apply limit and ordering
