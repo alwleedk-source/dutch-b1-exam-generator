@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { 
   Loader2, Volume2, Star, CheckCircle, BookOpen, 
   Search, Filter, ArrowUpDown, Grid3x3, List,
-  Play, Trophy
+  Play, Trophy, Trash2, Archive, ArchiveRestore, Award
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/select";
 
 type ViewMode = 'grid' | 'list';
-type FilterMode = 'all' | 'learning' | 'mastered' | 'due';
+type FilterMode = 'all' | 'learning' | 'mastered' | 'due' | 'archived';
 type SortMode = 'alphabetical' | 'mastery' | 'date' | 'next-review';
 
 export default function Vocabulary() {
@@ -58,6 +58,46 @@ export default function Vocabulary() {
     onError: (error) => {
       toast.error("Failed to generate audio: " + error.message);
       setPlayingId(null);
+    },
+  });
+
+  const deleteVocabMutation = trpc.vocabulary.deleteUserVocabulary.useMutation({
+    onSuccess: () => {
+      toast.success(t.wordDeleted || "Word deleted");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error("Failed to delete: " + error.message);
+    },
+  });
+
+  const archiveVocabMutation = trpc.vocabulary.archiveUserVocabulary.useMutation({
+    onSuccess: () => {
+      toast.success(t.wordArchived || "Word archived");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error("Failed to archive: " + error.message);
+    },
+  });
+
+  const unarchiveVocabMutation = trpc.vocabulary.unarchiveUserVocabulary.useMutation({
+    onSuccess: () => {
+      toast.success(t.wordUnarchived || "Word restored");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error("Failed to restore: " + error.message);
+    },
+  });
+
+  const markAsMasteredMutation = trpc.vocabulary.markAsMastered.useMutation({
+    onSuccess: () => {
+      toast.success(t.markedAsMastered || "Marked as mastered");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error("Failed to mark as mastered: " + error.message);
     },
   });
 
@@ -123,16 +163,24 @@ export default function Vocabulary() {
     switch (filterMode) {
       case 'learning':
         filtered = filtered.filter(word => 
-          word.status === 'learning' || getMasteryPercentage(word) < 80
+          word.status !== 'archived' && (word.status === 'learning' || getMasteryPercentage(word) < 80)
         );
         break;
       case 'mastered':
         filtered = filtered.filter(word => 
-          word.status === 'mastered' || getMasteryPercentage(word) >= 80
+          word.status !== 'archived' && (word.status === 'mastered' || getMasteryPercentage(word) >= 80)
         );
         break;
       case 'due':
-        filtered = filtered.filter(word => isDue(word));
+        filtered = filtered.filter(word => word.status !== 'archived' && isDue(word));
+        break;
+      case 'archived':
+        filtered = filtered.filter(word => word.status === 'archived');
+        break;
+      case 'all':
+      default:
+        // Exclude archived from 'all' view
+        filtered = filtered.filter(word => word.status !== 'archived');
         break;
     }
 
@@ -247,6 +295,7 @@ export default function Vocabulary() {
                   <SelectItem value="learning">{t.filterLearning}</SelectItem>
                   <SelectItem value="mastered">{t.filterMastered}</SelectItem>
                   <SelectItem value="due">{t.filterDue}</SelectItem>
+                  <SelectItem value="archived">{t.filterArchived || "Archived"}</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -395,19 +444,77 @@ export default function Vocabulary() {
                         )}
                       </div>
 
-                      {/* Action Button */}
-                      <Button 
-                        className="w-full" 
-                        size="sm"
-                        variant={isWordDue ? "default" : "outline"}
-                        onClick={() => {
-                          setPracticeWordId(word.id);
-                          setPracticeModalOpen(true);
-                        }}
-                      >
-                        <Play className="h-4 w-4 mr-2" />
-                        {isWordDue ? t.reviewNow : t.practice}
-                      </Button>
+                      {/* Action Buttons */}
+                      <div className="space-y-2">
+                        {/* Practice Button */}
+                        {word.status !== 'archived' && (
+                          <Button 
+                            className="w-full" 
+                            size="sm"
+                            variant={isWordDue ? "default" : "outline"}
+                            onClick={() => {
+                              setPracticeWordId(word.id);
+                              setPracticeModalOpen(true);
+                            }}
+                          >
+                            <Play className="h-4 w-4 mr-2" />
+                            {isWordDue ? t.reviewNow : t.practice}
+                          </Button>
+                        )}
+
+                        {/* Management Buttons */}
+                        <div className="flex gap-2">
+                          {word.status === 'archived' ? (
+                            <Button
+                              className="flex-1"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => unarchiveVocabMutation.mutate({ userVocabId: word.id })}
+                            >
+                              <ArchiveRestore className="h-3 w-3 mr-1" />
+                              {t.restore || "Restore"}
+                            </Button>
+                          ) : (
+                            <>
+                              {word.status !== 'mastered' && (
+                                <Button
+                                  className="flex-1"
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => markAsMasteredMutation.mutate({ userVocabId: word.id })}
+                                  title={t.markAsMastered || "Mark as mastered"}
+                                >
+                                  <Award className="h-3 w-3 mr-1" />
+                                  {t.mastered || "Mastered"}
+                                </Button>
+                              )}
+                              <Button
+                                className="flex-1"
+                                size="sm"
+                                variant="outline"
+                                onClick={() => archiveVocabMutation.mutate({ userVocabId: word.id })}
+                                title={t.archive || "Archive"}
+                              >
+                                <Archive className="h-3 w-3 mr-1" />
+                                {t.archive || "Archive"}
+                              </Button>
+                            </>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => {
+                              if (confirm(t.confirmDelete || "Are you sure you want to delete this word?")) {
+                                deleteVocabMutation.mutate({ userVocabId: word.id });
+                              }
+                            }}
+                            title={t.delete || "Delete"}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
                 );

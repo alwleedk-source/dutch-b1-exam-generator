@@ -887,6 +887,79 @@ export const appRouter = router({
 
         return { success: true, ...srsResult };
       }),
+
+    deleteUserVocabulary: protectedProcedure
+      .input(z.object({
+        userVocabId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const userVocab = await db.getUserVocabularyById(input.userVocabId);
+        if (!userVocab || userVocab.user_id !== ctx.user.id) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Vocabulary not found" });
+        }
+
+        await db.deleteUserVocabulary(input.userVocabId);
+        
+        // Update user's vocabulary count
+        await db.updateUserVocabularyCount(ctx.user.id);
+
+        return { success: true };
+      }),
+
+    archiveUserVocabulary: protectedProcedure
+      .input(z.object({
+        userVocabId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const userVocab = await db.getUserVocabularyById(input.userVocabId);
+        if (!userVocab || userVocab.user_id !== ctx.user.id) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Vocabulary not found" });
+        }
+
+        await db.updateUserVocabularyStatus(input.userVocabId, "archived");
+
+        return { success: true };
+      }),
+
+    unarchiveUserVocabulary: protectedProcedure
+      .input(z.object({
+        userVocabId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const userVocab = await db.getUserVocabularyById(input.userVocabId);
+        if (!userVocab || userVocab.user_id !== ctx.user.id) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Vocabulary not found" });
+        }
+
+        await db.updateUserVocabularyStatus(input.userVocabId, "learning");
+
+        return { success: true };
+      }),
+
+    markAsMastered: protectedProcedure
+      .input(z.object({
+        userVocabId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const userVocab = await db.getUserVocabularyById(input.userVocabId);
+        if (!userVocab || userVocab.user_id !== ctx.user.id) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Vocabulary not found" });
+        }
+
+        // Update to mastered status and set high ease factor
+        await db.updateUserVocabularySRS(input.userVocabId, {
+          status: "mastered",
+          ease_factor: 3000, // High ease factor (3.0)
+          interval: 30, // Review in 30 days
+          repetitions: 10, // High repetition count
+          next_review_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          last_reviewed_at: new Date(),
+          correct_count: userVocab.correct_count,
+          incorrect_count: userVocab.incorrect_count,
+        });
+
+        return { success: true };
+      }),
   }),
 
   // Reporting

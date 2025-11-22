@@ -960,6 +960,28 @@ export async function updateUserVocabularySRS(
   }
 }
 
+export async function deleteUserVocabulary(userVocabId: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db
+    .delete(userVocabulary)
+    .where(eq(userVocabulary.id, userVocabId));
+}
+
+export async function updateUserVocabularyStatus(
+  userVocabId: number,
+  status: "new" | "learning" | "mastered" | "archived"
+) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db
+    .update(userVocabulary)
+    .set({ status, updated_at: new Date() })
+    .where(eq(userVocabulary.id, userVocabId));
+}
+
 
 export async function getAllTexts() {
   const db = await getDb();

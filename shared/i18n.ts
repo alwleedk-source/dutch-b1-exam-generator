@@ -196,6 +196,19 @@ export interface Translations {
   practice: string;
   noResults: string;
   tryDifferentFilter: string;
+  filterArchived: string;
+  wordDeleted: string;
+  wordArchived: string;
+  wordUnarchived: string;
+  markedAsMastered: string;
+  archive: string;
+  restore: string;
+  delete: string;
+  mastered: string;
+  confirmDelete: string;
+  confirmArchive: string;
+  skip: string;
+  dontShowAgain: string;
   
   // Practice mode
   flashcards: string;
@@ -447,6 +460,19 @@ export const translations: Record<Language, Translations> = {
     practice: "Oefenen",
     noResults: "Geen resultaten",
     tryDifferentFilter: "Probeer andere zoek- of filtercriteria",
+    filterArchived: "Gearchiveerd",
+    wordDeleted: "Woord verwijderd",
+    wordArchived: "Woord gearchiveerd",
+    wordUnarchived: "Woord hersteld",
+    markedAsMastered: "Gemarkeerd als beheerst",
+    archive: "Archiveren",
+    restore: "Herstellen",
+    delete: "Verwijderen",
+    mastered: "Beheerst",
+    confirmDelete: "Weet je zeker dat je dit woord wilt verwijderen?",
+    confirmArchive: "Dit woord archiveren? Het verschijnt niet vaak in oefeningen.",
+    skip: "Overslaan",
+    dontShowAgain: "Niet meer tonen",
     
     // Practice mode
     flashcards: "Flashcards",
@@ -696,6 +722,19 @@ export const translations: Record<Language, Translations> = {
     practice: "تدريب",
     noResults: "لا توجد نتائج",
     tryDifferentFilter: "جرب تغيير معايير البحث أو الفلترة",
+    filterArchived: "مؤرشفة",
+    wordDeleted: "تم حذف الكلمة",
+    wordArchived: "تم أرشفة الكلمة",
+    wordUnarchived: "تم استعادة الكلمة",
+    markedAsMastered: "تم وضع علامة متقنة",
+    archive: "أرشفة",
+    restore: "استعادة",
+    delete: "حذف",
+    mastered: "متقنة",
+    confirmDelete: "هل أنت متأكد من حذف هذه الكلمة؟",
+    confirmArchive: "أرشفة هذه الكلمة؟ لن تظهر كثيراً في التدريب.",
+    skip: "تخطي",
+    dontShowAgain: "لا تظهر مرة أخرى",
     
     // Practice mode
     flashcards: "بطاقات تعليمية",
@@ -945,6 +984,19 @@ export const translations: Record<Language, Translations> = {
     practice: "Practice",
     noResults: "No results",
     tryDifferentFilter: "Try different search or filter criteria",
+    filterArchived: "Archived",
+    wordDeleted: "Word deleted",
+    wordArchived: "Word archived",
+    wordUnarchived: "Word restored",
+    markedAsMastered: "Marked as mastered",
+    archive: "Archive",
+    restore: "Restore",
+    delete: "Delete",
+    mastered: "Mastered",
+    confirmDelete: "Are you sure you want to delete this word?",
+    confirmArchive: "Archive this word? It won't appear in practice often.",
+    skip: "Skip",
+    dontShowAgain: "Don't show again",
     
     // Practice mode
     flashcards: "Flashcards",
@@ -1195,6 +1247,19 @@ export const translations: Record<Language, Translations> = {
     practice: "Pratik Yap",
     noResults: "Sonuç yok",
     tryDifferentFilter: "Farklı arama veya filtre kriterleri deneyin",
+    filterArchived: "Arşivlendi",
+    wordDeleted: "Kelime silindi",
+    wordArchived: "Kelime arşivlendi",
+    wordUnarchived: "Kelime geri yüklendi",
+    markedAsMastered: "Uzmanlaştı olarak işaretlendi",
+    archive: "Arşivle",
+    restore: "Geri Yükle",
+    delete: "Sil",
+    mastered: "Uzmanlaştı",
+    confirmDelete: "Bu kelimeyi silmek istediğinizden emin misiniz?",
+    confirmArchive: "Bu kelimeyi arşivle? Pratikte sık görünmeyecek.",
+    skip: "Atla",
+    dontShowAgain: "Bir daha gösterme",
     
     // Practice mode
     flashcards: "Flashcards",

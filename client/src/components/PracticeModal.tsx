@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
-import { Volume2, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
+import { Volume2, ChevronLeft, ChevronRight, RotateCcw, SkipForward, Archive } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
 import { trpc } from "../lib/trpc";
 import { toast } from "sonner";
@@ -47,6 +47,21 @@ export function PracticeModal({ open, onOpenChange, wordId, onComplete }: Practi
     onError: (error) => {
       toast.error(t.audioError || "Failed to generate audio");
       setPlayingAudio(false);
+    },
+  });
+
+  const archiveVocabMutation = trpc.vocabulary.archiveUserVocabulary.useMutation({
+    onSuccess: () => {
+      toast.success(t.wordArchived || "Word archived");
+      // Move to next word after archiving
+      if (currentIndex < words.length - 1) {
+        handleNext();
+      } else {
+        onComplete();
+      }
+    },
+    onError: (error) => {
+      toast.error("Failed to archive: " + error.message);
     },
   });
 
@@ -357,30 +372,57 @@ export function PracticeModal({ open, onOpenChange, wordId, onComplete }: Practi
             </Card>
 
             {/* Navigation */}
-            <div className="flex justify-between items-center">
-              <Button
-                variant="outline"
-                onClick={handlePrevious}
-                disabled={currentIndex === 0}
-              >
-                <ChevronLeft className="h-4 w-4 mr-2" />
-                {t.previous || "Previous"}
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={resetCard}
-              >
-                <RotateCcw className="h-4 w-4 mr-2" />
-                {t.reset || "Reset"}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleNext}
-                disabled={currentIndex === words.length - 1}
-              >
-                {t.next || "Next"}
-                <ChevronRight className="h-4 w-4 ml-2" />
-              </Button>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <Button
+                  variant="outline"
+                  onClick={handlePrevious}
+                  disabled={currentIndex === 0}
+                >
+                  <ChevronLeft className="h-4 w-4 mr-2" />
+                  {t.previous || "Previous"}
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={resetCard}
+                >
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  {t.reset || "Reset"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleNext}
+                  disabled={currentIndex === words.length - 1}
+                >
+                  {t.next || "Next"}
+                  <ChevronRight className="h-4 w-4 ml-2" />
+                </Button>
+              </div>
+              
+              {/* Skip and Archive Buttons */}
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={handleNext}
+                  disabled={currentIndex === words.length - 1}
+                >
+                  <SkipForward className="h-4 w-4 mr-2" />
+                  {t.skip || "Skip"}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex-1 text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+                  onClick={() => {
+                    if (confirm(t.confirmArchive || "Archive this word? It won't appear in practice often.")) {
+                      archiveVocabMutation.mutate({ userVocabId: currentWord.id });
+                    }
+                  }}
+                >
+                  <Archive className="h-4 w-4 mr-2" />
+                  {t.dontShowAgain || "Don't show again"}
+                </Button>
+              </div>
             </div>
           </div>
         )}
