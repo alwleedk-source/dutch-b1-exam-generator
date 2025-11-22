@@ -84,6 +84,12 @@ function isNewUser(createdAt: Date): boolean {
   return createdAt > sevenDaysAgo;
 }
 
+// Check if post/topic can be edited (within 5 minutes)
+function canEditOrDelete(createdAt: Date): boolean {
+  const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+  return createdAt > fiveMinutesAgo;
+}
+
 export const forumRouter = router({
   // Get all categories
   getCategories: publicProcedure.query(async () => {
@@ -435,6 +441,168 @@ export const forumRouter = router({
             eq(forumNotifications.user_id, ctx.user.id)
           )
         );
+      
+      return { success: true };
+    }),
+
+  // Update topic (within 5 minutes)
+  updateTopic: protectedProcedure
+    .input(z.object({
+      topicId: z.number(),
+      title: z.string().min(5).max(255).optional(),
+      content: z.string().min(20).max(10000).optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      // Get topic
+      const topic = await database
+        .select()
+        .from(forumTopics)
+        .where(eq(forumTopics.id, input.topicId))
+        .limit(1);
+      
+      if (topic.length === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Topic not found" });
+      }
+      
+      // Check ownership
+      if (topic[0].user_id !== ctx.user.id && ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "You can only edit your own topics" });
+      }
+      
+      // Check 5-minute window (for non-admins)
+      if (ctx.user.role !== "admin" && !canEditOrDelete(topic[0].created_at)) {
+        throw new TRPCError({ 
+          code: "FORBIDDEN", 
+          message: "You can only edit topics within 5 minutes of posting" 
+        });
+      }
+      
+      // Update topic
+      await database
+        .update(forumTopics)
+        .set({
+          ...(input.title && { title: input.title }),
+          ...(input.content && { content: input.content }),
+        })
+        .where(eq(forumTopics.id, input.topicId));
+      
+      return { success: true };
+    }),
+
+  // Delete topic (within 5 minutes)
+  deleteTopic: protectedProcedure
+    .input(z.object({ topicId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      // Get topic
+      const topic = await database
+        .select()
+        .from(forumTopics)
+        .where(eq(forumTopics.id, input.topicId))
+        .limit(1);
+      
+      if (topic.length === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Topic not found" });
+      }
+      
+      // Check ownership
+      if (topic[0].user_id !== ctx.user.id && ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "You can only delete your own topics" });
+      }
+      
+      // Check 5-minute window (for non-admins)
+      if (ctx.user.role !== "admin" && !canEditOrDelete(topic[0].created_at)) {
+        throw new TRPCError({ 
+          code: "FORBIDDEN", 
+          message: "You can only delete topics within 5 minutes of posting" 
+        });
+      }
+      
+      // Delete topic (cascade will delete posts)
+      await database
+        .delete(forumTopics)
+        .where(eq(forumTopics.id, input.topicId));
+      
+      return { success: true };
+    }),
+
+  // Update post (within 5 minutes)
+  updatePost: protectedProcedure
+    .input(z.object({
+      postId: z.number(),
+      content: z.string().min(10).max(10000),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      // Get post
+      const post = await database
+        .select()
+        .from(forumPosts)
+        .where(eq(forumPosts.id, input.postId))
+        .limit(1);
+      
+      if (post.length === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Post not found" });
+      }
+      
+      // Check ownership
+      if (post[0].user_id !== ctx.user.id && ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "You can only edit your own posts" });
+      }
+      
+      // Check 5-minute window (for non-admins)
+      if (ctx.user.role !== "admin" && !canEditOrDelete(post[0].created_at)) {
+        throw new TRPCError({ 
+          code: "FORBIDDEN", 
+          message: "You can only edit posts within 5 minutes of posting" 
+        });
+      }
+      
+      // Update post
+      await database
+        .update(forumPosts)
+        .set({ content: input.content })
+        .where(eq(forumPosts.id, input.postId));
+      
+      return { success: true };
+    }),
+
+  // Delete post (within 5 minutes)
+  deletePost: protectedProcedure
+    .input(z.object({ postId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      // Get post
+      const post = await database
+        .select()
+        .from(forumPosts)
+        .where(eq(forumPosts.id, input.postId))
+        .limit(1);
+      
+      if (post.length === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Post not found" });
+      }
+      
+      // Check ownership
+      if (post[0].user_id !== ctx.user.id && ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "You can only delete your own posts" });
+      }
+      
+      // Check 5-minute window (for non-admins)
+      if (ctx.user.role !== "admin" && !canEditOrDelete(post[0].created_at)) {
+        throw new TRPCError({ 
+          code: "FORBIDDEN", 
+          message: "You can only delete posts within 5 minutes of posting" 
+        });
+      }
+      
+      // Delete post
+      await database
+        .delete(forumPosts)
+        .where(eq(forumPosts.id, input.postId));
+      
+      // Update topic reply count
+      await database
+        .update(forumTopics)
+        .set({ reply_count: sql`${forumTopics.reply_count} - 1` })
+        .where(eq(forumTopics.id, post[0].topic_id));
       
       return { success: true };
     }),
