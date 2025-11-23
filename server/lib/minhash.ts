@@ -120,8 +120,8 @@ export function findSimilarTexts(
 }
 
 /**
- * Check if a text is duplicate (≥95% similar to existing texts)
- * Only rejects nearly identical texts, allows different texts even with common words
+ * Check if a text is duplicate (≥80% similar to existing texts)
+ * Rejects texts with 80% or more similarity based on word patterns
  * @param text - New text to check
  * @param existingTexts - Array of existing texts with signatures
  * @returns Object with isDuplicate flag and similar texts
@@ -135,7 +135,7 @@ export function checkDuplicate(
   similarTexts: Array<{ id: number; title: string; similarity: number }>;
 } {
   const signature = calculateMinHash(text);
-  const similarTexts = findSimilarTexts(signature, existingTexts, 0.95);
+  const similarTexts = findSimilarTexts(signature, existingTexts, 0.80);
   
   return {
     isDuplicate: similarTexts.length > 0,

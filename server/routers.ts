@@ -167,6 +167,35 @@ export const appRouter = router({
         }
         console.log('[Text Creation] ✅ Language validation passed: Dutch text confirmed');
         
+        // ✅ Check for duplicate texts (80% similarity threshold)
+        console.log('[Text Creation] Checking for duplicate texts...');
+        const { checkDuplicate } = await import("./lib/minhash");
+        
+        // Get all existing texts with their signatures
+        const allTexts = await db.getAllTexts();
+        const textsWithSignatures = allTexts
+          .filter(t => t.min_hash_signature)
+          .map(t => ({
+            id: t.id,
+            title: t.title || `Text #${t.id}`,
+            signature: JSON.parse(t.min_hash_signature!),
+          }));
+        
+        // Check for duplicates
+        const duplicateCheck = checkDuplicate(input.dutch_text, textsWithSignatures);
+        
+        if (duplicateCheck.isDuplicate) {
+          const similarTextsInfo = duplicateCheck.similarTexts
+            .map(t => `"${t.title}" (${Math.round(t.similarity * 100)}% similar)`)
+            .join(', ');
+          
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `This text is too similar to existing text(s): ${similarTextsInfo}. Please use original content with at least 20% difference.`,
+          });
+        }
+        console.log('[Text Creation] ✅ Duplicate check passed: Text is original');
+        
         // Calculate dynamic question count based on text length
         const { calculateQuestionCount, calculateExamTime } = await import("./lib/questionCount");
         const questionCount = calculateQuestionCount(input.dutch_text.length);
@@ -229,18 +258,9 @@ export const appRouter = router({
         const wordCount = cleanedText.split(/\s+/).length;
         const estimatedReadingMinutes = Math.ceil(wordCount / 200);
         
-        // Calculate MinHash signature for duplicate detection (using cleaned text)
-        const minHashSignature = calculateMinHash(cleanedText);
+        // Calculate MinHash signature for storage (using cleaned text)
+        const minHashSignature = duplicateCheck.signature; // Reuse signature from duplicate check
         const minHashSignatureJson = JSON.stringify(minHashSignature);
-
-        // Check for duplicate text BEFORE saving (save API costs)
-        const isDuplicate = await db.checkDuplicateText(minHashSignature, ctx.user.id);
-        if (isDuplicate) {
-          throw new TRPCError({ 
-            code: "BAD_REQUEST", 
-            message: "This text already exists. Please use a different text." 
-          });
-        }
 
         // Format text automatically with advanced AI-powered formatter
         const { formatTextAdvanced } = await import("./lib/advanced-text-formatter");
