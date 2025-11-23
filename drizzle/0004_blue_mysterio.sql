@@ -1,0 +1,1 @@
+ALTER TABLE "text_ratings" ADD COLUMN "reason" varchar(100);

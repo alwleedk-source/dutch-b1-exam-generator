@@ -361,7 +361,7 @@ export default function ExamResults() {
                 {t.rateThisExam || 'Rate this exam'}
               </Button>
             )}
-            <Link href={`/study/${examData.text_id}`}>
+            <Link href={`/study/${examId}`}>
               <Button variant="outline" size="lg">
                 <BookOpen className="h-4 w-4 mr-2" />
                 Bestudeer de tekst

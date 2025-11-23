@@ -21,11 +21,14 @@ export default function PublicExams() {
   const [generatingExamId, setGeneratingExamId] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<'date' | 'rating' | 'popular'>('date');
   const [minRating, setMinRating] = useState<number>(0);
+  const [reasonFilter, setReasonFilter] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
-  const { data: allTexts, isLoading } = trpc.text.listPublicTexts.useQuery();
+  const { data: allTexts, isLoading } = trpc.text.listPublicTexts.useQuery(
+    reasonFilter ? { reason: reasonFilter } : undefined
+  );
   
   // Apply client-side filtering and sorting
   const texts = useMemo(() => {
@@ -76,7 +79,7 @@ export default function PublicExams() {
   // Reset to page 1 when filters change
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [sortBy, minRating]);
+  }, [sortBy, minRating, reasonFilter, searchQuery]);
   
   const generateExamMutation = trpc.exam.generateExam.useMutation({
     onSuccess: (data) => {
@@ -159,6 +162,24 @@ export default function PublicExams() {
                   <SelectItem value="3">{t.threeStarsPlus || '3+ Stars'}</SelectItem>
                   <SelectItem value="4">{t.fourStarsPlus || '4+ Stars'}</SelectItem>
                   <SelectItem value="4.5">{t.fourHalfStarsPlus || '4.5+ Stars'}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium">{t.filterByReason || 'Filter by Reason'}:</span>
+              <Select value={reasonFilter} onValueChange={setReasonFilter}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder={t.allReasons || 'All Reasons'} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">{t.allReasons || 'All Reasons'}</SelectItem>
+                  <SelectItem value={t.reasonHelpful}>{t.reasonHelpful}</SelectItem>
+                  <SelectItem value={t.reasonClear}>{t.reasonClear}</SelectItem>
+                  <SelectItem value={t.reasonGoodLevel}>{t.reasonGoodLevel}</SelectItem>
+                  <SelectItem value={t.reasonRealExam}>{t.reasonRealExam}</SelectItem>
+                  <SelectItem value={t.reasonGoodPractice}>{t.reasonGoodPractice}</SelectItem>
                 </SelectContent>
               </Select>
             </div>

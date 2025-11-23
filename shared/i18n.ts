@@ -589,6 +589,8 @@ export interface Translations {
   reasonRealExam: string;
   reasonGoodPractice: string;
   reasonOther: string;
+  filterByReason: string;
+  allReasons: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -1161,6 +1163,8 @@ export const translations: Record<Language, Translations> = {
     reasonRealExam: "Kwam voor in echt examen",
     reasonGoodPractice: "Goede oefening",
     reasonOther: "Andere reden",
+    filterByReason: "Filter op reden",
+    allReasons: "Alle redenen",
   },
   
   ar: {
@@ -1730,6 +1734,8 @@ export const translations: Record<Language, Translations> = {
     reasonRealExam: "ظهر في امتحان حقيقي",
     reasonGoodPractice: "تدريب جيد",
     reasonOther: "سبب آخر",
+    filterByReason: "تصفية حسب السبب",
+    allReasons: "جميع الأسباب",
   },
   
   en: {
@@ -2300,6 +2306,8 @@ export const translations: Record<Language, Translations> = {
     reasonRealExam: "Appeared in real exam",
     reasonGoodPractice: "Good practice",
     reasonOther: "Other reason",
+    filterByReason: "Filter by Reason",
+    allReasons: "All Reasons",
   },
   
   tr: {
@@ -2871,6 +2879,8 @@ export const translations: Record<Language, Translations> = {
     reasonRealExam: "Gerçek sınavda çıktı",
     reasonGoodPractice: "İyi pratik",
     reasonOther: "Diğer neden",
+    filterByReason: "Nedene göre filtrele",
+    allReasons: "Tüm nedenler",
   },
 };
 

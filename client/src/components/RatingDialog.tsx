@@ -7,6 +7,7 @@ import { RatingStars } from "@/components/RatingStars";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface RatingDialogProps {
   open: boolean;
@@ -24,6 +25,7 @@ export function RatingDialog({
   existingRating 
 }: RatingDialogProps) {
   const { t } = useLanguage();
+  const queryClient = useQueryClient();
   const [rating, setRating] = useState(existingRating?.rating || 0);
   const [reason, setReason] = useState("");
   const [comment, setComment] = useState(existingRating?.comment || "");
@@ -31,6 +33,9 @@ export function RatingDialog({
   const rateTextMutation = trpc.rating.rateText.useMutation({
     onSuccess: () => {
       toast.success("Thank you for your rating!");
+      // Invalidate queries to refresh rating data
+      queryClient.invalidateQueries({ queryKey: [['rating', 'getUserRating']] });
+      queryClient.invalidateQueries({ queryKey: [['rating', 'getTextRatings']] });
       onOpenChange(false);
     },
     onError: (error) => {
@@ -43,22 +48,12 @@ export function RatingDialog({
       toast.error("Please select a rating");
       return;
     }
-
-    // Combine reason and comment
-    let finalComment = "";
-    if (reason) {
-      finalComment = reason;
-      if (comment.trim()) {
-        finalComment += ": " + comment.trim();
-      }
-    } else if (comment.trim()) {
-      finalComment = comment.trim();
-    }
     
     rateTextMutation.mutate({
       text_id: textId,
       rating,
-      comment: finalComment || undefined,
+      reason: reason || undefined,
+      comment: comment.trim() || undefined,
     });
   };
 

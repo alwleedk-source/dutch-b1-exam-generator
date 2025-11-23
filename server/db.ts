@@ -1,4 +1,4 @@
-import { eq, desc, and, sql, or, gte, ilike, count } from "drizzle-orm";
+import { eq, desc, and, sql, or, gte, ilike, count, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import {
@@ -1499,7 +1499,7 @@ export async function getRecentActivity(limit: number = 10) {
 /**
  * Add or update a text rating
  */
-export async function rateText(userId: number, textId: number, rating: number, comment?: string) {
+export async function rateText(userId: number, textId: number, rating: number, reason?: string, comment?: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
@@ -1519,6 +1519,7 @@ export async function rateText(userId: number, textId: number, rating: number, c
       .update(textRatings)
       .set({ 
         rating, 
+        reason: reason || null,
         comment: comment || null,
         updated_at: new Date()
       })
@@ -1534,6 +1535,7 @@ export async function rateText(userId: number, textId: number, rating: number, c
         text_id: textId,
         user_id: userId,
         rating,
+        reason: reason || null,
         comment: comment || null
       });
   }
@@ -1617,4 +1619,33 @@ export async function deleteRating(ratingId: number) {
   
   // Trigger will automatically update texts table
   return { success: true };
+}
+
+/**
+ * Get texts filtered by rating reason
+ */
+export async function getTextsByReason(textIds: number[], reason: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  // Get text IDs that have ratings with the specified reason
+  const ratingsWithReason = await db
+    .select({ text_id: textRatings.text_id })
+    .from(textRatings)
+    .where(and(
+      inArray(textRatings.text_id, textIds),
+      eq(textRatings.reason, reason)
+    ))
+    .groupBy(textRatings.text_id);
+  
+  const filteredTextIds = ratingsWithReason.map(r => r.text_id);
+  
+  if (filteredTextIds.length === 0) return [];
+  
+  // Get the actual texts
+  return await db
+    .select()
+    .from(texts)
+    .where(inArray(texts.id, filteredTextIds))
+    .orderBy(desc(texts.created_at));
 }

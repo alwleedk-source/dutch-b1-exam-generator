@@ -439,11 +439,21 @@ export const appRouter = router({
       return await db.getApprovedTexts();
     }),
 
-    listPublicTexts: publicProcedure.query(async () => {
-      // Get all approved texts with exam statistics
-      const texts = await db.getApprovedTexts();
-      return texts;
-    }),
+    listPublicTexts: publicProcedure
+      .input(z.object({
+        reason: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        // Get all approved texts with exam statistics
+        const texts = await db.getApprovedTexts();
+        
+        // Filter by reason if provided
+        if (input?.reason) {
+          return await db.getTextsByReason(texts.map(t => t.id), input.reason);
+        }
+        
+        return texts;
+      }),
 
     getTextWithTranslation: publicProcedure
       .input(z.object({
@@ -1522,10 +1532,11 @@ export const appRouter = router({
       .input(z.object({
         text_id: z.number(),
         rating: z.number().min(1).max(5),
+        reason: z.string().optional(),
         comment: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        return await db.rateText(ctx.user.id, input.text_id, input.rating, input.comment);
+        return await db.rateText(ctx.user.id, input.text_id, input.rating, input.reason, input.comment);
       }),
 
     // Get user's rating for a text
