@@ -123,7 +123,7 @@ export default function StudyMode() {
               <p className="text-muted-foreground mb-4">
                 {t.pleaseLogin || "Please log in to use Study Mode"}
               </p>
-              <Button onClick={() => window.location.href = "/api/auth/google"}>
+              <Button onClick={() => window.location.href = "/auth/google"}>
                 {t.login || "Login"}
               </Button>
             </CardContent>

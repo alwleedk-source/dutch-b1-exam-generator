@@ -11,7 +11,7 @@ export function NotAuthenticatedPage({ message }: NotAuthenticatedPageProps) {
   const { t } = useLanguage();
 
   const handleLogin = () => {
-    window.location.href = "/api/auth/google";
+    window.location.href = "/auth/google";
   };
 
   return (
