@@ -226,54 +226,61 @@ export default function PublicExams() {
                 return (
                   <Card key={text.id} className="hover:shadow-lg transition-shadow">
                     <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <CardTitle className="text-xl">
+                      <div className="flex flex-col gap-3">
+                        {/* Title and badges row */}
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <CardTitle className="text-lg sm:text-xl break-words mb-2">
                               {text.title || `Text #${text.id}`}
                             </CardTitle>
-                            {isHighlyRated && (
-                              <Badge variant="default" className="bg-yellow-500">
-                                <Star className="h-3 w-3 mr-1" />
-                                {t.recommended || 'Recommended'}
-                              </Badge>
+                          </div>
+                          <div className="flex flex-col gap-1 flex-shrink-0">
+                            {text.is_b1_level && (
+                              <Badge variant="default" className="whitespace-nowrap">B1 {t.levelDetected || "Level"}</Badge>
                             )}
-                            {isPopular && (
-                              <Badge variant="secondary">
-                                <TrendingUp className="h-3 w-3 mr-1" />
-                                {t.popular || 'Popular'}
-                              </Badge>
+                            {text.detected_level && (
+                              <Badge variant="outline" className="whitespace-nowrap">{text.detected_level}</Badge>
                             )}
                           </div>
-                          <CardDescription className="flex items-center gap-4">
-                            <span>{text.word_count} {t.words}</span>
-                            <span>•</span>
-                            <span>{text.estimated_reading_minutes} {t.minRead}</span>
-                            {text.creator_name && (
-                              <>
-                                <span>•</span>
-                                <span>{t.by || 'by'} {text.creator_name}</span>
-                              </>
-                            )}
-                          </CardDescription>
                         </div>
-                        <div className="flex flex-col gap-2">
-                          {text.is_b1_level && (
-                            <Badge variant="default">B1 {t.levelDetected || "Level"}</Badge>
+                        
+                        {/* Quality badges */}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {isHighlyRated && (
+                            <Badge variant="default" className="bg-yellow-500">
+                              <Star className="h-3 w-3 mr-1" />
+                              {t.recommended || 'Recommended'}
+                            </Badge>
                           )}
-                          {text.detected_level && (
-                            <Badge variant="outline">{text.detected_level}</Badge>
+                          {isPopular && (
+                            <Badge variant="secondary">
+                              <TrendingUp className="h-3 w-3 mr-1" />
+                              {t.popular || 'Popular'}
+                            </Badge>
                           )}
                         </div>
+                        
+                        {/* Meta info */}
+                        <CardDescription className="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
+                          <span className="whitespace-nowrap">{text.word_count} {t.words}</span>
+                          <span className="hidden sm:inline">•</span>
+                          <span className="whitespace-nowrap">{text.estimated_reading_minutes} {t.minRead}</span>
+                          {text.creator_name && (
+                            <>
+                              <span className="hidden sm:inline">•</span>
+                              <span className="truncate">{t.by || 'by'} {text.creator_name}</span>
+                            </>
+                          )}
+                        </CardDescription>
                       </div>
                       
                       {/* Rating Display */}
                       {text.total_ratings > 0 && (
-                        <div className="mt-3 pt-3 border-t">
+                        <div className="mt-2 pt-3 border-t">
                           <RatingStars 
                             rating={text.average_rating || 0} 
                             totalRatings={text.total_ratings}
-                            size="md"
+                            size="sm"
                           />
                         </div>
                       )}
