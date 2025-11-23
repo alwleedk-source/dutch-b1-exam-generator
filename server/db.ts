@@ -707,20 +707,20 @@ export async function getUserVocabularyProgress(user_id: number) {
   // Use Drizzle ORM with proper JOIN
   const results = await db
     .select({
-      // From user_vocabulary
+      // From user_vocabulary (snake_case columns)
       id: userVocabulary.id,
-      userId: userVocabulary.userId,
-      vocabularyId: userVocabulary.vocabularyId,
+      user_id: userVocabulary.user_id,
+      vocabulary_id: userVocabulary.vocabulary_id,
       status: userVocabulary.status,
-      correctCount: userVocabulary.correctCount,
-      incorrectCount: userVocabulary.incorrectCount,
-      lastReviewedAt: userVocabulary.lastReviewedAt,
-      nextReviewAt: userVocabulary.nextReviewAt,
-      easeFactor: userVocabulary.easeFactor,
+      correct_count: userVocabulary.correct_count,
+      incorrect_count: userVocabulary.incorrect_count,
+      last_reviewed_at: userVocabulary.last_reviewed_at,
+      next_review_at: userVocabulary.next_review_at,
+      ease_factor: userVocabulary.ease_factor,
       interval: userVocabulary.interval,
       repetitions: userVocabulary.repetitions,
-      createdAt: userVocabulary.createdAt,
-      updatedAt: userVocabulary.updatedAt,
+      created_at: userVocabulary.created_at,
+      updated_at: userVocabulary.updated_at,
       // From vocabulary (camelCase columns)
       dutchWord: vocabulary.dutchWord,
       arabicTranslation: vocabulary.arabicTranslation,
@@ -731,26 +731,24 @@ export async function getUserVocabularyProgress(user_id: number) {
       audioKey: vocabulary.audioKey,
     })
     .from(userVocabulary)
-    .innerJoin(vocabulary, eq(userVocabulary.vocabularyId, vocabulary.id))
-    .where(eq(userVocabulary.userId, user_id))
-    .orderBy(desc(userVocabulary.createdAt));
+    .innerJoin(vocabulary, eq(userVocabulary.vocabulary_id, vocabulary.id))
+    .where(eq(userVocabulary.user_id, user_id))
+    .orderBy(desc(userVocabulary.created_at));
 
-  // Convert ease_factor from decimal to integer for consistency
-  // Add aliases for client compatibility
+  // Add camelCase aliases for client compatibility
   return results.map((r) => ({
     ...r,
-    // Convert ease_factor to integer (stored as decimal in DB)
-    easeFactor: r.easeFactor ? Math.round(parseFloat(r.easeFactor.toString()) * 1000) : 2500,
-    ease_factor: r.easeFactor ? Math.round(parseFloat(r.easeFactor.toString()) * 1000) : 2500,
-    // Add snake_case aliases for backward compatibility
-    user_id: r.userId,
-    vocabulary_id: r.vocabularyId,
-    correct_count: r.correctCount,
-    incorrect_count: r.incorrectCount,
-    last_reviewed_at: r.lastReviewedAt,
-    next_review_at: r.nextReviewAt,
-    created_at: r.createdAt,
-    updated_at: r.updatedAt,
+    // ease_factor is already correct from DB (stored as integer)
+    // Add camelCase aliases
+    userId: r.user_id,
+    vocabularyId: r.vocabulary_id,
+    correctCount: r.correct_count,
+    incorrectCount: r.incorrect_count,
+    lastReviewedAt: r.last_reviewed_at,
+    nextReviewAt: r.next_review_at,
+    easeFactor: r.ease_factor,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
     // Add word aliases
     word: r.dutchWord,
     dutch_word: r.dutchWord,

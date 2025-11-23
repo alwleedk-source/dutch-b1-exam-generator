@@ -47,7 +47,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [t, setT] = useState<Translations>(() => getTranslations(language));
 
   // Mutation to update language in database
-  const updateLanguageMutation = trpc.auth.updateLanguage.useMutation({
+  const updateLanguageMutation = trpc.auth.updatePreferences.useMutation({
     onSuccess: () => {
       // Language updated successfully
     },
@@ -116,7 +116,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     
     // Sync with database if user is logged in
     if (user) {
-      updateLanguageMutation.mutate({ language: lang });
+      updateLanguageMutation.mutate({ preferred_language: lang });
     }
   };
 
