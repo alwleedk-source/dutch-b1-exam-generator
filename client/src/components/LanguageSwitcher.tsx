@@ -9,6 +9,7 @@ import { Globe } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const languages = [
+  { code: "nl", name: "Nederlands", flag: "🇳🇱" },
   { code: "ar", name: "العربية", flag: "🇸🇦" },
   { code: "en", name: "English", flag: "🇬🇧" },
   { code: "tr", name: "Türkçe", flag: "🇹🇷" },
