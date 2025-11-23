@@ -67,49 +67,58 @@ export default function ForumCategory() {
               <Link key={topic.id} href={`/forum/topic/${topic.id}`}>
                 <Card className="card-hover cursor-pointer">
                   <CardContent className="pt-6">
-                    <div className="flex items-start gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2 flex-wrap">
-                          {topic.is_pinned && (
-                            <Pin className="h-4 w-4 text-blue-600" />
-                          )}
-                          {topic.is_locked && (
-                            <Lock className="h-4 w-4 text-gray-600" />
-                          )}
-                          {topic.is_hidden && (
-                            <Badge variant="outline" className="border-orange-500 text-orange-600">
-                              <EyeOff className="h-3 w-3 mr-1" />
-                              {t.hidden || "Hidden"}
-                            </Badge>
-                          )}
-                          <h3 className="text-lg font-semibold hover:text-primary">
-                            {topic.title}
-                          </h3>
-                        </div>
-                        
-                        <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                          <UserAvatar name={topic.user_name} size="sm" />
-                          <span title={topic.user_name || "Unknown"}>{truncateName(topic.user_name)}</span>
-                          <span>•</span>
-                          <span>
+                    <div className="flex flex-col gap-3">
+                      {/* Title and badges */}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {topic.is_pinned && (
+                          <Pin className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                        )}
+                        {topic.is_locked && (
+                          <Lock className="h-4 w-4 text-gray-600 flex-shrink-0" />
+                        )}
+                        {topic.is_hidden && (
+                          <Badge variant="outline" className="border-orange-500 text-orange-600 flex-shrink-0">
+                            <EyeOff className="h-3 w-3 mr-1" />
+                            {t.hidden || "Hidden"}
+                          </Badge>
+                        )}
+                        <h3 className="text-lg font-semibold hover:text-primary break-words">
+                          {topic.title}
+                        </h3>
+                      </div>
+                      
+                      {/* User info and stats */}
+                      <div className="flex items-center justify-between gap-3 flex-wrap">
+                        {/* User info */}
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground min-w-0">
+                          <UserAvatar name={topic.user_name} size="sm" className="flex-shrink-0" />
+                          <span className="truncate" title={topic.user_name || "Unknown"}>{truncateName(topic.user_name)}</span>
+                          <span className="hidden sm:inline">•</span>
+                          <span className="hidden sm:inline truncate">
                             {topic.created_at && formatDistanceToNow(new Date(topic.created_at), { addSuffix: true })}
                           </span>
                         </div>
+                        
+                        {/* Stats */}
+                        <div className="flex gap-3 sm:gap-4 text-sm text-muted-foreground flex-shrink-0">
+                          <div className="flex items-center gap-1">
+                            <ThumbsUp className="h-4 w-4" />
+                            <span>{topic.upvote_count}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <MessageSquare className="h-4 w-4" />
+                            <span>{topic.reply_count}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Eye className="h-4 w-4" />
+                            <span>{topic.view_count}</span>
+                          </div>
+                        </div>
                       </div>
                       
-                      <div className="flex gap-4 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <ThumbsUp className="h-4 w-4" />
-                          <span>{topic.upvote_count}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <MessageSquare className="h-4 w-4" />
-                          <span>{topic.reply_count}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Eye className="h-4 w-4" />
-                          <span>{topic.view_count}</span>
-                        </div>
+                      {/* Time on mobile (separate line) */}
+                      <div className="sm:hidden text-xs text-muted-foreground">
+                        {topic.created_at && formatDistanceToNow(new Date(topic.created_at), { addSuffix: true })}
                       </div>
                     </div>
                   </CardContent>
