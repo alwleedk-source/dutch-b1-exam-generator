@@ -362,15 +362,16 @@ export default function Vocabulary() {
             {/* Action Buttons */}
             {stats.total > 0 && (
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-4 sm:mb-6">
-                <Button
-                  onClick={() => setReviewModalOpen(true)}
-                  className="flex-1"
-                  variant="outline"
-                  size="lg"
-                >
-                  <Eye className="h-5 w-5 mr-2" />
-                  {t.simpleReview || "Simple Review"}
-                </Button>
+                <Link href="/vocabulary/simple" className="flex-1">
+                  <Button
+                    className="w-full"
+                    variant="outline"
+                    size="lg"
+                  >
+                    <Eye className="h-5 w-5 mr-2" />
+                    {t.simpleReview || "Simple Review"}
+                  </Button>
+                </Link>
                 <Button
                   onClick={() => setPracticeModalOpen(true)}
                   className="flex-1"

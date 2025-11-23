@@ -15,6 +15,7 @@ const CreateExam = lazy(() => import("./pages/CreateExam"));
 const TakeExam = lazy(() => import("./pages/TakeExam"));
 const Progress = lazy(() => import("./pages/Progress"));
 const Vocabulary = lazy(() => import("./pages/Vocabulary"));
+const VocabularySimple = lazy(() => import("./pages/VocabularySimple"));
 const Dictionary = lazy(() => import("./pages/Dictionary"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const Leaderboard = lazy(() => import("./pages/Leaderboard"));
@@ -58,6 +59,7 @@ function Router() {
       <Route path="/exam/:id/review" component={ExamReview} />
       <Route path="/progress" component={Progress} />
       <Route path="/vocabulary" component={Vocabulary} />
+      <Route path="/vocabulary/simple" component={VocabularySimple} />
       <Route path="/dictionary" component={Dictionary} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/leaderboard" component={Leaderboard} />
