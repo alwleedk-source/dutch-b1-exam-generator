@@ -30,7 +30,7 @@ const languages = [
 ];
 
 export default function LanguageSelector({ open, onLanguageSelected }: LanguageSelectorProps) {
-  const { setLanguage } = useLanguage();
+  const { setLanguage, t } = useLanguage();
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   
@@ -53,7 +53,7 @@ export default function LanguageSelector({ open, onLanguageSelected }: LanguageS
       <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="text-center text-2xl">
-            اختر لغتك / Choose your language
+            {t.chooseLanguage}
           </DialogTitle>
           <DialogDescription className="text-center">
             Select your preferred language for translations

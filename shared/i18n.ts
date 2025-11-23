@@ -508,6 +508,9 @@ export interface Translations {
   wordAddedSuccess: string;
   wordAlreadyExists: string;
   wordAddFailed: string;
+  translation: string;
+  chooseLanguage: string;
+  forumEditorPlaceholder: string;
   
   // Admin Dashboard
   filterByStatus: string;
@@ -1097,6 +1100,9 @@ export const translations: Record<Language, Translations> = {
     wordAddedSuccess: "✅ Woord toegevoegd aan je woordenschat!",
     wordAlreadyExists: "ℹ️ Dit woord staat al in je woordenschat",
     wordAddFailed: "❌ Kon woord niet toevoegen",
+    translation: "Vertaling",
+    chooseLanguage: "Kies je taal",
+    forumEditorPlaceholder: "Schrijf de inhoud van je onderwerp hier...",
     
     // Admin Dashboard
     filterByStatus: "Filter op status",
@@ -1683,6 +1689,9 @@ export const translations: Record<Language, Translations> = {
     wordAddedSuccess: "✅ تمت إضافة الكلمة إلى مفرداتك!",
     wordAlreadyExists: "ℹ️ هذه الكلمة موجودة بالفعل في مفرداتك",
     wordAddFailed: "❌ فشل في إضافة الكلمة",
+    translation: "الترجمة",
+    chooseLanguage: "اختر لغتك",
+    forumEditorPlaceholder: "اكتب محتوى موضوعك هنا...",
     
     // Admin Dashboard
     filterByStatus: "تصفية حسب الحالة",
@@ -2270,6 +2279,9 @@ export const translations: Record<Language, Translations> = {
     wordAddedSuccess: "✅ Word added to your vocabulary!",
     wordAlreadyExists: "ℹ️ This word is already in your vocabulary",
     wordAddFailed: "❌ Failed to add word",
+    translation: "Translation",
+    chooseLanguage: "Choose your language",
+    forumEditorPlaceholder: "Write your topic content here...",
     
     // Admin Dashboard
     filterByStatus: "Filter by status",
@@ -2858,6 +2870,9 @@ export const translations: Record<Language, Translations> = {
     wordAddedSuccess: "✅ Kelime dağarcığınıza eklendi!",
     wordAlreadyExists: "ℹ️ Bu kelime zaten kelime dağarcığınızda",
     wordAddFailed: "❌ Kelime eklenemedi",
+    translation: "Çeviri",
+    chooseLanguage: "Dilinizi seçin",
+    forumEditorPlaceholder: "Konu içeriğinizi buraya yazın...",
     
     // Admin Dashboard
     filterByStatus: "Duruma göre filtrele",

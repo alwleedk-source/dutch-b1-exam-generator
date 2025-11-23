@@ -21,15 +21,8 @@ export default function Dictionary() {
     }
   };
   
-  const getTranslationLabel = () => {
-    switch(language) {
-      case 'ar': return 'الترجمة';
-      case 'en': return 'Translation';
-      case 'tr': return 'Çeviri';
-      case 'nl': return 'Vertaling';
-      default: return 'Translation';
-    }
-  };
+  // Translation label is now handled by i18n
+  const translationLabel = t.translation;
 
   const { data: words, isLoading } = trpc.dictionary.search.useQuery(
     { query: searchQuery, letter: selectedLetter },
@@ -273,7 +266,7 @@ export default function Dictionary() {
               {/* Primary Translation (based on user language) */}
               {getPreferredTranslation(word) && (
                 <div className="mb-3">
-                  <span className="text-xs font-semibold text-gray-500 uppercase">{getTranslationLabel()}:</span>
+                  <span className="text-xs font-semibold text-gray-500 uppercase">{translationLabel}:</span>
                   <p className="text-base font-medium text-gray-900 mt-1">{getPreferredTranslation(word)}</p>
                 </div>
               )}

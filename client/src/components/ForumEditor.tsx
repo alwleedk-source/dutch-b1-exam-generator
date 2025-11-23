@@ -23,7 +23,7 @@ export function ForumEditor({ value, onChange, placeholder, className }: ForumEd
         },
       }),
       Placeholder.configure({
-        placeholder: placeholder || 'اكتب محتوى موضوعك هنا...',
+        placeholder: placeholder || t.forumEditorPlaceholder,
       }),
     ],
     content: value,
