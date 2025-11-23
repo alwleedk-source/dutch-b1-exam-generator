@@ -38,13 +38,13 @@ export default function Dictionary() {
 
   const addToVocabularyMutation = trpc.vocabulary.addFromDictionary.useMutation({
     onSuccess: () => {
-      toast.success("✅ تمت إضافة الكلمة إلى مفرداتك!");
+      toast.success(t.wordAddedSuccess);
     },
     onError: (error) => {
       if (error.message.includes("already have")) {
-        toast.info("ℹ️ هذه الكلمة موجودة بالفعل في مفرداتك");
+        toast.info(t.wordAlreadyExists);
       } else {
-        toast.error("❌ فشل في إضافة الكلمة: " + error.message);
+        toast.error(`${t.wordAddFailed}: ${error.message}`);
       }
     },
   });

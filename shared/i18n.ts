@@ -505,6 +505,9 @@ export interface Translations {
   dictionaryHowToListenDesc: string;
   dictionaryStartBrowsing: string;
   dictionaryStats: string;
+  wordAddedSuccess: string;
+  wordAlreadyExists: string;
+  wordAddFailed: string;
   
   // Admin Dashboard
   filterByStatus: string;
@@ -1091,6 +1094,9 @@ export const translations: Record<Language, Translations> = {
     dictionaryHowToListenDesc: "Klik op het luidsprekerpictogram om de juiste uitspraak van elk woord te horen.",
     dictionaryStartBrowsing: "🚀 Begin met Bladeren →",
     dictionaryStats: "📊 Bevat duizenden B1-niveau Nederlandse woorden met vertalingen in het Arabisch, Engels en Turks",
+    wordAddedSuccess: "✅ Woord toegevoegd aan je woordenschat!",
+    wordAlreadyExists: "ℹ️ Dit woord staat al in je woordenschat",
+    wordAddFailed: "❌ Kon woord niet toevoegen",
     
     // Admin Dashboard
     filterByStatus: "Filter op status",
@@ -1674,6 +1680,9 @@ export const translations: Record<Language, Translations> = {
     dictionaryHowToListenDesc: "اضغط على أيقونة السماعة لسماع النطق الصحيح لكل كلمة.",
     dictionaryStartBrowsing: "🚀 ابدأ التصفح →",
     dictionaryStats: "📊 يحتوي على آلاف الكلمات الهولندية بمستوى B1 مع ترجمات بالعربية والإنجليزية والتركية",
+    wordAddedSuccess: "✅ تمت إضافة الكلمة إلى مفرداتك!",
+    wordAlreadyExists: "ℹ️ هذه الكلمة موجودة بالفعل في مفرداتك",
+    wordAddFailed: "❌ فشل في إضافة الكلمة",
     
     // Admin Dashboard
     filterByStatus: "تصفية حسب الحالة",
@@ -2258,6 +2267,9 @@ export const translations: Record<Language, Translations> = {
     dictionaryHowToListenDesc: "Click the speaker icon to hear the correct pronunciation of each word.",
     dictionaryStartBrowsing: "🚀 Start Browsing →",
     dictionaryStats: "📊 Contains thousands of B1-level Dutch words with translations in Arabic, English, and Turkish",
+    wordAddedSuccess: "✅ Word added to your vocabulary!",
+    wordAlreadyExists: "ℹ️ This word is already in your vocabulary",
+    wordAddFailed: "❌ Failed to add word",
     
     // Admin Dashboard
     filterByStatus: "Filter by status",
@@ -2843,6 +2855,9 @@ export const translations: Record<Language, Translations> = {
     dictionaryHowToListenDesc: "Her kelimenin doğru telaffuzunu duymak için hoparlör simgesine tıklayın.",
     dictionaryStartBrowsing: "🚀 Gözatmeye Başla →",
     dictionaryStats: "📊 Arapça, İngilizce ve Türkçe çevirileriyle binlerce B1 seviyesi Hollandaca kelime içerir",
+    wordAddedSuccess: "✅ Kelime dağarcığınıza eklendi!",
+    wordAlreadyExists: "ℹ️ Bu kelime zaten kelime dağarcığınızda",
+    wordAddFailed: "❌ Kelime eklenemedi",
     
     // Admin Dashboard
     filterByStatus: "Duruma göre filtrele",
