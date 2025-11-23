@@ -208,13 +208,7 @@ export default function InteractiveText({ textId, content, className = "", disab
             e.preventDefault();
             e.stopPropagation();
             handleSaveWord(word);
-            
-            // Hide tooltip by triggering mouseleave
-            const mouseLeaveEvent = new Event('mouseleave', { bubbles: true });
-            wrapper.dispatchEvent(mouseLeaveEvent);
-            
-            // Clear current hovered element to allow tooltip to work on next hover
-            currentHoveredElement.current = null;
+            // Tooltip will hide naturally when user moves mouse away
           }
         }
       }
