@@ -1538,7 +1538,23 @@ export async function rateText(userId: number, textId: number, rating: number, c
       });
   }
   
-  // Trigger will automatically update texts table
+  // Calculate and update average rating and total ratings
+  const allRatings = await db
+    .select()
+    .from(textRatings)
+    .where(eq(textRatings.text_id, textId));
+  
+  const avgRating = allRatings.reduce((sum, r) => sum + r.rating, 0) / allRatings.length;
+  const totalRatings = allRatings.length;
+  
+  await db
+    .update(texts)
+    .set({
+      average_rating: avgRating,
+      total_ratings: totalRatings
+    })
+    .where(eq(texts.id, textId));
+  
   return { success: true };
 }
 
