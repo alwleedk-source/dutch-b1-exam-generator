@@ -34,7 +34,15 @@ export default function InteractiveText({ textId, content, className = "" }: Int
       toast.success(t.wordSavedToVocabulary);
     },
     onError: (error) => {
-      toast.error(error.message || t.failedToSaveWord);
+      // Check if it's a duplicate word error (409 Conflict)
+      if (error.message?.includes('already have') || error.message?.includes('موجودة بالفعل')) {
+        // Show informational message instead of error
+        toast.info(t.wordAlreadyInVocabulary, {
+          icon: '📚',
+        });
+      } else {
+        toast.error(error.message || t.failedToSaveWord);
+      }
     },
   });
   

@@ -269,6 +269,7 @@ export interface Translations {
   wordUnarchived: string;
   markedAsMastered: string;
   wordSavedToVocabulary: string;
+  wordAlreadyInVocabulary: string;
   failedToSaveWord: string;
   archive: string;
   restore: string;
@@ -749,8 +750,9 @@ export const translations: Record<Language, Translations> = {
     wordArchived: "Woord gearchiveerd",
     wordUnarchived: "Woord hersteld",
     markedAsMastered: "Gemarkeerd als beheerst",
-    wordSavedToVocabulary: "Woord opgeslagen in woordenschat!",
-    failedToSaveWord: "Opslaan mislukt",
+    wordSavedToVocabulary: "Woord opgeslagen in woordenschat",
+    wordAlreadyInVocabulary: "Dit woord staat al in je woordenschat",
+    failedToSaveWord: "Kon woord niet opslaan",
     archive: "Archiveren",
     restore: "Herstellen",
     mastered: "Beheerst",
@@ -1213,7 +1215,8 @@ export const translations: Record<Language, Translations> = {
     wordArchived: "تم أرشفة الكلمة",
     wordUnarchived: "تم استعادة الكلمة",
     markedAsMastered: "تم وضع علامة متقنة",
-    wordSavedToVocabulary: "تم حفظ الكلمة في مفرداتك!",
+    wordSavedToVocabulary: "تم حفظ الكلمة في القاموس",
+    wordAlreadyInVocabulary: "هذه الكلمة موجودة بالفعل في قاموسك",
     failedToSaveWord: "فشل حفظ الكلمة",
     archive: "أرشفة",
     restore: "استعادة",
@@ -1676,7 +1679,8 @@ export const translations: Record<Language, Translations> = {
     wordArchived: "Word archived",
     wordUnarchived: "Word restored",
     markedAsMastered: "Marked as mastered",
-    wordSavedToVocabulary: "Word saved to vocabulary!",
+    wordSavedToVocabulary: "Word saved to vocabulary",
+    wordAlreadyInVocabulary: "This word is already in your vocabulary",
     failedToSaveWord: "Failed to save word",
     archive: "Archive",
     restore: "Restore",
@@ -2141,7 +2145,8 @@ export const translations: Record<Language, Translations> = {
     wordArchived: "Kelime arşivlendi",
     wordUnarchived: "Kelime geri yüklendi",
     markedAsMastered: "Uzmanlaştı olarak işaretlendi",
-    wordSavedToVocabulary: "Kelime kelime dağarcığına kaydedildi!",
+    wordSavedToVocabulary: "Kelime sözlüğe kaydedildi",
+    wordAlreadyInVocabulary: "Bu kelime zaten sözlüğünüzde mevcut",
     failedToSaveWord: "Kelime kaydedilemedi",
     archive: "Arşivle",
     restore: "Geri Yükle",
