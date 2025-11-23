@@ -40,8 +40,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       console.error("Error reading language preference:", error);
     }
     
-    // Default: English
-    return "en";
+    // Default: Dutch (since this is a Dutch learning app)
+    return "nl";
   });
 
   const [t, setT] = useState<Translations>(() => getTranslations(language));
