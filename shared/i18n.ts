@@ -2842,7 +2842,7 @@ export const translations: Record<Language, Translations> = {
     dictionaryHowToListen: "🔊 Nasıl dinlenir?",
     dictionaryHowToListenDesc: "Her kelimenin doğru telaffuzunu duymak için hoparlör simgesine tıklayın.",
     dictionaryStartBrowsing: "🚀 Gözatmeye Başla →",
-    dictionaryStats: "📊 Arapça, İngilizce ve Türkçe çevirileriyle binlerce B1 seviyesi Hollandaca kelime içerir",,
+    dictionaryStats: "📊 Arapça, İngilizce ve Türkçe çevirileriyle binlerce B1 seviyesi Hollandaca kelime içerir",
     
     // Admin Dashboard
     filterByStatus: "Duruma göre filtrele",
