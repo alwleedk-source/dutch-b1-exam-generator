@@ -169,12 +169,11 @@ export default function PublicExams() {
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium">{t.filterByReason || 'Filter by Reason'}:</span>
-              <Select value={reasonFilter} onValueChange={setReasonFilter}>
+              <Select value={reasonFilter || undefined} onValueChange={(value) => setReasonFilter(value || "")}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder={t.allReasons || 'All Reasons'} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">{t.allReasons || 'All Reasons'}</SelectItem>
                   <SelectItem value={t.reasonHelpful}>{t.reasonHelpful}</SelectItem>
                   <SelectItem value={t.reasonClear}>{t.reasonClear}</SelectItem>
                   <SelectItem value={t.reasonGoodLevel}>{t.reasonGoodLevel}</SelectItem>
