@@ -155,6 +155,18 @@ export const appRouter = router({
           }
         }
         
+        // ✅ Check if text is in Dutch language FIRST (before any processing)
+        console.log('[Text Creation] Validating language...');
+        const languageValidation = await gemini.validateDutchText(input.dutch_text);
+        
+        if (!languageValidation.isDutch) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Text must be in Dutch language only. Other languages are not accepted."
+          });
+        }
+        console.log('[Text Creation] ✅ Language validation passed: Dutch text confirmed');
+        
         // Calculate dynamic question count based on text length
         const { calculateQuestionCount, calculateExamTime } = await import("./lib/questionCount");
         const questionCount = calculateQuestionCount(input.dutch_text.length);
