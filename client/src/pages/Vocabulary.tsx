@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { 
   Loader2, Volume2, Star, CheckCircle, BookOpen, 
   Search, Filter, ArrowUpDown, Grid3x3, List,
-  Play, Trophy, Trash2, Archive, ArchiveRestore, Award, Eye
+  Play, Trophy, Trash2, Archive, ArchiveRestore, Award, Eye, ChevronDown, ChevronUp
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-type ViewMode = 'grid' | 'list';
+type ViewMode = 'grid' | 'list' | 'simple';
 type FilterMode = 'all' | 'learning' | 'mastered' | 'due' | 'archived';
 type SortMode = 'alphabetical' | 'mastery' | 'date' | 'next-review';
 
@@ -42,6 +42,7 @@ export default function Vocabulary() {
   const [practiceWordId, setPracticeWordId] = useState<number | undefined>();
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [reviewWordId, setReviewWordId] = useState<number | undefined>();
+  const [expandedDefinitions, setExpandedDefinitions] = useState<Set<number>>(new Set());
   
   // Get user's preferred language
   const preferredLanguage = user?.preferred_language || localStorage.getItem('preferredLanguage') || 'en';
@@ -116,6 +117,16 @@ export default function Vocabulary() {
     } else {
       generateAudioMutation.mutate({ vocabId: word.id, word: word.word });
     }
+  };
+
+  const toggleDefinition = (wordId: number) => {
+    const newExpanded = new Set(expandedDefinitions);
+    if (newExpanded.has(wordId)) {
+      newExpanded.delete(wordId);
+    } else {
+      newExpanded.add(wordId);
+    }
+    setExpandedDefinitions(newExpanded);
   };
 
   // Get translation based on user's preferred language
@@ -240,44 +251,44 @@ export default function Vocabulary() {
     <div className="min-h-screen bg-gradient-bg">
       <AppHeader />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
         <div className="max-w-7xl mx-auto">
           {/* Header with Stats */}
-          <div className="mb-8 animate-fade-in">
-            <h2 className="text-3xl font-bold mb-4">{t.yourVocabulary}</h2>
+          <div className="mb-6 sm:mb-8 animate-fade-in">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4 px-2 sm:px-0">{t.yourVocabulary}</h2>
             
             {/* Statistics Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
               <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-primary">{stats.total}</div>
-                  <div className="text-sm text-muted-foreground">{t.wordsLearned}</div>
+                <CardContent className="p-3 sm:p-4 text-center">
+                  <div className="text-xl sm:text-2xl font-bold text-primary">{stats.total}</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground">{t.wordsLearned}</div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-green-600">{stats.mastered}</div>
-                  <div className="text-sm text-muted-foreground">{t.vocabMastered}</div>
+                <CardContent className="p-3 sm:p-4 text-center">
+                  <div className="text-xl sm:text-2xl font-bold text-green-600">{stats.mastered}</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground">{t.vocabMastered}</div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-blue-600">{stats.learning}</div>
-                  <div className="text-sm text-muted-foreground">{t.vocabLearning}</div>
+                <CardContent className="p-3 sm:p-4 text-center">
+                  <div className="text-xl sm:text-2xl font-bold text-blue-600">{stats.learning}</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground">{t.vocabLearning}</div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-orange-600">{stats.due}</div>
-                  <div className="text-sm text-muted-foreground">{t.vocabDue}</div>
+                <CardContent className="p-3 sm:p-4 text-center">
+                  <div className="text-xl sm:text-2xl font-bold text-orange-600">{stats.due}</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground">{t.vocabDue}</div>
                 </CardContent>
               </Card>
             </div>
 
             {/* Controls */}
-            <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <div className="flex flex-col gap-3 sm:gap-4 mb-4 sm:mb-6">
               {/* Search */}
-              <div className="relative flex-1">
+              <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder={t.searchWord}
@@ -287,57 +298,70 @@ export default function Vocabulary() {
                 />
               </div>
 
-              {/* Filter */}
-              <Select value={filterMode} onValueChange={(value: FilterMode) => setFilterMode(value)}>
-                <SelectTrigger className="w-full md:w-[180px]">
-                  <Filter className="h-4 w-4 mr-2" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t.filterAll}</SelectItem>
-                  <SelectItem value="learning">{t.filterLearning}</SelectItem>
-                  <SelectItem value="mastered">{t.filterMastered}</SelectItem>
-                  <SelectItem value="due">{t.filterDue}</SelectItem>
-                  <SelectItem value="archived">{t.filterArchived || "Archived"}</SelectItem>
-                </SelectContent>
-              </Select>
+              {/* Filter, Sort, View Mode */}
+              <div className="flex flex-wrap gap-2">
+                {/* Filter */}
+                <Select value={filterMode} onValueChange={(value: FilterMode) => setFilterMode(value)}>
+                  <SelectTrigger className="flex-1 min-w-[140px]">
+                    <Filter className="h-4 w-4 mr-2" />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t.filterAll}</SelectItem>
+                    <SelectItem value="learning">{t.filterLearning}</SelectItem>
+                    <SelectItem value="mastered">{t.filterMastered}</SelectItem>
+                    <SelectItem value="due">{t.filterDue}</SelectItem>
+                    <SelectItem value="archived">{t.filterArchived || "Archived"}</SelectItem>
+                  </SelectContent>
+                </Select>
 
-              {/* Sort */}
-              <Select value={sortMode} onValueChange={(value: SortMode) => setSortMode(value)}>
-                <SelectTrigger className="w-full md:w-[180px]">
-                  <ArrowUpDown className="h-4 w-4 mr-2" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="date">{t.sortNewest}</SelectItem>
-                  <SelectItem value="alphabetical">{t.sortAlphabetical}</SelectItem>
-                  <SelectItem value="mastery">{t.sortMastery}</SelectItem>
-                  <SelectItem value="next-review">{t.sortNextReview}</SelectItem>
-                </SelectContent>
-              </Select>
+                {/* Sort */}
+                <Select value={sortMode} onValueChange={(value: SortMode) => setSortMode(value)}>
+                  <SelectTrigger className="flex-1 min-w-[140px]">
+                    <ArrowUpDown className="h-4 w-4 mr-2" />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="date">{t.sortNewest}</SelectItem>
+                    <SelectItem value="alphabetical">{t.sortAlphabetical}</SelectItem>
+                    <SelectItem value="mastery">{t.sortMastery}</SelectItem>
+                    <SelectItem value="next-review">{t.sortNextReview}</SelectItem>
+                  </SelectContent>
+                </Select>
 
-              {/* View Mode Toggle */}
-              <div className="flex gap-2">
-                <Button
-                  variant={viewMode === 'grid' ? 'default' : 'outline'}
-                  size="icon"
-                  onClick={() => setViewMode('grid')}
-                >
-                  <Grid3x3 className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'outline'}
-                  size="icon"
-                  onClick={() => setViewMode('list')}
-                >
-                  <List className="h-4 w-4" />
-                </Button>
+                {/* View Mode Toggle */}
+                <div className="flex gap-2">
+                  <Button
+                    variant={viewMode === 'grid' ? 'default' : 'outline'}
+                    size="icon"
+                    onClick={() => setViewMode('grid')}
+                    title="Grid View"
+                  >
+                    <Grid3x3 className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === 'list' ? 'default' : 'outline'}
+                    size="icon"
+                    onClick={() => setViewMode('list')}
+                    title="List View"
+                  >
+                    <List className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === 'simple' ? 'default' : 'outline'}
+                    size="icon"
+                    onClick={() => setViewMode('simple')}
+                    title="Simple View"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
 
             {/* Action Buttons */}
             {stats.total > 0 && (
-              <div className="flex flex-col sm:flex-row gap-3 mb-6">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <Button
                   onClick={() => setReviewModalOpen(true)}
                   className="flex-1"
@@ -383,16 +407,73 @@ export default function Vocabulary() {
                 </p>
               </CardContent>
             </Card>
+          ) : viewMode === 'simple' ? (
+            // SIMPLE MODE - Clean and minimal
+            <div className="grid gap-3 sm:gap-4">
+              {filteredAndSortedVocabulary.map((word: any) => {
+                const translation = getTranslation(word);
+                const isExpanded = expandedDefinitions.has(word.id);
+
+                return (
+                  <Card key={word.id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex items-center justify-between gap-4">
+                        {/* Word and Translation */}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-xl sm:text-2xl font-bold mb-1 break-words">{word.word}</h3>
+                          <p className="text-muted-foreground text-sm sm:text-base break-words">{translation}</p>
+                          
+                          {/* Definition (collapsible) */}
+                          {word.definition && (
+                            <div className="mt-2">
+                              <button
+                                onClick={() => toggleDefinition(word.id)}
+                                className="flex items-center gap-1 text-xs sm:text-sm text-primary hover:underline"
+                              >
+                                {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                                {isExpanded ? (t.hideDefinition || 'Hide definition') : (t.showDefinition || 'Show definition (Dutch)')}
+                              </button>
+                              {isExpanded && (
+                                <p className="text-xs sm:text-sm text-muted-foreground/80 italic mt-2 p-3 bg-muted/30 rounded">
+                                  {word.definition}
+                                </p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Audio Button */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0"
+                          onClick={() => handlePlayAudio(word)}
+                          disabled={playingId === word.id}
+                        >
+                          {playingId === word.id ? (
+                            <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin" />
+                          ) : (
+                            <Volume2 className="h-5 w-5 sm:h-6 sm:w-6" />
+                          )}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
           ) : (
+            // GRID/LIST MODE - Full featured
             <div className={
               viewMode === 'grid' 
-                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
                 : "grid gap-3"
             }>
               {filteredAndSortedVocabulary.map((word: any) => {
                 const masteryPercentage = getMasteryPercentage(word);
                 const translation = getTranslation(word);
                 const isWordDue = isDue(word);
+                const isExpanded = expandedDefinitions.has(word.id);
 
                 return (
                   <Card 
@@ -401,24 +482,39 @@ export default function Vocabulary() {
                       isWordDue ? 'border-orange-500/50 shadow-orange-100' : ''
                     }`}
                   >
-                    <CardContent className="p-4">
+                    <CardContent className="p-3 sm:p-4">
                       {/* Header */}
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="text-xl font-bold">{word.word}</h3>
+                      <div className="flex items-start justify-between mb-3 gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <h3 className="text-lg sm:text-xl font-bold break-words">{word.word}</h3>
                             {masteryPercentage >= 80 && (
-                              <CheckCircle className="h-4 w-4 text-green-500" />
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
                             )}
                             {isWordDue && (
-                              <Badge variant="outline" className="text-xs bg-orange-50 text-orange-700 border-orange-300">
+                              <Badge variant="outline" className="text-xs bg-orange-50 text-orange-700 border-orange-300 whitespace-nowrap">
                                 {t.vocabDue}
                               </Badge>
                             )}
                           </div>
-                          <p className="text-muted-foreground text-sm">{translation}</p>
+                          <p className="text-muted-foreground text-sm break-words">{translation}</p>
+                          
+                          {/* Definition (collapsible) */}
                           {word.definition && (
-                            <p className="text-xs text-muted-foreground/70 italic mt-1">{word.definition}</p>
+                            <div className="mt-2">
+                              <button
+                                onClick={() => toggleDefinition(word.id)}
+                                className="flex items-center gap-1 text-xs text-primary hover:underline"
+                              >
+                                {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                                {isExpanded ? (t.hideDefinition || 'Hide') : (t.showDefinition || 'Dutch definition')}
+                              </button>
+                              {isExpanded && (
+                                <p className="text-xs text-muted-foreground/70 italic mt-1 p-2 bg-muted/30 rounded">
+                                  {word.definition}
+                                </p>
+                              )}
+                            </div>
                           )}
                         </div>
 
@@ -426,7 +522,7 @@ export default function Vocabulary() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8"
+                          className="h-8 w-8 flex-shrink-0"
                           onClick={() => handlePlayAudio(word)}
                           disabled={playingId === word.id}
                         >
@@ -502,16 +598,15 @@ export default function Vocabulary() {
                             </Button>
                           ) : (
                             <>
-                              {word.status !== 'mastered' && (
+                              {masteryPercentage < 80 && (
                                 <Button
                                   className="flex-1"
                                   size="sm"
                                   variant="outline"
                                   onClick={() => markAsMasteredMutation.mutate({ userVocabId: word.id })}
-                                  title={t.markAsMastered || "Mark as mastered"}
                                 >
                                   <Award className="h-3 w-3 mr-1" />
-                                  {t.mastered || "Mastered"}
+                                  {t.markMastered || "Master"}
                                 </Button>
                               )}
                               <Button
@@ -519,7 +614,6 @@ export default function Vocabulary() {
                                 size="sm"
                                 variant="outline"
                                 onClick={() => archiveVocabMutation.mutate({ userVocabId: word.id })}
-                                title={t.archive || "Archive"}
                               >
                                 <Archive className="h-3 w-3 mr-1" />
                                 {t.archive || "Archive"}
@@ -529,13 +623,11 @@ export default function Vocabulary() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
                             onClick={() => {
                               if (confirm(t.confirmDelete || "Are you sure you want to delete this word?")) {
                                 deleteVocabMutation.mutate({ userVocabId: word.id });
                               }
                             }}
-                            title={t.delete || "Delete"}
                           >
                             <Trash2 className="h-3 w-3" />
                           </Button>
@@ -550,24 +642,24 @@ export default function Vocabulary() {
         </div>
       </main>
 
-      {/* Practice Modal */}
+      {/* Modals */}
       <PracticeModal
         open={practiceModalOpen}
         onOpenChange={setPracticeModalOpen}
-        wordId={practiceWordId}
+        specificWordId={practiceWordId}
         onComplete={() => {
           refetch();
-          setPracticeModalOpen(false);
+          setPracticeWordId(undefined);
         }}
       />
 
-      {/* Review Modal */}
       <ReviewModal
         open={reviewModalOpen}
         onOpenChange={setReviewModalOpen}
-        wordId={reviewWordId}
+        specificWordId={reviewWordId}
         onComplete={() => {
-          setReviewModalOpen(false);
+          refetch();
+          setReviewWordId(undefined);
         }}
       />
     </div>

@@ -591,6 +591,8 @@ export interface Translations {
   reasonOther: string;
   filterByReason: string;
   allReasons: string;
+  showDefinition: string;
+  hideDefinition: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -1165,6 +1167,8 @@ export const translations: Record<Language, Translations> = {
     reasonOther: "Andere reden",
     filterByReason: "Filter op reden",
     allReasons: "Alle redenen",
+    showDefinition: "Toon definitie (Nederlands)",
+    hideDefinition: "Verberg definitie",
   },
   
   ar: {
@@ -1736,6 +1740,8 @@ export const translations: Record<Language, Translations> = {
     reasonOther: "سبب آخر",
     filterByReason: "تصفية حسب السبب",
     allReasons: "جميع الأسباب",
+    showDefinition: "عرض التعريف (بالهولندية)",
+    hideDefinition: "إخفاء التعريف",
   },
   
   en: {
@@ -2308,6 +2314,8 @@ export const translations: Record<Language, Translations> = {
     reasonOther: "Other reason",
     filterByReason: "Filter by Reason",
     allReasons: "All Reasons",
+    showDefinition: "Show definition (Dutch)",
+    hideDefinition: "Hide definition",
   },
   
   tr: {
@@ -2881,6 +2889,8 @@ export const translations: Record<Language, Translations> = {
     reasonOther: "Diğer neden",
     filterByReason: "Nedene göre filtrele",
     allReasons: "Tüm nedenler",
+    showDefinition: "Tanımı göster (Hollandaca)",
+    hideDefinition: "Tanımı gizle",
   },
 };
 
