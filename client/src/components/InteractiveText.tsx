@@ -207,6 +207,12 @@ export default function InteractiveText({ textId, content, className = "", disab
             e.preventDefault();
             e.stopPropagation();
             handleSaveWord(word);
+            
+            // Hide tooltip after double-click
+            const tooltip = tooltipRef.current;
+            if (tooltip) {
+              tooltip.style.opacity = '0';
+            }
           }
         }
       }

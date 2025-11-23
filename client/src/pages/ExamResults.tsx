@@ -5,8 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { useParams, useLocation, Link } from "wouter";
 import { trpc } from "@/lib/trpc";
-import { CheckCircle, XCircle, TrendingUp, TrendingDown, BookOpen, RotateCcw, Home, Award, Eye } from "lucide-react";
+import { CheckCircle, XCircle, TrendingUp, TrendingDown, BookOpen, RotateCcw, Home, Award, Eye, Star } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useState } from "react";
+import { RatingDialog } from "@/components/RatingDialog";
 
 export default function ExamResults() {
   const { t } = useLanguage();
@@ -14,6 +16,7 @@ export default function ExamResults() {
   const params = useParams();
   const [, setLocation] = useLocation();
   const examId = params.id ? parseInt(params.id) : null;
+  const [showRatingDialog, setShowRatingDialog] = useState(false);
 
   const { data: examData, isLoading, error } = trpc.exam.getExamDetails.useQuery(
     { examId: examId! },
@@ -342,6 +345,14 @@ export default function ExamResults() {
                 Bekijk antwoorden
               </Button>
             </Link>
+            <Button 
+              variant="outline" 
+              size="lg"
+              onClick={() => setShowRatingDialog(true)}
+            >
+              <Star className="h-4 w-4 mr-2" />
+              {t.rateThisExam || 'Rate this exam'}
+            </Button>
             <Link href={`/study/${examData.text_id}`}>
               <Button variant="outline" size="lg">
                 <BookOpen className="h-4 w-4 mr-2" />
@@ -360,6 +371,15 @@ export default function ExamResults() {
               </Button>
             </Link>
           </div>
+          
+          {/* Rating Dialog */}
+          {examData.text_id && (
+            <RatingDialog
+              textId={examData.text_id}
+              open={showRatingDialog}
+              onOpenChange={setShowRatingDialog}
+            />
+          )}
         </div>
       </main>
     </div>

@@ -577,6 +577,9 @@ export interface Translations {
   page: string;
   previous: string;
   next: string;
+  
+  // Rating
+  rateThisExam: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -1137,6 +1140,9 @@ export const translations: Record<Language, Translations> = {
     page: "Pagina",
     previous: "Vorige",
     next: "Volgende",
+    
+    // Rating
+    rateThisExam: "Beoordeel dit examen",
   },
   
   ar: {
@@ -1694,6 +1700,9 @@ export const translations: Record<Language, Translations> = {
     page: "صفحة",
     previous: "السابق",
     next: "التالي",
+    
+    // Rating
+    rateThisExam: "قيّم هذا الامتحان",
   },
   
   en: {
@@ -2252,6 +2261,9 @@ export const translations: Record<Language, Translations> = {
     page: "Page",
     previous: "Previous",
     next: "Next",
+    
+    // Rating
+    rateThisExam: "Rate this exam",
   },
   
   tr: {
@@ -2811,6 +2823,9 @@ export const translations: Record<Language, Translations> = {
     page: "Sayfa",
     previous: "Önceki",
     next: "Sonraki",
+    
+    // Rating
+    rateThisExam: "Bu sınavı değerlendir",
   },
 };
 
