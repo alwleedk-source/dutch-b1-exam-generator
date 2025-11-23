@@ -208,10 +208,13 @@ export default function InteractiveText({ textId, content, className = "", disab
             e.stopPropagation();
             handleSaveWord(word);
             
-            // Hide tooltip after double-click
+            // Hide tooltip and trigger mouseleave to reset state
             const tooltip = tooltipRef.current;
             if (tooltip) {
               tooltip.style.opacity = '0';
+              // Trigger mouseleave event on the wrapper to properly reset tooltip state
+              const mouseLeaveEvent = new Event('mouseleave', { bubbles: true });
+              wrapper.dispatchEvent(mouseLeaveEvent);
             }
           }
         }
