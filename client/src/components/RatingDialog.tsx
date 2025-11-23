@@ -105,7 +105,6 @@ export function RatingDialog({
                 <SelectValue placeholder={t.selectReason} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">{t.selectReason}</SelectItem>
                 <SelectItem value={t.reasonHelpful}>{t.reasonHelpful}</SelectItem>
                 <SelectItem value={t.reasonClear}>{t.reasonClear}</SelectItem>
                 <SelectItem value={t.reasonGoodLevel}>{t.reasonGoodLevel}</SelectItem>
