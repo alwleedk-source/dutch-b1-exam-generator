@@ -355,6 +355,7 @@ export interface Translations {
   officialExamFormat: string;
   withWordTranslations: string;
   noWordTranslations: string;
+  searchTexts: string;
   
   // Forum
   forumTitle: string;
@@ -935,6 +936,7 @@ export const translations: Record<Language, Translations> = {
     officialExamFormat: "Officieel examenformaat",
     withWordTranslations: "Met woordvertalingen",
     noWordTranslations: "Zonder woordvertalingen",
+    searchTexts: "Zoek naar tekst...",
     
     // Forum
     forumTitle: "Community",
@@ -1503,6 +1505,7 @@ export const translations: Record<Language, Translations> = {
     officialExamFormat: "صيغة الامتحان الرسمي",
     withWordTranslations: "مع ترجمة الكلمات",
     noWordTranslations: "بدون ترجمة الكلمات",
+    searchTexts: "ابحث عن نص...",
     
     // Forum
     forumTitle: "المجتمع",
@@ -2072,6 +2075,7 @@ export const translations: Record<Language, Translations> = {
     officialExamFormat: "Official exam format",
     withWordTranslations: "With word translations",
     noWordTranslations: "No word translations",
+    searchTexts: "Search for text...",
     
     // Forum
     forumTitle: "Community",
@@ -2642,6 +2646,7 @@ export const translations: Record<Language, Translations> = {
     officialExamFormat: "Resmi sınav formatı",
     withWordTranslations: "Kelime çevirileriyle",
     noWordTranslations: "Kelime çevirisi olmadan",
+    searchTexts: "Metin ara...",
     
     // Forum
     forumTitle: "Topluluk",

@@ -4,10 +4,11 @@ import { NotAuthenticatedPage } from "@/components/NotAuthenticatedPage";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RatingStars } from "@/components/RatingStars";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { BookOpen, Users, TrendingUp, Clock, Play, Star, Filter } from "lucide-react";
+import { BookOpen, Users, TrendingUp, Clock, Play, Star, Filter, Search } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -20,6 +21,7 @@ export default function PublicExams() {
   const [generatingExamId, setGeneratingExamId] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<'date' | 'rating' | 'popular'>('date');
   const [minRating, setMinRating] = useState<number>(0);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
@@ -30,6 +32,14 @@ export default function PublicExams() {
     if (!allTexts) return [];
     
     let filtered = [...allTexts];
+    
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(t => 
+        t.title?.toLowerCase().includes(query)
+      );
+    }
     
     // Filter by minimum rating
     if (minRating > 0) {
@@ -101,6 +111,23 @@ export default function PublicExams() {
             <p className="text-muted-foreground">
               {t.allExams}
             </p>
+          </div>
+
+          {/* Search */}
+          <div className="mb-4">
+            <div className="relative max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder={t.searchTexts || "Search for text..."}
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1); // Reset to first page on search
+                }}
+                className="pl-10"
+              />
+            </div>
           </div>
 
           {/* Filters */}
