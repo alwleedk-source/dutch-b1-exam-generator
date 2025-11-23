@@ -134,7 +134,100 @@ export default function Dictionary() {
         </div>
       )}
 
-      {words && words.length === 0 && (
+      {/* Welcome Page when ALL is selected and no search */}
+      {!isLoading && selectedLetter === null && searchQuery.length < 2 && (
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-8 shadow-lg">
+            {/* Icon */}
+            <div className="flex justify-center mb-6">
+              <div className="bg-blue-600 text-white rounded-full p-4">
+                <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Title */}
+            <h2 className="text-3xl font-bold text-center mb-4 text-gray-900">
+              {t.dictionaryWelcomeTitle || "📚 B1 Dutch Dictionary"}
+            </h2>
+            
+            {/* Description */}
+            <p className="text-lg text-center text-gray-700 mb-8 leading-relaxed">
+              {t.dictionaryWelcomeDesc || "This dictionary contains essential Dutch words that every B1 level learner should know."}
+            </p>
+
+            {/* How to Use Section */}
+            <div className="space-y-6 mb-8">
+              {/* Browse */}
+              <div className="flex gap-4 items-start">
+                <div className="bg-blue-600 text-white rounded-full p-2 flex-shrink-0">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-gray-900 mb-1">
+                    {t.dictionaryHowToBrowse || "🔍 How to browse?"}
+                  </h3>
+                  <p className="text-gray-700">
+                    {t.dictionaryHowToBrowseDesc || "Choose a letter from A-Z to browse words, or use the search bar to find specific words."}
+                  </p>
+                </div>
+              </div>
+
+              {/* Add to Vocabulary */}
+              <div className="flex gap-4 items-start">
+                <div className="bg-green-600 text-white rounded-full p-2 flex-shrink-0">
+                  <Plus className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-gray-900 mb-1">
+                    {t.dictionaryHowToAdd || "➕ How to add words to your vocabulary?"}
+                  </h3>
+                  <p className="text-gray-700">
+                    {t.dictionaryHowToAddDesc || "Click the + button next to any word to add it to your personal vocabulary for practice and memorization."}
+                  </p>
+                </div>
+              </div>
+
+              {/* Listen */}
+              <div className="flex gap-4 items-start">
+                <div className="bg-purple-600 text-white rounded-full p-2 flex-shrink-0">
+                  <Volume2 className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-gray-900 mb-1">
+                    {t.dictionaryHowToListen || "🔊 How to listen?"}
+                  </h3>
+                  <p className="text-gray-700">
+                    {t.dictionaryHowToListenDesc || "Click the speaker icon to hear the correct pronunciation of each word."}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* CTA Button */}
+            <div className="text-center">
+              <button
+                onClick={() => setSelectedLetter('A')}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors shadow-md hover:shadow-lg"
+              >
+                {t.dictionaryStartBrowsing || "🚀 Start Browsing →"}
+              </button>
+            </div>
+
+            {/* Stats */}
+            <div className="mt-8 pt-6 border-t border-blue-200">
+              <p className="text-center text-sm text-gray-600">
+                {t.dictionaryStats || "📊 Contains thousands of B1-level Dutch words with translations in Arabic, English, and Turkish"}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {words && words.length === 0 && searchQuery.length >= 2 && (
         <div className="text-center py-12 text-gray-500">
           {t.noResultsFound}
         </div>

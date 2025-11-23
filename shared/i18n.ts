@@ -495,6 +495,16 @@ export interface Translations {
   tryDifferentSearch: string;
   playAudio: string;
   addToVocabulary: string;
+  dictionaryWelcomeTitle: string;
+  dictionaryWelcomeDesc: string;
+  dictionaryHowToBrowse: string;
+  dictionaryHowToBrowseDesc: string;
+  dictionaryHowToAdd: string;
+  dictionaryHowToAddDesc: string;
+  dictionaryHowToListen: string;
+  dictionaryHowToListenDesc: string;
+  dictionaryStartBrowsing: string;
+  dictionaryStats: string;
   
   // Admin Dashboard
   filterByStatus: string;
@@ -1071,6 +1081,16 @@ export const translations: Record<Language, Translations> = {
     tryDifferentSearch: "Probeer een andere zoekopdracht",
     playAudio: "Audio afspelen",
     addToVocabulary: "Toevoegen aan mijn woordenschat",
+    dictionaryWelcomeTitle: "📚 B1 Nederlands Woordenboek",
+    dictionaryWelcomeDesc: "Dit woordenboek bevat essentiële Nederlandse woorden die elke B1-leerling zou moeten kennen.",
+    dictionaryHowToBrowse: "🔍 Hoe te bladeren?",
+    dictionaryHowToBrowseDesc: "Kies een letter van A-Z om woorden te bladeren, of gebruik de zoekbalk om specifieke woorden te vinden.",
+    dictionaryHowToAdd: "➕ Hoe woorden toevoegen aan je woordenschat?",
+    dictionaryHowToAddDesc: "Klik op de + knop naast een woord om het toe te voegen aan je persoonlijke woordenschat voor oefening en memorisatie.",
+    dictionaryHowToListen: "🔊 Hoe te luisteren?",
+    dictionaryHowToListenDesc: "Klik op het luidsprekerpictogram om de juiste uitspraak van elk woord te horen.",
+    dictionaryStartBrowsing: "🚀 Begin met Bladeren →",
+    dictionaryStats: "📊 Bevat duizenden B1-niveau Nederlandse woorden met vertalingen in het Arabisch, Engels en Turks",
     
     // Admin Dashboard
     filterByStatus: "Filter op status",
@@ -1644,6 +1664,16 @@ export const translations: Record<Language, Translations> = {
     tryDifferentSearch: "جرب بحثاً مختلفاً",
     playAudio: "تشغيل الصوت",
     addToVocabulary: "إضافة إلى مفرداتي",
+    dictionaryWelcomeTitle: "📚 قاموس الهولندية B1",
+    dictionaryWelcomeDesc: "يحتوي هذا القاموس على الكلمات الهولندية الأساسية التي يجب أن يعرفها كل متعلم بمستوى B1.",
+    dictionaryHowToBrowse: "🔍 كيف تتصفح؟",
+    dictionaryHowToBrowseDesc: "اختر حرفاً من A-Z لتصفح الكلمات، أو استخدم شريط البحث للعثور على كلمات محددة.",
+    dictionaryHowToAdd: "➕ كيف تضيف كلمات لمفرداتك؟",
+    dictionaryHowToAddDesc: "اضغط على زر + بجانب أي كلمة لإضافتها إلى مفرداتك الشخصية للتدرب عليها وحفظها.",
+    dictionaryHowToListen: "🔊 كيف تستمع؟",
+    dictionaryHowToListenDesc: "اضغط على أيقونة السماعة لسماع النطق الصحيح لكل كلمة.",
+    dictionaryStartBrowsing: "🚀 ابدأ التصفح →",
+    dictionaryStats: "📊 يحتوي على آلاف الكلمات الهولندية بمستوى B1 مع ترجمات بالعربية والإنجليزية والتركية",
     
     // Admin Dashboard
     filterByStatus: "تصفية حسب الحالة",
@@ -2218,6 +2248,16 @@ export const translations: Record<Language, Translations> = {
     tryDifferentSearch: "Try a different search",
     playAudio: "Play audio",
     addToVocabulary: "Add to my vocabulary",
+    dictionaryWelcomeTitle: "📚 B1 Dutch Dictionary",
+    dictionaryWelcomeDesc: "This dictionary contains essential Dutch words that every B1 level learner should know.",
+    dictionaryHowToBrowse: "🔍 How to browse?",
+    dictionaryHowToBrowseDesc: "Choose a letter from A-Z to browse words, or use the search bar to find specific words.",
+    dictionaryHowToAdd: "➕ How to add words to your vocabulary?",
+    dictionaryHowToAddDesc: "Click the + button next to any word to add it to your personal vocabulary for practice and memorization.",
+    dictionaryHowToListen: "🔊 How to listen?",
+    dictionaryHowToListenDesc: "Click the speaker icon to hear the correct pronunciation of each word.",
+    dictionaryStartBrowsing: "🚀 Start Browsing →",
+    dictionaryStats: "📊 Contains thousands of B1-level Dutch words with translations in Arabic, English, and Turkish",
     
     // Admin Dashboard
     filterByStatus: "Filter by status",
@@ -2791,8 +2831,18 @@ export const translations: Record<Language, Translations> = {
     allLetters: "Tümü",
     noResultsFound: "Sonuç bulunamadı. Farklı bir arama veya harf deneyin.",
     tryDifferentSearch: "Farklı bir arama deneyin",
-    playAudio: "Sesi çal",
+    playAudio: "Ses çal",
     addToVocabulary: "Kelime dağarcığıma ekle",
+    dictionaryWelcomeTitle: "📚 B1 Hollandaca Sözlük",
+    dictionaryWelcomeDesc: "Bu sözlük, her B1 seviyesi öğrencisinin bilmesi gereken temel Hollandaca kelimeleri içerir.",
+    dictionaryHowToBrowse: "🔍 Nasıl göz atılır?",
+    dictionaryHowToBrowseDesc: "Kelimelere göz atmak için A-Z arasında bir harf seçin veya belirli kelimeleri bulmak için arama çubuğunu kullanın.",
+    dictionaryHowToAdd: "➕ Kelime dağarcığınıza kelimeler nasıl eklenir?",
+    dictionaryHowToAddDesc: "Pratik ve ezber için kişisel kelime dağarcığınıza eklemek için herhangi bir kelimenin yanındaki + düğmesine tıklayın.",
+    dictionaryHowToListen: "🔊 Nasıl dinlenir?",
+    dictionaryHowToListenDesc: "Her kelimenin doğru telaffuzunu duymak için hoparlör simgesine tıklayın.",
+    dictionaryStartBrowsing: "🚀 Gözatmeye Başla →",
+    dictionaryStats: "📊 Arapça, İngilizce ve Türkçe çevirileriyle binlerce B1 seviyesi Hollandaca kelime içerir",,
     
     // Admin Dashboard
     filterByStatus: "Duruma göre filtrele",
