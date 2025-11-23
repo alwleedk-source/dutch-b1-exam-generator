@@ -28,6 +28,7 @@ export default function InteractiveText({ textId, content, className = "", disab
   const [vocabulary, setVocabulary] = useState<Map<string, VocabularyWord>>(new Map());
   const [preferredLanguage, setPreferredLanguage] = useState<string>('en');
   const tooltipRef = useRef<HTMLDivElement>(null);
+  const currentHoveredElement = useRef<Element | null>(null);
   
   // Mutation to save word to vocabulary
   const saveWordMutation = trpc.vocabulary.saveWordFromText.useMutation({
@@ -208,14 +209,12 @@ export default function InteractiveText({ textId, content, className = "", disab
             e.stopPropagation();
             handleSaveWord(word);
             
-            // Hide tooltip and trigger mouseleave to reset state
-            const tooltip = tooltipRef.current;
-            if (tooltip) {
-              tooltip.style.opacity = '0';
-              // Trigger mouseleave event on the wrapper to properly reset tooltip state
-              const mouseLeaveEvent = new Event('mouseleave', { bubbles: true });
-              wrapper.dispatchEvent(mouseLeaveEvent);
-            }
+            // Hide tooltip by triggering mouseleave
+            const mouseLeaveEvent = new Event('mouseleave', { bubbles: true });
+            wrapper.dispatchEvent(mouseLeaveEvent);
+            
+            // Clear current hovered element to allow tooltip to work on next hover
+            currentHoveredElement.current = null;
           }
         }
       }
@@ -232,6 +231,7 @@ export default function InteractiveText({ textId, content, className = "", disab
     
     const handleMouseEnter = (e: Event) => {
       const wrapper = e.currentTarget as HTMLElement;
+      currentHoveredElement.current = wrapper;
       const translation = wrapper.getAttribute('data-translation') || '';
       
       // Update tooltip content
@@ -260,7 +260,11 @@ export default function InteractiveText({ textId, content, className = "", disab
       tooltip.style.opacity = '1';
     };
     
-    const handleMouseLeave = () => {
+    const handleMouseLeave = (e: Event) => {
+      const wrapper = e.currentTarget as HTMLElement;
+      if (currentHoveredElement.current === wrapper) {
+        currentHoveredElement.current = null;
+      }
       tooltip.style.opacity = '0';
     };
     
