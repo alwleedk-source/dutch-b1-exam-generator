@@ -405,8 +405,30 @@ export async function getExamsByUser(user_id: number) {
   if (!db) return [];
 
   return await db
-    .select()
+    .select({
+      id: exams.id,
+      user_id: exams.user_id,
+      text_id: exams.text_id,
+      questions: exams.questions,
+      answers: exams.answers,
+      total_questions: exams.total_questions,
+      correct_answers: exams.correct_answers,
+      score_percentage: exams.score_percentage,
+      staatsexamen_score: exams.staatsexamen_score,
+      started_at: exams.started_at,
+      completed_at: exams.completed_at,
+      time_spent_minutes: exams.time_spent_minutes,
+      exam_mode: exams.exam_mode,
+      time_limit_minutes: exams.time_limit_minutes,
+      timer_paused_at: exams.timer_paused_at,
+      status: exams.status,
+      created_at: exams.created_at,
+      updated_at: exams.updated_at,
+      title: texts.title,
+      dutch_text: texts.dutch_text,
+    })
     .from(exams)
+    .leftJoin(texts, eq(exams.text_id, texts.id))
     .where(eq(exams.user_id, user_id))
     .orderBy(desc(exams.created_at));
 }

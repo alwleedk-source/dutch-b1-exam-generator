@@ -271,7 +271,11 @@ export default function CreateExam() {
                     placeholder="e.g., De Nederlandse cultuur"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
+                    maxLength={255}
                   />
+                  <p className="text-xs text-muted-foreground">
+                    {title.length}/255 characters
+                  </p>
                 </div>
 
                 {/* Image Upload */}
