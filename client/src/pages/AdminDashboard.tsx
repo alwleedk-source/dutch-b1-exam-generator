@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Users, FileText, AlertCircle, CheckCircle, XCircle, Loader2, Search, Trash2, Eye, 
-  BookOpen, TrendingUp, Activity, UserCog, Filter, X 
+  BookOpen, TrendingUp, Activity, UserCog, Filter, X, Settings 
 } from "lucide-react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -202,6 +202,21 @@ export default function AdminDashboard() {
 
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-6">
+              {/* Quick Actions */}
+              <div className="mb-6">
+                <Link href="/admin/settings">
+                  <Card className="cursor-pointer hover:shadow-lg transition-shadow border-primary/20">
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                      <div>
+                        <CardTitle className="text-lg">{t.systemSettings}</CardTitle>
+                        <CardDescription>{t.examCreation}</CardDescription>
+                      </div>
+                      <Settings className="h-8 w-8 text-primary" />
+                    </CardHeader>
+                  </Card>
+                </Link>
+              </div>
+              
               {/* Statistics Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card>
