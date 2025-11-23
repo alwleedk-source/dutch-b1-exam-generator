@@ -704,58 +704,66 @@ export async function getUserVocabularyProgress(user_id: number) {
   const db = await getDb();
   if (!db) return [];
 
-  // Use raw SQL to handle camelCase column names in database
-  const results = await db.execute(sql`
-    SELECT 
-      uv.id,
-      uv.user_id,
-      uv.vocabulary_id,
-      uv.status,
-      uv.correct_count,
-      uv.incorrect_count,
-      uv.last_reviewed_at,
-      uv.next_review_at,
-      uv.ease_factor,
-      uv.interval,
-      uv.repetitions,
-      uv.created_at,
-      uv.updated_at,
-      v."dutchWord" as dutch_word,
-      v."arabicTranslation" as arabic_translation,
-      v."englishTranslation" as english_translation,
-      v."turkishTranslation" as turkish_translation,
-      v."dutchDefinition" as dutch_definition,
-      v."audioUrl" as audio_url,
-      v."audioKey" as audio_key
-    FROM user_vocabulary uv
-    INNER JOIN vocabulary v ON uv.vocabulary_id = v.id
-    WHERE uv.user_id = ${user_id}
-    ORDER BY uv.created_at DESC
-  `);
+  // Use Drizzle ORM with proper JOIN
+  const results = await db
+    .select({
+      // From user_vocabulary
+      id: userVocabulary.id,
+      userId: userVocabulary.userId,
+      vocabularyId: userVocabulary.vocabularyId,
+      status: userVocabulary.status,
+      correctCount: userVocabulary.correctCount,
+      incorrectCount: userVocabulary.incorrectCount,
+      lastReviewedAt: userVocabulary.lastReviewedAt,
+      nextReviewAt: userVocabulary.nextReviewAt,
+      easeFactor: userVocabulary.easeFactor,
+      interval: userVocabulary.interval,
+      repetitions: userVocabulary.repetitions,
+      createdAt: userVocabulary.createdAt,
+      updatedAt: userVocabulary.updatedAt,
+      // From vocabulary (camelCase columns)
+      dutchWord: vocabulary.dutchWord,
+      arabicTranslation: vocabulary.arabicTranslation,
+      englishTranslation: vocabulary.englishTranslation,
+      turkishTranslation: vocabulary.turkishTranslation,
+      dutchDefinition: vocabulary.dutchDefinition,
+      audioUrl: vocabulary.audioUrl,
+      audioKey: vocabulary.audioKey,
+    })
+    .from(userVocabulary)
+    .innerJoin(vocabulary, eq(userVocabulary.vocabularyId, vocabulary.id))
+    .where(eq(userVocabulary.userId, user_id))
+    .orderBy(desc(userVocabulary.createdAt));
 
   // Convert ease_factor from decimal to integer for consistency
-  // Return all translations, let client choose based on user preference
-  return results.map((r: any) => ({
+  // Add aliases for client compatibility
+  return results.map((r) => ({
     ...r,
-    ease_factor: r.ease_factor ? Math.round(parseFloat(r.ease_factor.toString()) * 1000) : 2500,
-    // Add aliases for client compatibility
-    word: r.dutch_word,
-    // Keep all translations available
-    arabicTranslation: r.arabic_translation,
-    englishTranslation: r.english_translation,
-    turkishTranslation: r.turkish_translation,
-    dutchDefinition: r.dutch_definition,
-    definition: r.dutch_definition,
-    audioUrl: r.audio_url,
-    audioKey: r.audio_key,
-    // Add camelCase aliases for counts
-    correctCount: r.correct_count,
-    incorrectCount: r.incorrect_count,
-    // Add camelCase aliases for dates
-    createdAt: r.created_at,
-    updatedAt: r.updated_at,
-    nextReviewAt: r.next_review_at,
-    lastReviewedAt: r.last_reviewed_at,
+    // Convert ease_factor to integer (stored as decimal in DB)
+    easeFactor: r.easeFactor ? Math.round(parseFloat(r.easeFactor.toString()) * 1000) : 2500,
+    ease_factor: r.easeFactor ? Math.round(parseFloat(r.easeFactor.toString()) * 1000) : 2500,
+    // Add snake_case aliases for backward compatibility
+    user_id: r.userId,
+    vocabulary_id: r.vocabularyId,
+    correct_count: r.correctCount,
+    incorrect_count: r.incorrectCount,
+    last_reviewed_at: r.lastReviewedAt,
+    next_review_at: r.nextReviewAt,
+    created_at: r.createdAt,
+    updated_at: r.updatedAt,
+    // Add word aliases
+    word: r.dutchWord,
+    dutch_word: r.dutchWord,
+    // Add translation aliases
+    arabic_translation: r.arabicTranslation,
+    english_translation: r.englishTranslation,
+    turkish_translation: r.turkishTranslation,
+    // Add definition aliases
+    definition: r.dutchDefinition,
+    dutch_definition: r.dutchDefinition,
+    // Add audio aliases
+    audio_url: r.audioUrl,
+    audio_key: r.audioKey,
   }));
 }
 
