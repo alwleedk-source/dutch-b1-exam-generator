@@ -1508,8 +1508,8 @@ export async function rateText(userId: number, textId: number, rating: number, c
     .select()
     .from(textRatings)
     .where(and(
-      eq(textRatings.textId, textId),
-      eq(textRatings.userId, userId)
+      eq(textRatings.text_id, textId),
+      eq(textRatings.user_id, userId)
     ))
     .limit(1);
   
@@ -1520,19 +1520,19 @@ export async function rateText(userId: number, textId: number, rating: number, c
       .set({ 
         rating, 
         comment: comment || null,
-        updatedAt: new Date()
+        updated_at: new Date()
       })
       .where(and(
-        eq(textRatings.textId, textId),
-        eq(textRatings.userId, userId)
+        eq(textRatings.text_id, textId),
+        eq(textRatings.user_id, userId)
       ));
   } else {
     // Insert new rating
     await db
       .insert(textRatings)
       .values({
-        textId,
-        userId,
+        text_id: textId,
+        user_id: userId,
         rating,
         comment: comment || null
       });

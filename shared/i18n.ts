@@ -580,6 +580,14 @@ export interface Translations {
   
   // Rating
   rateThisExam: string;
+  ratingReason: string;
+  selectReason: string;
+  reasonHelpful: string;
+  reasonClear: string;
+  reasonGoodLevel: string;
+  reasonRealExam: string;
+  reasonGoodPractice: string;
+  reasonOther: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -1143,6 +1151,14 @@ export const translations: Record<Language, Translations> = {
     
     // Rating
     rateThisExam: "Beoordeel dit examen",
+    ratingReason: "Reden voor beoordeling",
+    selectReason: "Selecteer een reden (optioneel)",
+    reasonHelpful: "Nuttige tekst",
+    reasonClear: "Duidelijke vragen",
+    reasonGoodLevel: "Geschikt niveau",
+    reasonRealExam: "Kwam voor in echt examen",
+    reasonGoodPractice: "Goede oefening",
+    reasonOther: "Andere reden",
   },
   
   ar: {
@@ -1703,6 +1719,14 @@ export const translations: Record<Language, Translations> = {
     
     // Rating
     rateThisExam: "قيّم هذا الامتحان",
+    ratingReason: "سبب التقييم",
+    selectReason: "اختر سبباً (اختياري)",
+    reasonHelpful: "نص مفيد",
+    reasonClear: "أسئلة واضحة",
+    reasonGoodLevel: "مستوى مناسب",
+    reasonRealExam: "ظهر في امتحان حقيقي",
+    reasonGoodPractice: "تدريب جيد",
+    reasonOther: "سبب آخر",
   },
   
   en: {
@@ -2264,6 +2288,14 @@ export const translations: Record<Language, Translations> = {
     
     // Rating
     rateThisExam: "Rate this exam",
+    ratingReason: "Rating reason",
+    selectReason: "Select a reason (optional)",
+    reasonHelpful: "Helpful text",
+    reasonClear: "Clear questions",
+    reasonGoodLevel: "Appropriate level",
+    reasonRealExam: "Appeared in real exam",
+    reasonGoodPractice: "Good practice",
+    reasonOther: "Other reason",
   },
   
   tr: {
@@ -2826,6 +2858,14 @@ export const translations: Record<Language, Translations> = {
     
     // Rating
     rateThisExam: "Bu sınavı değerlendir",
+    ratingReason: "Değerlendirme nedeni",
+    selectReason: "Bir neden seçin (isteğe bağlı)",
+    reasonHelpful: "Faydalı metin",
+    reasonClear: "Açık sorular",
+    reasonGoodLevel: "Uygun seviye",
+    reasonRealExam: "Gerçek sınavda çıktı",
+    reasonGoodPractice: "İyi pratik",
+    reasonOther: "Diğer neden",
   },
 };
 

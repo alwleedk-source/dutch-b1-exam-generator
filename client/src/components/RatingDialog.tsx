@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RatingStars } from "@/components/RatingStars";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -24,6 +25,7 @@ export function RatingDialog({
 }: RatingDialogProps) {
   const { t } = useLanguage();
   const [rating, setRating] = useState(existingRating?.rating || 0);
+  const [reason, setReason] = useState("");
   const [comment, setComment] = useState(existingRating?.comment || "");
 
   const rateTextMutation = trpc.rating.rateText.useMutation({
@@ -42,10 +44,21 @@ export function RatingDialog({
       return;
     }
 
+    // Combine reason and comment
+    let finalComment = "";
+    if (reason) {
+      finalComment = reason;
+      if (comment.trim()) {
+        finalComment += ": " + comment.trim();
+      }
+    } else if (comment.trim()) {
+      finalComment = comment.trim();
+    }
+    
     rateTextMutation.mutate({
       text_id: textId,
       rating,
-      comment: comment.trim() || undefined,
+      comment: finalComment || undefined,
     });
   };
 
@@ -82,20 +95,41 @@ export function RatingDialog({
             </p>
           </div>
 
-          {/* Comment (Optional) */}
+          {/* Reason Selection (Optional) */}
           <div className="space-y-2">
             <label className="text-sm font-medium">
-              Comment (Optional)
+              {t.ratingReason}
+            </label>
+            <Select value={reason} onValueChange={setReason}>
+              <SelectTrigger>
+                <SelectValue placeholder={t.selectReason} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">{t.selectReason}</SelectItem>
+                <SelectItem value={t.reasonHelpful}>{t.reasonHelpful}</SelectItem>
+                <SelectItem value={t.reasonClear}>{t.reasonClear}</SelectItem>
+                <SelectItem value={t.reasonGoodLevel}>{t.reasonGoodLevel}</SelectItem>
+                <SelectItem value={t.reasonRealExam}>{t.reasonRealExam}</SelectItem>
+                <SelectItem value={t.reasonGoodPractice}>{t.reasonGoodPractice}</SelectItem>
+                <SelectItem value={t.reasonOther}>{t.reasonOther}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Additional Comment (Optional) */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">
+              {t.additionalDetails} ({t.optional})
             </label>
             <Textarea
               placeholder={t.shareThoughts}
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              rows={4}
-              maxLength={500}
+              rows={3}
+              maxLength={300}
             />
             <p className="text-xs text-muted-foreground text-right">
-              {comment.length}/500
+              {comment.length}/300
             </p>
           </div>
         </div>
