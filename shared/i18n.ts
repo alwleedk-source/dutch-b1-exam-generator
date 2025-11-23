@@ -353,6 +353,8 @@ export interface Translations {
   noTimeLimit: string;
   pleaseAnswerAll: string;
   officialExamFormat: string;
+  withWordTranslations: string;
+  noWordTranslations: string;
   
   // Forum
   forumTitle: string;
@@ -829,6 +831,8 @@ export const translations: Record<Language, Translations> = {
     noTimeLimit: "Geen tijdslimiet",
     pleaseAnswerAll: "Beantwoord alle vragen",
     officialExamFormat: "Officieel examenformaat",
+    withWordTranslations: "Met woordvertalingen",
+    noWordTranslations: "Zonder woordvertalingen",
     
     // Forum
     forumTitle: "Community Forum",
@@ -1293,6 +1297,8 @@ export const translations: Record<Language, Translations> = {
     noTimeLimit: "بدون حد زمني",
     pleaseAnswerAll: "يرجى الإجابة على جميع الأسئلة",
     officialExamFormat: "صيغة الامتحان الرسمي",
+    withWordTranslations: "مع ترجمة الكلمات",
+    noWordTranslations: "بدون ترجمة الكلمات",
     
     // Forum
     forumTitle: "مجتمع المنتدى",
@@ -1758,6 +1764,8 @@ export const translations: Record<Language, Translations> = {
     noTimeLimit: "No time limit",
     pleaseAnswerAll: "Please answer all questions",
     officialExamFormat: "Official exam format",
+    withWordTranslations: "With word translations",
+    noWordTranslations: "No word translations",
     
     // Forum
     forumTitle: "Community Forum",
@@ -2224,6 +2232,8 @@ export const translations: Record<Language, Translations> = {
     noTimeLimit: "Zaman sınırı yok",
     pleaseAnswerAll: "Lütfen tüm soruları cevaplayın",
     officialExamFormat: "Resmi sınav formatı",
+    withWordTranslations: "Kelime çevirileriyle",
+    noWordTranslations: "Kelime çevirisi olmadan",
     
     // Forum
     forumTitle: "Topluluk Forumu",

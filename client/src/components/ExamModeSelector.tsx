@@ -61,7 +61,7 @@ export default function ExamModeSelector({
                     ✓ {t.pauseTimer}
                   </span>
                   <span className="text-xs px-2 py-1 bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 rounded">
-                    ✓ {t.withTranslations || "With word translations"}
+                    ✓ {t.withWordTranslations}
                   </span>
                 </div>
               </div>
@@ -94,7 +94,7 @@ export default function ExamModeSelector({
                     ✓ {t.officialExamFormat}
                   </span>
                   <span className="text-xs px-2 py-1 bg-red-500/10 text-red-700 dark:text-red-400 rounded">
-                    ✗ {t.noTranslations || "No word translations"}
+                    ✗ {t.noWordTranslations}
                   </span>
                 </div>
               </div>
