@@ -535,6 +535,48 @@ export interface Translations {
   confirmDeleteButton: string;
   areYouSure: string;
   thisActionCannotBeUndone: string;
+
+  // My Exams - New
+  uniqueTexts: string;
+  totalAttempts: string;
+  attempt: string;
+  best: string;
+  average: string;
+  viewLatest: string;
+  hideAttempts: string;
+  viewAllAttempts: string;
+  allAttempts: string;
+  latest: string;
+  mostAttempts: string;
+  trackProgressViewExams: string;
+  today: string;
+  yesterday: string;
+  daysAgo: string;
+  weeksAgo: string;
+
+  // Public Exams - Filters
+  newestFirst: string;
+  highestRated: string;
+  mostPopular: string;
+  minRating: string;
+  allRatings: string;
+  threeStarsPlus: string;
+  fourStarsPlus: string;
+  fourHalfStarsPlus: string;
+  recommended: string;
+  popular: string;
+  clearFilters: string;
+  noExamsMatchFilters: string;
+  tryAdjustingFilters: string;
+  by: string;
+  exam: string;
+  exams: string;
+  found: string;
+
+  // Pagination
+  page: string;
+  previous: string;
+  next: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -1053,6 +1095,48 @@ export const translations: Record<Language, Translations> = {
     confirmDeleteButton: "Ja, verwijderen",
     areYouSure: "Weet je het zeker?",
     thisActionCannotBeUndone: "Deze actie kan niet ongedaan worden gemaakt.",
+
+    // My Exams - New
+    uniqueTexts: "Unieke Teksten",
+    totalAttempts: "Totale Pogingen",
+    attempt: "Poging",
+    best: "Beste",
+    average: "Gemiddelde",
+    viewLatest: "Bekijk Laatste",
+    hideAttempts: "Verberg Pogingen",
+    viewAllAttempts: "Bekijk Alle Pogingen",
+    allAttempts: "Alle Pogingen",
+    latest: "Laatste",
+    mostAttempts: "Meeste Pogingen",
+    trackProgressViewExams: "Volg je voortgang en bekijk je examens",
+    today: "Vandaag",
+    yesterday: "Gisteren",
+    daysAgo: "dagen geleden",
+    weeksAgo: "weken geleden",
+
+    // Public Exams - Filters
+    newestFirst: "Nieuwste eerst",
+    highestRated: "Hoogst gewaardeerd",
+    mostPopular: "Meest populair",
+    minRating: "Min. Beoordeling",
+    allRatings: "Alle Beoordelingen",
+    threeStarsPlus: "3+ Sterren",
+    fourStarsPlus: "4+ Sterren",
+    fourHalfStarsPlus: "4.5+ Sterren",
+    recommended: "Aanbevolen",
+    popular: "Populair",
+    clearFilters: "Filters wissen",
+    noExamsMatchFilters: "Geen examens komen overeen met je filters",
+    tryAdjustingFilters: "Probeer je filters aan te passen om meer examens te zien",
+    by: "door",
+    exam: "examen",
+    exams: "examens",
+    found: "gevonden",
+
+    // Pagination
+    page: "Pagina",
+    previous: "Vorige",
+    next: "Volgende",
   },
   
   ar: {
@@ -1568,6 +1652,48 @@ export const translations: Record<Language, Translations> = {
     confirmDeleteButton: "نعم، احذف",
     areYouSure: "هل أنت متأكد؟",
     thisActionCannotBeUndone: "لا يمكن التراجع عن هذا الإجراء.",
+
+    // My Exams - New
+    uniqueTexts: "نصوص فريدة",
+    totalAttempts: "إجمالي المحاولات",
+    attempt: "محاولة",
+    best: "الأفضل",
+    average: "المتوسط",
+    viewLatest: "عرض الأحدث",
+    hideAttempts: "إخفاء المحاولات",
+    viewAllAttempts: "عرض جميع المحاولات",
+    allAttempts: "جميع المحاولات",
+    latest: "الأحدث",
+    mostAttempts: "الأكثر محاولات",
+    trackProgressViewExams: "تتبع تقدمك وعرض امتحاناتك",
+    today: "اليوم",
+    yesterday: "أمس",
+    daysAgo: "أيام مضت",
+    weeksAgo: "أسابيع مضت",
+
+    // Public Exams - Filters
+    newestFirst: "الأحدث أولاً",
+    highestRated: "الأعلى تقييماً",
+    mostPopular: "الأكثر شعبية",
+    minRating: "الحد الأدنى للتقييم",
+    allRatings: "جميع التقييمات",
+    threeStarsPlus: "3+ نجوم",
+    fourStarsPlus: "4+ نجوم",
+    fourHalfStarsPlus: "4.5+ نجوم",
+    recommended: "موصى به",
+    popular: "شائع",
+    clearFilters: "مسح الفلاتر",
+    noExamsMatchFilters: "لا توجد امتحانات تطابق الفلاتر",
+    tryAdjustingFilters: "حاول تعديل الفلاتر لرؤية المزيد من الامتحانات",
+    by: "بواسطة",
+    exam: "امتحان",
+    exams: "امتحانات",
+    found: "تم العثور عليها",
+
+    // Pagination
+    page: "صفحة",
+    previous: "السابق",
+    next: "التالي",
   },
   
   en: {
@@ -2084,6 +2210,48 @@ export const translations: Record<Language, Translations> = {
     confirmDeleteButton: "Yes, delete",
     areYouSure: "Are you sure?",
     thisActionCannotBeUndone: "This action cannot be undone.",
+
+    // My Exams - New
+    uniqueTexts: "Unique Texts",
+    totalAttempts: "Total Attempts",
+    attempt: "Attempt",
+    best: "Best",
+    average: "Average",
+    viewLatest: "View Latest",
+    hideAttempts: "Hide Attempts",
+    viewAllAttempts: "View All Attempts",
+    allAttempts: "All Attempts",
+    latest: "Latest",
+    mostAttempts: "Most Attempts",
+    trackProgressViewExams: "Track your progress and view your exams",
+    today: "Today",
+    yesterday: "Yesterday",
+    daysAgo: "days ago",
+    weeksAgo: "weeks ago",
+
+    // Public Exams - Filters
+    newestFirst: "Newest First",
+    highestRated: "Highest Rated",
+    mostPopular: "Most Popular",
+    minRating: "Min Rating",
+    allRatings: "All Ratings",
+    threeStarsPlus: "3+ Stars",
+    fourStarsPlus: "4+ Stars",
+    fourHalfStarsPlus: "4.5+ Stars",
+    recommended: "Recommended",
+    popular: "Popular",
+    clearFilters: "Clear Filters",
+    noExamsMatchFilters: "No exams match your filters",
+    tryAdjustingFilters: "Try adjusting your filters to see more exams",
+    by: "by",
+    exam: "exam",
+    exams: "exams",
+    found: "found",
+
+    // Pagination
+    page: "Page",
+    previous: "Previous",
+    next: "Next",
   },
   
   tr: {
@@ -2601,6 +2769,48 @@ export const translations: Record<Language, Translations> = {
     confirmDeleteButton: "Evet, sil",
     areYouSure: "Emin misiniz?",
     thisActionCannotBeUndone: "Bu işlem geri alınamaz.",
+
+    // My Exams - New
+    uniqueTexts: "Benzersiz Metinler",
+    totalAttempts: "Toplam Denemeler",
+    attempt: "Deneme",
+    best: "En İyi",
+    average: "Ortalama",
+    viewLatest: "En Sonuncuyu Görüntüle",
+    hideAttempts: "Denemeleri Gizle",
+    viewAllAttempts: "Tüm Denemeleri Görüntüle",
+    allAttempts: "Tüm Denemeler",
+    latest: "En Son",
+    mostAttempts: "En Çok Deneme",
+    trackProgressViewExams: "İlerlemenizi takip edin ve sınavlarınızı görüntüleyin",
+    today: "Bugün",
+    yesterday: "Dün",
+    daysAgo: "gün önce",
+    weeksAgo: "hafta önce",
+
+    // Public Exams - Filters
+    newestFirst: "Önce En Yeni",
+    highestRated: "En Yüksek Puanlı",
+    mostPopular: "En Popüler",
+    minRating: "Min. Puan",
+    allRatings: "Tüm Puanlar",
+    threeStarsPlus: "3+ Yıldız",
+    fourStarsPlus: "4+ Yıldız",
+    fourHalfStarsPlus: "4.5+ Yıldız",
+    recommended: "Önerilen",
+    popular: "Popüler",
+    clearFilters: "Filtreleri Temizle",
+    noExamsMatchFilters: "Filtrelerinize uygun sınav yok",
+    tryAdjustingFilters: "Daha fazla sınav görmek için filtrelerinizi ayarlamayı deneyin",
+    by: "tarafından",
+    exam: "sınav",
+    exams: "sınavlar",
+    found: "bulundu",
+
+    // Pagination
+    page: "Sayfa",
+    previous: "Önceki",
+    next: "Sonraki",
   },
 };
 

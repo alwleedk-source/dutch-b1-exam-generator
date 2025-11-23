@@ -20,6 +20,8 @@ export default function PublicExams() {
   const [generatingExamId, setGeneratingExamId] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<'date' | 'rating' | 'popular'>('date');
   const [minRating, setMinRating] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
 
   const { data: allTexts, isLoading } = trpc.text.listPublicTexts.useQuery();
   
@@ -53,6 +55,18 @@ export default function PublicExams() {
     
     return filtered;
   }, [allTexts, minRating, sortBy]);
+
+  // Pagination
+  const totalPages = Math.ceil(texts.length / itemsPerPage);
+  const paginatedTexts = texts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Reset to page 1 when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [sortBy, minRating]);
   
   const generateExamMutation = trpc.exam.generateExam.useMutation({
     onSuccess: (data) => {
@@ -93,38 +107,38 @@ export default function PublicExams() {
           <div className="mb-6 flex flex-wrap gap-4 items-center">
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Sort by:</span>
+              <span className="text-sm font-medium">{t.sortBy || 'Sort by'}:</span>
               <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="date">Newest First</SelectItem>
-                  <SelectItem value="rating">Highest Rated</SelectItem>
-                  <SelectItem value="popular">Most Popular</SelectItem>
+                  <SelectItem value="date">{t.newestFirst || 'Newest First'}</SelectItem>
+                  <SelectItem value="rating">{t.highestRated || 'Highest Rated'}</SelectItem>
+                  <SelectItem value="popular">{t.mostPopular || 'Most Popular'}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="flex items-center gap-2">
               <Star className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Min Rating:</span>
+              <span className="text-sm font-medium">{t.minRating || 'Min Rating'}:</span>
               <Select value={minRating.toString()} onValueChange={(value) => setMinRating(Number(value))}>
                 <SelectTrigger className="w-[150px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="0">All Ratings</SelectItem>
-                  <SelectItem value="3">3+ Stars</SelectItem>
-                  <SelectItem value="4">4+ Stars</SelectItem>
-                  <SelectItem value="4.5">4.5+ Stars</SelectItem>
+                  <SelectItem value="0">{t.allRatings || 'All Ratings'}</SelectItem>
+                  <SelectItem value="3">{t.threeStarsPlus || '3+ Stars'}</SelectItem>
+                  <SelectItem value="4">{t.fourStarsPlus || '4+ Stars'}</SelectItem>
+                  <SelectItem value="4.5">{t.fourHalfStarsPlus || '4.5+ Stars'}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             {texts && texts.length > 0 && (
               <div className="ml-auto text-sm text-muted-foreground">
-                {texts.length} exam{texts.length !== 1 ? 's' : ''} found
+                {texts.length} {texts.length === 1 ? (t.exam || 'exam') : (t.exams || 'exams')} {t.found || 'found'}
               </div>
             )}
           </div>
@@ -138,16 +152,16 @@ export default function PublicExams() {
               <CardContent className="py-12 text-center">
                 <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">
-                  {minRating > 0 ? "No exams match your filters" : t.noExamsYet}
+                  {minRating > 0 ? (t.noExamsMatchFilters || "No exams match your filters") : t.noExamsYet}
                 </h3>
                 <p className="text-muted-foreground mb-4">
                   {minRating > 0 
-                    ? "Try adjusting your filters to see more exams" 
+                    ? (t.tryAdjustingFilters || "Try adjusting your filters to see more exams") 
                     : t.createFirstExam
                   }
                 </p>
                 {minRating > 0 ? (
-                  <Button onClick={() => setMinRating(0)}>Clear Filters</Button>
+                  <Button onClick={() => setMinRating(0)}>{t.clearFilters || 'Clear Filters'}</Button>
                 ) : (
                   <Link href="/create-exam">
                     <Button>{t.createFirstExam}</Button>
@@ -156,8 +170,8 @@ export default function PublicExams() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid gap-4">
-              {texts.map((text: any) => {
+            <div className="grid gap-4 mb-6">
+              {paginatedTexts.map((text: any) => {
                 const isHighlyRated = text.average_rating >= 4.5 && text.total_ratings >= 3;
                 const isPopular = text.total_ratings >= 10;
                 
@@ -173,13 +187,13 @@ export default function PublicExams() {
                             {isHighlyRated && (
                               <Badge variant="default" className="bg-yellow-500">
                                 <Star className="h-3 w-3 mr-1" />
-                                Recommended
+                                {t.recommended || 'Recommended'}
                               </Badge>
                             )}
                             {isPopular && (
                               <Badge variant="secondary">
                                 <TrendingUp className="h-3 w-3 mr-1" />
-                                Popular
+                                {t.popular || 'Popular'}
                               </Badge>
                             )}
                           </div>
@@ -190,7 +204,7 @@ export default function PublicExams() {
                             {text.creator_name && (
                               <>
                                 <span>•</span>
-                                <span>by {text.creator_name}</span>
+                                <span>{t.by || 'by'} {text.creator_name}</span>
                               </>
                             )}
                           </CardDescription>
@@ -247,6 +261,31 @@ export default function PublicExams() {
                 );
               })}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                >
+                  {t.previous || 'Previous'}
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                  {t.page || 'Page'} {currentPage} {t.of || 'of'} {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  {t.next || 'Next'}
+                </Button>
+              </div>
+            )}
           )}
         </div>
       </main>

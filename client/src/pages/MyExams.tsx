@@ -7,10 +7,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { BookOpen, Clock, CheckCircle, XCircle, TrendingUp, RotateCcw, Award, Target, Calendar, Search, Trophy, Star } from "lucide-react";
+import { 
+  BookOpen, Clock, CheckCircle, XCircle, TrendingUp, RotateCcw, 
+  Award, Target, Calendar, Search, Trophy, Star, ChevronDown, ChevronUp 
+} from "lucide-react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useMemo, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+
+// Group exams by text_id
+interface GroupedExam {
+  textId: number;
+  title: string;
+  dutchText: string;
+  attempts: any[];
+  totalAttempts: number;
+  completedAttempts: number;
+  bestScore: number;
+  latestAttempt: any;
+  avgScore: number;
+}
 
 export default function MyExams() {
   const { user, logout } = useAuth();
@@ -18,8 +35,72 @@ export default function MyExams() {
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
+  const [expandedGroups, setExpandedGroups] = useState<Set<number>>(new Set());
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const { data: exams, isLoading } = trpc.exam.getMyExams.useQuery();
+
+  // Group exams by text_id
+  const groupedExams = useMemo(() => {
+    if (!exams || exams.length === 0) return [];
+
+    const groups = new Map<number, GroupedExam>();
+
+    exams.forEach(exam => {
+      const textId = exam.text_id;
+      
+      if (!groups.has(textId)) {
+        groups.set(textId, {
+          textId,
+          title: exam.title || `Text #${textId}`,
+          dutchText: exam.dutch_text || "",
+          attempts: [],
+          totalAttempts: 0,
+          completedAttempts: 0,
+          bestScore: 0,
+          latestAttempt: exam,
+          avgScore: 0,
+        });
+      }
+
+      const group = groups.get(textId)!;
+      group.attempts.push(exam);
+      group.totalAttempts++;
+      
+      if (exam.status === 'completed') {
+        group.completedAttempts++;
+        if ((exam.score_percentage || 0) > group.bestScore) {
+          group.bestScore = exam.score_percentage || 0;
+        }
+      }
+
+      // Update latest attempt
+      if (new Date(exam.created_at) > new Date(group.latestAttempt.created_at)) {
+        group.latestAttempt = exam;
+      }
+    });
+
+    // Calculate average score for completed attempts
+    groups.forEach(group => {
+      const completedScores = group.attempts
+        .filter(a => a.status === 'completed')
+        .map(a => a.score_percentage || 0);
+      
+      if (completedScores.length > 0) {
+        group.avgScore = Math.round(
+          completedScores.reduce((sum, score) => sum + score, 0) / completedScores.length
+        );
+      }
+
+      // Sort attempts by date (newest first)
+      group.attempts.sort((a, b) => 
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+    });
+
+    return Array.from(groups.values());
+  }, [exams]);
 
   // Calculate statistics
   const stats = useMemo(() => {
@@ -32,41 +113,6 @@ export default function MyExams() {
     const avgScore = completed.length > 0 ? Math.round(totalScore / completed.length) : 0;
     
     const totalTime = completed.reduce((sum, e) => sum + (e.time_spent_minutes || 0), 0);
-    
-    // Calculate performance by question type
-    const performanceByType: Record<string, { correct: number; total: number }> = {};
-    
-    completed.forEach(exam => {
-      if (exam.performance_analysis) {
-        try {
-          const analysis = typeof exam.performance_analysis === 'string' 
-            ? JSON.parse(exam.performance_analysis) 
-            : exam.performance_analysis;
-          
-          Object.entries(analysis).forEach(([type, data]: [string, any]) => {
-            if (!performanceByType[type]) {
-              performanceByType[type] = { correct: 0, total: 0 };
-            }
-            performanceByType[type].correct += data.correct || 0;
-            performanceByType[type].total += data.total || 0;
-          });
-        } catch (e) {
-          console.error('Error parsing performance analysis:', e);
-        }
-      }
-    });
-
-    // Find strongest and weakest areas
-    const typePerformances = Object.entries(performanceByType).map(([type, data]) => ({
-      type,
-      percentage: data.total > 0 ? (data.correct / data.total) * 100 : 0,
-      correct: data.correct,
-      total: data.total
-    })).filter(p => p.total > 0);
-
-    typePerformances.sort((a, b) => b.percentage - a.percentage);
-    const strongest = typePerformances[0];
-    const weakest = typePerformances[typePerformances.length - 1];
 
     return {
       total: exams.length,
@@ -74,52 +120,66 @@ export default function MyExams() {
       inProgress: inProgress.length,
       avgScore,
       totalTime,
-      strongest,
-      weakest
+      uniqueTexts: groupedExams.length,
     };
-  }, [exams]);
+  }, [exams, groupedExams]);
 
-  // Filter and sort exams
-  const filteredAndSortedExams = useMemo(() => {
-    if (!exams) return [];
-    
-    let filtered = exams;
+  // Filter and sort grouped exams
+  const filteredAndSortedGroups = useMemo(() => {
+    let filtered = [...groupedExams];
     
     // Filter by tab
     if (activeTab === 'completed') {
-      filtered = filtered.filter(e => e.status === 'completed');
+      filtered = filtered.filter(g => g.completedAttempts > 0);
     } else if (activeTab === 'in_progress') {
-      filtered = filtered.filter(e => e.status === 'in_progress');
+      filtered = filtered.filter(g => 
+        g.attempts.some(a => a.status === 'in_progress')
+      );
     }
     
     // Filter by search
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(e => 
-        (e.title && e.title.toLowerCase().includes(query)) ||
-        (e.dutch_text && e.dutch_text.toLowerCase().includes(query))
+      filtered = filtered.filter(g => 
+        g.title.toLowerCase().includes(query) ||
+        g.dutchText.toLowerCase().includes(query)
       );
     }
     
     // Sort
-    const sorted = [...filtered];
     switch (sortBy) {
       case 'newest':
-        sorted.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        filtered.sort((a, b) => 
+          new Date(b.latestAttempt.created_at).getTime() - 
+          new Date(a.latestAttempt.created_at).getTime()
+        );
         break;
       case 'oldest':
-        sorted.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        filtered.sort((a, b) => 
+          new Date(a.latestAttempt.created_at).getTime() - 
+          new Date(b.latestAttempt.created_at).getTime()
+        );
         break;
       case 'highest':
-        sorted.sort((a, b) => (b.score_percentage || 0) - (a.score_percentage || 0));
+        filtered.sort((a, b) => b.bestScore - a.bestScore);
         break;
       case 'lowest':
-        sorted.sort((a, b) => (a.score_percentage || 0) - (b.score_percentage || 0));
+        filtered.sort((a, b) => a.bestScore - b.bestScore);
+        break;
+      case 'most_attempts':
+        filtered.sort((a, b) => b.totalAttempts - a.totalAttempts);
         break;
     }
     
-    return sorted;
-  }, [exams, activeTab, searchQuery, sortBy]);
+    return filtered;
+  }, [groupedExams, activeTab, searchQuery, sortBy]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredAndSortedGroups.length / itemsPerPage);
+  const paginatedGroups = filteredAndSortedGroups.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   // Format relative time
   const formatRelativeTime = (date: string) => {
@@ -128,19 +188,29 @@ export default function MyExams() {
     const diffMs = now.getTime() - then.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     
-    if (diffDays === 0) return 'Vandaag';
-    if (diffDays === 1) return 'Gisteren';
-    if (diffDays < 7) return `${diffDays} dagen geleden`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weken geleden`;
+    if (diffDays === 0) return t.today || 'Vandaag';
+    if (diffDays === 1) return t.yesterday || 'Gisteren';
+    if (diffDays < 7) return `${diffDays} ${t.daysAgo || 'dagen geleden'}`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} ${t.weeksAgo || 'weken geleden'}`;
     return then.toLocaleDateString('nl-NL');
   };
 
   // Get badge for score
   const getScoreBadge = (percentage: number) => {
-    if (percentage >= 90) return { icon: <Trophy className="h-5 w-5" />, text: 'Perfect!', color: 'bg-green-100 text-green-700 border-green-300' };
-    if (percentage >= 80) return { icon: <Star className="h-5 w-5" />, text: 'Uitstekend', color: 'bg-blue-100 text-blue-700 border-blue-300' };
-    if (percentage >= 60) return { icon: <CheckCircle className="h-5 w-5" />, text: 'Goed', color: 'bg-yellow-100 text-yellow-700 border-yellow-300' };
-    return { icon: <XCircle className="h-5 w-5" />, text: 'Onvoldoende', color: 'bg-red-100 text-red-700 border-red-300' };
+    if (percentage >= 90) return { icon: <Trophy className="h-4 w-4" />, text: 'Perfect!', color: 'bg-green-100 text-green-700 border-green-300' };
+    if (percentage >= 80) return { icon: <Star className="h-4 w-4" />, text: 'Uitstekend', color: 'bg-blue-100 text-blue-700 border-blue-300' };
+    if (percentage >= 60) return { icon: <CheckCircle className="h-4 w-4" />, text: 'Goed', color: 'bg-yellow-100 text-yellow-700 border-yellow-300' };
+    return { icon: <XCircle className="h-4 w-4" />, text: 'Onvoldoende', color: 'bg-red-100 text-red-700 border-red-300' };
+  };
+
+  const toggleGroup = (textId: number) => {
+    const newExpanded = new Set(expandedGroups);
+    if (newExpanded.has(textId)) {
+      newExpanded.delete(textId);
+    } else {
+      newExpanded.add(textId);
+    }
+    setExpandedGroups(newExpanded);
   };
 
   if (!user) {
@@ -149,16 +219,14 @@ export default function MyExams() {
 
   return (
     <div className="min-h-screen bg-gradient-bg">
-      {/* Header */}
       <AppHeader />
 
-      {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
             <h2 className="text-3xl font-bold mb-2">{t.myExams}</h2>
             <p className="text-muted-foreground">
-              Volg je voortgang en bekijk je examens
+              {t.trackProgressViewExams || "Volg je voortgang en bekijk je examens"}
             </p>
           </div>
 
@@ -171,11 +239,9 @@ export default function MyExams() {
               <CardContent className="py-12 text-center">
                 <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">{t.noExamsYet}</h3>
-                <p className="text-muted-foreground mb-4">
-                  {t.createFirstExam}
-                </p>
+                <p className="text-muted-foreground mb-4">{t.createFirstExam}</p>
                 <Link href="/create-exam">
-                  <Button>{t.createFirstExam || "Maak je eerste examen"}</Button>
+                  <Button>{t.createExam || "Maak je eerste examen"}</Button>
                 </Link>
               </CardContent>
             </Card>
@@ -187,8 +253,26 @@ export default function MyExams() {
                   <Card>
                     <CardContent className="pt-6">
                       <div className="text-center">
-                        <div className="text-3xl font-bold text-primary mb-1">{stats.completed}</div>
-                        <p className="text-sm text-muted-foreground">Afgerond</p>
+                        <div className="text-3xl font-bold text-primary mb-1">{stats.uniqueTexts}</div>
+                        <p className="text-sm text-muted-foreground">{t.uniqueTexts || "Unieke Teksten"}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-blue-500 mb-1">{stats.total}</div>
+                        <p className="text-sm text-muted-foreground">{t.totalAttempts || "Totale Pogingen"}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-green-500 mb-1">{stats.completed}</div>
+                        <p className="text-sm text-muted-foreground">{t.completed || "Afgerond"}</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -203,44 +287,10 @@ export default function MyExams() {
                         }`}>
                           {stats.avgScore}%
                         </div>
-                        <p className="text-sm text-muted-foreground">Gemiddelde</p>
+                        <p className="text-sm text-muted-foreground">{t.averageScore || "Gemiddelde"}</p>
                       </div>
                     </CardContent>
                   </Card>
-                  
-                  {stats.strongest && (
-                    <Card>
-                      <CardContent className="pt-6">
-                        <div className="text-center">
-                          <div className="flex items-center justify-center gap-1 mb-1">
-                            <span className="text-lg font-semibold text-green-500">
-                              💪 {Math.round(stats.strongest.percentage)}%
-                            </span>
-                          </div>
-                          <p className="text-xs text-muted-foreground capitalize line-clamp-1">
-                            {stats.strongest.type.replace('_', ' ')}
-                          </p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-                  
-                  {stats.weakest && (
-                    <Card>
-                      <CardContent className="pt-6">
-                        <div className="text-center">
-                          <div className="flex items-center justify-center gap-1 mb-1">
-                            <span className="text-lg font-semibold text-orange-500">
-                              🎯 {Math.round(stats.weakest.percentage)}%
-                            </span>
-                          </div>
-                          <p className="text-xs text-muted-foreground capitalize line-clamp-1">
-                            {stats.weakest.type.replace('_', ' ')}
-                          </p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
                 </div>
               )}
 
@@ -248,13 +298,13 @@ export default function MyExams() {
               <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
                 <TabsList className="grid w-full grid-cols-3 max-w-md">
                   <TabsTrigger value="all">
-                    Alle ({exams.length})
+                    {t.all || "Alle"} ({groupedExams.length})
                   </TabsTrigger>
                   <TabsTrigger value="completed">
-                    Afgerond ({stats?.completed || 0})
+                    {t.completed || "Afgerond"} ({groupedExams.filter(g => g.completedAttempts > 0).length})
                   </TabsTrigger>
                   <TabsTrigger value="in_progress">
-                    Bezig ({stats?.inProgress || 0})
+                    {t.inProgress || "Bezig"} ({groupedExams.filter(g => g.attempts.some(a => a.status === 'in_progress')).length})
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
@@ -264,7 +314,7 @@ export default function MyExams() {
                 <div className="flex-1 relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Zoek examen..."
+                    placeholder={t.searchExam || "Zoek examen..."}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10"
@@ -272,171 +322,200 @@ export default function MyExams() {
                 </div>
                 <Select value={sortBy} onValueChange={setSortBy}>
                   <SelectTrigger className="w-full sm:w-48">
-                    <SelectValue placeholder="Sorteer op..." />
+                    <SelectValue placeholder={t.sortBy || "Sorteer op..."} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="newest">Nieuwste eerst</SelectItem>
-                    <SelectItem value="oldest">Oudste eerst</SelectItem>
-                    <SelectItem value="highest">Hoogste score</SelectItem>
-                    <SelectItem value="lowest">Laagste score</SelectItem>
+                    <SelectItem value="newest">{t.newestFirst || "Nieuwste eerst"}</SelectItem>
+                    <SelectItem value="oldest">{t.oldestFirst || "Oudste eerst"}</SelectItem>
+                    <SelectItem value="highest">{t.highestScore || "Hoogste score"}</SelectItem>
+                    <SelectItem value="lowest">{t.lowestScore || "Laagste score"}</SelectItem>
+                    <SelectItem value="most_attempts">{t.mostAttempts || "Meeste pogingen"}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-              {/* Exams List */}
-              {filteredAndSortedExams.length === 0 ? (
+              {/* Grouped Exams List */}
+              {paginatedGroups.length === 0 ? (
                 <Card>
                   <CardContent className="py-12 text-center">
                     <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">{t.noExamsYet}</p>
+                    <p className="text-muted-foreground">{t.noResultsFound || "Geen resultaten gevonden"}</p>
                   </CardContent>
                 </Card>
               ) : (
-                <div className="grid gap-4">
-                  {filteredAndSortedExams.map((exam) => {
-                    // Parse performance analysis
-                    let performanceData: any = null;
-                    let strongest: { type: string; percentage: number } | null = null;
-                    let weakest: { type: string; percentage: number } | null = null;
-                    
-                    try {
-                      if (exam.performance_analysis) {
-                        performanceData = typeof exam.performance_analysis === 'string' 
-                          ? JSON.parse(exam.performance_analysis) 
-                          : exam.performance_analysis;
-                        
-                        // Find strongest and weakest
-                        const performances = Object.entries(performanceData).map(([type, data]: [string, any]) => ({
-                          type,
-                          percentage: data.total > 0 ? (data.correct / data.total) * 100 : 0
-                        })).filter(p => p.percentage > 0);
-                        
-                        if (performances.length > 0) {
-                          performances.sort((a, b) => b.percentage - a.percentage);
-                          strongest = performances[0];
-                          weakest = performances[performances.length - 1];
-                        }
-                      }
-                    } catch (e) {
-                      console.error('Error parsing performance:', e);
-                    }
+                <>
+                  <div className="grid gap-4 mb-6">
+                    {paginatedGroups.map((group) => {
+                      const isExpanded = expandedGroups.has(group.textId);
+                      const latestBadge = group.latestAttempt.status === 'completed' 
+                        ? getScoreBadge(group.latestAttempt.score_percentage || 0) 
+                        : null;
 
-                    const scorePercentage = exam.score_percentage || 0;
-                    const badge = exam.status === 'completed' ? getScoreBadge(scorePercentage) : null;
-
-                    return (
-                      <Card key={exam.id} className="hover:shadow-lg transition-shadow">
-                        <CardHeader>
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1 min-w-0">
-                              <CardTitle className="text-2xl font-bold mb-2 flex items-center gap-2">
-                                <BookOpen className="h-6 w-6 text-primary flex-shrink-0" />
-                                <span className="truncate">{exam.title || `Examen #${exam.id}`}</span>
-                              </CardTitle>
-                              <CardDescription className="space-y-2">
-                                <div className="flex flex-wrap items-center gap-3 text-sm">
-                                  <span className="flex items-center gap-1">
-                                    <Calendar className="h-4 w-4" />
-                                    {exam.status === 'completed' 
-                                      ? `Afgerond ${formatRelativeTime(exam.completed_at || exam.created_at)}`
-                                      : `Aangemaakt ${formatRelativeTime(exam.created_at)}`
-                                    }
-                                  </span>
-                                  <span className="flex items-center gap-1">
-                                    <Clock className="h-4 w-4" />
-                                    {exam.time_spent_minutes || 0} min
-                                  </span>
-                                  {exam.status === 'completed' && (
-                                    <span className="flex items-center gap-1">
-                                      <Target className="h-4 w-4" />
-                                      {exam.correct_answers}/{exam.total_questions}
+                      return (
+                        <Card key={group.textId} className="hover:shadow-lg transition-shadow">
+                          <CardHeader>
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1 min-w-0">
+                                <CardTitle className="text-xl font-bold mb-2 flex items-center gap-2">
+                                  <BookOpen className="h-5 w-5 text-primary flex-shrink-0" />
+                                  <span className="truncate">{group.title}</span>
+                                </CardTitle>
+                                <CardDescription className="space-y-2">
+                                  <div className="flex flex-wrap items-center gap-3 text-sm">
+                                    <Badge variant="outline" className="gap-1">
+                                      <RotateCcw className="h-3 w-3" />
+                                      {group.totalAttempts} {group.totalAttempts === 1 ? (t.attempt || 'poging') : (t.attempts || 'pogingen')}
+                                    </Badge>
+                                    {group.completedAttempts > 0 && (
+                                      <>
+                                        <Badge variant="outline" className="gap-1 bg-green-50 text-green-700 border-green-300">
+                                          <Trophy className="h-3 w-3" />
+                                          {t.best || 'Beste'}: {group.bestScore}%
+                                        </Badge>
+                                        <Badge variant="outline" className="gap-1 bg-blue-50 text-blue-700 border-blue-300">
+                                          <TrendingUp className="h-3 w-3" />
+                                          {t.average || 'Gem'}: {group.avgScore}%
+                                        </Badge>
+                                      </>
+                                    )}
+                                    <span className="flex items-center gap-1 text-muted-foreground">
+                                      <Calendar className="h-3 w-3" />
+                                      {formatRelativeTime(group.latestAttempt.created_at)}
                                     </span>
-                                  )}
-                                </div>
-                              </CardDescription>
-                            </div>
-                            <div className="flex-shrink-0">
-                              {exam.status === 'completed' && badge ? (
-                                <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border-2 ${badge.color}`}>
-                                  {badge.icon}
-                                  <div className="text-center">
-                                    <div className="text-2xl font-bold leading-none">{scorePercentage}%</div>
-                                    <div className="text-xs font-medium mt-0.5">{badge.text}</div>
                                   </div>
-                                </div>
-                              ) : (
-                                <div className="px-4 py-2 rounded-full bg-yellow-500/10 text-yellow-600 text-sm font-medium border-2 border-yellow-300">
-                                  Bezig
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          {/* Performance Summary - Only show strongest and weakest */}
-                          {exam.status === 'completed' && (strongest || weakest) && (
-                            <div className="mb-4 flex flex-wrap gap-2">
-                              {strongest && (
-                                <div className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-green-50 text-green-700 text-sm border border-green-200">
-                                  <span>💪</span>
-                                  <span className="font-medium capitalize">{strongest.type.replace('_', ' ')}</span>
-                                  <span className="font-bold">({Math.round(strongest.percentage)}%)</span>
-                                </div>
-                              )}
-                              {weakest && strongest?.type !== weakest?.type && (
-                                <div className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-orange-50 text-orange-700 text-sm border border-orange-200">
-                                  <span>🎯</span>
-                                  <span className="font-medium capitalize">{weakest.type.replace('_', ' ')}</span>
-                                  <span className="font-bold">({Math.round(weakest.percentage)}%)</span>
+                                </CardDescription>
+                              </div>
+                              {latestBadge && (
+                                <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${latestBadge.color} text-sm`}>
+                                  {latestBadge.icon}
+                                  <span className="font-bold">{group.latestAttempt.score_percentage}%</span>
                                 </div>
                               )}
                             </div>
-                          )}
-                          
-                          <div className="flex flex-wrap gap-2">
-                            {exam.status === 'completed' ? (
-                              <>
-                                <Link href={`/exam/${exam.id}/results`}>
-                                  <Button variant="default" size="sm">
-                                    <TrendingUp className="h-4 w-4 mr-2" />
-                                    Resultaten
-                                  </Button>
-                                </Link>
-                                <Link href={`/study/${exam.text_id}`}>
-                                  <Button variant="outline" size="sm">
-                                    <BookOpen className="h-4 w-4 mr-2" />
-                                    Bestudeer
-                                  </Button>
-                                </Link>
-                                <Link href={`/exam/${exam.id}`}>
-                                  <Button variant="outline" size="sm">
-                                    <RotateCcw className="h-4 w-4 mr-2" />
-                                    Opnieuw
-                                  </Button>
-                                </Link>
-                              </>
-                            ) : (
-                              <>
-                                <Link href={`/exam/${exam.id}`}>
-                                  <Button size="sm">
-                                    <BookOpen className="h-4 w-4 mr-2" />
-                                    Start examen
-                                  </Button>
-                                </Link>
-                                <Link href={`/study/${exam.text_id}`}>
-                                  <Button variant="outline" size="sm">
-                                    <BookOpen className="h-4 w-4 mr-2" />
-                                    Bestudeer
-                                  </Button>
-                                </Link>
-                              </>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="flex flex-wrap gap-2 mb-3">
+                              <Link href={`/exam/${group.latestAttempt.id}${group.latestAttempt.status === 'completed' ? '/results' : ''}`}>
+                                <Button variant="default" size="sm">
+                                  {group.latestAttempt.status === 'completed' 
+                                    ? (t.viewLatest || 'Bekijk Laatste') 
+                                    : (t.continue || 'Doorgaan')
+                                  }
+                                </Button>
+                              </Link>
+                              {group.totalAttempts > 1 && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => toggleGroup(group.textId)}
+                                >
+                                  {isExpanded ? (
+                                    <>
+                                      <ChevronUp className="h-4 w-4 mr-1" />
+                                      {t.hideAttempts || 'Verberg Pogingen'}
+                                    </>
+                                  ) : (
+                                    <>
+                                      <ChevronDown className="h-4 w-4 mr-1" />
+                                      {t.viewAllAttempts || 'Bekijk Alle Pogingen'} ({group.totalAttempts})
+                                    </>
+                                  )}
+                                </Button>
+                              )}
+                            </div>
+
+                            {/* Expanded Attempts List */}
+                            {isExpanded && (
+                              <div className="mt-4 space-y-2 border-t pt-4">
+                                <h4 className="font-semibold text-sm mb-3">{t.allAttempts || 'Alle Pogingen'}:</h4>
+                                {group.attempts.map((attempt, index) => {
+                                  const attemptBadge = attempt.status === 'completed' 
+                                    ? getScoreBadge(attempt.score_percentage || 0) 
+                                    : null;
+
+                                  return (
+                                    <div 
+                                      key={attempt.id} 
+                                      className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                                    >
+                                      <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-1">
+                                          <span className="text-sm font-medium">
+                                            {t.attempt || 'Poging'} #{group.totalAttempts - index}
+                                          </span>
+                                          {index === 0 && (
+                                            <Badge variant="secondary" className="text-xs">
+                                              {t.latest || 'Laatste'}
+                                            </Badge>
+                                          )}
+                                        </div>
+                                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                          <span className="flex items-center gap-1">
+                                            <Calendar className="h-3 w-3" />
+                                            {formatRelativeTime(attempt.created_at)}
+                                          </span>
+                                          {attempt.status === 'completed' && (
+                                            <>
+                                              <span className="flex items-center gap-1">
+                                                <Clock className="h-3 w-3" />
+                                                {attempt.time_spent_minutes || 0} min
+                                              </span>
+                                              <span className="flex items-center gap-1">
+                                                <Target className="h-3 w-3" />
+                                                {attempt.correct_answers}/{attempt.total_questions}
+                                              </span>
+                                            </>
+                                          )}
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        {attemptBadge && (
+                                          <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full border text-xs ${attemptBadge.color}`}>
+                                            <span className="font-bold">{attempt.score_percentage}%</span>
+                                          </div>
+                                        )}
+                                        <Link href={`/exam/${attempt.id}${attempt.status === 'completed' ? '/results' : ''}`}>
+                                          <Button variant="ghost" size="sm">
+                                            {attempt.status === 'completed' ? (t.view || 'Bekijk') : (t.continue || 'Doorgaan')}
+                                          </Button>
+                                        </Link>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
                             )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                      >
+                        {t.previous || 'Vorige'}
+                      </Button>
+                      <span className="text-sm text-muted-foreground">
+                        {t.page || 'Pagina'} {currentPage} {t.of || 'van'} {totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                      >
+                        {t.next || 'Volgende'}
+                      </Button>
+                    </div>
+                  )}
+                </>
               )}
             </>
           )}
