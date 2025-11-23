@@ -218,13 +218,27 @@ export default function InteractiveText({ textId, content, className = "", disab
     return () => document.removeEventListener('click', handleClick);
   }, [textId]);
   
-  // Handle tooltip positioning on hover
+  // Handle tooltip positioning on hover using event delegation
   useEffect(() => {
     const tooltip = tooltipRef.current;
     if (!tooltip) return;
     
-    const handleMouseEnter = (e: Event) => {
-      const wrapper = e.currentTarget as HTMLElement;
+    // Use event delegation on document level to handle dynamically added elements
+    const handleMouseOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      
+      // Check if hovering over a vocab word wrapper
+      const wrapper = target.closest('.vocab-word-wrapper') as HTMLElement;
+      if (!wrapper) {
+        // If not hovering over any wrapper, hide tooltip
+        tooltip.style.opacity = '0';
+        currentHoveredElement.current = null;
+        return;
+      }
+      
+      // If already hovering over this element, don't reposition
+      if (currentHoveredElement.current === wrapper) return;
+      
       currentHoveredElement.current = wrapper;
       const translation = wrapper.getAttribute('data-translation') || '';
       
@@ -254,27 +268,13 @@ export default function InteractiveText({ textId, content, className = "", disab
       tooltip.style.opacity = '1';
     };
     
-    const handleMouseLeave = (e: Event) => {
-      const wrapper = e.currentTarget as HTMLElement;
-      if (currentHoveredElement.current === wrapper) {
-        currentHoveredElement.current = null;
-      }
-      tooltip.style.opacity = '0';
-    };
-    
-    const wrappers = document.querySelectorAll('.vocab-word-wrapper');
-    wrappers.forEach(wrapper => {
-      wrapper.addEventListener('mouseenter', handleMouseEnter);
-      wrapper.addEventListener('mouseleave', handleMouseLeave);
-    });
+    // Add mouseover listener to document
+    document.addEventListener('mouseover', handleMouseOver);
     
     return () => {
-      wrappers.forEach(wrapper => {
-        wrapper.removeEventListener('mouseenter', handleMouseEnter);
-        wrapper.removeEventListener('mouseleave', handleMouseLeave);
-      });
+      document.removeEventListener('mouseover', handleMouseOver);
     };
-  }, [processedContent]);
+  }, []); // Empty dependency array - only set up once
   
   return (
     <>
