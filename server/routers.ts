@@ -7,6 +7,7 @@ import { TRPCError } from "@trpc/server";
 import * as db from "./db";
 import * as gemini from "./lib/gemini";
 import { forumRouter } from "./routers/forum";
+import { notificationsRouter } from "./routers/notifications";
 
 // Admin-only procedure
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -1544,7 +1545,29 @@ export const appRouter = router({
         comment: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        return await db.rateText(ctx.user.id, input.text_id, input.rating, input.reason, input.comment);
+        const result = await db.rateText(ctx.user.id, input.text_id, input.rating, input.reason, input.comment);
+        
+        // Send notification to exam creator
+        try {
+          const text = await db.getTextById(input.text_id);
+          if (text && text.created_by && text.created_by !== ctx.user.id) {
+            const { createNotification } = await import("./routers/notifications");
+            await createNotification({
+              userId: text.created_by,
+              type: 'exam_rated',
+              title: `${ctx.user.name || 'Someone'} rated your exam`,
+              message: `${input.rating} stars${input.comment ? ': ' + input.comment.substring(0, 100) : ''}`,
+              actionUrl: `/exam/${text.id}`,
+              examId: text.id,
+              fromUserId: ctx.user.id,
+              priority: 'normal',
+            });
+          }
+        } catch (error) {
+          console.error('[Notification] Failed to send exam rating notification:', error);
+        }
+        
+        return result;
       }),
 
     // Get user's rating for a text
@@ -1583,6 +1606,9 @@ export const appRouter = router({
 
   // Forum router
   forum: forumRouter,
+  
+  // Notifications router
+  notifications: notificationsRouter,
 });
 
 export type AppRouter = typeof appRouter;

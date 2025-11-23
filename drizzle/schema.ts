@@ -473,6 +473,42 @@ export type ForumNotification = typeof forumNotifications.$inferSelect;
 export type InsertForumNotification = typeof forumNotifications.$inferInsert;
 
 /**
+ * Unified notifications system
+ * Supports all types of notifications: exams, vocabulary, achievements, forum, system
+ */
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  user_id: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  
+  // Notification type and content
+  type: varchar("type", { length: 50 }).notNull(), // new_public_exam, exam_rated, vocab_milestone, achievement_unlocked, etc.
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message"),
+  
+  // References (nullable - not all notifications have references)
+  exam_id: integer("exam_id").references(() => exams.id, { onDelete: "cascade" }),
+  topic_id: integer("topic_id").references(() => forumTopics.id, { onDelete: "cascade" }),
+  post_id: integer("post_id").references(() => forumPosts.id, { onDelete: "cascade" }),
+  vocab_id: integer("vocab_id").references(() => vocabulary.id, { onDelete: "cascade" }),
+  from_user_id: integer("from_user_id").references(() => users.id, { onDelete: "cascade" }),
+  
+  // Action URL for navigation
+  action_url: varchar("action_url", { length: 255 }),
+  
+  // Status and priority
+  is_read: boolean("is_read").default(false).notNull(),
+  priority: varchar("priority", { length: 20 }).default("normal").notNull(), // low, normal, high, urgent
+  
+  // Timestamps
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  read_at: timestamp("read_at"),
+  expires_at: timestamp("expires_at"), // For temporary notifications
+});
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = typeof notifications.$inferInsert;
+
+/**
  * Forum moderators
  */
 export const forumModerators = pgTable("forum_moderators", {

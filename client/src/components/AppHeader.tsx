@@ -75,6 +75,7 @@ export function AppHeader() {
 
           {/* Mobile Navigation */}
           <div className="flex md:hidden items-center gap-1.5">
+            <NotificationsDropdown />
             <LanguageSwitcher />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

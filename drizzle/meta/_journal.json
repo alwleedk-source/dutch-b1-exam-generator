@@ -36,6 +36,13 @@
       "when": 1763911860642,
       "tag": "0004_blue_mysterio",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1763936638764,
+      "tag": "0005_closed_christian_walker",
+      "breakpoints": true
     }
   ]
 }
