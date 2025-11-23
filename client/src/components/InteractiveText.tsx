@@ -8,6 +8,7 @@ interface InteractiveTextProps {
   textId: number;
   content: string;
   className?: string;
+  disableTooltips?: boolean; // Disable tooltips for exam mode
 }
 
 interface VocabularyWord {
@@ -21,7 +22,7 @@ interface VocabularyWord {
 /**
  * Interactive text component with hover translations
  */
-export default function InteractiveText({ textId, content, className = "" }: InteractiveTextProps) {
+export default function InteractiveText({ textId, content, className = "", disableTooltips = false }: InteractiveTextProps) {
   const { user } = useAuth();
   const { t } = useLanguage();
   const [vocabulary, setVocabulary] = useState<Map<string, VocabularyWord>>(new Map());
@@ -276,8 +277,8 @@ export default function InteractiveText({ textId, content, className = "" }: Int
         }
         
         .vocab-word {
-          cursor: pointer;
-          border-bottom: 2px dotted currentColor;
+          cursor: ${disableTooltips ? 'default' : 'pointer'};
+          border-bottom: ${disableTooltips ? 'none' : '2px dotted currentColor'};
           color: inherit;
           transition: all 0.2s ease;
           user-select: none;
@@ -290,9 +291,9 @@ export default function InteractiveText({ textId, content, className = "" }: Int
         }
         
         .vocab-word:hover {
-          background-color: #f3f4f6;
-          border-bottom-style: solid;
-          border-bottom-width: 2px;
+          background-color: ${disableTooltips ? 'transparent' : '#f3f4f6'};
+          border-bottom-style: ${disableTooltips ? 'none' : 'solid'};
+          border-bottom-width: ${disableTooltips ? '0' : '2px'};
         }
         
         .global-vocab-tooltip {
@@ -311,6 +312,7 @@ export default function InteractiveText({ textId, content, className = "" }: Int
           min-width: 100px;
           max-width: 300px;
           transform: translateX(-50%);
+          display: ${disableTooltips ? 'none' : 'block'};
         }
         
         .tooltip-translation {

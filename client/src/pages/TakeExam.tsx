@@ -233,12 +233,14 @@ export default function TakeExam() {
                 textId={exam.text_id}
                 content={exam.formatted_html}
                 className="formatted-text-container"
+                disableTooltips={examMode === "exam"}
               />
             ) : (
               <InteractiveText
                 textId={exam.text_id}
                 content={exam.dutch_text}
                 className="whitespace-pre-wrap leading-relaxed text-foreground"
+                disableTooltips={examMode === "exam"}
               />
             )}
           </div>

@@ -60,6 +60,9 @@ export default function ExamModeSelector({
                   <span className="text-xs px-2 py-1 bg-blue-500/10 text-blue-700 dark:text-blue-400 rounded">
                     ✓ {t.pauseTimer}
                   </span>
+                  <span className="text-xs px-2 py-1 bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 rounded">
+                    ✓ {t.withTranslations || "With word translations"}
+                  </span>
                 </div>
               </div>
             </Label>
@@ -89,6 +92,9 @@ export default function ExamModeSelector({
                   </span>
                   <span className="text-xs px-2 py-1 bg-purple-500/10 text-purple-700 dark:text-purple-400 rounded">
                     ✓ {t.officialExamFormat}
+                  </span>
+                  <span className="text-xs px-2 py-1 bg-red-500/10 text-red-700 dark:text-red-400 rounded">
+                    ✗ {t.noTranslations || "No word translations"}
                   </span>
                 </div>
               </div>
