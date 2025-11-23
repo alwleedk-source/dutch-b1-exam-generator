@@ -23,6 +23,12 @@ export default function ExamResults() {
     { enabled: !!examId, retry: false }
   );
 
+  // Check if user has already rated this text
+  const { data: userRating } = trpc.rating.getUserRating.useQuery(
+    { text_id: examData?.text_id! },
+    { enabled: !!examData?.text_id && !!user }
+  );
+
   // Handle error state
   if (error) {
     return (
@@ -345,14 +351,16 @@ export default function ExamResults() {
                 Bekijk antwoorden
               </Button>
             </Link>
-            <Button 
-              variant="outline" 
-              size="lg"
-              onClick={() => setShowRatingDialog(true)}
-            >
-              <Star className="h-4 w-4 mr-2" />
-              {t.rateThisExam || 'Rate this exam'}
-            </Button>
+            {!userRating && (
+              <Button 
+                variant="outline" 
+                size="lg"
+                onClick={() => setShowRatingDialog(true)}
+              >
+                <Star className="h-4 w-4 mr-2" />
+                {t.rateThisExam || 'Rate this exam'}
+              </Button>
+            )}
             <Link href={`/study/${examData.text_id}`}>
               <Button variant="outline" size="lg">
                 <BookOpen className="h-4 w-4 mr-2" />

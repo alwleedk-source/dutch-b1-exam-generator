@@ -1,4 +1,4 @@
-import { boolean, index, integer, pgTable, serial, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core";
+import { boolean, index, integer, pgTable, serial, text, timestamp, unique, uniqueIndex, varchar } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
 /**
@@ -62,6 +62,10 @@ export const texts = pgTable("texts", {
   
   // Status
   status: varchar("status", { length: 50 }).default("pending").notNull(),
+  
+  // Ratings
+  average_rating: integer("average_rating").default(0),
+  total_ratings: integer("total_ratings").default(0),
   
   // Source tracking
   created_by: integer("created_by").notNull(),
