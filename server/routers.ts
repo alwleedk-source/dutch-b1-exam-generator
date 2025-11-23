@@ -631,9 +631,13 @@ export const appRouter = router({
       const user = await db.getUserById(ctx.user.id);
       const examStats = await db.getUserExamStats(ctx.user.id);
       const completedExams = await db.getCompletedExamsByUser(ctx.user.id);
+      const vocabularyCount = await db.getUserVocabularyCount(ctx.user.id);
 
       return {
-        user,
+        user: {
+          ...user,
+          total_vocabulary_learned: vocabularyCount, // Override with actual count
+        },
         examStats,
         completedExams,
       };

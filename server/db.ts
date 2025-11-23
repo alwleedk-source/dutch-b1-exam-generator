@@ -722,6 +722,18 @@ export async function getUserVocabularyByVocabId(user_id: number, vocabulary_id:
   return result[0] || null;
 }
 
+export async function getUserVocabularyCount(user_id: number) {
+  const db = await getDb();
+  if (!db) return 0;
+
+  const result = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(userVocabulary)
+    .where(eq(userVocabulary.user_id, user_id));
+
+  return Number(result[0]?.count || 0);
+}
+
 export async function getUserVocabularyProgress(user_id: number) {
   const db = await getDb();
   if (!db) return [];
