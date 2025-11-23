@@ -1289,9 +1289,84 @@ export const appRouter = router({
       return await db.getAllUsers();
     }),
 
+    // Get user details with exams and texts
+    getUserDetails: adminProcedure
+      .input(z.object({ userId: z.number() }))
+      .query(async ({ input }) => {
+        const user = await db.getUserById(input.userId);
+        if (!user) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+        }
+        
+        const userExams = await db.getUserExams(input.userId);
+        const userTexts = await db.getUserTexts(input.userId);
+        
+        return {
+          user,
+          exams: userExams,
+          texts: userTexts,
+        };
+      }),
+
+    // Delete user
+    deleteUser: adminProcedure
+      .input(z.object({ userId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteUser(input.userId);
+        return { success: true };
+      }),
+
+    // Update user role
+    updateUserRole: adminProcedure
+      .input(z.object({
+        userId: z.number(),
+        role: z.enum(["user", "admin", "moderator"]),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateUserRole(input.userId, input.role);
+        return { success: true };
+      }),
+
     getAllTexts: adminProcedure.query(async () => {
       return await db.getAllTexts();
     }),
+
+    // Get texts with advanced filtering
+    getTextsFiltered: adminProcedure
+      .input(z.object({
+        search: z.string().optional(),
+        status: z.enum(["pending", "approved", "rejected"]).optional(),
+        level: z.string().optional(),
+        userId: z.number().optional(),
+        limit: z.number().optional(),
+        offset: z.number().optional(),
+      }))
+      .query(async ({ input }) => {
+        return await db.getTextsFiltered(input);
+      }),
+
+    // Get text with full details
+    getTextWithDetails: adminProcedure
+      .input(z.object({ textId: z.number() }))
+      .query(async ({ input }) => {
+        const text = await db.getTextWithDetails(input.textId);
+        if (!text) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Text not found" });
+        }
+        return text;
+      }),
+
+    // Get dashboard statistics
+    getDashboardStats: adminProcedure.query(async () => {
+      return await db.getAdminStats();
+    }),
+
+    // Get recent activity
+    getRecentActivity: adminProcedure
+      .input(z.object({ limit: z.number().optional() }))
+      .query(async ({ input }) => {
+        return await db.getRecentActivity(input.limit);
+      }),
 
     getPendingTexts: adminProcedure.query(async () => {
       return await db.getPendingTexts();

@@ -161,17 +161,34 @@ export async function getAllUsers() {
 
   const allUsers = await db.select().from(users).orderBy(desc(users.created_at));
   
-  // Add totalExamsCompleted for each user
+  // Add comprehensive stats for each user
   const usersWithStats = await Promise.all(
     allUsers.map(async (user) => {
+      // Count completed exams
       const completedExams = await db
         .select()
         .from(exams)
         .where(and(eq(exams.user_id, user.id), eq(exams.status, 'completed')));
       
+      // Count created texts
+      const createdTexts = await db
+        .select()
+        .from(texts)
+        .where(eq(texts.created_by, user.id));
+      
+      // Calculate average score
+      const examsWithScores = completedExams.filter(e => e.score !== null && e.total_questions !== null);
+      const avgScore = examsWithScores.length > 0
+        ? Math.round(
+            examsWithScores.reduce((sum, e) => sum + ((e.score! / e.total_questions!) * 100), 0) / examsWithScores.length
+          )
+        : 0;
+      
       return {
         ...user,
         totalExamsCompleted: completedExams.length,
+        totalTextsCreated: createdTexts.length,
+        averageScore: avgScore,
       };
     })
   );
@@ -1160,4 +1177,276 @@ export async function searchDictionary(options: {
     .limit(options.limit || 50);
 
   return result;
+}
+
+// ==================== ADMIN USER MANAGEMENT ====================
+
+/**
+ * Get user exams by user ID
+ */
+export async function getUserExams(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select({
+      id: exams.id,
+      text_id: exams.text_id,
+      status: exams.status,
+      score: exams.score,
+      total_questions: exams.total_questions,
+      time_spent_minutes: exams.time_spent_minutes,
+      created_at: exams.created_at,
+      text_title: texts.title,
+    })
+    .from(exams)
+    .leftJoin(texts, eq(exams.text_id, texts.id))
+    .where(eq(exams.user_id, userId))
+    .orderBy(desc(exams.created_at));
+}
+
+/**
+ * Get user texts by user ID
+ */
+export async function getUserTexts(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(texts)
+    .where(eq(texts.created_by, userId))
+    .orderBy(desc(texts.created_at));
+}
+
+/**
+ * Delete user (admin only)
+ */
+export async function deleteUser(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Delete user's vocabulary first (foreign key constraint)
+  await db.delete(userVocabulary).where(eq(userVocabulary.user_id, userId));
+  
+  // Delete user's exam results
+  await db.delete(examResults).where(eq(examResults.user_id, userId));
+  
+  // Delete user's exams
+  await db.delete(exams).where(eq(exams.user_id, userId));
+  
+  // Delete user's texts
+  await db.delete(texts).where(eq(texts.created_by, userId));
+  
+  // Finally delete the user
+  await db.delete(users).where(eq(users.id, userId));
+}
+
+/**
+ * Update user role
+ */
+export async function updateUserRole(userId: number, role: 'user' | 'admin' | 'moderator') {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .update(users)
+    .set({ role, updated_at: new Date() })
+    .where(eq(users.id, userId));
+}
+
+/**
+ * Ban/unban user
+ */
+export async function updateUserBanStatus(userId: number, isBanned: boolean) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .update(users)
+    .set({ 
+      // Assuming there's a banned field, if not we'll add it
+      updated_at: new Date() 
+    })
+    .where(eq(users.id, userId));
+}
+
+// ==================== ADMIN TEXT MANAGEMENT ====================
+
+/**
+ * Get texts with advanced filtering
+ */
+export async function getTextsFiltered(options: {
+  search?: string;
+  status?: 'pending' | 'approved' | 'rejected';
+  level?: string;
+  userId?: number;
+  limit?: number;
+  offset?: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  let query = db
+    .select({
+      id: texts.id,
+      title: texts.title,
+      dutch_text: texts.dutch_text,
+      status: texts.status,
+      is_valid_dutch: texts.is_valid_dutch,
+      is_b1_level: texts.is_b1_level,
+      word_count: texts.word_count,
+      estimated_reading_minutes: texts.estimated_reading_minutes,
+      created_at: texts.created_at,
+      created_by: texts.created_by,
+      user_name: users.name,
+      user_email: users.email,
+    })
+    .from(texts)
+    .leftJoin(users, eq(texts.created_by, users.id));
+  
+  // Apply filters
+  const conditions = [];
+  
+  if (options.search) {
+    conditions.push(
+      or(
+        ilike(texts.title, `%${options.search}%`),
+        ilike(texts.dutch_text, `%${options.search}%`)
+      )
+    );
+  }
+  
+  if (options.status) {
+    conditions.push(eq(texts.status, options.status));
+  }
+  
+  if (options.userId) {
+    conditions.push(eq(texts.created_by, options.userId));
+  }
+  
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions)) as any;
+  }
+  
+  // Apply ordering and pagination
+  const result = await query
+    .orderBy(desc(texts.created_at))
+    .limit(options.limit || 50)
+    .offset(options.offset || 0);
+  
+  return result;
+}
+
+/**
+ * Get text with full details including questions
+ */
+export async function getTextWithDetails(textId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const text = await db
+    .select({
+      id: texts.id,
+      title: texts.title,
+      dutch_text: texts.dutch_text,
+      formatted_html: texts.formatted_html,
+      text_type: texts.text_type,
+      status: texts.status,
+      is_valid_dutch: texts.is_valid_dutch,
+      is_b1_level: texts.is_b1_level,
+      word_count: texts.word_count,
+      estimated_reading_minutes: texts.estimated_reading_minutes,
+      created_at: texts.created_at,
+      created_by: texts.created_by,
+      user_name: users.name,
+      user_email: users.email,
+    })
+    .from(texts)
+    .leftJoin(users, eq(texts.created_by, users.id))
+    .where(eq(texts.id, textId))
+    .limit(1);
+  
+  if (text.length === 0) return null;
+  
+  // Get associated exam (questions)
+  const exam = await db
+    .select()
+    .from(exams)
+    .where(eq(exams.text_id, textId))
+    .limit(1);
+  
+  return {
+    ...text[0],
+    questions: exam.length > 0 ? exam[0].questions : null,
+  };
+}
+
+// ==================== ADMIN STATISTICS ====================
+
+/**
+ * Get dashboard statistics
+ */
+export async function getAdminStats() {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const totalUsers = await db.select().from(users);
+  const totalTexts = await db.select().from(texts);
+  const totalExams = await db.select().from(exams);
+  const pendingTexts = await db.select().from(texts).where(eq(texts.status, 'pending'));
+  const completedExams = await db.select().from(exams).where(eq(exams.status, 'completed'));
+  
+  return {
+    totalUsers: totalUsers.length,
+    totalTexts: totalTexts.length,
+    totalExams: totalExams.length,
+    pendingTexts: pendingTexts.length,
+    completedExams: completedExams.length,
+    inProgressExams: totalExams.length - completedExams.length,
+  };
+}
+
+/**
+ * Get recent activity
+ */
+export async function getRecentActivity(limit: number = 10) {
+  const db = await getDb();
+  if (!db) return { recentTexts: [], recentExams: [] };
+  
+  const recentTexts = await db
+    .select({
+      id: texts.id,
+      title: texts.title,
+      created_at: texts.created_at,
+      user_name: users.name,
+      user_email: users.email,
+    })
+    .from(texts)
+    .leftJoin(users, eq(texts.created_by, users.id))
+    .orderBy(desc(texts.created_at))
+    .limit(limit);
+  
+  const recentExams = await db
+    .select({
+      id: exams.id,
+      text_id: exams.text_id,
+      created_at: exams.created_at,
+      status: exams.status,
+      score: exams.score,
+      total_questions: exams.total_questions,
+      user_name: users.name,
+      user_email: users.email,
+      text_title: texts.title,
+    })
+    .from(exams)
+    .leftJoin(users, eq(exams.user_id, users.id))
+    .leftJoin(texts, eq(exams.text_id, texts.id))
+    .orderBy(desc(exams.created_at))
+    .limit(limit);
+  
+  return {
+    recentTexts,
+    recentExams,
+  };
 }
