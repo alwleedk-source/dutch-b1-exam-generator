@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +20,7 @@ import { useState } from "react";
 
 export default function AdminDashboard() {
   const { user, loading } = useAuth();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("overview");
   
   // Search and filter states
