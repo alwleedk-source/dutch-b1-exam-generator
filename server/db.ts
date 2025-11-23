@@ -1,4 +1,4 @@
-import { eq, desc, and, sql, or, gte, ilike } from "drizzle-orm";
+import { eq, desc, and, sql, or, gte, ilike, count } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import {
@@ -16,6 +16,8 @@ import {
   InsertTextVocabulary,
   userVocabulary,
   InsertUserVocabulary,
+  textRatings,
+  InsertTextRating,
   reports,
   InsertReport,
   achievements,
@@ -578,17 +580,18 @@ export async function updateUserVocabularyCount(user_id: number) {
   if (!db) return;
 
   // Count total vocabulary for this user
-  const result = await db.execute(sql`
-    SELECT COUNT(*) as count FROM "user_vocabulary" WHERE "user_id" = ${user_id}
-  `);
+  const result = await db
+    .select({ count: count() })
+    .from(userVocabulary)
+    .where(eq(userVocabulary.userId, user_id));
   
-  const count = result?.rows?.[0]?.count || 0;
+  const vocabularyCount = result[0]?.count || 0;
   
   // Update user stats
   await db
     .update(users)
     .set({ 
-      total_vocabulary_learned: Number(count),
+      total_vocabulary_learned: Number(vocabularyCount),
       updated_at: new Date() 
     })
     .where(eq(users.id, user_id));
@@ -1463,25 +1466,36 @@ export async function rateText(userId: number, textId: number, rating: number, c
   // Check if user already rated this text
   const existingRating = await db
     .select()
-    .from(sql`text_ratings`)
-    .where(sql`text_id = ${textId} AND user_id = ${userId}`)
+    .from(textRatings)
+    .where(and(
+      eq(textRatings.textId, textId),
+      eq(textRatings.userId, userId)
+    ))
     .limit(1);
   
   if (existingRating.length > 0) {
     // Update existing rating
-    await db.execute(
-      sql`UPDATE text_ratings 
-          SET rating = ${rating}, 
-              comment = ${comment || null}, 
-              updated_at = NOW() 
-          WHERE text_id = ${textId} AND user_id = ${userId}`
-    );
+    await db
+      .update(textRatings)
+      .set({ 
+        rating, 
+        comment: comment || null,
+        updatedAt: new Date()
+      })
+      .where(and(
+        eq(textRatings.textId, textId),
+        eq(textRatings.userId, userId)
+      ));
   } else {
     // Insert new rating
-    await db.execute(
-      sql`INSERT INTO text_ratings (text_id, user_id, rating, comment) 
-          VALUES (${textId}, ${userId}, ${rating}, ${comment || null})`
-    );
+    await db
+      .insert(textRatings)
+      .values({
+        textId,
+        userId,
+        rating,
+        comment: comment || null
+      });
   }
   
   // Trigger will automatically update texts table
@@ -1495,11 +1509,16 @@ export async function getUserRating(userId: number, textId: number) {
   const db = await getDb();
   if (!db) return null;
   
-  const result = await db.execute(
-    sql`SELECT * FROM text_ratings WHERE text_id = ${textId} AND user_id = ${userId} LIMIT 1`
-  );
+  const result = await db
+    .select()
+    .from(textRatings)
+    .where(and(
+      eq(textRatings.textId, textId),
+      eq(textRatings.userId, userId)
+    ))
+    .limit(1);
   
-  return result.rows[0] || null;
+  return result[0] || null;
 }
 
 /**
@@ -1509,58 +1528,24 @@ export async function getTextRatings(textId: number) {
   const db = await getDb();
   if (!db) return [];
   
-  const result = await db.execute(
-    sql`SELECT 
-          tr.*,
-          u.name as user_name,
-          u.email as user_email
-        FROM text_ratings tr
-        LEFT JOIN users u ON tr.user_id = u.id
-        WHERE tr.text_id = ${textId}
-        ORDER BY tr.created_at DESC`
-  );
+  const result = await db
+    .select({
+      id: textRatings.id,
+      textId: textRatings.textId,
+      userId: textRatings.userId,
+      rating: textRatings.rating,
+      comment: textRatings.comment,
+      createdAt: textRatings.createdAt,
+      updatedAt: textRatings.updatedAt,
+      userName: users.name,
+      userEmail: users.email,
+    })
+    .from(textRatings)
+    .leftJoin(users, eq(textRatings.userId, users.id))
+    .where(eq(textRatings.textId, textId))
+    .orderBy(desc(textRatings.createdAt));
   
-  return result.rows;
-}
-
-/**
- * Get texts with ratings (for public exams page)
- */
-export async function getTextsWithRatings(options: {
-  minRating?: number;
-  sortBy?: 'rating' | 'date' | 'popular';
-  limit?: number;
-  offset?: number;
-}) {
-  const db = await getDb();
-  if (!db) return [];
-  
-  let orderByClause = 'ORDER BY t.created_at DESC';
-  
-  if (options.sortBy === 'rating') {
-    orderByClause = 'ORDER BY t.average_rating DESC, t.total_ratings DESC';
-  } else if (options.sortBy === 'popular') {
-    orderByClause = 'ORDER BY t.total_ratings DESC, t.average_rating DESC';
-  }
-  
-  const minRatingFilter = options.minRating 
-    ? sql`AND t.average_rating >= ${options.minRating}`
-    : sql``;
-  
-  const result = await db.execute(
-    sql`SELECT 
-          t.*,
-          u.name as creator_name,
-          u.email as creator_email
-        FROM texts t
-        LEFT JOIN users u ON t.created_by = u.id
-        WHERE t.status = 'approved' ${minRatingFilter}
-        ${sql.raw(orderByClause)}
-        LIMIT ${options.limit || 50}
-        OFFSET ${options.offset || 0}`
-  );
-  
-  return result.rows;
+  return result;
 }
 
 /**
@@ -1570,9 +1555,9 @@ export async function deleteRating(ratingId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  await db.execute(
-    sql`DELETE FROM text_ratings WHERE id = ${ratingId}`
-  );
+  await db
+    .delete(textRatings)
+    .where(eq(textRatings.id, ratingId));
   
   // Trigger will automatically update texts table
   return { success: true };

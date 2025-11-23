@@ -523,6 +523,29 @@ export type ForumRateLimit = typeof forumRateLimits.$inferSelect;
 export type InsertForumRateLimit = typeof forumRateLimits.$inferInsert;
 
 /**
+ * Text ratings (user ratings for texts)
+ */
+export const textRatings = pgTable("text_ratings", {
+  id: serial("id").primaryKey(),
+  text_id: integer("text_id").references(() => texts.id, { onDelete: "cascade" }).notNull(),
+  user_id: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  
+  rating: integer("rating").notNull(), // 1-5 stars
+  comment: text("comment"),
+  
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  textRatings_textIdIdx: index("idx_text_ratings_text_id").on(table.text_id),
+  textRatings_userIdIdx: index("idx_text_ratings_user_id").on(table.user_id),
+  textRatings_ratingIdx: index("idx_text_ratings_rating").on(table.rating),
+  textRatings_textUserUnique: unique("text_ratings_text_id_user_id_key").on(table.text_id, table.user_id),
+}));
+
+export type TextRating = typeof textRatings.$inferSelect;
+export type InsertTextRating = typeof textRatings.$inferInsert;
+
+/**
  * User ban status (added to users table via migration)
  * Fields: is_banned, banned_at, banned_by, ban_reason
  */
