@@ -1532,11 +1532,10 @@ export const appRouter = router({
       .input(z.object({
         text_id: z.number(),
         rating: z.number().min(1).max(5),
-        reason: z.string().optional(),
         comment: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        return await db.rateText(ctx.user.id, input.text_id, input.rating, input.reason, input.comment);
+        return await db.rateText(ctx.user.id, input.text_id, input.rating, input.comment);
       }),
 
     // Get user's rating for a text
