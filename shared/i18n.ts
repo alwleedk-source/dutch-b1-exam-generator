@@ -937,10 +937,10 @@ export const translations: Record<Language, Translations> = {
     noWordTranslations: "Zonder woordvertalingen",
     
     // Forum
-    forumTitle: "Community Forum",
+    forumTitle: "Community",
     forumDescription: "Discussieer, deel ervaringen en stel vragen",
     createNewTopic: "Nieuw Onderwerp",
-    backToForum: "Terug naar Forum",
+    backToForum: "Terug naar Community",
     topics: "Onderwerpen",
     noTopicsYet: "Nog geen onderwerpen. Wees de eerste om een discussie te starten!",
     createFirstTopic: "Maak Eerste Onderwerp",
@@ -1505,10 +1505,10 @@ export const translations: Record<Language, Translations> = {
     noWordTranslations: "بدون ترجمة الكلمات",
     
     // Forum
-    forumTitle: "مجتمع المنتدى",
+    forumTitle: "المجتمع",
     forumDescription: "ناقش وشارك التجارب واطرح الأسئلة",
     createNewTopic: "موضوع جديد",
-    backToForum: "العودة للمنتدى",
+    backToForum: "العودة للمجتمع",
     topics: "مواضيع",
     noTopicsYet: "لا توجد مواضيع بعد. كن أول من يبدأ نقاشًا!",
     createFirstTopic: "أنشئ أول موضوع",
@@ -2074,10 +2074,10 @@ export const translations: Record<Language, Translations> = {
     noWordTranslations: "No word translations",
     
     // Forum
-    forumTitle: "Community Forum",
+    forumTitle: "Community",
     forumDescription: "Discuss, share experiences and ask questions",
     createNewTopic: "New Topic",
-    backToForum: "Back to Forum",
+    backToForum: "Back to Community",
     topics: "Topics",
     noTopicsYet: "No topics yet. Be the first to start a discussion!",
     createFirstTopic: "Create First Topic",
@@ -2644,10 +2644,10 @@ export const translations: Record<Language, Translations> = {
     noWordTranslations: "Kelime çevirisi olmadan",
     
     // Forum
-    forumTitle: "Topluluk Forumu",
+    forumTitle: "Topluluk",
     forumDescription: "Tartışın, deneyimleri paylaşın ve sorular sorun",
     createNewTopic: "Yeni Konu",
-    backToForum: "Foruma Dön",
+    backToForum: "Topluluğa Dön",
     topics: "Konular",
     noTopicsYet: "Henüz konu yok. Tartışmayı başlatan ilk kişi olun!",
     createFirstTopic: "İlk Konuyu Oluştur",
