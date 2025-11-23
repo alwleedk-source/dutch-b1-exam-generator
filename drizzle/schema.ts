@@ -535,6 +535,7 @@ export const textRatings = pgTable("text_ratings", {
   user_id: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
   
   rating: integer("rating").notNull(), // 1-5 stars
+  reason: varchar("reason", { length: 100 }), // Rating reason (helpful, clear, good_level, etc.)
   comment: text("comment"), // Additional comment
   
   created_at: timestamp("created_at").defaultNow().notNull(),

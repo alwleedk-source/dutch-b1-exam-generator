@@ -1499,7 +1499,7 @@ export async function getRecentActivity(limit: number = 10) {
 /**
  * Add or update a text rating
  */
-export async function rateText(userId: number, textId: number, rating: number, comment?: string) {
+export async function rateText(userId: number, textId: number, rating: number, reason?: string, comment?: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
@@ -1519,6 +1519,7 @@ export async function rateText(userId: number, textId: number, rating: number, c
       .update(textRatings)
       .set({ 
         rating, 
+        reason: reason || null,
         comment: comment || null,
         updated_at: new Date()
       })
@@ -1534,6 +1535,7 @@ export async function rateText(userId: number, textId: number, rating: number, c
         text_id: textId,
         user_id: userId,
         rating,
+        reason: reason || null,
         comment: comment || null
       });
   }

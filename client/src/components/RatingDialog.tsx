@@ -49,22 +49,11 @@ export function RatingDialog({
       return;
     }
     
-    // Temporarily disable reason until migration runs
-    // Combine reason and comment for now
-    let finalComment = "";
-    if (reason) {
-      finalComment = reason;
-      if (comment.trim()) {
-        finalComment += ": " + comment.trim();
-      }
-    } else if (comment.trim()) {
-      finalComment = comment.trim();
-    }
-    
     rateTextMutation.mutate({
       text_id: textId,
       rating,
-      comment: finalComment || undefined,
+      reason: reason || undefined,
+      comment: comment.trim() || undefined,
     });
   };
 

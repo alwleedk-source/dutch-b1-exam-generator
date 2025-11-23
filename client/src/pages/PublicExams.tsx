@@ -26,8 +26,9 @@ export default function PublicExams() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
-  // Temporarily disable reason filter until migration runs
-  const { data: allTexts, isLoading } = trpc.text.listPublicTexts.useQuery();
+  const { data: allTexts, isLoading } = trpc.text.listPublicTexts.useQuery(
+    reasonFilter ? { reason: reasonFilter } : undefined
+  );
   
   // Apply client-side filtering and sorting
   const texts = useMemo(() => {
@@ -165,8 +166,7 @@ export default function PublicExams() {
               </Select>
             </div>
 
-            {/* Reason filter - temporarily disabled until migration runs */}
-            {/* <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium">{t.filterByReason || 'Filter by Reason'}:</span>
               <Select value={reasonFilter || undefined} onValueChange={(value) => setReasonFilter(value || "")}>
@@ -181,7 +181,7 @@ export default function PublicExams() {
                   <SelectItem value={t.reasonGoodPractice}>{t.reasonGoodPractice}</SelectItem>
                 </SelectContent>
               </Select>
-            </div> */}
+            </div>
 
             {texts && texts.length > 0 && (
               <div className="ml-auto text-sm text-muted-foreground">
