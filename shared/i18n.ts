@@ -524,6 +524,7 @@ export interface Translations {
   enableExamCreation: string;
   disableExamCreation: string;
   settingUpdated: string;
+  backToDashboard: string;
   
   // Admin Dashboard
   filterByStatus: string;
@@ -1129,6 +1130,7 @@ export const translations: Record<Language, Translations> = {
     enableExamCreation: "Examen aanmaken inschakelen",
     disableExamCreation: "Examen aanmaken uitschakelen",
     settingUpdated: "Instelling bijgewerkt",
+    backToDashboard: "Terug naar dashboard",
     
     // Admin Dashboard
     filterByStatus: "Filter op status",
@@ -1731,6 +1733,7 @@ export const translations: Record<Language, Translations> = {
     enableExamCreation: "تفعيل إضافة الامتحانات",
     disableExamCreation: "إيقاف إضافة الامتحانات",
     settingUpdated: "تم تحديث الإعداد",
+    backToDashboard: "العودة للوحة التحكم",
     
     // Admin Dashboard
     filterByStatus: "تصفية حسب الحالة",
@@ -2334,6 +2337,7 @@ export const translations: Record<Language, Translations> = {
     enableExamCreation: "Enable Exam Creation",
     disableExamCreation: "Disable Exam Creation",
     settingUpdated: "Setting updated",
+    backToDashboard: "Back to Dashboard",
     
     // Admin Dashboard
     filterByStatus: "Filter by status",
@@ -2938,6 +2942,7 @@ export const translations: Record<Language, Translations> = {
     enableExamCreation: "Sınav Oluşturmayı Etkinleştir",
     disableExamCreation: "Sınav Oluşturmayı Devre Dışı Bırak",
     settingUpdated: "Ayar güncellendi",
+    backToDashboard: "Panoya Dön",
     
     // Admin Dashboard
     filterByStatus: "Duruma göre filtrele",

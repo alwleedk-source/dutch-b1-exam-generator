@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { BookOpen, Loader2, CheckCircle, AlertCircle, Sparkles, Upload, Image as ImageIcon, AlertTriangle } from "lucide-react";
+import { BookOpen, Loader2, CheckCircle, AlertCircle, Sparkles, Upload, Image as ImageIcon, AlertTriangle, X } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useState, useRef } from "react";
@@ -250,7 +250,16 @@ export default function CreateExam() {
       {/* Exam Creation Disabled Overlay */}
       {examCreationStatus && !examCreationStatus.enabled && user?.role !== 'admin' && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <Card className="max-w-md w-full shadow-2xl">
+          <Card className="max-w-md w-full shadow-2xl relative">
+            {/* Close button */}
+            <button
+              onClick={() => setLocation("/dashboard")}
+              className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Close"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            
             <CardHeader className="text-center">
               <div className="mx-auto mb-4 w-16 h-16 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center">
                 <AlertTriangle className="w-8 h-8 text-orange-600 dark:text-orange-400" />
