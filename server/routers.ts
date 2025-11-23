@@ -677,15 +677,23 @@ export const appRouter = router({
 
         questions.forEach((q: any, idx: number) => {
           // Map questionType from Gemini (camelCase) to our format (snake_case)
-          let questionType = q.question_type || q.questionType || 'search';
+          let questionType = q.skillType || q.question_type || q.questionType || 'search';
           
           // Normalize question type names
           const typeMapping: Record<string, string> = {
+            // English (for backward compatibility)
             'Main Idea': 'main_idea',
             'Scanning': 'search',
             'Sequencing': 'sequence',
             'Inference': 'inference',
             'Vocabulary': 'vocabulary',
+            
+            // Dutch (primary format)
+            'hoofdgedachte': 'main_idea',
+            'zoeken': 'search',
+            'volgorde': 'sequence',
+            'conclusie': 'inference',
+            'woordenschat': 'vocabulary',
           };
           
           questionType = typeMapping[questionType] || questionType.toLowerCase().replace(/ /g, '_');
