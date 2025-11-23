@@ -590,3 +590,18 @@ export type InsertTextRating = typeof textRatings.$inferInsert;
  * User ban status (added to users table via migration)
  * Fields: is_banned, banned_at, banned_by, ban_reason
  */
+
+/**
+ * System settings (admin-controlled)
+ */
+export const systemSettings = pgTable("system_settings", {
+  id: serial("id").primaryKey(),
+  key: varchar("key", { length: 100 }).notNull().unique(),
+  value: text("value").notNull(),
+  description: text("description"),
+  updated_by: integer("updated_by").references(() => users.id),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type SystemSetting = typeof systemSettings.$inferSelect;
+export type InsertSystemSetting = typeof systemSettings.$inferInsert;

@@ -18,6 +18,7 @@ const Vocabulary = lazy(() => import("./pages/Vocabulary"));
 const VocabularySimple = lazy(() => import("./pages/VocabularySimple"));
 const Dictionary = lazy(() => import("./pages/Dictionary"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminSettings = lazy(() => import("./pages/AdminSettings"));
 const Leaderboard = lazy(() => import("./pages/Leaderboard"));
 const Achievements = lazy(() => import("./pages/Achievements"));
 const StudyMode = lazy(() => import("./pages/StudyMode"));
@@ -62,6 +63,7 @@ function Router() {
       <Route path="/vocabulary/simple" component={VocabularySimple} />
       <Route path="/dictionary" component={Dictionary} />
       <Route path="/admin" component={AdminDashboard} />
+      <Route path="/admin/settings" component={AdminSettings} />
       <Route path="/leaderboard" component={Leaderboard} />
       <Route path="/achievements" component={Achievements} />
       <Route path="/study/:examId" component={StudyMode} />

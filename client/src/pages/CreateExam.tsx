@@ -22,6 +22,9 @@ export default function CreateExam() {
   const { t } = useLanguage();
   const [, setLocation] = useLocation();
   
+  // Check if exam creation is enabled
+  const { data: examCreationStatus } = trpc.settings.isExamCreationEnabled.useQuery();
+  
   const [dutchText, setDutchText] = useState("");
   const [title, setTitle] = useState("");
   const [textId, setTextId] = useState<number | null>(null);
@@ -243,6 +246,42 @@ export default function CreateExam() {
     <div className="min-h-screen bg-gradient-bg">
       {/* Header */}
       <AppHeader />
+      
+      {/* Exam Creation Disabled Overlay */}
+      {examCreationStatus && !examCreationStatus.enabled && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <Card className="max-w-md w-full shadow-2xl">
+            <CardHeader className="text-center">
+              <div className="mx-auto mb-4 w-16 h-16 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center">
+                <AlertTriangle className="w-8 h-8 text-orange-600 dark:text-orange-400" />
+              </div>
+              <CardTitle className="text-2xl">
+                {t.examCreationDisabledTitle}
+              </CardTitle>
+              <CardDescription className="text-base mt-2">
+                {t.examCreationDisabledMessage}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button 
+                className="w-full" 
+                size="lg"
+                onClick={() => setLocation("/public-exams")}
+              >
+                <BookOpen className="w-5 h-5 mr-2" />
+                {t.browseExams}
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => setLocation("/dashboard")}
+              >
+                {t.backToDashboard}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">

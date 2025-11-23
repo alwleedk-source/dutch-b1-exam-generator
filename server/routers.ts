@@ -8,6 +8,7 @@ import * as db from "./db";
 import * as gemini from "./lib/gemini";
 import { forumRouter } from "./routers/forum";
 import { notificationsRouter } from "./routers/notifications";
+import { settingsRouter } from "./routers/settings";
 
 // Admin-only procedure
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -1609,6 +1610,9 @@ export const appRouter = router({
   
   // Notifications router
   notifications: notificationsRouter,
+  
+  // Settings router (admin)
+  settings: settingsRouter,
 });
 
 export type AppRouter = typeof appRouter;

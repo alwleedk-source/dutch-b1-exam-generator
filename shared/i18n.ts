@@ -512,6 +512,19 @@ export interface Translations {
   chooseLanguage: string;
   forumEditorPlaceholder: string;
   
+  // Admin Settings
+  adminSettings: string;
+  systemSettings: string;
+  examCreation: string;
+  examCreationEnabled: string;
+  examCreationDisabled: string;
+  examCreationDisabledTitle: string;
+  examCreationDisabledMessage: string;
+  browseExams: string;
+  enableExamCreation: string;
+  disableExamCreation: string;
+  settingUpdated: string;
+  
   // Admin Dashboard
   filterByStatus: string;
   allStatus: string;
@@ -1104,6 +1117,19 @@ export const translations: Record<Language, Translations> = {
     chooseLanguage: "Kies je taal",
     forumEditorPlaceholder: "Schrijf de inhoud van je onderwerp hier...",
     
+    // Admin Settings
+    adminSettings: "Beheerdersinstellingen",
+    systemSettings: "Systeeminstellingen",
+    examCreation: "Examen aanmaken",
+    examCreationEnabled: "Examen aanmaken ingeschakeld",
+    examCreationDisabled: "Examen aanmaken uitgeschakeld",
+    examCreationDisabledTitle: "⏸️ Examen aanmaken tijdelijk uitgeschakeld",
+    examCreationDisabledMessage: "Je kunt de huidige examens gebruiken en examens zoeken als je wilt oefenen met een specifiek onderwerp.",
+    browseExams: "Examens bekijken",
+    enableExamCreation: "Examen aanmaken inschakelen",
+    disableExamCreation: "Examen aanmaken uitschakelen",
+    settingUpdated: "Instelling bijgewerkt",
+    
     // Admin Dashboard
     filterByStatus: "Filter op status",
     allStatus: "Alle Status",
@@ -1692,6 +1718,19 @@ export const translations: Record<Language, Translations> = {
     translation: "الترجمة",
     chooseLanguage: "اختر لغتك",
     forumEditorPlaceholder: "اكتب محتوى موضوعك هنا...",
+    
+    // Admin Settings
+    adminSettings: "إعدادات المدير",
+    systemSettings: "إعدادات النظام",
+    examCreation: "إضافة امتحان",
+    examCreationEnabled: "إضافة الامتحانات مفعّلة",
+    examCreationDisabled: "إضافة الامتحانات موقفة",
+    examCreationDisabledTitle: "⏸️ تم إيقاف إضافة الامتحانات مؤقتاً",
+    examCreationDisabledMessage: "يمكنك استخدام الامتحانات الحالية والبحث في الامتحانات إذا أردت أن تتدرب في موضوع معين.",
+    browseExams: "تصفح الامتحانات",
+    enableExamCreation: "تفعيل إضافة الامتحانات",
+    disableExamCreation: "إيقاف إضافة الامتحانات",
+    settingUpdated: "تم تحديث الإعداد",
     
     // Admin Dashboard
     filterByStatus: "تصفية حسب الحالة",
@@ -2283,6 +2322,19 @@ export const translations: Record<Language, Translations> = {
     chooseLanguage: "Choose your language",
     forumEditorPlaceholder: "Write your topic content here...",
     
+    // Admin Settings
+    adminSettings: "Admin Settings",
+    systemSettings: "System Settings",
+    examCreation: "Exam Creation",
+    examCreationEnabled: "Exam creation enabled",
+    examCreationDisabled: "Exam creation disabled",
+    examCreationDisabledTitle: "⏸️ Exam Creation Temporarily Disabled",
+    examCreationDisabledMessage: "You can use the current exams and search for exams if you want to practice a specific topic.",
+    browseExams: "Browse Exams",
+    enableExamCreation: "Enable Exam Creation",
+    disableExamCreation: "Disable Exam Creation",
+    settingUpdated: "Setting updated",
+    
     // Admin Dashboard
     filterByStatus: "Filter by status",
     allStatus: "All Status",
@@ -2873,6 +2925,19 @@ export const translations: Record<Language, Translations> = {
     translation: "Çeviri",
     chooseLanguage: "Dilinizi seçin",
     forumEditorPlaceholder: "Konu içeriğinizi buraya yazın...",
+    
+    // Admin Settings
+    adminSettings: "Yönetici Ayarları",
+    systemSettings: "Sistem Ayarları",
+    examCreation: "Sınav Oluşturma",
+    examCreationEnabled: "Sınav oluşturma etkin",
+    examCreationDisabled: "Sınav oluşturma devre dışı",
+    examCreationDisabledTitle: "⏸️ Sınav Oluşturma Geçici Olarak Devre Dışı",
+    examCreationDisabledMessage: "Mevcut sınavları kullanabilir ve belirli bir konuda çalışmak istiyorsanız sınavları arayabilirsiniz.",
+    browseExams: "Sınavlara Göz At",
+    enableExamCreation: "Sınav Oluşturmayı Etkinleştir",
+    disableExamCreation: "Sınav Oluşturmayı Devre Dışı Bırak",
+    settingUpdated: "Ayar güncellendi",
     
     // Admin Dashboard
     filterByStatus: "Duruma göre filtrele",

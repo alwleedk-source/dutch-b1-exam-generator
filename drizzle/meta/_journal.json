@@ -43,6 +43,13 @@
       "when": 1763936638764,
       "tag": "0005_closed_christian_walker",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1763938399976,
+      "tag": "0006_perpetual_deathbird",
+      "breakpoints": true
     }
   ]
 }
