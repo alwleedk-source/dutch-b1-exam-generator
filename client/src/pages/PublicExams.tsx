@@ -170,8 +170,9 @@ export default function PublicExams() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid gap-4 mb-6">
-              {paginatedTexts.map((text: any) => {
+            <>
+              <div className="grid gap-4 mb-6">
+                {paginatedTexts.map((text: any) => {
                 const isHighlyRated = text.average_rating >= 4.5 && text.total_ratings >= 3;
                 const isPopular = text.total_ratings >= 10;
                 
@@ -259,33 +260,34 @@ export default function PublicExams() {
                     </CardContent>
                   </Card>
                 );
-              })}
-            </div>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                >
-                  {t.previous || 'Previous'}
-                </Button>
-                <span className="text-sm text-muted-foreground">
-                  {t.page || 'Page'} {currentPage} {t.of || 'of'} {totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                >
-                  {t.next || 'Next'}
-                </Button>
+                })}
               </div>
-            )}
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    {t.previous || 'Previous'}
+                  </Button>
+                  <span className="text-sm text-muted-foreground">
+                    {t.page || 'Page'} {currentPage} {t.of || 'of'} {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    {t.next || 'Next'}
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </main>
