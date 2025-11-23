@@ -319,7 +319,7 @@ export default function PublicExams() {
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
                   >
-                    {t.previous || 'Previous'}
+                    {t.previousPage || 'Previous'}
                   </Button>
                   <span className="text-sm text-muted-foreground">
                     {t.page || 'Page'} {currentPage} {t.of || 'of'} {totalPages}
@@ -330,7 +330,7 @@ export default function PublicExams() {
                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
                   >
-                    {t.next || 'Next'}
+                    {t.nextPage || 'Next'}
                   </Button>
                 </div>
               )}

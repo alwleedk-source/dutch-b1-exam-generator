@@ -500,7 +500,7 @@ export default function MyExams() {
                         onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                         disabled={currentPage === 1}
                       >
-                        {t.previous || 'Vorige'}
+                        {t.previousPage || 'Vorige'}
                       </Button>
                       <span className="text-sm text-muted-foreground">
                         {t.page || 'Pagina'} {currentPage} {t.of || 'van'} {totalPages}
@@ -511,7 +511,7 @@ export default function MyExams() {
                         onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                         disabled={currentPage === totalPages}
                       >
-                        {t.next || 'Volgende'}
+                        {t.nextPage || 'Volgende'}
                       </Button>
                     </div>
                   )}

@@ -576,8 +576,8 @@ export interface Translations {
 
   // Pagination
   page: string;
-  previous: string;
-  next: string;
+  previousPage: string;
+  nextPage: string;
   
   // Rating
   rateThisExam: string;
@@ -1150,8 +1150,8 @@ export const translations: Record<Language, Translations> = {
 
     // Pagination
     page: "Pagina",
-    previous: "Vorige",
-    next: "Volgende",
+    previousPage: "Vorige",
+    nextPage: "Volgende",
     
     // Rating
     rateThisExam: "Beoordeel dit examen",
@@ -1721,8 +1721,8 @@ export const translations: Record<Language, Translations> = {
 
     // Pagination
     page: "صفحة",
-    previous: "السابق",
-    next: "التالي",
+    previousPage: "السابق",
+    nextPage: "التالي",
     
     // Rating
     rateThisExam: "قيّم هذا الامتحان",
@@ -2293,8 +2293,8 @@ export const translations: Record<Language, Translations> = {
 
     // Pagination
     page: "Page",
-    previous: "Previous",
-    next: "Next",
+    previousPage: "Previous",
+    nextPage: "Next",
     
     // Rating
     rateThisExam: "Rate this exam",
@@ -2866,8 +2866,8 @@ export const translations: Record<Language, Translations> = {
 
     // Pagination
     page: "Sayfa",
-    previous: "Önceki",
-    next: "Sonraki",
+    previousPage: "Önceki",
+    nextPage: "Sonraki",
     
     // Rating
     rateThisExam: "Bu sınavı değerlendir",
