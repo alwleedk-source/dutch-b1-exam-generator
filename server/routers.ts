@@ -1491,6 +1491,53 @@ export const appRouter = router({
       }),
   }),
 
+  // Rating router
+  rating: router({
+    // Rate a text
+    rateText: protectedProcedure
+      .input(z.object({
+        text_id: z.number(),
+        rating: z.number().min(1).max(5),
+        comment: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.rateText(ctx.user.id, input.text_id, input.rating, input.comment);
+      }),
+
+    // Get user's rating for a text
+    getUserRating: protectedProcedure
+      .input(z.object({ text_id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getUserRating(ctx.user.id, input.text_id);
+      }),
+
+    // Get all ratings for a text
+    getTextRatings: publicProcedure
+      .input(z.object({ text_id: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getTextRatings(input.text_id);
+      }),
+
+    // Get texts with ratings (for public exams)
+    getTextsWithRatings: publicProcedure
+      .input(z.object({
+        minRating: z.number().min(0).max(5).optional(),
+        sortBy: z.enum(['rating', 'date', 'popular']).optional(),
+        limit: z.number().optional(),
+        offset: z.number().optional(),
+      }))
+      .query(async ({ input }) => {
+        return await db.getTextsWithRatings(input);
+      }),
+
+    // Delete rating (admin only)
+    deleteRating: adminProcedure
+      .input(z.object({ rating_id: z.number() }))
+      .mutation(async ({ input }) => {
+        return await db.deleteRating(input.rating_id);
+      }),
+  }),
+
   // Forum router
   forum: forumRouter,
 });

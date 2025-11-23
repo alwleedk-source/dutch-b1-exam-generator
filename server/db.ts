@@ -1450,3 +1450,130 @@ export async function getRecentActivity(limit: number = 10) {
     recentExams,
   };
 }
+
+// ==================== TEXT RATINGS ====================
+
+/**
+ * Add or update a text rating
+ */
+export async function rateText(userId: number, textId: number, rating: number, comment?: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Check if user already rated this text
+  const existingRating = await db
+    .select()
+    .from(sql`text_ratings`)
+    .where(sql`text_id = ${textId} AND user_id = ${userId}`)
+    .limit(1);
+  
+  if (existingRating.length > 0) {
+    // Update existing rating
+    await db.execute(
+      sql`UPDATE text_ratings 
+          SET rating = ${rating}, 
+              comment = ${comment || null}, 
+              updated_at = NOW() 
+          WHERE text_id = ${textId} AND user_id = ${userId}`
+    );
+  } else {
+    // Insert new rating
+    await db.execute(
+      sql`INSERT INTO text_ratings (text_id, user_id, rating, comment) 
+          VALUES (${textId}, ${userId}, ${rating}, ${comment || null})`
+    );
+  }
+  
+  // Trigger will automatically update texts table
+  return { success: true };
+}
+
+/**
+ * Get user's rating for a specific text
+ */
+export async function getUserRating(userId: number, textId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.execute(
+    sql`SELECT * FROM text_ratings WHERE text_id = ${textId} AND user_id = ${userId} LIMIT 1`
+  );
+  
+  return result.rows[0] || null;
+}
+
+/**
+ * Get all ratings for a specific text
+ */
+export async function getTextRatings(textId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db.execute(
+    sql`SELECT 
+          tr.*,
+          u.name as user_name,
+          u.email as user_email
+        FROM text_ratings tr
+        LEFT JOIN users u ON tr.user_id = u.id
+        WHERE tr.text_id = ${textId}
+        ORDER BY tr.created_at DESC`
+  );
+  
+  return result.rows;
+}
+
+/**
+ * Get texts with ratings (for public exams page)
+ */
+export async function getTextsWithRatings(options: {
+  minRating?: number;
+  sortBy?: 'rating' | 'date' | 'popular';
+  limit?: number;
+  offset?: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  let orderByClause = 'ORDER BY t.created_at DESC';
+  
+  if (options.sortBy === 'rating') {
+    orderByClause = 'ORDER BY t.average_rating DESC, t.total_ratings DESC';
+  } else if (options.sortBy === 'popular') {
+    orderByClause = 'ORDER BY t.total_ratings DESC, t.average_rating DESC';
+  }
+  
+  const minRatingFilter = options.minRating 
+    ? sql`AND t.average_rating >= ${options.minRating}`
+    : sql``;
+  
+  const result = await db.execute(
+    sql`SELECT 
+          t.*,
+          u.name as creator_name,
+          u.email as creator_email
+        FROM texts t
+        LEFT JOIN users u ON t.created_by = u.id
+        WHERE t.status = 'approved' ${minRatingFilter}
+        ${sql.raw(orderByClause)}
+        LIMIT ${options.limit || 50}
+        OFFSET ${options.offset || 0}`
+  );
+  
+  return result.rows;
+}
+
+/**
+ * Delete a rating (admin only)
+ */
+export async function deleteRating(ratingId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.execute(
+    sql`DELETE FROM text_ratings WHERE id = ${ratingId}`
+  );
+  
+  // Trigger will automatically update texts table
+  return { success: true };
+}

@@ -677,9 +677,16 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">Dutch Text</h3>
-                <div className="bg-muted p-4 rounded-lg max-h-[300px] overflow-y-auto">
-                  <p className="whitespace-pre-wrap text-sm">{textDetails.dutch_text}</p>
+                <h3 className="font-semibold mb-2">Dutch Text (Formatted)</h3>
+                <div className="bg-white p-6 rounded-lg max-h-[500px] overflow-y-auto border">
+                  {textDetails.formatted_html ? (
+                    <div 
+                      className="prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{ __html: textDetails.formatted_html }}
+                    />
+                  ) : (
+                    <p className="whitespace-pre-wrap text-sm">{textDetails.dutch_text}</p>
+                  )}
                 </div>
               </div>
               {textDetails.questions && (
