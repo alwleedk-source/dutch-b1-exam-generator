@@ -42,7 +42,7 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <BookOpen className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-              <h1 className="text-xl sm:text-2xl font-bold gradient-text">Dutch B1</h1>
+              <h1 className="text-xl sm:text-2xl font-bold gradient-text">StaatKlaar</h1>
             </div>
 
             <div className="flex items-center gap-2 sm:gap-4">
@@ -338,7 +338,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-border/50 py-6 sm:py-8 px-4">
         <div className="container mx-auto text-center text-sm text-muted-foreground">
-          <p>© 2024 Dutch B1 Exam Generator. {t.staatsexamenPrep} - Built with ❤️ for immigrants in the Netherlands.</p>
+          <p>© 2024 StaatKlaar. {t.staatsexamenPrep} - Built with ❤️ for immigrants in the Netherlands.</p>
         </div>
       </footer>
     </div>

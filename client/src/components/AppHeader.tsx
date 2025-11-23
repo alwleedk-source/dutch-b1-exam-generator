@@ -28,7 +28,7 @@ export function AppHeader() {
           <Link href="/">
             <div className="flex items-center gap-2 cursor-pointer">
               <BookOpen className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-              <h1 className="text-lg sm:text-2xl font-bold gradient-text">Dutch B1</h1>
+              <h1 className="text-lg sm:text-2xl font-bold gradient-text">StaatKlaar</h1>
             </div>
           </Link>
           

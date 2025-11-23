@@ -138,7 +138,7 @@ export default function TakeExam() {
               <Link href="/">
                 <div className="flex items-center gap-1.5 sm:gap-2 cursor-pointer hover:opacity-80 transition-opacity">
                   <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
-                  <span className="font-bold text-base sm:text-lg gradient-text hidden xs:inline">Dutch B1</span>
+                  <span className="font-bold text-base sm:text-lg gradient-text hidden xs:inline">StaatKlaar</span>
                 </div>
               </Link>
               <div className="h-5 sm:h-6 w-px bg-border hidden sm:block" />
