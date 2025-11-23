@@ -583,7 +583,7 @@ export async function updateUserVocabularyCount(user_id: number) {
   const result = await db
     .select({ count: count() })
     .from(userVocabulary)
-    .where(eq(userVocabulary.userId, user_id));
+    .where(eq(userVocabulary.user_id, user_id));
   
   const vocabularyCount = result[0]?.count || 0;
   
