@@ -11,7 +11,7 @@ import { BookOpen, Users, TrendingUp, Clock, Play, Star, Filter } from "lucide-r
 import { Link, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { useState } from "react";
+import React, { useState, useMemo } from "react";
 
 export default function PublicExams() {
   const { user, logout } = useAuth();
@@ -21,11 +21,38 @@ export default function PublicExams() {
   const [sortBy, setSortBy] = useState<'date' | 'rating' | 'popular'>('date');
   const [minRating, setMinRating] = useState<number>(0);
 
-  const { data: texts, isLoading } = trpc.rating.getTextsWithRatings.useQuery({
-    sortBy,
-    minRating: minRating > 0 ? minRating : undefined,
-    limit: 50,
-  });
+  const { data: allTexts, isLoading } = trpc.text.listPublicTexts.useQuery();
+  
+  // Apply client-side filtering and sorting
+  const texts = useMemo(() => {
+    if (!allTexts) return [];
+    
+    let filtered = [...allTexts];
+    
+    // Filter by minimum rating
+    if (minRating > 0) {
+      filtered = filtered.filter(t => (t.average_rating || 0) >= minRating);
+    }
+    
+    // Sort
+    if (sortBy === 'rating') {
+      filtered.sort((a, b) => {
+        const ratingDiff = (b.average_rating || 0) - (a.average_rating || 0);
+        if (ratingDiff !== 0) return ratingDiff;
+        return (b.total_ratings || 0) - (a.total_ratings || 0);
+      });
+    } else if (sortBy === 'popular') {
+      filtered.sort((a, b) => {
+        const popularityDiff = (b.total_ratings || 0) - (a.total_ratings || 0);
+        if (popularityDiff !== 0) return popularityDiff;
+        return (b.average_rating || 0) - (a.average_rating || 0);
+      });
+    } else {
+      // date - already sorted by created_at DESC from server
+    }
+    
+    return filtered;
+  }, [allTexts, minRating, sortBy]);
   
   const generateExamMutation = trpc.exam.generateExam.useMutation({
     onSuccess: (data) => {
