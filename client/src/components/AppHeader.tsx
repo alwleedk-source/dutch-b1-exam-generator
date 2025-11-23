@@ -36,7 +36,7 @@ export function AppHeader() {
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-2">
-            {examCreationStatus?.enabled && (
+            {(examCreationStatus?.enabled || user?.role === 'admin') && (
               <Link href="/create-exam">
                 <Button variant="ghost" size="sm">{t.createNewExam || "Create Exam"}</Button>
               </Link>
@@ -88,7 +88,7 @@ export function AppHeader() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                {examCreationStatus?.enabled && (
+                {(examCreationStatus?.enabled || user?.role === 'admin') && (
                   <Link href="/create-exam">
                     <DropdownMenuItem>
                       <Plus className="mr-2 h-4 w-4" />

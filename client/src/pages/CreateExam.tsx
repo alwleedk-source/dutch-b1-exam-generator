@@ -248,7 +248,7 @@ export default function CreateExam() {
       <AppHeader />
       
       {/* Exam Creation Disabled Overlay */}
-      {examCreationStatus && !examCreationStatus.enabled && (
+      {examCreationStatus && !examCreationStatus.enabled && user?.role !== 'admin' && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <Card className="max-w-md w-full shadow-2xl">
             <CardHeader className="text-center">
