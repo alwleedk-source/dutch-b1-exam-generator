@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RatingStars } from "@/components/RatingStars";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface RatingDialogProps {
   open: boolean;
@@ -21,6 +22,7 @@ export function RatingDialog({
   textTitle,
   existingRating 
 }: RatingDialogProps) {
+  const { t } = useLanguage();
   const [rating, setRating] = useState(existingRating?.rating || 0);
   const [comment, setComment] = useState(existingRating?.comment || "");
 
@@ -86,7 +88,7 @@ export function RatingDialog({
               Comment (Optional)
             </label>
             <Textarea
-              placeholder="Share your thoughts about this exam..."
+              placeholder={t.shareThoughts}
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               rows={4}

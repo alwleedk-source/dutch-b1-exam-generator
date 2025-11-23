@@ -94,7 +94,7 @@ export default function Dictionary() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search for a word..."
+            placeholder={t.searchForWord}
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -110,7 +110,7 @@ export default function Dictionary() {
               : "bg-gray-200 text-gray-700 hover:bg-gray-300"
           }`}
         >
-          All
+          {t.allLetters}
         </button>
         {alphabet.map((letter) => (
           <button
@@ -136,7 +136,7 @@ export default function Dictionary() {
 
       {words && words.length === 0 && (
         <div className="text-center py-12 text-gray-500">
-          No results found. Try a different search or letter.
+          {t.noResultsFound}
         </div>
       )}
 
@@ -151,7 +151,7 @@ export default function Dictionary() {
                   <button
                     onClick={() => playAudio(word.audio_url, word.word)}
                     className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
-                    title="Play audio"
+                    title={t.playAudio}
                   >
                     <Volume2 size={20} />
                   </button>
@@ -159,7 +159,7 @@ export default function Dictionary() {
                     onClick={() => addToVocabularyMutation.mutate({ word: word.word })}
                     disabled={addToVocabularyMutation.isPending}
                     className="p-2 text-green-600 hover:bg-green-50 rounded-full transition-colors disabled:opacity-50"
-                    title="Add to my vocabulary"
+                    title={t.addToVocabulary}
                   >
                     {addToVocabularyMutation.isPending ? (
                       <Loader2 className="animate-spin" size={20} />

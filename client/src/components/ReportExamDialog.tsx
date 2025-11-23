@@ -93,16 +93,16 @@ export function ReportExamDialog({ examId, trigger }: ReportExamDialogProps) {
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="other" id="other" />
                 <Label htmlFor="other" className="font-normal cursor-pointer">
-                  Other issue
+                  {t.otherIssue}
                 </Label>
               </div>
             </RadioGroup>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="details">Additional details</Label>
+            <Label htmlFor="details">{t.additionalDetails}</Label>
             <Textarea
               id="details"
-              placeholder="Please provide more information about the issue..."
+              placeholder={t.provideMoreInfo}
               value={details}
               onChange={(e) => setDetails(e.target.value)}
               rows={4}
@@ -111,7 +111,7 @@ export function ReportExamDialog({ examId, trigger }: ReportExamDialogProps) {
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)} disabled={reportMutation.isPending}>
-            Cancel
+            {t.cancel}
           </Button>
           <Button onClick={handleSubmit} disabled={reportMutation.isPending}>
             {reportMutation.isPending ? (

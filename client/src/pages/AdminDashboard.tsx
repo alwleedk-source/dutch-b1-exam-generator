@@ -331,19 +331,19 @@ export default function AdminDashboard() {
                     <div className="flex items-center gap-2">
                       <Select value={textStatusFilter} onValueChange={setTextStatusFilter}>
                         <SelectTrigger className="w-[150px]">
-                          <SelectValue placeholder="Filter by status" />
+                          <SelectValue placeholder={t.filterByStatus} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">All Status</SelectItem>
-                          <SelectItem value="pending">Pending</SelectItem>
-                          <SelectItem value="approved">Approved</SelectItem>
-                          <SelectItem value="rejected">Rejected</SelectItem>
+                          <SelectItem value="all">{t.allStatus}</SelectItem>
+                          <SelectItem value="pending">{t.pending}</SelectItem>
+                          <SelectItem value="approved">{t.approved}</SelectItem>
+                          <SelectItem value="rejected">{t.rejected}</SelectItem>
                         </SelectContent>
                       </Select>
                       <div className="relative">
                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
-                          placeholder="Search texts..."
+                          placeholder={t.searchTexts}
                           className="pl-8 w-[250px]"
                           value={textSearch}
                           onChange={(e) => setTextSearch(e.target.value)}
@@ -356,13 +356,13 @@ export default function AdminDashboard() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>ID</TableHead>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Created By</TableHead>
-                        <TableHead>Words</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Actions</TableHead>
+                        <TableHead>{t.id}</TableHead>
+                        <TableHead>{t.title}</TableHead>
+                        <TableHead>{t.createdBy}</TableHead>
+                        <TableHead>{t.words}</TableHead>
+                        <TableHead>{t.status}</TableHead>
+                        <TableHead>{t.date}</TableHead>
+                        <TableHead>{t.actions}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -457,7 +457,7 @@ export default function AdminDashboard() {
                     <div className="relative">
                       <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                       <Input
-                        placeholder="Search exams..."
+                          placeholder={t.searchExams}
                         className="pl-8 w-[250px]"
                         value={examSearch}
                         onChange={(e) => setExamSearch(e.target.value)}
@@ -568,7 +568,7 @@ export default function AdminDashboard() {
                     <div className="relative">
                       <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                       <Input
-                        placeholder="Search users..."
+                          placeholder={t.searchUsers}
                         className="pl-8 w-[250px]"
                         value={userSearch}
                         onChange={(e) => setUserSearch(e.target.value)}
@@ -856,18 +856,24 @@ export default function AdminDashboard() {
       <Dialog open={!!examToDelete} onOpenChange={(open) => !open && setExamToDelete(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Exam?</DialogTitle>
+            <DialogTitle>{t.confirmDeleteTitle}</DialogTitle>
             <DialogDescription>
-              This action cannot be undone. This will permanently delete the exam result.
+              {t.confirmDeleteMessage}
+              <br />
+              <span className="text-destructive font-medium mt-2 block">
+                {t.thisActionCannotBeUndone}
+              </span>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setExamToDelete(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setExamToDelete(null)}>{t.cancel}</Button>
             <Button 
               variant="destructive" 
               onClick={() => deleteExamMutation.mutate({ exam_id: examToDelete! })}
+              disabled={deleteExamMutation.isPending}
             >
-              Delete
+              {deleteExamMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              {t.confirmDeleteButton}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -876,18 +882,24 @@ export default function AdminDashboard() {
       <Dialog open={!!textToDelete} onOpenChange={(open) => !open && setTextToDelete(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Text?</DialogTitle>
+            <DialogTitle>{t.confirmDeleteTitle}</DialogTitle>
             <DialogDescription>
-              This action cannot be undone. This will permanently delete the text and all associated exams.
+              {t.confirmDeleteMessage}
+              <br />
+              <span className="text-destructive font-medium mt-2 block">
+                {t.thisActionCannotBeUndone}
+              </span>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setTextToDelete(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setTextToDelete(null)}>{t.cancel}</Button>
             <Button 
               variant="destructive" 
               onClick={() => deleteTextMutation.mutate({ text_id: textToDelete! })}
+              disabled={deleteTextMutation.isPending}
             >
-              Delete
+              {deleteTextMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              {t.confirmDeleteButton}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -896,18 +908,24 @@ export default function AdminDashboard() {
       <Dialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete User?</DialogTitle>
+            <DialogTitle>{t.confirmDeleteTitle}</DialogTitle>
             <DialogDescription>
-              This action cannot be undone. This will permanently delete the user and all their data (texts, exams, vocabulary).
+              {t.confirmDeleteMessage}
+              <br />
+              <span className="text-destructive font-medium mt-2 block">
+                {t.thisActionCannotBeUndone}
+              </span>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setUserToDelete(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setUserToDelete(null)}>{t.cancel}</Button>
             <Button 
               variant="destructive" 
               onClick={() => deleteUserMutation.mutate({ userId: userToDelete! })}
+              disabled={deleteUserMutation.isPending}
             >
-              Delete User
+              {deleteUserMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              {t.confirmDeleteButton}
             </Button>
           </DialogFooter>
         </DialogContent>

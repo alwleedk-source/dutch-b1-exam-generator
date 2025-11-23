@@ -5,36 +5,51 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { HelmetProvider } from "react-helmet-async";
+// Eager load critical pages
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
-import CreateExam from "./pages/CreateExam";
-import TakeExam from "./pages/TakeExam";
-import Progress from "./pages/Progress";
-import Vocabulary from "./pages/Vocabulary";
-import Dictionary from "./pages/Dictionary";
-import AdminDashboard from "./pages/AdminDashboard";
-import Leaderboard from "./pages/Leaderboard";
-import Achievements from "./pages/Achievements";
-import StudyMode from "./pages/StudyMode";
-import ReviewPractice from "./pages/ReviewPractice";
-import MyExams from "./pages/MyExams";
-import PublicExams from "./pages/PublicExams";
-import ExamResults from "./pages/ExamResults";
-import ExamReview from "./pages/ExamReview";
-import ForumHome from "./pages/forum/ForumHome";
-import ForumCategory from "./pages/forum/ForumCategory";
-import ForumTopic from "./pages/forum/ForumTopic";
-import NewTopic from "./pages/forum/NewTopic";
-import ForumReports from "./pages/forum/ForumReports";
-import ModeratorPanel from "./pages/forum/ModeratorPanel";
-import UserManagement from "./pages/forum/UserManagement";
+
+// Lazy load non-critical pages
+const CreateExam = lazy(() => import("./pages/CreateExam"));
+const TakeExam = lazy(() => import("./pages/TakeExam"));
+const Progress = lazy(() => import("./pages/Progress"));
+const Vocabulary = lazy(() => import("./pages/Vocabulary"));
+const Dictionary = lazy(() => import("./pages/Dictionary"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const Leaderboard = lazy(() => import("./pages/Leaderboard"));
+const Achievements = lazy(() => import("./pages/Achievements"));
+const StudyMode = lazy(() => import("./pages/StudyMode"));
+const ReviewPractice = lazy(() => import("./pages/ReviewPractice"));
+const MyExams = lazy(() => import("./pages/MyExams"));
+const PublicExams = lazy(() => import("./pages/PublicExams"));
+const ExamResults = lazy(() => import("./pages/ExamResults"));
+const ExamReview = lazy(() => import("./pages/ExamReview"));
+const ForumHome = lazy(() => import("./pages/forum/ForumHome"));
+const ForumCategory = lazy(() => import("./pages/forum/ForumCategory"));
+const ForumTopic = lazy(() => import("./pages/forum/ForumTopic"));
+const NewTopic = lazy(() => import("./pages/forum/NewTopic"));
+const ForumReports = lazy(() => import("./pages/forum/ForumReports"));
+const ModeratorPanel = lazy(() => import("./pages/forum/ModeratorPanel"));
+const UserManagement = lazy(() => import("./pages/forum/UserManagement"));
 import LanguageSelector from "./components/LanguageSelector";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
+import { Loader2 } from "lucide-react";
+
+// Loading fallback component
+function LoadingFallback() {
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    </div>
+  );
+}
 
 function Router() {
   return (
-    <Switch>
+    <Suspense fallback={<LoadingFallback />}>
+      <Switch>
       <Route path="/" component={Home} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/create-exam" component={CreateExam} />
@@ -60,7 +75,8 @@ function Router() {
       <Route path="/forum/users" component={UserManagement} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
-    </Switch>
+      </Switch>
+    </Suspense>
   );
 }
 
@@ -82,8 +98,9 @@ function App() {
   
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="light" switchable>
-        <LanguageProvider>
+      <HelmetProvider>
+        <ThemeProvider defaultTheme="light" switchable>
+          <LanguageProvider>
           <TooltipProvider>
             <Toaster />
             <LanguageSelector 
@@ -92,8 +109,9 @@ function App() {
             />
             <Router />
           </TooltipProvider>
-        </LanguageProvider>
-      </ThemeProvider>
+          </LanguageProvider>
+        </ThemeProvider>
+      </HelmetProvider>
     </ErrorBoundary>
   );
 }

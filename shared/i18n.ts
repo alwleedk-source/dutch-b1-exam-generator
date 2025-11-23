@@ -486,6 +486,55 @@ export interface Translations {
   "forum.category.experiences_desc": string;
   "forum.category.questions": string;
   "forum.category.questions_desc": string;
+  
+  // Dictionary page
+  searchForWord: string;
+  allLetters: string;
+  noResultsFound: string;
+  tryDifferentSearch: string;
+  playAudio: string;
+  addToVocabulary: string;
+  
+  // Admin Dashboard
+  filterByStatus: string;
+  allStatus: string;
+  searchTexts: string;
+  searchExams: string;
+  searchUsers: string;
+  id: string;
+  title: string;
+  createdBy: string;
+  date: string;
+  
+  // Report Dialog
+  otherIssue: string;
+  additionalDetails: string;
+  provideMoreInfo: string;
+  
+  // Rating Dialog
+  shareThoughts: string;
+  
+  // Create Exam
+  pasteOrTypeDutchText: string;
+  
+  // Forum Editor
+  bold: string;
+  italic: string;
+  heading: string;
+  bulletList: string;
+  numberedList: string;
+  
+  // Accessibility
+  toggleSidebar: string;
+  goToPreviousPage: string;
+  goToNextPage: string;
+  
+  // Confirmation messages
+  confirmDeleteTitle: string;
+  confirmDeleteMessage: string;
+  confirmDeleteButton: string;
+  areYouSure: string;
+  thisActionCannotBeUndone: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -955,6 +1004,55 @@ export const translations: Record<Language, Translations> = {
     "forum.category.experiences_desc": "Deel je ervaringen met het leren van Nederlands",
     "forum.category.questions": "Vragen & Antwoorden",
     "forum.category.questions_desc": "Stel vragen en help anderen",
+    
+    // Dictionary page
+    searchForWord: "Zoek naar een woord...",
+    allLetters: "Alle",
+    noResultsFound: "Geen resultaten gevonden. Probeer een andere zoekopdracht of letter.",
+    tryDifferentSearch: "Probeer een andere zoekopdracht",
+    playAudio: "Audio afspelen",
+    addToVocabulary: "Toevoegen aan mijn woordenschat",
+    
+    // Admin Dashboard
+    filterByStatus: "Filter op status",
+    allStatus: "Alle Status",
+    searchTexts: "Zoek teksten...",
+    searchExams: "Zoek examens...",
+    searchUsers: "Zoek gebruikers...",
+    id: "ID",
+    title: "Titel",
+    createdBy: "Gemaakt door",
+    date: "Datum",
+    
+    // Report Dialog
+    otherIssue: "Ander probleem",
+    additionalDetails: "Aanvullende details",
+    provideMoreInfo: "Geef meer informatie over het probleem...",
+    
+    // Rating Dialog
+    shareThoughts: "Deel je gedachten over dit examen...",
+    
+    // Create Exam
+    pasteOrTypeDutchText: "Plak of typ hier Nederlandse tekst...",
+    
+    // Forum Editor
+    bold: "Vet",
+    italic: "Cursief",
+    heading: "Kop",
+    bulletList: "Opsommingslijst",
+    numberedList: "Genummerde lijst",
+    
+    // Accessibility
+    toggleSidebar: "Zijbalk wisselen",
+    goToPreviousPage: "Ga naar vorige pagina",
+    goToNextPage: "Ga naar volgende pagina",
+    
+    // Confirmation messages
+    confirmDeleteTitle: "Verwijderen bevestigen",
+    confirmDeleteMessage: "Weet je zeker dat je dit wilt verwijderen?",
+    confirmDeleteButton: "Ja, verwijderen",
+    areYouSure: "Weet je het zeker?",
+    thisActionCannotBeUndone: "Deze actie kan niet ongedaan worden gemaakt.",
   },
   
   ar: {
@@ -1421,6 +1519,55 @@ export const translations: Record<Language, Translations> = {
     "forum.category.experiences_desc": "شارك تجربتك في تعلم الهولندية",
     "forum.category.questions": "أسئلة وأجوبة",
     "forum.category.questions_desc": "اطرح الأسئلة وساعد الآخرين",
+    
+    // Dictionary page
+    searchForWord: "ابحث عن كلمة...",
+    allLetters: "الكل",
+    noResultsFound: "لم يتم العثور على نتائج. جرب بحثاً أو حرفاً مختلفاً.",
+    tryDifferentSearch: "جرب بحثاً مختلفاً",
+    playAudio: "تشغيل الصوت",
+    addToVocabulary: "إضافة إلى مفرداتي",
+    
+    // Admin Dashboard
+    filterByStatus: "تصفية حسب الحالة",
+    allStatus: "جميع الحالات",
+    searchTexts: "بحث في النصوص...",
+    searchExams: "بحث في الامتحانات...",
+    searchUsers: "بحث في المستخدمين...",
+    id: "المعرف",
+    title: "العنوان",
+    createdBy: "أنشئ بواسطة",
+    date: "التاريخ",
+    
+    // Report Dialog
+    otherIssue: "مشكلة أخرى",
+    additionalDetails: "تفاصيل إضافية",
+    provideMoreInfo: "يرجى تقديم المزيد من المعلومات حول المشكلة...",
+    
+    // Rating Dialog
+    shareThoughts: "شارك رأيك حول هذا الامتحان...",
+    
+    // Create Exam
+    pasteOrTypeDutchText: "الصق أو اكتب نصاً هولندياً هنا...",
+    
+    // Forum Editor
+    bold: "عريض",
+    italic: "مائل",
+    heading: "عنوان",
+    bulletList: "قائمة نقطية",
+    numberedList: "قائمة مرقمة",
+    
+    // Accessibility
+    toggleSidebar: "تبديل الشريط الجانبي",
+    goToPreviousPage: "الانتقال إلى الصفحة السابقة",
+    goToNextPage: "الانتقال إلى الصفحة التالية",
+    
+    // Confirmation messages
+    confirmDeleteTitle: "تأكيد الحذف",
+    confirmDeleteMessage: "هل أنت متأكد أنك تريد حذف هذا؟",
+    confirmDeleteButton: "نعم، احذف",
+    areYouSure: "هل أنت متأكد؟",
+    thisActionCannotBeUndone: "لا يمكن التراجع عن هذا الإجراء.",
   },
   
   en: {
@@ -1888,6 +2035,55 @@ export const translations: Record<Language, Translations> = {
     "forum.category.experiences_desc": "Share your experience learning Dutch",
     "forum.category.questions": "Questions & Answers",
     "forum.category.questions_desc": "Ask questions and help others",
+    
+    // Dictionary page
+    searchForWord: "Search for a word...",
+    allLetters: "All",
+    noResultsFound: "No results found. Try a different search or letter.",
+    tryDifferentSearch: "Try a different search",
+    playAudio: "Play audio",
+    addToVocabulary: "Add to my vocabulary",
+    
+    // Admin Dashboard
+    filterByStatus: "Filter by status",
+    allStatus: "All Status",
+    searchTexts: "Search texts...",
+    searchExams: "Search exams...",
+    searchUsers: "Search users...",
+    id: "ID",
+    title: "Title",
+    createdBy: "Created By",
+    date: "Date",
+    
+    // Report Dialog
+    otherIssue: "Other issue",
+    additionalDetails: "Additional details",
+    provideMoreInfo: "Please provide more information about the issue...",
+    
+    // Rating Dialog
+    shareThoughts: "Share your thoughts about this exam...",
+    
+    // Create Exam
+    pasteOrTypeDutchText: "Paste or type Dutch text here...",
+    
+    // Forum Editor
+    bold: "Bold",
+    italic: "Italic",
+    heading: "Heading",
+    bulletList: "Bullet List",
+    numberedList: "Numbered List",
+    
+    // Accessibility
+    toggleSidebar: "Toggle Sidebar",
+    goToPreviousPage: "Go to previous page",
+    goToNextPage: "Go to next page",
+    
+    // Confirmation messages
+    confirmDeleteTitle: "Confirm Delete",
+    confirmDeleteMessage: "Are you sure you want to delete this?",
+    confirmDeleteButton: "Yes, delete",
+    areYouSure: "Are you sure?",
+    thisActionCannotBeUndone: "This action cannot be undone.",
   },
   
   tr: {
@@ -2356,6 +2552,55 @@ export const translations: Record<Language, Translations> = {
     "forum.category.experiences_desc": "Hollandaca öğrenme deneyiminizi paylaşın",
     "forum.category.questions": "Sorular ve Cevaplar",
     "forum.category.questions_desc": "Sorular sorun ve başkalarına yardım edin",
+    
+    // Dictionary page
+    searchForWord: "Bir kelime arayın...",
+    allLetters: "Tümü",
+    noResultsFound: "Sonuç bulunamadı. Farklı bir arama veya harf deneyin.",
+    tryDifferentSearch: "Farklı bir arama deneyin",
+    playAudio: "Sesi çal",
+    addToVocabulary: "Kelime dağarcığıma ekle",
+    
+    // Admin Dashboard
+    filterByStatus: "Duruma göre filtrele",
+    allStatus: "Tüm Durumlar",
+    searchTexts: "Metinlerde ara...",
+    searchExams: "Sınavlarda ara...",
+    searchUsers: "Kullanıcılarda ara...",
+    id: "ID",
+    title: "Başlık",
+    createdBy: "Oluşturan",
+    date: "Tarih",
+    
+    // Report Dialog
+    otherIssue: "Diğer sorun",
+    additionalDetails: "Ek detaylar",
+    provideMoreInfo: "Lütfen sorun hakkında daha fazla bilgi verin...",
+    
+    // Rating Dialog
+    shareThoughts: "Bu sınav hakkındaki düşüncelerinizi paylaşın...",
+    
+    // Create Exam
+    pasteOrTypeDutchText: "Hollandaca metni buraya yapıştırın veya yazın...",
+    
+    // Forum Editor
+    bold: "Kalın",
+    italic: "İtalik",
+    heading: "Başlık",
+    bulletList: "Madde İşaretli Liste",
+    numberedList: "Numaralı Liste",
+    
+    // Accessibility
+    toggleSidebar: "Kenar çubuğunu aç/kapat",
+    goToPreviousPage: "Önceki sayfaya git",
+    goToNextPage: "Sonraki sayfaya git",
+    
+    // Confirmation messages
+    confirmDeleteTitle: "Silmeyi Onayla",
+    confirmDeleteMessage: "Bunu silmek istediğinizden emin misiniz?",
+    confirmDeleteButton: "Evet, sil",
+    areYouSure: "Emin misiniz?",
+    thisActionCannotBeUndone: "Bu işlem geri alınamaz.",
   },
 };
 

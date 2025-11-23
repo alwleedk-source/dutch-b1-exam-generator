@@ -316,7 +316,7 @@ export default function CreateExam() {
                   <RichTextEditor
                     value={dutchText}
                     onChange={handleTextChange}
-                    placeholder="Plak of typ hier Nederlandse tekst... (Paste or type Dutch text here)"
+                    placeholder={t.pasteOrTypeDutchText}
                     onImagePaste={handleImagePaste}
                   />
                   <div className="flex flex-col gap-1 text-sm text-muted-foreground mt-2">

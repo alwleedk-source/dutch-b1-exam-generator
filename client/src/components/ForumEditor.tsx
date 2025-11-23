@@ -4,6 +4,7 @@ import Placeholder from '@tiptap/extension-placeholder';
 import { useEffect } from 'react';
 import { Bold, Italic, List, ListOrdered, Heading2 } from 'lucide-react';
 import { Button } from './ui/button';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ForumEditorProps {
   value: string;
@@ -13,6 +14,7 @@ interface ForumEditorProps {
 }
 
 export function ForumEditor({ value, onChange, placeholder, className }: ForumEditorProps) {
+  const { t } = useLanguage();
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -56,7 +58,7 @@ export function ForumEditor({ value, onChange, placeholder, className }: ForumEd
           size="sm"
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={editor.isActive('bold') ? 'bg-muted' : ''}
-          title="Bold"
+          title={t.bold}
         >
           <Bold className="h-4 w-4" />
         </Button>
@@ -67,7 +69,7 @@ export function ForumEditor({ value, onChange, placeholder, className }: ForumEd
           size="sm"
           onClick={() => editor.chain().focus().toggleItalic().run()}
           className={editor.isActive('italic') ? 'bg-muted' : ''}
-          title="Italic"
+          title={t.italic}
         >
           <Italic className="h-4 w-4" />
         </Button>
@@ -78,7 +80,7 @@ export function ForumEditor({ value, onChange, placeholder, className }: ForumEd
           size="sm"
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
           className={editor.isActive('heading', { level: 2 }) ? 'bg-muted' : ''}
-          title="Heading"
+          title={t.heading}
         >
           <Heading2 className="h-4 w-4" />
         </Button>
@@ -89,7 +91,7 @@ export function ForumEditor({ value, onChange, placeholder, className }: ForumEd
           size="sm"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={editor.isActive('bulletList') ? 'bg-muted' : ''}
-          title="Bullet List"
+          title={t.bulletList}
         >
           <List className="h-4 w-4" />
         </Button>
@@ -100,7 +102,7 @@ export function ForumEditor({ value, onChange, placeholder, className }: ForumEd
           size="sm"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           className={editor.isActive('orderedList') ? 'bg-muted' : ''}
-          title="Numbered List"
+          title={t.numberedList}
         >
           <ListOrdered className="h-4 w-4" />
         </Button>

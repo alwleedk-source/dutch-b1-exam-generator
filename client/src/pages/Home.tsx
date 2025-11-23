@@ -14,6 +14,7 @@ import {
 import { Link, useLocation } from "wouter";
 import { Language } from "@shared/i18n";
 import { useEffect } from "react";
+import { SEO } from "@/components/SEO";
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
@@ -35,7 +36,9 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-bg">
+    <>
+      <SEO />
+      <div className="min-h-screen bg-gradient-bg">
       {/* Header */}
       <header className="border-b border-border/50 glass sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
@@ -342,5 +345,6 @@ export default function Home() {
         </div>
       </footer>
     </div>
+    </>
   );
 }
