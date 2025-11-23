@@ -227,21 +227,21 @@ export default function PublicExams() {
                   <Card key={text.id} className="hover:shadow-lg transition-shadow">
                     <CardHeader>
                       <div className="flex flex-col gap-3">
-                        {/* Title and badges row */}
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex-1 min-w-0">
-                            <CardTitle className="text-lg sm:text-xl break-words mb-2">
-                              {text.title || `Text #${text.id}`}
-                            </CardTitle>
-                          </div>
-                          <div className="flex flex-col gap-1 flex-shrink-0">
-                            {text.is_b1_level && (
-                              <Badge variant="default" className="whitespace-nowrap">B1 {t.levelDetected || "Level"}</Badge>
-                            )}
-                            {text.detected_level && (
-                              <Badge variant="outline" className="whitespace-nowrap">{text.detected_level}</Badge>
-                            )}
-                          </div>
+                        {/* Level badges above title */}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {text.is_b1_level && (
+                            <Badge variant="default" className="whitespace-nowrap">B1 {t.levelDetected || "Level"}</Badge>
+                          )}
+                          {text.detected_level && (
+                            <Badge variant="outline" className="whitespace-nowrap">{text.detected_level}</Badge>
+                          )}
+                        </div>
+                        
+                        {/* Title - full width */}
+                        <div>
+                          <CardTitle className="text-lg sm:text-xl break-words">
+                            {text.title || `Text #${text.id}`}
+                          </CardTitle>
                         </div>
                         
                         {/* Quality badges */}
