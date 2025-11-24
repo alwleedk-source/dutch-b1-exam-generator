@@ -45,6 +45,8 @@ export default function ForumTopic() {
   const [isEditingTopic, setIsEditingTopic] = useState(false);
   const [editTopicTitle, setEditTopicTitle] = useState("");
   const [editTopicContent, setEditTopicContent] = useState("");
+  const [editingPostId, setEditingPostId] = useState<number | null>(null);
+  const [editPostContent, setEditPostContent] = useState("");
   
   const utils = trpc.useUtils();
   const { data, isLoading } = trpc.forum.getTopic.useQuery({
@@ -94,6 +96,18 @@ export default function ForumTopic() {
   const deletePostMutation = trpc.forum.deletePost.useMutation({
     onSuccess: () => {
       toast.success(t.postDeleted || "Post deleted successfully");
+      utils.forum.getTopic.invalidate({ topicId });
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+  
+  const updatePostMutation = trpc.forum.updatePost.useMutation({
+    onSuccess: () => {
+      toast.success(t.postUpdated || "Post updated successfully!");
+      setEditingPostId(null);
+      setEditPostContent("");
       utils.forum.getTopic.invalidate({ topicId });
     },
     onError: (error) => {
@@ -377,10 +391,45 @@ export default function ForumTopic() {
                   </span>
                 </div>
                 
-                <div 
-                  className="prose prose-sm sm:prose dark:prose-invert max-w-none mb-3 break-words"
-                  dangerouslySetInnerHTML={{ __html: post.content }}
-                />
+                {editingPostId === post.id ? (
+                  <div className="mb-3">
+                    <ForumEditor
+                      value={editPostContent}
+                      onChange={setEditPostContent}
+                      placeholder={t.writeYourReply || "Write your reply..."}
+                      className="mb-3"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          updatePostMutation.mutate({
+                            postId: post.id,
+                            content: editPostContent,
+                          });
+                        }}
+                        disabled={updatePostMutation.isPending}
+                      >
+                        {t.save || "Save"}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setEditingPostId(null);
+                          setEditPostContent("");
+                        }}
+                      >
+                        {t.cancel || "Cancel"}
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div 
+                    className="prose prose-sm sm:prose dark:prose-invert max-w-none mb-3 break-words"
+                    dangerouslySetInnerHTML={{ __html: post.content }}
+                  />
+                )}
                 
                 <div className="flex flex-wrap gap-2">
                   <Button
@@ -407,20 +456,35 @@ export default function ForumTopic() {
                   )}
                   
                   {canEditOrDelete(post.created_at, post.user_id) && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        if (confirm(t.confirmDelete || "Are you sure you want to delete this post?")) {
-                          deletePostMutation.mutate({ postId: post.id });
-                        }
-                      }}
-                      disabled={deletePostMutation.isPending}
-                      className="text-xs sm:text-sm"
-                    >
-                      <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                      <span className="hidden xs:inline">{t.delete}</span>
-                    </Button>
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setEditingPostId(post.id);
+                          setEditPostContent(post.content);
+                        }}
+                        className="text-xs sm:text-sm"
+                      >
+                        <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                        <span className="hidden xs:inline">{t.edit}</span>
+                      </Button>
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          if (confirm(t.confirmDelete || "Are you sure you want to delete this post?")) {
+                            deletePostMutation.mutate({ postId: post.id });
+                          }
+                        }}
+                        disabled={deletePostMutation.isPending}
+                        className="text-xs sm:text-sm"
+                      >
+                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                        <span className="hidden xs:inline">{t.delete}</span>
+                      </Button>
+                    </>
                   )}
                 </div>
               </CardContent>

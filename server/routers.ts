@@ -799,23 +799,15 @@ export const appRouter = router({
           return { audioUrl: vocab.audioUrl, audioKey: vocab.audioKey || '' };
         }
         
-        // 2. Check if word exists in dictionary with audio
+        // 2. Check if word exists in dictionary with audio (TRUSTED SOURCE ONLY)
         const dictionaryEntry = await db.getDictionaryWord(input.word);
         if (dictionaryEntry?.audio_url) {
-          // Use dictionary audio
+          // Use dictionary audio - this is the ONLY trusted source
           await db.updateVocabularyAudio(input.vocabId, dictionaryEntry.audio_url, dictionaryEntry.audio_key || '');
           return { audioUrl: dictionaryEntry.audio_url, audioKey: dictionaryEntry.audio_key || '' };
         }
         
-        // 3. Check if any other vocabulary entry has audio for this word
-        const existingVocab = await db.getVocabularyByWord(input.word);
-        if (existingVocab?.audioUrl && existingVocab.id !== input.vocabId) {
-          // Reuse existing audio
-          await db.updateVocabularyAudio(input.vocabId, existingVocab.audioUrl, existingVocab.audioKey || '');
-          return { audioUrl: existingVocab.audioUrl, audioKey: existingVocab.audioKey || '' };
-        }
-        
-        // 4. Generate new audio only if none exists
+        // 3. Generate new audio (DO NOT copy from other users to avoid propagating errors)
         const { generateDutchSpeech } = await import("./lib/tts");
         const { audioUrl, audioKey } = await generateDutchSpeech(input.word);
         await db.updateVocabularyAudio(input.vocabId, audioUrl, audioKey);
