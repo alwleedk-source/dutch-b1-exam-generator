@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -41,6 +42,9 @@ export default function ForumTopic() {
   const [reportContentType, setReportContentType] = useState<"topic" | "post">("topic");
   const [reportContentId, setReportContentId] = useState<number>(0);
   const [reportReason, setReportReason] = useState<string>("");
+  const [isEditingTopic, setIsEditingTopic] = useState(false);
+  const [editTopicTitle, setEditTopicTitle] = useState("");
+  const [editTopicContent, setEditTopicContent] = useState("");
   
   const utils = trpc.useUtils();
   const { data, isLoading } = trpc.forum.getTopic.useQuery({
@@ -68,8 +72,19 @@ export default function ForumTopic() {
   
   const deleteTopicMutation = trpc.forum.deleteTopic.useMutation({
     onSuccess: () => {
-      toast.success(t.topicDeleted || "Topic deleted successfully");
-      window.location.href = "/forum";
+      toast.success(t.topicDeleted || "Topic deleted successfully!");
+      setLocation("/forum");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+  
+  const updateTopicMutation = trpc.forum.updateTopic.useMutation({
+    onSuccess: () => {
+      toast.success(t.topicUpdated || "Topic updated successfully!");
+      setIsEditingTopic(false);
+      utils.forum.getTopic.invalidate({ topicId });
     },
     onError: (error) => {
       toast.error(error.message);
@@ -272,20 +287,36 @@ export default function ForumTopic() {
               )}
               
               {canEditOrDelete(data.topic.created_at, data.topic.user_id) && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    if (confirm(t.confirmDelete || "Are you sure you want to delete this topic?")) {
-                      deleteTopicMutation.mutate({ topicId });
-                    }
-                  }}
-                  disabled={deleteTopicMutation.isPending}
-                  className="text-xs sm:text-sm"
-                >
-                  <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                  <span className="hidden xs:inline">{t.delete}</span>
-                </Button>
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setEditTopicTitle(data.topic.title);
+                      setEditTopicContent(data.topic.content);
+                      setIsEditingTopic(true);
+                    }}
+                    className="text-xs sm:text-sm"
+                  >
+                    <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    <span className="hidden xs:inline">{t.edit}</span>
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (confirm(t.confirmDelete || "Are you sure you want to delete this topic?")) {
+                        deleteTopicMutation.mutate({ topicId });
+                      }
+                    }}
+                    disabled={deleteTopicMutation.isPending}
+                    className="text-xs sm:text-sm"
+                  >
+                    <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    <span className="hidden xs:inline">{t.delete}</span>
+                  </Button>
+                </>
               )}
               
               {isModerator && (
@@ -431,6 +462,53 @@ export default function ForumTopic() {
           </Card>
         )}
       </main>
+      
+      {/* Edit Topic Dialog */}
+      <Dialog open={isEditingTopic} onOpenChange={setIsEditingTopic}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{t.editTopic || "Edit Topic"}</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <Label>{t.title || "Title"}</Label>
+              <Input
+                value={editTopicTitle}
+                onChange={(e) => setEditTopicTitle(e.target.value)}
+                placeholder={t.topicTitle || "Topic title"}
+              />
+            </div>
+            
+            <div>
+              <Label>{t.content || "Content"}</Label>
+              <ForumEditor
+                value={editTopicContent}
+                onChange={setEditTopicContent}
+                placeholder={t.topicContent || "Topic content"}
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditingTopic(false)}>
+              {t.cancel || "Cancel"}
+            </Button>
+            <Button 
+              onClick={() => {
+                updateTopicMutation.mutate({
+                  topicId,
+                  title: editTopicTitle,
+                  content: editTopicContent,
+                });
+              }}
+              disabled={updateTopicMutation.isPending}
+            >
+              {t.save || "Save"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       
       {/* Report Dialog */}
       <Dialog open={reportDialogOpen} onOpenChange={setReportDialogOpen}>
