@@ -1571,8 +1571,8 @@ export async function getUserRating(userId: number, textId: number) {
     .select()
     .from(textRatings)
     .where(and(
-      eq(textRatings.textId, textId),
-      eq(textRatings.userId, userId)
+      eq(textRatings.text_id, textId),
+      eq(textRatings.user_id, userId)
     ))
     .limit(1);
   
@@ -1589,19 +1589,19 @@ export async function getTextRatings(textId: number) {
   const result = await db
     .select({
       id: textRatings.id,
-      textId: textRatings.textId,
-      userId: textRatings.userId,
+      textId: textRatings.text_id,
+      userId: textRatings.user_id,
       rating: textRatings.rating,
       comment: textRatings.comment,
-      createdAt: textRatings.createdAt,
-      updatedAt: textRatings.updatedAt,
+      createdAt: textRatings.created_at,
+      updatedAt: textRatings.updated_at,
       userName: users.name,
       userEmail: users.email,
     })
     .from(textRatings)
-    .leftJoin(users, eq(textRatings.userId, users.id))
-    .where(eq(textRatings.textId, textId))
-    .orderBy(desc(textRatings.createdAt));
+    .leftJoin(users, eq(textRatings.user_id, users.id))
+    .where(eq(textRatings.text_id, textId))
+    .orderBy(desc(textRatings.created_at));
   
   return result;
 }
