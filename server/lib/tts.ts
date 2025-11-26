@@ -64,13 +64,34 @@ export interface TTSOptions {
 /**
  * Generate speech from text using Google Cloud TTS
  */
+/**
+ * Best Standard voices for Dutch (Netherlands)
+ * Selected for clarity and naturalness in educational context
+ */
+const DUTCH_STANDARD_VOICES = [
+  'nl-NL-Standard-B', // Male - Very clear (best for learning)
+  'nl-NL-Standard-C', // Male - Natural
+  'nl-NL-Standard-D', // Female - Clear
+];
+
+/**
+ * Get a random voice from the best Dutch Standard voices
+ */
+function getRandomDutchVoice(): string {
+  const randomIndex = Math.floor(Math.random() * DUTCH_STANDARD_VOICES.length);
+  return DUTCH_STANDARD_VOICES[randomIndex];
+}
+
 export async function generateSpeech(options: TTSOptions): Promise<{ audioUrl: string; audioKey: string }> {
   const {
     text,
     languageCode = 'nl-NL',
-    voiceName = 'nl-NL-Standard-A',
+    voiceName, // Will be randomly selected if not provided
     audioEncoding = 'MP3',
   } = options;
+  
+  // Use random voice if not specified
+  const selectedVoice = voiceName || getRandomDutchVoice();
 
   // Validate input
   if (!text || text.trim().length === 0) {
@@ -97,14 +118,14 @@ export async function generateSpeech(options: TTSOptions): Promise<{ audioUrl: s
       input: { text: normalizedText },
       voice: {
         languageCode,
-        name: voiceName,
+        name: selectedVoice,
       },
       audioConfig: {
         audioEncoding,
       },
     };
 
-    console.log(`[TTS] Generating speech for: "${normalizedText.substring(0, 50)}${normalizedText.length > 50 ? '...' : ''}"`);
+    console.log(`[TTS] Generating speech for: "${normalizedText.substring(0, 50)}${normalizedText.length > 50 ? '...' : ''}" using voice: ${selectedVoice}`);
 
     // Perform the text-to-speech request
     const [response] = await client.synthesizeSpeech(request);
