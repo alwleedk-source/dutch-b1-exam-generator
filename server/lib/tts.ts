@@ -31,14 +31,16 @@ function getTTSClient() {
         }
       } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
         console.log('[TTS] Using GOOGLE_APPLICATION_CREDENTIALS file path:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
+        // When using file path, don't pass credentials - the SDK will read the file automatically
+        credentials = undefined;
       } else {
         console.warn('[TTS] No Google TTS credentials found. Set GOOGLE_TTS_CREDENTIALS or GOOGLE_APPLICATION_CREDENTIALS.');
         return null;
       }
 
-      ttsClient = new TextToSpeechClient({
-        credentials,
-      });
+      ttsClient = new TextToSpeechClient(
+        credentials ? { credentials } : {}
+      );
 
       console.log('[TTS] Google TTS client initialized successfully');
     } catch (error: any) {
