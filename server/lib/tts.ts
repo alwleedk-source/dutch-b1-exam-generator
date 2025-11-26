@@ -12,7 +12,27 @@ function getTTSClient() {
     try {
       let credentials;
       
-      if (process.env.GOOGLE_TTS_CREDENTIALS) {
+      // Priority 1: Base64-encoded credentials (recommended for Coolify/Docker)
+      if (process.env.GOOGLE_TTS_CREDENTIALS_BASE64) {
+        try {
+          const decoded = Buffer.from(process.env.GOOGLE_TTS_CREDENTIALS_BASE64, 'base64').toString('utf-8');
+          credentials = JSON.parse(decoded);
+          console.log('[TTS] Successfully decoded GOOGLE_TTS_CREDENTIALS_BASE64');
+          
+          // Validate required fields
+          const required = ['type', 'project_id', 'private_key', 'client_email'];
+          const missing = required.filter(field => !credentials[field]);
+          if (missing.length > 0) {
+            throw new Error(`Missing required fields in credentials: ${missing.join(', ')}`);
+          }
+          
+        } catch (decodeError: any) {
+          console.error('[TTS] Failed to decode GOOGLE_TTS_CREDENTIALS_BASE64:', decodeError.message);
+          throw new Error(`Invalid GOOGLE_TTS_CREDENTIALS_BASE64: ${decodeError.message}`);
+        }
+      }
+      // Priority 2: Direct JSON string (may have escaping issues in some environments)
+      else if (process.env.GOOGLE_TTS_CREDENTIALS) {
         try {
           credentials = JSON.parse(process.env.GOOGLE_TTS_CREDENTIALS);
           console.log('[TTS] Successfully parsed GOOGLE_TTS_CREDENTIALS');
@@ -29,12 +49,14 @@ function getTTSClient() {
           console.error('[TTS] First 100 chars:', process.env.GOOGLE_TTS_CREDENTIALS.substring(0, 100));
           throw new Error(`Invalid GOOGLE_TTS_CREDENTIALS JSON: ${parseError.message}`);
         }
-      } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+      }
+      // Priority 3: File path (requires manual file management)
+      else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
         console.log('[TTS] Using GOOGLE_APPLICATION_CREDENTIALS file path:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
         // When using file path, don't pass credentials - the SDK will read the file automatically
         credentials = undefined;
       } else {
-        console.warn('[TTS] No Google TTS credentials found. Set GOOGLE_TTS_CREDENTIALS or GOOGLE_APPLICATION_CREDENTIALS.');
+        console.warn('[TTS] No Google TTS credentials found. Set GOOGLE_TTS_CREDENTIALS_BASE64, GOOGLE_TTS_CREDENTIALS, or GOOGLE_APPLICATION_CREDENTIALS.');
         return null;
       }
 
