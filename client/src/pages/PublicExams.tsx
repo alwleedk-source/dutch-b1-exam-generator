@@ -27,7 +27,7 @@ export default function PublicExams() {
   const itemsPerPage = 12;
 
   const { data: allTexts, isLoading } = trpc.text.listPublicTexts.useQuery(
-    reasonFilter ? { reason: reasonFilter } : undefined
+    reasonFilter && reasonFilter !== "all" ? { reason: reasonFilter } : undefined
   );
   
   // Apply client-side filtering and sorting
@@ -174,7 +174,7 @@ export default function PublicExams() {
                   <SelectValue placeholder={t.allReasons || 'All Reasons'} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">{t.allReasons || 'All Reasons'}</SelectItem>
+                  <SelectItem value="all">{t.allReasons || 'All Reasons'}</SelectItem>
                   <SelectItem value="helpful">{t.reasonHelpful}</SelectItem>
                   <SelectItem value="clear">{t.reasonClear}</SelectItem>
                   <SelectItem value="good_level">{t.reasonGoodLevel}</SelectItem>
