@@ -174,11 +174,12 @@ export default function PublicExams() {
                   <SelectValue placeholder={t.allReasons || 'All Reasons'} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={t.reasonHelpful}>{t.reasonHelpful}</SelectItem>
-                  <SelectItem value={t.reasonClear}>{t.reasonClear}</SelectItem>
-                  <SelectItem value={t.reasonGoodLevel}>{t.reasonGoodLevel}</SelectItem>
-                  <SelectItem value={t.reasonRealExam}>{t.reasonRealExam}</SelectItem>
-                  <SelectItem value={t.reasonGoodPractice}>{t.reasonGoodPractice}</SelectItem>
+                  <SelectItem value="">{t.allReasons || 'All Reasons'}</SelectItem>
+                  <SelectItem value="helpful">{t.reasonHelpful}</SelectItem>
+                  <SelectItem value="clear">{t.reasonClear}</SelectItem>
+                  <SelectItem value="good_level">{t.reasonGoodLevel}</SelectItem>
+                  <SelectItem value="real_exam">{t.reasonRealExam}</SelectItem>
+                  <SelectItem value="good_practice">{t.reasonGoodPractice}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
