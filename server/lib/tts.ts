@@ -254,7 +254,7 @@ export async function generateDutchSpeech(text: string): Promise<{ audioUrl: str
   return generateSpeechWithRetry({
     text,
     languageCode: 'nl-NL',
-    voiceName: 'nl-NL-Standard-A',
+    // voiceName is not specified, so a random voice will be selected from DUTCH_STANDARD_VOICES
     audioEncoding: 'MP3',
   });
 }
