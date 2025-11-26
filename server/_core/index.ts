@@ -41,10 +41,9 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   app.use(cookieParser());
   
-  // Trust Railway proxy for secure cookies
-  if (process.env.NODE_ENV === "production") {
-    app.set('trust proxy', 1);
-  }
+  // Trust proxy for secure cookies (Coolify/Railway)
+  // Always trust proxy in production
+  app.set('trust proxy', 1);
   
   // Session configuration
   app.use(
@@ -56,9 +55,12 @@ async function startServer() {
         secure: process.env.NODE_ENV === "production",
         httpOnly: true,
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        sameSite: "lax", // Use 'lax' for better compatibility
+        domain: undefined, // Let browser handle domain
+        path: '/',
       },
-      proxy: process.env.NODE_ENV === "production", // Trust Railway proxy
+      proxy: true, // Always trust proxy
+      name: 'connect.sid', // Explicit session cookie name
     })
   );
   
