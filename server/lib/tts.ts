@@ -1,17 +1,53 @@
 import { TextToSpeechClient } from '@google-cloud/text-to-speech';
 import { uploadToR2 } from './r2';
+import crypto from 'crypto';
 
 let ttsClient: TextToSpeechClient | null = null;
 
+/**
+ * Get or initialize TTS client with proper error handling
+ */
 function getTTSClient() {
   if (!ttsClient) {
-    // Google Cloud TTS will use GOOGLE_APPLICATION_CREDENTIALS env var
-    // or fall back to Application Default Credentials
-    ttsClient = new TextToSpeechClient({
-      credentials: process.env.GOOGLE_TTS_CREDENTIALS 
-        ? JSON.parse(process.env.GOOGLE_TTS_CREDENTIALS)
-        : undefined,
-    });
+    try {
+      let credentials;
+      
+      if (process.env.GOOGLE_TTS_CREDENTIALS) {
+        try {
+          credentials = JSON.parse(process.env.GOOGLE_TTS_CREDENTIALS);
+          console.log('[TTS] Successfully parsed GOOGLE_TTS_CREDENTIALS');
+          
+          // Validate required fields
+          const required = ['type', 'project_id', 'private_key', 'client_email'];
+          const missing = required.filter(field => !credentials[field]);
+          if (missing.length > 0) {
+            throw new Error(`Missing required fields in credentials: ${missing.join(', ')}`);
+          }
+          
+        } catch (parseError: any) {
+          console.error('[TTS] Failed to parse GOOGLE_TTS_CREDENTIALS:', parseError.message);
+          console.error('[TTS] First 100 chars:', process.env.GOOGLE_TTS_CREDENTIALS.substring(0, 100));
+          throw new Error(`Invalid GOOGLE_TTS_CREDENTIALS JSON: ${parseError.message}`);
+        }
+      } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+        console.log('[TTS] Using GOOGLE_APPLICATION_CREDENTIALS file path:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
+      } else {
+        console.warn('[TTS] No Google TTS credentials found. Set GOOGLE_TTS_CREDENTIALS or GOOGLE_APPLICATION_CREDENTIALS.');
+        return null;
+      }
+
+      ttsClient = new TextToSpeechClient({
+        credentials,
+      });
+
+      console.log('[TTS] Google TTS client initialized successfully');
+    } catch (error: any) {
+      console.error('[TTS] Failed to initialize TTS client:', {
+        message: error.message,
+        stack: error.stack?.substring(0, 200),
+      });
+      throw error; // Re-throw to make the error visible
+    }
   }
   return ttsClient;
 }
@@ -23,6 +59,9 @@ export interface TTSOptions {
   audioEncoding?: 'MP3' | 'OGG_OPUS' | 'LINEAR16';
 }
 
+/**
+ * Generate speech from text using Google Cloud TTS
+ */
 export async function generateSpeech(options: TTSOptions): Promise<{ audioUrl: string; audioKey: string }> {
   const {
     text,
@@ -31,12 +70,29 @@ export async function generateSpeech(options: TTSOptions): Promise<{ audioUrl: s
     audioEncoding = 'MP3',
   } = options;
 
+  // Validate input
+  if (!text || text.trim().length === 0) {
+    throw new Error('Text cannot be empty');
+  }
+
+  if (text.length > 5000) {
+    throw new Error('Text is too long (max 5000 characters)');
+  }
+
   try {
     const client = getTTSClient();
 
+    // Verify client is properly initialized
+    if (!client) {
+      throw new Error('TTS client is not initialized. Check GOOGLE_TTS_CREDENTIALS environment variable.');
+    }
+
+    // Normalize text: trim whitespace
+    const normalizedText = text.trim();
+
     // Construct the request
     const request = {
-      input: { text },
+      input: { text: normalizedText },
       voice: {
         languageCode,
         name: voiceName,
@@ -46,6 +102,8 @@ export async function generateSpeech(options: TTSOptions): Promise<{ audioUrl: s
       },
     };
 
+    console.log(`[TTS] Generating speech for: "${normalizedText.substring(0, 50)}${normalizedText.length > 50 ? '...' : ''}"`);
+
     // Perform the text-to-speech request
     const [response] = await client.synthesizeSpeech(request);
 
@@ -53,9 +111,11 @@ export async function generateSpeech(options: TTSOptions): Promise<{ audioUrl: s
       throw new Error('No audio content received from TTS API');
     }
 
-    // Generate unique filename
+    console.log(`[TTS] Successfully received audio content (${response.audioContent.length} bytes)`);
+
+    // Generate unique filename using MD5 hash to avoid special characters in base64
     const timestamp = Date.now();
-    const hash = Buffer.from(text).toString('base64').slice(0, 8);
+    const hash = crypto.createHash('md5').update(normalizedText).digest('hex').slice(0, 8);
     const extension = audioEncoding === 'MP3' ? 'mp3' : audioEncoding === 'OGG_OPUS' ? 'ogg' : 'wav';
     const filename = `tts/${languageCode}/${hash}-${timestamp}.${extension}`;
 
@@ -63,20 +123,90 @@ export async function generateSpeech(options: TTSOptions): Promise<{ audioUrl: s
     const audioBuffer = Buffer.from(response.audioContent as Uint8Array);
     const contentType = audioEncoding === 'MP3' ? 'audio/mpeg' : audioEncoding === 'OGG_OPUS' ? 'audio/ogg' : 'audio/wav';
     
+    console.log(`[TTS] Uploading to R2: ${filename} (${audioBuffer.length} bytes)`);
     const audioUrl = await uploadToR2(filename, audioBuffer, contentType);
+
+    if (!audioUrl) {
+      throw new Error('Failed to upload audio to R2: No URL returned');
+    }
+
+    console.log(`[TTS] Successfully generated and uploaded audio: ${audioUrl}`);
 
     return {
       audioUrl,
       audioKey: filename,
     };
-  } catch (error) {
-    console.error('[TTS] Failed to generate speech:', error);
-    throw new Error('Failed to generate speech');
+  } catch (error: any) {
+    // Detailed error logging
+    console.error('[TTS] Failed to generate speech:', {
+      text: text.substring(0, 100),
+      languageCode,
+      voiceName,
+      errorMessage: error.message,
+      errorCode: error.code,
+      errorDetails: error.details,
+    });
+
+    // Throw specific error messages based on error type
+    if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+      throw new Error('Network error: Cannot connect to Google TTS API');
+    } else if (error.message?.includes('quota') || error.code === 8) {
+      throw new Error('Google TTS quota exceeded. Please try again later.');
+    } else if (error.message?.includes('credentials') || error.message?.includes('Invalid GOOGLE_TTS_CREDENTIALS') || error.code === 16) {
+      throw new Error('Invalid or missing Google TTS credentials. Please check GOOGLE_TTS_CREDENTIALS environment variable.');
+    } else if (error.message?.includes('R2')) {
+      throw new Error(`R2 Storage error: ${error.message}`);
+    } else if (error.message?.includes('empty') || error.message?.includes('too long')) {
+      throw error; // Re-throw validation errors as-is
+    } else {
+      throw new Error(`Failed to generate speech: ${error.message}`);
+    }
   }
 }
 
+/**
+ * Generate speech with retry mechanism for transient errors
+ */
+async function generateSpeechWithRetry(
+  options: TTSOptions,
+  maxRetries: number = 3
+): Promise<{ audioUrl: string; audioKey: string }> {
+  let lastError: Error | null = null;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`[TTS] Attempt ${attempt}/${maxRetries} for: "${options.text.substring(0, 50)}${options.text.length > 50 ? '...' : ''}"`);
+      return await generateSpeech(options);
+    } catch (error: any) {
+      lastError = error;
+      console.error(`[TTS] Attempt ${attempt} failed:`, error.message);
+
+      // Don't retry for certain errors (permanent failures)
+      if (error.message?.includes('credentials') || 
+          error.message?.includes('Invalid') ||
+          error.message?.includes('empty') ||
+          error.message?.includes('too long')) {
+        console.log(`[TTS] Not retrying due to permanent error type`);
+        throw error;
+      }
+
+      // Wait before retrying (exponential backoff)
+      if (attempt < maxRetries) {
+        const waitTime = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
+        console.log(`[TTS] Waiting ${waitTime}ms before retry...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+      }
+    }
+  }
+
+  throw lastError || new Error('Failed to generate speech after retries');
+}
+
+/**
+ * Generate Dutch speech (convenience function)
+ */
 export async function generateDutchSpeech(text: string): Promise<{ audioUrl: string; audioKey: string }> {
-  return generateSpeech({
+  return generateSpeechWithRetry({
     text,
     languageCode: 'nl-NL',
     voiceName: 'nl-NL-Standard-A',
