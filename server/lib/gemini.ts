@@ -417,7 +417,7 @@ ZORG ERVOOR:
       },
     ],
     responseFormat: "json",
-    maxOutputTokens: 4096,
+    maxOutputTokens: 8192, // Increased for large texts with many questions (13-15)
     temperature: 0.8,
   });
 
@@ -502,7 +502,7 @@ Zorg ervoor dat de geselecteerde woorden studenten echt helpen om de tekst beter
       },
     ],
     responseFormat: "json",
-    maxOutputTokens: 4096,
+    maxOutputTokens: 8192, // Increased for large texts with many vocabulary words (up to 75)
     temperature: 0.7,
   });
 
