@@ -14,6 +14,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import InteractiveText from "@/components/InteractiveText";
 import ExamModeSelector from "@/components/ExamModeSelector";
 import ExamTimer from "@/components/ExamTimer";
+import { QuestionNavigator } from "@/components/QuestionNavigator";
 
 export default function TakeExam() {
   const { user } = useAuth();
@@ -25,6 +26,7 @@ export default function TakeExam() {
   const [startTime] = useState(Date.now());
   const [examMode, setExamMode] = useState<"practice" | "exam" | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
+  const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   
   const { data: examData, error: examError, isLoading: examLoading } = trpc.exam.getExamDetails.useQuery(
     { examId: examId! }, 
@@ -102,6 +104,14 @@ export default function TakeExam() {
     });
   };
   
+  const scrollToQuestion = (index: number) => {
+    const element = document.getElementById(`question-${index}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setCurrentQuestion(index);
+    }
+  };
+  
   // Show mode selector if exam hasn't started
   if (!hasStarted) {
     return (
@@ -129,6 +139,13 @@ export default function TakeExam() {
         }
       `}</style>
       <div className="min-h-screen bg-background">
+      {/* Question Navigator - Desktop only */}
+      <QuestionNavigator
+        totalQuestions={questions.length}
+        answers={answers}
+        currentQuestion={currentQuestion}
+        onQuestionClick={scrollToQuestion}
+      />
       {/* Header with progress */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b print:hidden">
         <div className="container max-w-5xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3">
@@ -265,7 +282,7 @@ export default function TakeExam() {
           </h3>
           
           {questions.map((q: any, index: number) => (
-            <Card key={index} className="p-4 sm:p-6">
+            <Card key={index} id={`question-${index}`} className="p-4 sm:p-6 scroll-mt-24">
               <div className="mb-3 sm:mb-4">
                 <span className="text-xs sm:text-sm font-medium text-primary">
                   {t.question} {index + 1}

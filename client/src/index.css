@@ -244,6 +244,15 @@
       max-width: 1280px; /* Standard content width */
     }
   }
+  
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari and Opera */
+  }
 }
 /* ==================== FORMATTED TEXT STYLES ==================== */
 .formatted-text-container {
