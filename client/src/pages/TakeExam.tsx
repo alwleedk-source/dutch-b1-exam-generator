@@ -112,6 +112,13 @@ export default function TakeExam() {
     }
   };
   
+  const scrollToText = () => {
+    const element = document.getElementById('dutch-text');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+  
   // Show mode selector if exam hasn't started
   if (!hasStarted) {
     return (
@@ -145,6 +152,7 @@ export default function TakeExam() {
         answers={answers}
         currentQuestion={currentQuestion}
         onQuestionClick={scrollToQuestion}
+        onBackToText={scrollToText}
       />
       {/* Header with progress */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b print:hidden">
@@ -242,7 +250,7 @@ export default function TakeExam() {
 
       <div className="container max-w-5xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {/* Full Text Display */}
-        <Card className="p-4 sm:p-6 md:p-8 mb-6 sm:mb-8">
+        <Card id="dutch-text" className="p-4 sm:p-6 md:p-8 mb-6 sm:mb-8">
           <div className="prose prose-sm sm:prose-base md:prose-lg max-w-none">
             <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">{exam.title}</h2>
             {exam.formatted_html ? (

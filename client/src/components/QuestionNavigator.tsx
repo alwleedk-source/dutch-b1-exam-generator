@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Check } from "lucide-react";
+import { Check, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface QuestionNavigatorProps {
@@ -7,6 +7,7 @@ interface QuestionNavigatorProps {
   answers: Record<number, string>;
   currentQuestion: number;
   onQuestionClick: (index: number) => void;
+  onBackToText: () => void;
 }
 
 export function QuestionNavigator({
@@ -14,12 +15,24 @@ export function QuestionNavigator({
   answers,
   currentQuestion,
   onQuestionClick,
+  onBackToText,
 }: QuestionNavigatorProps) {
   const answeredCount = Object.keys(answers).length;
 
   return (
     <div className="fixed left-4 top-24 hidden lg:block w-20 max-h-[calc(100vh-200px)] overflow-y-auto scrollbar-hide">
       <div className="bg-sidebar dark:bg-card border border-sidebar-border dark:border-border rounded-xl p-3 shadow-lg">
+        {/* Back to text button */}
+        <button
+          onClick={onBackToText}
+          className="w-full mb-3 py-2 px-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary font-medium text-xs transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary flex items-center justify-center gap-1"
+          aria-label="Back to text"
+          title="Scroll back to the Dutch text"
+        >
+          <FileText className="w-3.5 h-3.5" />
+          <span>النص</span>
+        </button>
+        
         {/* Progress indicator */}
         <div className="text-xs text-center mb-3 font-medium text-muted-foreground">
           {answeredCount}/{totalQuestions}
