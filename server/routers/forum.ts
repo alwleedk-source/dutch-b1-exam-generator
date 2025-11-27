@@ -435,12 +435,17 @@ export const forumRouter = router({
       
       // Create notification for topic author
       if (topic[0].user_id !== ctx.user.id) {
-        await database.insert(forumNotifications).values({
-          user_id: topic[0].user_id,
-          notification_type: "reply_to_topic",
-          topic_id: input.topicId,
-          post_id: post.id,
-          from_user_id: ctx.user.id,
+        const { createNotification } = await import("./notifications");
+        await createNotification({
+          userId: topic[0].user_id,
+          type: 'forum_reply',
+          title: `${ctx.user.name || 'Someone'} replied to your topic`,
+          message: input.content.substring(0, 100) + (input.content.length > 100 ? '...' : ''),
+          actionUrl: `/forum/topic/${input.topicId}`,
+          topicId: input.topicId,
+          postId: post.id,
+          fromUserId: ctx.user.id,
+          priority: 'normal',
         });
       }
       

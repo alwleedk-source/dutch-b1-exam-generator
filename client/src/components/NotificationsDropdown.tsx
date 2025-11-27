@@ -32,26 +32,12 @@ export function NotificationsDropdown() {
   
   // Initialize audio
   useEffect(() => {
-    // Create a simple notification sound using Web Audio API
-    const createNotificationSound = () => {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.value = 800; // Frequency in Hz
-      oscillator.type = 'sine';
-      
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-      
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.5);
-    };
-    
-    audioRef.current = { play: createNotificationSound } as any;
+    // Create audio element with a simple beep sound
+    const audio = new Audio();
+    // Simple notification beep as data URL (short sine wave)
+    audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZUQ8PVqzn77BdGAg+ltrzxnMpBSl+zPLaizsIGGS57OihUhENTKXh8bllHAU2jdXzzn0vBSF1xe/glEcLElyx6+ytWBUIQJrZ88p2KwUme8rx3I4+CRdjuuzno1QQDlKo5fCwYBkGPJPY88p3LQUmeMnw2Ys8CRZiuOvlolMPDk+m4/G2ZRsGOI/W8sx7LgUjdcXv4ZVICxFbse3srVgVCECa2fPKdisGJnvK8dyOPgkXY7rs56NUDw5SqOXwsGAZBjyT2PPKdy0FJnjJ8NmLPAkWYrjr5aJTDw5PpuPxtmUbBjiP1vLMey4FI3XF7+GVSAsRW7Ht7K1YFQhAmtnzynYrBiZ7yvHcjj4JF2O67OejVA8OUqjl8LBgGQY8k9jzynctBSZ4yfDZizwJFmK46+WiUw8OT6bj8bZlGwY4j9byzHsuBSN1xe/hlUgLEVux7eytWBUIQJrZ88p2KwYme8rx3I4+CRdjuuzno1QPDlKo5fCwYBkGPJPY88p3LQUmeMnw2Ys8CRZiuOvlolMPDk+m4/G2ZRsGOI/W8sx7LgUjdcXv4ZVICxFbse3srVgVCECa2fPKdisGJnvK8dyOPgkXY7rs56NUDw5SqOXwsGAZBjyT2PPKdy0FJnjJ8NmLPAkWYrjr5aJTDw5PpuPxtmUbBjiP1vLMey4FI3XF7+GVSAsRW7Ht7K1YFQhAmtnzynYrBiZ7yvHcjj4JF2O67OejVA8OUqjl8LBgGQY8k9jzynctBSZ4yfDZizwJFmK46+WiUw8OT6bj8bZlGwY4j9byzHsuBSN1xe/hlUgLEVux7eytWBUIQJrZ88p2KwYme8rx3I4+CRdjuuzno1QPDlKo5fCwYBkGPJPY88p3LQUmeMnw2Ys8CRZiuOvlolMPDk+m4/G2ZRsGOI/W8sx7LgUjdcXv4ZVICxFbse3srVgVCECa2fPKdisGJnvK8dyOPgkXY7rs56NUDw5SqOXwsGAZBjyT2PPKdy0FJnjJ8NmLPAkWYrjr5aJTDw5PpuPxtmUbBjiP1vLMey4FI3XF7+GVSAsRW7Ht7K1YFQhAmtnzynYrBiZ7yvHcjj4JF2O67OejVA8OUqjl8LBgGQY8k9jzynctBSZ4yfDZizwJFmK46+WiUw8OT6bj8bZlGwY4j9byzHsuBSN1xe/hlUgLEVux7eytWBUIQJrZ88p2KwYme8rx3I4+CRdjuuzno1QPDlKo5fCwYBkGPJPY88p3LQUmeMnw2Ys8CRZiuOvlolMPDk+m4/G2ZRsGOI/W8sx7LgUjdcXv4ZVICxFbse3srVgVCECa2fPKdisGJnvK8dyOPgkXY7rs56NUDw5SqOXwsGAZBjyT2PPKdy0FJnjJ8NmLPAkWYrjr5aJTDw5PpuPxtmUbBjiP1vLMey4FI3XF7+GVSAsRW7Ht7K1YFQhAmtnzynYrBiZ7yvHcjj4JF2O67OejVA8OUqjl8LBgGQY8k9jzynctBSZ4yfDZizwJFmK46+WiUw8OT6bj8bZlGwY4j9byzHsuBSN1xe/hlUgLEVux7eytWBUIQJrZ88p2KwYme8rx3I4+CRdjuuzno1QPDlKo5fCwYBkGPJPY88p3LQUmeMnw2Ys8CRZiuOvlolMPDk+m4/G2ZRsGOI/W8sx7LgUjdcXv4ZVICxFbse3srVg==';
+    audio.volume = 0.3;
+    audioRef.current = audio;
   }, []);
   
   // Detect new notifications and show toast
@@ -67,9 +53,11 @@ export function NotificationsDropdown() {
         // Play sound
         if (audioRef.current) {
           try {
-            (audioRef.current as any).play();
+            audioRef.current.play().catch((e: any) => {
+              console.log('Audio play failed (user interaction required):', e);
+            });
           } catch (e) {
-            console.log('Audio play failed:', e);
+            console.log('Audio play error:', e);
           }
         }
         
