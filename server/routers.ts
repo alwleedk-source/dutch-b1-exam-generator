@@ -133,7 +133,7 @@ export const appRouter = router({
     create: protectedProcedure
       .input(z.object({
         dutch_text: z.string()
-          .min(2000, "Text must be at least 2000 characters for quality exam generation")
+          .min(1500, "Text must be at least 1500 characters for quality exam generation")
           .max(10100, "Text must not exceed 10,100 characters"),
         title: z.string().max(255, "Title must not exceed 255 characters").optional(),
         source: z.enum(["paste", "upload", "scan"]).default("paste"),
