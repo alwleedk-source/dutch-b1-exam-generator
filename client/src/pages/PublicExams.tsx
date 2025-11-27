@@ -290,7 +290,12 @@ export default function PublicExams() {
                       {/* Text Preview */}
                       <div className="mb-4 p-4 bg-muted/50 rounded-lg">
                         <p className="text-sm text-muted-foreground line-clamp-3">
-                          {text.dutch_text?.substring(0, 200)}...
+                          {(() => {
+                            // Use dutch_text if available, otherwise strip HTML from formatted_html
+                            const plainText = text.dutch_text || 
+                              (text.formatted_html?.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim());
+                            return plainText?.substring(0, 200) + '...';
+                          })()}
                         </p>
                       </div>
 
