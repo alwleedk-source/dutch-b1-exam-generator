@@ -345,18 +345,16 @@ export const appRouter = router({
         const minHashSignature = duplicateCheck.signature; // Reuse signature from duplicate check
         const minHashSignatureJson = JSON.stringify(minHashSignature);
 
-        // Format text automatically with advanced AI-powered formatter
-        const { formatTextAdvanced } = await import("./lib/advanced-text-formatter");
-        const formattedResult = await formatTextAdvanced(cleanedText);
-        
-        console.log(`[Text Creation] Formatting: ${formattedResult.usedAI ? 'AI-powered' : 'Rule-based'}, Type: ${formattedResult.textType}, Columns: ${formattedResult.hasColumns}`);
+        // cleanedText is already in HTML format from cleanAndFormatText
+        // No need for additional formatting - use it directly!
+        console.log('[Text Creation] Using HTML from cleanAndFormatText directly');
 
         // Only save to DB if Gemini succeeded (use cleaned text)
         const result = await db.createText({
           dutch_text: cleanedText,
           title: finalTitle,
-          formatted_html: formattedResult.html,
-          text_type: formattedResult.textType,
+          formatted_html: cleanedText, // Already in HTML format!
+          text_type: 'article', // Default type
           word_count: wordCount,
           estimated_reading_minutes: estimatedReadingMinutes,
           min_hash_signature: minHashSignatureJson,
