@@ -502,33 +502,53 @@ export async function processTextComplete(dutchText: string, questionCount: numb
 
 Voer de volgende taken uit op de gegeven Nederlandse tekst:
 
-=== TAAK 1: TEKST OPSCHONEN EN CORRIGEREN ===
+=== TAAK 1: TEKST OPSCHONEN EN FORMATTEREN ===
 
-Analyseer de tekst op:
-1. **OCR-fouten** (als de tekst uit een afbeelding komt):
-   - Vreemde tekens en symbolen (|, \\, £, *, +, <, >, {, }, [, ], ~, etc.)
-   - Verkeerd herkende letters (bijv. "rn" → "m", "l" → "I")
-   - Ontbrekende of extra spaties
-   - Zinnen die door elkaar lopen
+**VERPLICHT: Voer ALTIJD de volgende stappen uit, zelfs als de tekst geen fouten bevat:**
 
-2. **Spelfouten en grammatica**:
-   - Typfouten
-   - Verkeerde werkwoordsvormen
-   - Ontbrekende of verkeerde leestekens
+**STAP 1: Verwijder ongewenste elementen**
+- PDF/document metadata:
+  * Copyright notices (bijv. "© CvTE", "© 2022", "All rights reserved")
+  * Document references (bijv. "Tekstboekje Lezen I", "Openbaar examen")
+  * Page numbers (bijv. "16", "Pagina 1")
+  * Headers en footers die zich herhalen
+  * Datum- en tijdstempels
+  * Auteursinformatie die niet deel uitmaakt van de hoofdtekst
+- Herhaalde teksten aan begin/einde van secties
+- Losse cijfers of symbolen zonder context
+- Navigatie-elementen (bijv. "Terug", "Volgende pagina")
 
-3. **Opmaak en structuur**:
-   - Paragrafen die beter gescheiden moeten worden
-   - Zinnen die te lang of onduidelijk zijn
-   - Ontbrekende hoofdletters
+**STAP 2: Converteer naar schone HTML**
+- Gebruik <h1> voor de hoofdtitel van de tekst
+- Gebruik <h2> voor belangrijke secties en subtitels (bijv. "## Contact")
+- Gebruik <h3> voor subsecties indien nodig
+- Gebruik <p> voor alle paragrafen
+- Gebruik <strong> voor vetgedrukte tekst
+- Gebruik <ul> en <li> voor opsommingen
+- Gebruik <table>, <tr>, <td> voor tabellen
+- VERWIJDER alle Markdown formatting (##, **, *, etc.)
+- Zorg dat ALLE tekst in HTML tags zit (geen losse tekst)
 
-**Instructies:**
-- Corrigeer ALLE fouten die je vindt
-- Verwijder ALLE vreemde symbolen en tekens
-- Verbeter de leesbaarheid en structuur
+**STAP 3: Corrigeer fouten**
+- OCR-fouten:
+  * Vreemde tekens en symbolen (|, \\, £, *, +, <, >, {, }, [, ], ~, etc.)
+  * Verkeerd herkende letters (bijv. "rn" → "m", "l" → "I")
+  * Ontbrekende of extra spaties
+  * Zinnen die door elkaar lopen
+- Spelfouten en grammatica:
+  * Typfouten
+  * Verkeerde werkwoordsvormen
+  * Ontbrekende of verkeerde leestekens
+- Structuur:
+  * Paragrafen die beter gescheiden moeten worden
+  * Zinnen die te lang of onduidelijk zijn
+  * Ontbrekende hoofdletters
+
+**BELANGRIJK:**
+- Voer ALLE drie stappen ALTIJD uit
 - Behoud de originele betekenis en inhoud
-- Behoud de paragraafstructuur (maar verbeter deze indien nodig)
 - Zorg dat de tekst grammaticaal correct en professioneel is
-- Als de tekst al perfect is, geef deze dan ongewijzigd terug
+- De output moet ALTIJD proper HTML zijn, nooit plain text of Markdown
 
 === TAAK 2: TITEL GENEREREN ===
 
@@ -659,7 +679,7 @@ IMPORTANT: Respond ONLY with valid JSON. Do not include any markdown formatting,
       },
     ],
     responseFormat: "json",
-    maxOutputTokens: 8192, // Larger output for complete processing
+    maxOutputTokens: 16384, // Increased for large texts with full HTML formatting
     temperature: 0.7, // Balanced for quality
   });
 
