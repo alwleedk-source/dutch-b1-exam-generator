@@ -70,9 +70,25 @@ export default function Dashboard() {
               <div className="text-2xl font-bold">
                 {statsLoading ? "..." : Math.round(Number(stats?.examStats?.averageScore) || 0)}%
               </div>
-              <p className="text-xs text-muted-foreground">
-                Performance
-              </p>
+              <div className="flex items-center gap-2 mt-2">
+                <p className="text-xs text-muted-foreground">
+                  Performance
+                </p>
+                {!statsLoading && stats?.examStats?.averageScore && (
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded ${
+                    Number(stats.examStats.averageScore) >= 90 ? 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300' :
+                    Number(stats.examStats.averageScore) >= 80 ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' :
+                    Number(stats.examStats.averageScore) >= 70 ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' :
+                    Number(stats.examStats.averageScore) >= 65 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' :
+                    'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
+                  }`}>
+                    {Number(stats.examStats.averageScore) >= 90 ? 'B1+' :
+                     Number(stats.examStats.averageScore) >= 80 ? 'B1.3' :
+                     Number(stats.examStats.averageScore) >= 70 ? 'B1.2' :
+                     Number(stats.examStats.averageScore) >= 65 ? 'B1.1' : 'A2'}
+                  </span>
+                )}
+              </div>
             </CardContent>
           </Card>
 

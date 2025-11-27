@@ -172,12 +172,12 @@ async function checkLevelProgression(userId: number) {
     return sum + percentage;
   }, 0) / previousExams.length;
   
-  // Determine levels
+  // Determine levels (65% is official B1 passing threshold)
   const getCurrentLevel = (avg: number) => {
     if (avg >= 90) return 'B1+';
     if (avg >= 80) return 'B1.3';
     if (avg >= 70) return 'B1.2';
-    if (avg >= 60) return 'B1.1';
+    if (avg >= 65) return 'B1.1';
     return 'A2';
   };
   
