@@ -130,13 +130,15 @@ ${text}
 **BELANGRIJK - Output Format (HTML ONLY!):**
 - Gebruik ALLEEN HTML tags: <h1>, <h2>, <p>
 - GEEN Markdown (##, **, etc.)
+- GEEN code blocks (```html of ```)
+- Begin DIRECT met <h1> tag
 - Hoofdtitel: <h1>Titel</h1>
 - Tussenkoppen: <h2>Tussenkop</h2>
 - Paragrafen: <p>Tekst hier...</p>
 - Voeg 3-6 tussenkoppen toe afhankelijk van de tekstlengte
 - Zorg dat de tekst goed gestructureerd is met duidelijke secties
 
-**Geef ALLEEN de gecorrigeerde tekst in PURE HTML formaat terug (met <h1>, <h2>, <p> tags), zonder uitleg of opmerkingen.**`,
+**KRITISCH: Geef ALLEEN de HTML terug, ZONDER code blocks, ZONDER uitleg, ZONDER opmerkingen. Begin DIRECT met <h1>.**`,
       },
     ],
     temperature: 0.3, // Lower temperature for more accurate corrections
@@ -144,7 +146,16 @@ ${text}
     responseFormat: "text",
   });
 
-  const cleanedText = response.trim();
+  let cleanedText = response.trim();
+  
+  // Strip code blocks if AI added them despite instructions
+  if (cleanedText.startsWith('```html')) {
+    cleanedText = cleanedText.replace(/^```html\s*/i, '').replace(/```\s*$/, '').trim();
+    console.log('[cleanAndFormatText] Stripped code block wrapper from response');
+  } else if (cleanedText.startsWith('```')) {
+    cleanedText = cleanedText.replace(/^```\s*/i, '').replace(/```\s*$/, '').trim();
+    console.log('[cleanAndFormatText] Stripped code block wrapper from response');
+  }
   
   // Validate that the text was actually cleaned (check for common PDF footers)
   const pdfFooterPatterns = [
