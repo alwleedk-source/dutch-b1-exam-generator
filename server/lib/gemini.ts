@@ -428,10 +428,10 @@ ZORG ERVOOR:
  * Extract vocabulary from Dutch text (B1 level important words)
  */
 export async function extractVocabulary(dutchText: string, maxWords?: number) {
-  // Dynamic calculation: 15% of text length, min 25, max 75
+  // Dynamic calculation: 15% of text length, min 25, max 45 (reduced for cost optimization)
   if (!maxWords) {
     const wordCount = dutchText.split(/\s+/).length;
-    maxWords = Math.min(Math.max(Math.floor(wordCount * 0.15), 25), 75);
+    maxWords = Math.min(Math.max(Math.floor(wordCount * 0.15), 25), 45);
   }
   
   const response = await generateWithGemini({
