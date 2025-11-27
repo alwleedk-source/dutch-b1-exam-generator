@@ -20,10 +20,10 @@ export function QuestionNavigator({
   const answeredCount = Object.keys(answers).length;
 
   return (
-    <div className="fixed left-4 top-24 hidden lg:block w-20 max-h-[calc(100vh-120px)] flex flex-col">
-      <div className="bg-sidebar dark:bg-card border border-sidebar-border dark:border-border rounded-xl shadow-lg flex flex-col max-h-full">
+    <div className="fixed left-4 top-24 hidden lg:block w-20">
+      <div className="bg-sidebar dark:bg-card border border-sidebar-border dark:border-border rounded-xl p-3 shadow-lg max-h-[calc(100vh-120px)] overflow-y-auto scrollbar-hide">
         {/* Sticky header with text button and counter */}
-        <div className="sticky top-0 z-10 bg-sidebar dark:bg-card rounded-t-xl p-3 border-b border-sidebar-border dark:border-border">
+        <div className="sticky top-0 z-10 bg-sidebar dark:bg-card pb-3 -mt-3 pt-3">
           {/* Back to text button */}
           <button
             onClick={onBackToText}
@@ -36,13 +36,13 @@ export function QuestionNavigator({
           </button>
           
           {/* Progress indicator */}
-          <div className="text-xs text-center font-medium text-muted-foreground">
+          <div className="text-xs text-center mb-3 font-medium text-muted-foreground">
             {answeredCount}/{totalQuestions}
           </div>
         </div>
         
-        {/* Question numbers - scrollable */}
-        <div className="flex flex-col gap-2 p-3 overflow-y-auto scrollbar-hide">
+        {/* Question numbers */}
+        <div className="flex flex-col gap-2">
           {Array.from({ length: totalQuestions }, (_, index) => {
             const isAnswered = answers[index] !== undefined;
             const isCurrent = currentQuestion === index;
