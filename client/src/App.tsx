@@ -33,7 +33,8 @@ const ForumTopic = lazy(() => import("./pages/forum/ForumTopic"));
 const NewTopic = lazy(() => import("./pages/forum/NewTopic"));
 const ForumReports = lazy(() => import("./pages/forum/ForumReports"));
 const ModeratorPanel = lazy(() => import("./pages/forum/ModeratorPanel"));
-const UserManagement = lazy(() => import("./pages/forum/UserManagement"));
+const ForumUsers = lazy(() => import("./pages/forum/ForumUsers"));
+const ModerationLog = lazy(() => import("./pages/forum/ModerationLog"));
 import LanguageSelector from "./components/LanguageSelector";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useState, useEffect, lazy, Suspense } from "react";
@@ -76,7 +77,8 @@ function Router() {
       <Route path="/forum/new-topic" component={NewTopic} />
       <Route path="/forum/reports" component={ForumReports} />
       <Route path="/forum/moderator" component={ModeratorPanel} />
-      <Route path="/forum/users" component={UserManagement} />
+      <Route path="/forum/users" component={ForumUsers} />
+      <Route path="/forum/moderation-log" component={ModerationLog} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
       </Switch>

@@ -811,13 +811,31 @@ export const forumRouter = router({
         });
       }
       
-      await database.insert(forumReports).values({
+      const [report] = await database.insert(forumReports).values({
         reporter_user_id: ctx.user.id,
         topic_id: input.topicId || null,
         post_id: input.postId || null,
         reason: input.reason,
         details: input.details,
-      });
+      }).returning();
+      
+      // Notify all admins and moderators
+      const adminsAndMods = await database
+        .select({ id: users.id })
+        .from(users)
+        .where(sql`${users.role} = 'admin' OR ${users.role} = 'moderator'`);
+      
+      const { createNotification } = await import("./notifications");
+      for (const mod of adminsAndMods) {
+        await createNotification({
+          userId: mod.id,
+          type: 'forum_report',
+          title: 'New content report',
+          message: `${input.reason}: ${input.details?.substring(0, 50) || 'No details provided'}`,
+          actionUrl: '/forum/reports',
+          priority: 'high',
+        });
+      }
       
       // Check if 3+ reports, auto-hide
       const reports = await database
@@ -851,17 +869,46 @@ export const forumRouter = router({
     .input(z.object({
       userId: z.number(),
       reason: z.string(),
+      duration: z.enum(["1day", "1week", "1month", "permanent"]),
     }))
     .mutation(async ({ ctx, input }) => {
+      // Calculate banned_until based on duration
+      let bannedUntil: Date | null = null;
+      if (input.duration !== "permanent") {
+        const now = new Date();
+        switch (input.duration) {
+          case "1day":
+            bannedUntil = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+            break;
+          case "1week":
+            bannedUntil = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+            break;
+          case "1month":
+            bannedUntil = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+            break;
+        }
+      }
+      
       await database
         .update(users)
         .set({
           is_banned: true,
           banned_at: new Date(),
+          banned_until: bannedUntil,
           banned_by: ctx.user.id,
           ban_reason: input.reason,
         })
         .where(eq(users.id, input.userId));
+      
+      // Log moderation action
+      const { forumModerationActions } = await import("../../drizzle/schema");
+      await database.insert(forumModerationActions).values({
+        action_type: "ban",
+        moderator_id: ctx.user.id,
+        target_user_id: input.userId,
+        reason: input.reason,
+        ban_duration: input.duration,
+      });
       
       return { success: true };
     }),
@@ -875,10 +922,20 @@ export const forumRouter = router({
         .set({
           is_banned: false,
           banned_at: null,
+          banned_until: null,
           banned_by: null,
           ban_reason: null,
         })
         .where(eq(users.id, input.userId));
+      
+      // Log moderation action
+      const { forumModerationActions } = await import("../../drizzle/schema");
+      await database.insert(forumModerationActions).values({
+        action_type: "unban",
+        moderator_id: ctx.user.id,
+        target_user_id: input.userId,
+        reason: "Unbanned by admin",
+      });
       
       return { success: true };
     }),
@@ -1076,5 +1133,279 @@ export const forumRouter = router({
         .leftJoin(users, eq(forumModerators.user_id, users.id));
       
       return moderators;
+    }),
+});
+
+  // Moderator: Get report details with full content and user stats
+  getReportDetails: moderatorProcedure
+    .input(z.object({ reportId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const report = await database
+        .select({
+          id: forumReports.id,
+          reporter_user_id: forumReports.reporter_user_id,
+          reporter_name: users.name,
+          topic_id: forumReports.topic_id,
+          post_id: forumReports.post_id,
+          reason: forumReports.reason,
+          details: forumReports.details,
+          status: forumReports.status,
+          created_at: forumReports.created_at,
+        })
+        .from(forumReports)
+        .leftJoin(users, eq(forumReports.reporter_user_id, users.id))
+        .where(eq(forumReports.id, input.reportId))
+        .limit(1);
+      
+      if (report.length === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Report not found" });
+      }
+      
+      const reportData = report[0];
+      let content = null;
+      let contentAuthor = null;
+      
+      // Get reported content
+      if (reportData.topic_id) {
+        const topic = await database
+          .select({
+            id: forumTopics.id,
+            title: forumTopics.title,
+            content: forumTopics.content,
+            user_id: forumTopics.user_id,
+            user_name: users.name,
+            created_at: forumTopics.created_at,
+          })
+          .from(forumTopics)
+          .leftJoin(users, eq(forumTopics.user_id, users.id))
+          .where(eq(forumTopics.id, reportData.topic_id))
+          .limit(1);
+        
+        if (topic.length > 0) {
+          content = { type: "topic", ...topic[0] };
+          contentAuthor = topic[0].user_id;
+        }
+      } else if (reportData.post_id) {
+        const post = await database
+          .select({
+            id: forumPosts.id,
+            content: forumPosts.content,
+            user_id: forumPosts.user_id,
+            user_name: users.name,
+            topic_id: forumPosts.topic_id,
+            created_at: forumPosts.created_at,
+          })
+          .from(forumPosts)
+          .leftJoin(users, eq(forumPosts.user_id, users.id))
+          .where(eq(forumPosts.id, reportData.post_id))
+          .limit(1);
+        
+        if (post.length > 0) {
+          content = { type: "post", ...post[0] };
+          contentAuthor = post[0].user_id;
+        }
+      }
+      
+      // Get user stats
+      let userStats = null;
+      if (contentAuthor) {
+        const [topicCount] = await database
+          .select({ count: sql<number>`count(*)::int` })
+          .from(forumTopics)
+          .where(eq(forumTopics.user_id, contentAuthor));
+        
+        const [postCount] = await database
+          .select({ count: sql<number>`count(*)::int` })
+          .from(forumPosts)
+          .where(eq(forumPosts.user_id, contentAuthor));
+        
+        const [reportCount] = await database
+          .select({ count: sql<number>`count(*)::int` })
+          .from(forumReports)
+          .where(
+            sql`${forumReports.topic_id} IN (SELECT id FROM ${forumTopics} WHERE user_id = ${contentAuthor}) OR ${forumReports.post_id} IN (SELECT id FROM ${forumPosts} WHERE user_id = ${contentAuthor})`
+          );
+        
+        const userData = await database
+          .select({
+            id: users.id,
+            name: users.name,
+            created_at: users.created_at,
+            is_banned: users.is_banned,
+            ban_reason: users.ban_reason,
+          })
+          .from(users)
+          .where(eq(users.id, contentAuthor))
+          .limit(1);
+        
+        if (userData.length > 0) {
+          userStats = {
+            ...userData[0],
+            topicCount: topicCount.count,
+            postCount: postCount.count,
+            reportCount: reportCount.count,
+          };
+        }
+      }
+      
+      return {
+        ...reportData,
+        content,
+        userStats,
+      };
+    }),
+  
+  // Moderator: Get user's all content
+  getUserContent: moderatorProcedure
+    .input(z.object({ userId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const topics = await database
+        .select({
+          id: forumTopics.id,
+          title: forumTopics.title,
+          content: forumTopics.content,
+          created_at: forumTopics.created_at,
+          reply_count: forumTopics.reply_count,
+          is_hidden: forumTopics.is_hidden,
+        })
+        .from(forumTopics)
+        .where(eq(forumTopics.user_id, input.userId))
+        .orderBy(desc(forumTopics.created_at));
+      
+      const posts = await database
+        .select({
+          id: forumPosts.id,
+          content: forumPosts.content,
+          topic_id: forumPosts.topic_id,
+          created_at: forumPosts.created_at,
+          is_hidden: forumPosts.is_hidden,
+        })
+        .from(forumPosts)
+        .where(eq(forumPosts.user_id, input.userId))
+        .orderBy(desc(forumPosts.created_at));
+      
+      return { topics, posts };
+    }),
+  
+  // Moderator: Delete content (topic or post)
+  deleteContent: moderatorProcedure
+    .input(z.object({
+      topicId: z.number().optional(),
+      postId: z.number().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      if (!input.topicId && !input.postId) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Either topicId or postId required" });
+      }
+      
+      const { forumModerationActions } = await import("../../drizzle/schema");
+      
+      if (input.topicId) {
+        await database.delete(forumTopics).where(eq(forumTopics.id, input.topicId));
+        
+        await database.insert(forumModerationActions).values({
+          action_type: "delete_topic",
+          moderator_id: ctx.user.id,
+          topic_id: input.topicId,
+          reason: "Deleted by moderator",
+        });
+      } else if (input.postId) {
+        await database.delete(forumPosts).where(eq(forumPosts.id, input.postId));
+        
+        await database.insert(forumModerationActions).values({
+          action_type: "delete_post",
+          moderator_id: ctx.user.id,
+          post_id: input.postId,
+          reason: "Deleted by moderator",
+        });
+      }
+      
+      return { success: true };
+    }),
+  
+  // Moderator: Bulk delete user content
+  bulkDeleteUserContent: moderatorProcedure
+    .input(z.object({
+      userId: z.number(),
+      deleteTopics: z.boolean().default(false),
+      deletePosts: z.boolean().default(false),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const { forumModerationActions } = await import("../../drizzle/schema");
+      
+      if (input.deleteTopics) {
+        await database.delete(forumTopics).where(eq(forumTopics.user_id, input.userId));
+      }
+      
+      if (input.deletePosts) {
+        await database.delete(forumPosts).where(eq(forumPosts.user_id, input.userId));
+      }
+      
+      await database.insert(forumModerationActions).values({
+        action_type: "bulk_delete",
+        moderator_id: ctx.user.id,
+        target_user_id: input.userId,
+        reason: `Bulk deleted: ${input.deleteTopics ? 'topics' : ''} ${input.deletePosts ? 'posts' : ''}`,
+      });
+      
+      return { success: true };
+    }),
+  
+  // Moderator: Get moderation log
+  getModerationLog: moderatorProcedure
+    .input(z.object({
+      limit: z.number().optional().default(50),
+    }))
+    .query(async ({ ctx, input }) => {
+      const { forumModerationActions } = await import("../../drizzle/schema");
+      
+      const log = await database
+        .select({
+          id: forumModerationActions.id,
+          action_type: forumModerationActions.action_type,
+          moderator_id: forumModerationActions.moderator_id,
+          moderator_name: sql<string>`mod_user.name`,
+          target_user_id: forumModerationActions.target_user_id,
+          target_user_name: sql<string>`target_user.name`,
+          topic_id: forumModerationActions.topic_id,
+          post_id: forumModerationActions.post_id,
+          reason: forumModerationActions.reason,
+          ban_duration: forumModerationActions.ban_duration,
+          created_at: forumModerationActions.created_at,
+        })
+        .from(forumModerationActions)
+        .leftJoin(sql`users AS mod_user`, sql`mod_user.id = ${forumModerationActions.moderator_id}`)
+        .leftJoin(sql`users AS target_user`, sql`target_user.id = ${forumModerationActions.target_user_id}`)
+        .orderBy(desc(forumModerationActions.created_at))
+        .limit(input.limit);
+      
+      return log;
+    }),
+  
+  // Moderator: Dismiss report
+  dismissReport: moderatorProcedure
+    .input(z.object({ reportId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      await database
+        .update(forumReports)
+        .set({
+          status: "dismissed",
+          resolved_by: ctx.user.id,
+          resolved_at: new Date(),
+        })
+        .where(eq(forumReports.id, input.reportId));
+      
+      return { success: true };
+    }),
+  
+  // Get pending reports count (for badge)
+  getPendingReportsCount: moderatorProcedure
+    .query(async () => {
+      const [result] = await database
+        .select({ count: sql<number>`count(*)::int` })
+        .from(forumReports)
+        .where(eq(forumReports.status, "pending"));
+      
+      return result.count;
     }),
 });

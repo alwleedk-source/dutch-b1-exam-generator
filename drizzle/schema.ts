@@ -26,6 +26,7 @@ export const users = pgTable("users", {
   // Forum ban status
   is_banned: boolean("is_banned").default(false).notNull(),
   banned_at: timestamp("banned_at"),
+  banned_until: timestamp("banned_until"), // For temporary bans
   banned_by: integer("banned_by"),
   ban_reason: text("ban_reason"),
   
@@ -588,8 +589,31 @@ export type InsertTextRating = typeof textRatings.$inferInsert;
 
 /**
  * User ban status (added to users table via migration)
- * Fields: is_banned, banned_at, banned_by, ban_reason
+ * Fields: is_banned, banned_at, banned_until, banned_by, ban_reason
  */
+
+/**
+ * Forum moderation actions (audit log)
+ */
+export const forumModerationActions = pgTable("forum_moderation_actions", {
+  id: serial("id").primaryKey(),
+  
+  action_type: varchar("action_type", { length: 50 }).notNull(), // ban, unban, delete_post, delete_topic, warn, bulk_delete
+  moderator_id: integer("moderator_id").references(() => users.id, { onDelete: "set null" }).notNull(),
+  target_user_id: integer("target_user_id").references(() => users.id, { onDelete: "cascade" }),
+  
+  // Content references (if deleting specific content)
+  topic_id: integer("topic_id").references(() => forumTopics.id, { onDelete: "set null" }),
+  post_id: integer("post_id").references(() => forumPosts.id, { onDelete: "set null" }),
+  
+  reason: text("reason"),
+  ban_duration: varchar("ban_duration", { length: 20 }), // 1day, 1week, 1month, permanent
+  
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type ForumModerationAction = typeof forumModerationActions.$inferSelect;
+export type InsertForumModerationAction = typeof forumModerationActions.$inferInsert;
 
 /**
  * System settings (admin-controlled)

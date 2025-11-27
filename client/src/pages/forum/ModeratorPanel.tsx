@@ -2,13 +2,20 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { AlertTriangle, Shield, AlertCircle, Users } from "lucide-react";
+import { trpc } from "@/lib/trpc";
+import { AlertTriangle, Shield, AlertCircle, Users, FileText } from "lucide-react";
 import { Link } from "wouter";
 
 export default function ModeratorPanel() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  
+  const { data: pendingCount } = trpc.forum.getPendingReportsCount.useQuery(undefined, {
+    enabled: !!(user && (user.role === "moderator" || user.role === "admin")),
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
   
   // Check if user is moderator or admin
   if (!user || (user.role !== "moderator" && user.role !== "admin")) {
@@ -36,13 +43,21 @@ export default function ModeratorPanel() {
       icon: AlertCircle,
       href: "/forum/reports",
       color: "text-yellow-500",
+      badge: pendingCount && pendingCount > 0 ? pendingCount : undefined,
+    },
+    {
+      title: "Moderation Log",
+      description: "View audit trail of all moderation actions",
+      icon: FileText,
+      href: "/forum/moderation-log",
+      color: "text-blue-500",
     },
     {
       title: t.userManagement || "User Management",
       description: t.userManagementDesc || "Ban/unban users and manage moderators",
       icon: Users,
       href: "/forum/users",
-      color: "text-blue-500",
+      color: "text-purple-500",
       adminOnly: true,
     },
   ];
@@ -78,9 +93,21 @@ export default function ModeratorPanel() {
                     <Card className="hover:bg-muted/50 transition-colors cursor-pointer h-full">
                       <CardContent className="pt-6">
                         <div className="flex items-start gap-4">
-                          <tool.icon className={`h-8 w-8 ${tool.color}`} />
+                          <div className="relative">
+                            <tool.icon className={`h-8 w-8 ${tool.color}`} />
+                            {tool.badge && (
+                              <Badge 
+                                variant="destructive" 
+                                className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                              >
+                                {tool.badge}
+                              </Badge>
+                            )}
+                          </div>
                           <div className="flex-1">
-                            <h3 className="font-semibold mb-1">{tool.title}</h3>
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-semibold mb-1">{tool.title}</h3>
+                            </div>
                             <p className="text-sm text-muted-foreground">
                               {tool.description}
                             </p>
@@ -104,6 +131,7 @@ export default function ModeratorPanel() {
                 <li>• {t.moderatorToolHide || "Hide/Unhide topics to remove from public view"}</li>
                 <li>• {t.moderatorToolDelete || "Delete topics and posts at any time"}</li>
                 <li>• {t.moderatorToolReports || "Review and resolve user reports"}</li>
+                <li>• View complete moderation audit log</li>
                 {user.role === "admin" && (
                   <>
                     <li>• {t.moderatorToolBan || "Ban/Unban users (Admin only)"}</li>
