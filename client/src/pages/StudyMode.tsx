@@ -163,27 +163,31 @@ export default function StudyMode() {
             <CardTitle>{t.dutchText || "Dutch Text"}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div 
-              className="prose prose-lg max-w-none"
-              style={{
-                direction: 'ltr',
-                lineHeight: '1.8',
-                fontSize: '1.1rem',
-              }}
-            >
-              <div 
-                className="text-foreground"
-                dir="ltr"
-                style={{
-                  whiteSpace: 'pre-wrap',
-                  wordSpacing: '0.1em',
-                  letterSpacing: '0.01em',
-                  textAlign: 'left',
-                }}
-                dangerouslySetInnerHTML={{
-                  __html: text?.text?.dutch_text?.replace(/\n\n/g, '</p><p style="margin-top: 1.5em; margin-bottom: 1.5em;">').replace(/^/, '<p style="margin-top: 0;">').replace(/$/, '</p>')
-                }}
-              />
+            <div className="prose prose-lg max-w-none">
+              {text?.text?.formatted_html ? (
+                <div 
+                  className="formatted-text-container text-foreground"
+                  dir="ltr"
+                  dangerouslySetInnerHTML={{
+                    __html: text.text.formatted_html
+                  }}
+                />
+              ) : (
+                <div 
+                  className="text-foreground"
+                  dir="ltr"
+                  style={{
+                    whiteSpace: 'pre-wrap',
+                    wordSpacing: '0.1em',
+                    letterSpacing: '0.01em',
+                    textAlign: 'left',
+                    lineHeight: '1.8',
+                  }}
+                  dangerouslySetInnerHTML={{
+                    __html: text?.text?.dutch_text?.replace(/\n\n/g, '</p><p style="margin-top: 1.5em; margin-bottom: 1.5em;">').replace(/^/, '<p style="margin-top: 0;">').replace(/$/, '</p>')
+                  }}
+                />
+              )}
             </div>
           </CardContent>
         </Card>
