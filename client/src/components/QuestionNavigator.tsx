@@ -20,8 +20,8 @@ export function QuestionNavigator({
   const answeredCount = Object.keys(answers).length;
 
   return (
-    <div className="fixed left-4 top-24 hidden lg:block w-20 max-h-[calc(100vh-200px)] flex flex-col">
-      <div className="bg-sidebar dark:bg-card border border-sidebar-border dark:border-border rounded-xl shadow-lg flex flex-col">
+    <div className="fixed left-4 top-24 hidden lg:block w-20 max-h-[calc(100vh-120px)] flex flex-col">
+      <div className="bg-sidebar dark:bg-card border border-sidebar-border dark:border-border rounded-xl shadow-lg flex flex-col max-h-full">
         {/* Sticky header with text button and counter */}
         <div className="sticky top-0 z-10 bg-sidebar dark:bg-card rounded-t-xl p-3 border-b border-sidebar-border dark:border-border">
           {/* Back to text button */}
