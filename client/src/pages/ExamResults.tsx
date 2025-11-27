@@ -286,7 +286,7 @@ export default function ExamResults() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {Object.entries(performanceAnalysis).map(([type, data]: [string, any]) => {
+                {performanceAnalysis && Object.entries(performanceAnalysis).map(([type, data]: [string, any]) => {
                   const percentage = data.total > 0 ? (data.correct / data.total) * 100 : 0;
                   const isStrong = percentage >= 70;
                   
