@@ -384,7 +384,13 @@ ZORG ERVOOR:
 /**
  * Extract vocabulary from Dutch text (B1 level important words)
  */
-export async function extractVocabulary(dutchText: string, maxWords: number = 25) {
+export async function extractVocabulary(dutchText: string, maxWords?: number) {
+  // Dynamic calculation: 15% of text length, min 25, max 75
+  if (!maxWords) {
+    const wordCount = dutchText.split(/\s+/).length;
+    maxWords = Math.min(Math.max(Math.floor(wordCount * 0.15), 25), 75);
+  }
+  
   const response = await generateWithGemini({
     messages: [
       {
