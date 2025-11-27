@@ -132,7 +132,7 @@ ${text}
       },
     ],
     temperature: 0.3, // Lower temperature for more accurate corrections
-    maxOutputTokens: 4096,
+    maxOutputTokens: 8192, // Increased for large texts
     responseFormat: "text",
   });
 
