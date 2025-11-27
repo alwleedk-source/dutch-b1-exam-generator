@@ -221,9 +221,43 @@ export const appRouter = router({
           try {
             cleanedText = await gemini.cleanAndFormatText(input.dutch_text);
             console.log(`[Text Creation] ✅ Text cleaned: ${cleanedText.length} chars`);
-          } catch (e) {
-            console.error('[Text Creation] ⚠️ Text cleaning failed, using original text:', e);
-            cleanedText = input.dutch_text;
+            
+            // 🚨 CRITICAL: Validate that text was actually cleaned before proceeding
+            const pdfFooterPatterns = [
+              /©\s*CvTE/i,
+              /Tekstboekje\s+Lezen/i,
+              /Openbaar\s+examen/i,
+              /Staatsexamen/i,
+              /Examen\s+NT2/i,
+            ];
+            
+            const hasFooters = pdfFooterPatterns.some(pattern => pattern.test(cleanedText));
+            const hasHTML = cleanedText.includes('<h1>') || cleanedText.includes('<h2>') || cleanedText.includes('<p>');
+            
+            if (hasFooters || !hasHTML) {
+              console.error('[Text Creation] ❌ Text cleaning FAILED validation:');
+              if (hasFooters) console.error('  - Still contains PDF footers');
+              if (!hasHTML) console.error('  - Does not contain HTML formatting');
+              
+              throw new TRPCError({ 
+                code: "INTERNAL_SERVER_ERROR", 
+                message: "Text cleaning failed. The AI could not properly clean and format your text. Please try again or contact support if the issue persists." 
+              });
+            }
+            
+            console.log('[Text Creation] ✅ Text validation passed - proceeding with exam generation');
+          } catch (e: any) {
+            // If it's already a TRPCError (validation failed), re-throw it
+            if (e.code) {
+              throw e;
+            }
+            
+            // Otherwise, it's a different error
+            console.error('[Text Creation] ❌ Text cleaning failed with error:', e);
+            throw new TRPCError({ 
+              code: "INTERNAL_SERVER_ERROR", 
+              message: `Text cleaning failed: ${e.message}` 
+            });
           }
           
           if (!finalTitle || finalTitle.trim() === "") {

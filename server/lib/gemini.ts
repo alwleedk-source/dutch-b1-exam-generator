@@ -91,44 +91,52 @@ export async function cleanAndFormatText(text: string): Promise<string> {
 
 Taak: Lees de volgende Nederlandse tekst zorgvuldig en analyseer deze op:
 
-1. **OCR-fouten** (als de tekst uit een afbeelding komt):
+1. **PDF Headers/Footers VERWIJDEREN** (ZEER BELANGRIJK!):
+   - Verwijder copyright notices (bijv. "© CvTE - Tekstboekje Lezen I - 2022 Openbaar examen")
+   - Verwijder paginanummers (bijv. "Pagina 1 van 5", "1", "2", etc.)
+   - Verwijder datums en tijdstempels (bijv. "2022", "01-01-2022")
+   - Verwijder website URLs en email adressen in headers/footers
+   - Verwijder herhalende tekst die op elke pagina voorkomt
+   - Verwijder "Openbaar examen", "Staatsexamen", "Examen NT2" en soortgelijke exam-gerelateerde footers
+
+2. **OCR-fouten** (als de tekst uit een afbeelding komt):
    - Vreemde tekens en symbolen (|, \\, £, *, +, <, >, {, }, [, ], ~, etc.)
    - Verkeerd herkende letters (bijv. "rn" → "m", "l" → "I")
    - Ontbrekende of extra spaties
    - Zinnen die door elkaar lopen
 
-2. **Spelfouten en grammatica**:
+3. **Spelfouten en grammatica**:
    - Typfouten
    - Verkeerde werkwoordsvormen
    - Ontbrekende of verkeerde leestekens
 
-3. **Opmaak en structuur**:
+4. **Opmaak en structuur**:
    - Paragrafen die beter gescheiden moeten worden
    - Zinnen die te lang of onduidelijk zijn
    - Ontbrekende hoofdletters
 
 **Instructies:**
+- Verwijder EERST alle PDF headers/footers (dit is de belangrijkste stap!)
 - Corrigeer ALLE fouten die je vindt
 - Verwijder ALLE vreemde symbolen en tekens
 - Verbeter de leesbaarheid en structuur
 - Behoud de originele betekenis en inhoud
 - Behoud de paragraafstructuur (maar verbeter deze indien nodig)
 - Zorg dat de tekst grammaticaal correct en professioneel is
-- Als de tekst al perfect is, geef deze dan ongewijzigd terug
 
 **Originele tekst:**
 ${text}
 
-**BELANGRIJK - Structuur en Tussenkoppen:**
-- Voeg duidelijke tussenkoppen toe waar de tekst van onderwerp verandert
-- Gebruik het volgende formaat voor tussenkoppen:
-  * Plaats elke tussenkop op een nieuwe regel
-  * Begin de tussenkop met "## " (twee hashes en een spatie)
-  * Bijvoorbeeld: "## Wat is dagelijkse rijtijd?"
-  * Voeg 3-6 tussenkoppen toe afhankelijk van de tekstlengte (ongeveer 1 tussenkop per 200-300 woorden)
+**BELANGRIJK - Output Format (HTML ONLY!):**
+- Gebruik ALLEEN HTML tags: <h1>, <h2>, <p>
+- GEEN Markdown (##, **, etc.)
+- Hoofdtitel: <h1>Titel</h1>
+- Tussenkoppen: <h2>Tussenkop</h2>
+- Paragrafen: <p>Tekst hier...</p>
+- Voeg 3-6 tussenkoppen toe afhankelijk van de tekstlengte
 - Zorg dat de tekst goed gestructureerd is met duidelijke secties
 
-**Geef ALLEEN de gecorrigeerde en opgemaakte tekst terug met tussenkoppen in ## formaat, zonder uitleg of opmerkingen.**`,
+**Geef ALLEEN de gecorrigeerde tekst in PURE HTML formaat terug (met <h1>, <h2>, <p> tags), zonder uitleg of opmerkingen.**`,
       },
     ],
     temperature: 0.3, // Lower temperature for more accurate corrections
@@ -136,7 +144,31 @@ ${text}
     responseFormat: "text",
   });
 
-  return response.trim();
+  const cleanedText = response.trim();
+  
+  // Validate that the text was actually cleaned (check for common PDF footers)
+  const pdfFooterPatterns = [
+    /©\s*CvTE/i,
+    /Tekstboekje\s+Lezen/i,
+    /Openbaar\s+examen/i,
+    /Staatsexamen/i,
+    /Examen\s+NT2/i,
+  ];
+  
+  const hasFooters = pdfFooterPatterns.some(pattern => pattern.test(cleanedText));
+  
+  if (hasFooters) {
+    console.warn('[cleanAndFormatText] Warning: Text still contains PDF footers after cleaning');
+    console.warn('[cleanAndFormatText] This may indicate the AI failed to clean properly');
+  }
+  
+  // Validate HTML format
+  if (!cleanedText.includes('<h1>') && !cleanedText.includes('<h2>') && !cleanedText.includes('<p>')) {
+    console.warn('[cleanAndFormatText] Warning: Text does not contain HTML tags');
+    console.warn('[cleanAndFormatText] AI may have returned Markdown or plain text instead');
+  }
+  
+  return cleanedText;
 }
 
 /**
