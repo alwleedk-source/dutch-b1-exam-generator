@@ -282,7 +282,9 @@ export const appRouter = router({
           }
           
           try {
-            vocabData = await gemini.extractVocabulary(cleanedText);
+            // Strip HTML tags for vocabulary extraction (Gemini needs plain text)
+            const plainText = cleanedText.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+            vocabData = await gemini.extractVocabulary(plainText);
             console.log(`[Text Creation] ✅ Vocabulary extracted: ${vocabData.vocabulary.length} words`);
           } catch (e) {
             console.error('[Text Creation] ⚠️ Vocabulary extraction failed:', e);
@@ -330,7 +332,9 @@ export const appRouter = router({
             }
             
             try {
-              vocabData = await gemini.extractVocabulary(cleanedText);
+              // Strip HTML tags for vocabulary extraction (Gemini needs plain text)
+              const plainText = cleanedText.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+              vocabData = await gemini.extractVocabulary(plainText);
             } catch (e) {
               vocabData = { vocabulary: [] };
             }
