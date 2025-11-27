@@ -12,13 +12,83 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { formatDistanceToNow } from "date-fns";
 import { Link } from "wouter";
 import { Badge } from "./ui/badge";
+import { toast } from "sonner";
+import { useEffect, useRef, useState } from "react";
 
 export function NotificationsDropdown() {
   const { t } = useLanguage();
   const utils = trpc.useUtils();
+  const [hasNewNotification, setHasNewNotification] = useState(false);
+  const previousUnreadCount = useRef<number>(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   
-  const { data: notifications } = trpc.notifications.getNotifications.useQuery();
-  const { data: unreadCount } = trpc.notifications.getUnreadCount.useQuery();
+  // Polling: refetch every 60 seconds
+  const { data: notifications } = trpc.notifications.getNotifications.useQuery(undefined, {
+    refetchInterval: 60000, // 60 seconds
+  });
+  const { data: unreadCount } = trpc.notifications.getUnreadCount.useQuery(undefined, {
+    refetchInterval: 60000, // 60 seconds
+  });
+  
+  // Initialize audio
+  useEffect(() => {
+    // Create a simple notification sound using Web Audio API
+    const createNotificationSound = () => {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 800; // Frequency in Hz
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.5);
+    };
+    
+    audioRef.current = { play: createNotificationSound } as any;
+  }, []);
+  
+  // Detect new notifications and show toast
+  useEffect(() => {
+    if (unreadCount && previousUnreadCount.current > 0) {
+      const newCount = unreadCount.count - previousUnreadCount.current;
+      
+      if (newCount > 0) {
+        // Trigger animation
+        setHasNewNotification(true);
+        setTimeout(() => setHasNewNotification(false), 1000);
+        
+        // Play sound
+        if (audioRef.current) {
+          try {
+            (audioRef.current as any).play();
+          } catch (e) {
+            console.log('Audio play failed:', e);
+          }
+        }
+        
+        // Show toast for the latest notification
+        if (notifications && notifications.length > 0) {
+          const latestNotification = notifications[0];
+          toast.info(latestNotification.title, {
+            description: latestNotification.message,
+            duration: 5000,
+            icon: getNotificationIcon(latestNotification.type || latestNotification.notification_type),
+          });
+        }
+      }
+    }
+    
+    if (unreadCount) {
+      previousUnreadCount.current = unreadCount.count;
+    }
+  }, [unreadCount, notifications]);
   
   const markReadMutation = trpc.notifications.markNotificationRead.useMutation({
     onSuccess: () => {
@@ -88,7 +158,7 @@ export function NotificationsDropdown() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
+          <Bell className={`h-5 w-5 transition-transform ${hasNewNotification ? 'animate-bounce' : ''}`} />
           {unreadCount && unreadCount.count > 0 && (
             <Badge 
               variant="destructive" 
