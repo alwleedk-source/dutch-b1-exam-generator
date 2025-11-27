@@ -67,7 +67,7 @@ export default function PublicExams() {
     }
     
     return filtered;
-  }, [allTexts, minRating, sortBy]);
+  }, [allTexts, minRating, sortBy, searchQuery]);
 
   // Pagination
   const totalPages = Math.ceil(texts.length / itemsPerPage);
