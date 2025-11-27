@@ -128,15 +128,15 @@ export function NotificationsDropdown() {
               const actionUrl = notification.action_url || 
                 (notification.topic_id ? `/forum/topic/${notification.topic_id}` : '#');
               
-              return (
-                <Link 
-                  key={notification.id} 
-                  href={actionUrl}
+              // Check if notification type is 'rating' - these should not navigate
+              const isRatingNotification = (notification.type || notification.notification_type) === 'rating';
+              
+              const menuItem = (
+                <DropdownMenuItem
+                  key={notification.id}
+                  className={`cursor-pointer ${!notification.is_read ? 'bg-muted/50' : ''}`}
+                  onClick={() => handleNotificationClick(notification)}
                 >
-                  <DropdownMenuItem
-                    className={`cursor-pointer ${!notification.is_read ? 'bg-muted/50' : ''}`}
-                    onClick={() => handleNotificationClick(notification)}
-                  >
                     <div className="flex gap-3 items-start flex-1">
                       <div className="mt-0.5">
                         {getNotificationIcon(notification.type || notification.notification_type)}
@@ -165,7 +165,13 @@ export function NotificationsDropdown() {
                         <div className="ml-2 h-2 w-2 rounded-full bg-primary flex-shrink-0 mt-2" />
                       )}
                     </div>
-                  </DropdownMenuItem>
+                </DropdownMenuItem>
+              );
+              
+              // Wrap in Link only if it's not a rating notification
+              return isRatingNotification ? menuItem : (
+                <Link key={notification.id} href={actionUrl}>
+                  {menuItem}
                 </Link>
               );
             })}
