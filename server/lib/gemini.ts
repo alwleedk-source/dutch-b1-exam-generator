@@ -130,7 +130,7 @@ ${text}
 **BELANGRIJK - Output Format (HTML ONLY!):**
 - Gebruik ALLEEN HTML tags: <h1>, <h2>, <p>
 - GEEN Markdown (##, **, etc.)
-- GEEN code blocks (```html of ```)
+- GEEN code blocks (\`\`\`html of \`\`\`)
 - Begin DIRECT met <h1> tag
 - Hoofdtitel: <h1>Titel</h1>
 - Tussenkoppen: <h2>Tussenkop</h2>
