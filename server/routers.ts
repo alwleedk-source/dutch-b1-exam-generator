@@ -205,44 +205,42 @@ export const appRouter = router({
         console.log(`[Text Creation] Calculated question count: ${questionCount}, exam time: ${examTimeMinutes} minutes for ${input.dutch_text.length} characters`);
         
         // ✨ OPTIMIZED: Process text completely in ONE Gemini API call (saves 80% tokens!)
-        console.log('[Text Creation] Processing text with unified Gemini call...');
+        // For large texts (>= 8000 chars), use separate calls for better reliability
+        const TEXT_SIZE_THRESHOLD = 8000;
+        const useSeparateCalls = input.dutch_text.length >= TEXT_SIZE_THRESHOLD;
+        
         let cleanedText = input.dutch_text;
         let finalTitle = input.title;
         let examData: any;
         let vocabData: any;
         
-        try {
-          const result = await gemini.processTextComplete(input.dutch_text, questionCount);
-          cleanedText = result.cleanedText;
-          finalTitle = input.title || result.title; // Use provided title if available
-          examData = { questions: result.questions };
-          vocabData = { vocabulary: result.vocabulary };
-          console.log('[Text Creation] ✅ Unified processing successful!');
-          console.log(`[Text Creation] - Text cleaned: ${cleanedText.length} chars`);
-          console.log(`[Text Creation] - Title: ${finalTitle}`);
-          console.log(`[Text Creation] - Questions: ${result.questions.length}`);
-          console.log(`[Text Creation] - Vocabulary: ${result.vocabulary.length} words`);
-        } catch (error: any) {
-          console.error('[Text Creation] ❌ Unified processing failed, falling back to separate calls:', error);
+        if (useSeparateCalls) {
+          console.log(`[Text Creation] Large text detected (${input.dutch_text.length} chars), using separate calls for better reliability...`);
           
-          // Fallback to old method if unified processing fails
+          // Use separate calls for large texts (more reliable)
           try {
             cleanedText = await gemini.cleanAndFormatText(input.dutch_text);
+            console.log(`[Text Creation] ✅ Text cleaned: ${cleanedText.length} chars`);
           } catch (e) {
+            console.error('[Text Creation] ⚠️ Text cleaning failed, using original text:', e);
             cleanedText = input.dutch_text;
           }
           
           if (!finalTitle || finalTitle.trim() === "") {
             try {
               finalTitle = await gemini.generateTitle(cleanedText);
+              console.log(`[Text Creation] ✅ Title generated: ${finalTitle}`);
             } catch (e) {
+              console.error('[Text Creation] ⚠️ Title generation failed, using default:', e);
               finalTitle = cleanedText.substring(0, 50).trim() + "...";
             }
           }
           
           try {
             examData = await gemini.generateExamQuestions(cleanedText, questionCount);
+            console.log(`[Text Creation] ✅ Questions generated: ${examData.questions.length}`);
           } catch (e: any) {
+            console.error('[Text Creation] ❌ Question generation failed:', e);
             throw new TRPCError({ 
               code: "INTERNAL_SERVER_ERROR", 
               message: `Failed to generate exam: ${e.message}` 
@@ -251,8 +249,57 @@ export const appRouter = router({
           
           try {
             vocabData = await gemini.extractVocabulary(cleanedText);
+            console.log(`[Text Creation] ✅ Vocabulary extracted: ${vocabData.vocabulary.length} words`);
           } catch (e) {
+            console.error('[Text Creation] ⚠️ Vocabulary extraction failed:', e);
             vocabData = { vocabulary: [] };
+          }
+        } else {
+          console.log(`[Text Creation] Processing text with unified Gemini call (${input.dutch_text.length} chars)...`);
+          
+          try {
+            const result = await gemini.processTextComplete(input.dutch_text, questionCount);
+            cleanedText = result.cleanedText;
+            finalTitle = input.title || result.title; // Use provided title if available
+            examData = { questions: result.questions };
+            vocabData = { vocabulary: result.vocabulary };
+            console.log('[Text Creation] ✅ Unified processing successful!');
+            console.log(`[Text Creation] - Text cleaned: ${cleanedText.length} chars`);
+            console.log(`[Text Creation] - Title: ${finalTitle}`);
+            console.log(`[Text Creation] - Questions: ${result.questions.length}`);
+            console.log(`[Text Creation] - Vocabulary: ${result.vocabulary.length} words`);
+          } catch (error: any) {
+            console.error('[Text Creation] ❌ Unified processing failed, falling back to separate calls:', error);
+            
+            // Fallback to old method if unified processing fails
+            try {
+              cleanedText = await gemini.cleanAndFormatText(input.dutch_text);
+            } catch (e) {
+              cleanedText = input.dutch_text;
+            }
+            
+            if (!finalTitle || finalTitle.trim() === "") {
+              try {
+                finalTitle = await gemini.generateTitle(cleanedText);
+              } catch (e) {
+                finalTitle = cleanedText.substring(0, 50).trim() + "...";
+              }
+            }
+            
+            try {
+              examData = await gemini.generateExamQuestions(cleanedText, questionCount);
+            } catch (e: any) {
+              throw new TRPCError({ 
+                code: "INTERNAL_SERVER_ERROR", 
+                message: `Failed to generate exam: ${e.message}` 
+              });
+            }
+            
+            try {
+              vocabData = await gemini.extractVocabulary(cleanedText);
+            } catch (e) {
+              vocabData = { vocabulary: [] };
+            }
           }
         }
         
