@@ -858,7 +858,7 @@ export const translations: Record<Language, Translations> = {
     // Processing steps
     stepCleanText: "Tekst opschonen en corrigeren",
     stepGenerateTitle: "Slimme titel genereren",
-    stepCreateQuestions: "10 begripsvragen maken",
+    stepCreateQuestions: "B1-niveau vragen maken",
     stepExtractVocabulary: "Belangrijke woordenschat extraheren",
     stepFormatText: "Definitieve tekst formatteren",
     
@@ -1463,7 +1463,7 @@ export const translations: Record<Language, Translations> = {
     // Processing steps
     stepCleanText: "تنظيف وتصحيح النص",
     stepGenerateTitle: "توليد عنوان ذكي",
-    stepCreateQuestions: "إنشاء 10 أسئلة فهم",
+    stepCreateQuestions: "إنشاء أسئلة مستوى B1",
     stepExtractVocabulary: "استخراج المفردات المهمة",
     stepFormatText: "تنسيق النص النهائي",
      // Vocabulary page
@@ -2066,7 +2066,7 @@ export const translations: Record<Language, Translations> = {
     // Processing steps
     stepCleanText: "Clean and correct text",
     stepGenerateTitle: "Generate smart title",
-    stepCreateQuestions: "Create 10 comprehension questions",
+    stepCreateQuestions: "Create B1 level questions",
     stepExtractVocabulary: "Extract important vocabulary",
     stepFormatText: "Format final text",
        // Vocabulary page
@@ -2670,7 +2670,7 @@ export const translations: Record<Language, Translations> = {
     // Processing steps
     stepCleanText: "Metni temizle ve düzelt",
     stepGenerateTitle: "Akıllı başlık oluştur",
-    stepCreateQuestions: "10 anlama sorusu oluştur",
+    stepCreateQuestions: "B1 seviyesi sorular oluştur",
     stepExtractVocabulary: "Önemli kelimeleri çıkar",
     stepFormatText: "Son metni biçimlendir",
     
