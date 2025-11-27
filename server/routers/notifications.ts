@@ -240,7 +240,12 @@ export const notificationsRouter = router({
       })
       .from(notifications)
       .leftJoin(users, eq(notifications.from_user_id, users.id))
-      .where(eq(notifications.user_id, ctx.user.id))
+      .where(
+        and(
+          eq(notifications.user_id, ctx.user.id),
+          sql`${notifications.type} != 'daily_check_marker'`
+        )
+      )
       .orderBy(desc(notifications.created_at))
       .limit(100);
 
