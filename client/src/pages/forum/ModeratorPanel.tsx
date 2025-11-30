@@ -46,6 +46,13 @@ export default function ModeratorPanel() {
       badge: pendingCount && pendingCount > 0 ? pendingCount : undefined,
     },
     {
+      title: "Moderation Dashboard",
+      description: "View statistics and analytics for moderation activities",
+      icon: FileText,
+      href: "/forum/moderation-dashboard",
+      color: "text-green-500",
+    },
+    {
       title: "Moderation Log",
       description: "View audit trail of all moderation actions",
       icon: FileText,

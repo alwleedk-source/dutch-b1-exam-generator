@@ -1,0 +1,37 @@
+=== ADDED FILES ===
+
+Backend:
+1. server/routers/forum_moderation_enhancements.ts
+2. add_moderation_features.sql
+
+Frontend:
+3. client/src/pages/forum/ModerationDashboard.tsx
+4. client/src/pages/forum/ForumReportsEnhanced.tsx
+
+Documentation:
+5. COMMUNITY_MODERATION_ANALYSIS.md
+6. MODERATION_ENHANCEMENTS_GUIDE.md
+7. CHANGES_SUMMARY.md
+8. FILES_CHANGED.txt (this file)
+
+=== MODIFIED FILES ===
+
+Backend:
+1. drizzle/schema.ts
+   - Added forumWarnings table
+   - Added forumModeratorNotes table
+
+2. server/routers.ts
+   - Added import for forumModerationEnhancementsRouter
+   - Added forumModeration to appRouter
+
+3. server/routers/forum.ts
+   - Added imports for forumWarnings and forumModeratorNotes
+
+Frontend:
+4. client/src/pages/forum/ModeratorPanel.tsx
+   - Added link to Moderation Dashboard
+
+=== TOTAL ===
+Added: 8 files
+Modified: 4 files

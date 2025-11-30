@@ -616,6 +616,37 @@ export type ForumModerationAction = typeof forumModerationActions.$inferSelect;
 export type InsertForumModerationAction = typeof forumModerationActions.$inferInsert;
 
 /**
+ * Forum warnings (moderator warnings to users)
+ */
+export const forumWarnings = pgTable("forum_warnings", {
+  id: serial("id").primaryKey(),
+  user_id: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  moderator_id: integer("moderator_id").references(() => users.id, { onDelete: "set null" }).notNull(),
+  reason: text("reason").notNull(),
+  severity: varchar("severity", { length: 20 }).default("medium").notNull(), // low, medium, high
+  topic_id: integer("topic_id").references(() => forumTopics.id, { onDelete: "set null" }),
+  post_id: integer("post_id").references(() => forumPosts.id, { onDelete: "set null" }),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type ForumWarning = typeof forumWarnings.$inferSelect;
+export type InsertForumWarning = typeof forumWarnings.$inferInsert;
+
+/**
+ * Forum moderator notes (internal notes for moderators)
+ */
+export const forumModeratorNotes = pgTable("forum_moderator_notes", {
+  id: serial("id").primaryKey(),
+  user_id: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  moderator_id: integer("moderator_id").references(() => users.id, { onDelete: "set null" }).notNull(),
+  note: text("note").notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type ForumModeratorNote = typeof forumModeratorNotes.$inferSelect;
+export type InsertForumModeratorNote = typeof forumModeratorNotes.$inferInsert;
+
+/**
  * System settings (admin-controlled)
  */
 export const systemSettings = pgTable("system_settings", {

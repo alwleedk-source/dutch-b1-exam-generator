@@ -13,6 +13,8 @@ import {
   forumModerators,
   forumReports,
   forumRateLimits,
+  forumWarnings,
+  forumModeratorNotes,
   users
 } from "../../drizzle/schema";
 import { eq, desc, and, sql, gte } from "drizzle-orm";

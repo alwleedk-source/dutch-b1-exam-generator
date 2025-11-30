@@ -7,6 +7,7 @@ import { TRPCError } from "@trpc/server";
 import * as db from "./db";
 import * as gemini from "./lib/gemini";
 import { forumRouter } from "./routers/forum";
+import { forumModerationEnhancementsRouter } from "./routers/forum_moderation_enhancements";
 import { notificationsRouter } from "./routers/notifications";
 import { settingsRouter } from "./routers/settings";
 
@@ -1682,6 +1683,9 @@ export const appRouter = router({
 
   // Forum router
   forum: forumRouter,
+  
+  // Forum moderation enhancements
+  forumModeration: forumModerationEnhancementsRouter,
   
   // Notifications router
   notifications: notificationsRouter,
