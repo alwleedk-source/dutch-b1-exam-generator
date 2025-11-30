@@ -27,4 +27,3 @@ CREATE INDEX IF NOT EXISTS idx_forum_warnings_created_at ON forum_warnings(creat
 CREATE INDEX IF NOT EXISTS idx_forum_moderator_notes_user_id ON forum_moderator_notes(user_id);
 CREATE INDEX IF NOT EXISTS idx_forum_reports_status ON forum_reports(status);
 CREATE INDEX IF NOT EXISTS idx_forum_reports_created_at ON forum_reports(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_forum_moderation_actions_created_at ON forum_moderation_actions(created_at DESC);
