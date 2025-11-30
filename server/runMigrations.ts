@@ -11,7 +11,8 @@ async function runMigrations() {
     "004_add_ban_columns.sql",
     "005_add_forum_tables.sql",
     "006_add_timer_fields.sql",
-    "1764513010_add_moderation_enhancements.sql"
+    "1764513010_add_moderation_enhancements.sql",
+    "1764514800_add_banned_until_column.sql"
   ];
   
   for (const migrationFile of migrations) {
