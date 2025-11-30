@@ -1136,8 +1136,7 @@ export const forumRouter = router({
       
       return moderators;
     }),
-});
-
+  
   // Moderator: Get report details with full content and user stats
   getReportDetails: moderatorProcedure
     .input(z.object({ reportId: z.number() }))
