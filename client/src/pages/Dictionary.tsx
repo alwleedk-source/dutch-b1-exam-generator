@@ -76,7 +76,7 @@ export default function Dictionary() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">B1 Dictionary</h1>
-          <p className="text-gray-600">Search and explore Dutch B1 vocabulary with translations</p>
+          <p className="text-muted-foreground">Search and explore Dutch B1 vocabulary with translations</p>
         </div>
 
         {/* Search Bar */}
@@ -88,7 +88,7 @@ export default function Dictionary() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t.searchForWord}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
             />
           </div>
         </div>
@@ -99,7 +99,7 @@ export default function Dictionary() {
             onClick={() => setSelectedLetter(null)}
             className={`px-3 py-1 rounded ${selectedLetter === null
               ? "bg-blue-600 text-white"
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
               }`}
           >
             {t.allLetters}
@@ -110,7 +110,7 @@ export default function Dictionary() {
               onClick={() => setSelectedLetter(letter)}
               className={`px-3 py-1 rounded ${selectedLetter === letter
                 ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                 }`}
             >
               {letter}
@@ -128,7 +128,7 @@ export default function Dictionary() {
         {/* Welcome Page when ALL is selected and no search */}
         {!isLoading && selectedLetter === null && searchQuery.length < 2 && (
           <div className="max-w-3xl mx-auto">
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-8 shadow-lg">
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-2 border-blue-200 dark:border-blue-800 rounded-2xl p-8 shadow-lg">
               {/* Icon */}
               <div className="flex justify-center mb-6">
                 <div className="bg-blue-600 text-white rounded-full p-4">
@@ -139,12 +139,12 @@ export default function Dictionary() {
               </div>
 
               {/* Title */}
-              <h2 className="text-3xl font-bold text-center mb-4 text-gray-900">
+              <h2 className="text-3xl font-bold text-center mb-4 text-foreground">
                 {t.dictionaryWelcomeTitle || "📚 B1 Dutch Dictionary"}
               </h2>
 
               {/* Description */}
-              <p className="text-lg text-center text-gray-700 mb-8 leading-relaxed">
+              <p className="text-lg text-center text-muted-foreground mb-8 leading-relaxed">
                 {t.dictionaryWelcomeDesc || "This dictionary contains essential Dutch words that every B1 level learner should know."}
               </p>
 
@@ -158,10 +158,10 @@ export default function Dictionary() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg text-gray-900 mb-1">
+                    <h3 className="font-bold text-lg text-foreground mb-1">
                       {t.dictionaryHowToBrowse || "🔍 How to browse?"}
                     </h3>
-                    <p className="text-gray-700">
+                    <p className="text-muted-foreground">
                       {t.dictionaryHowToBrowseDesc || "Choose a letter from A-Z to browse words, or use the search bar to find specific words."}
                     </p>
                   </div>
@@ -173,10 +173,10 @@ export default function Dictionary() {
                     <Plus className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg text-gray-900 mb-1">
+                    <h3 className="font-bold text-lg text-foreground mb-1">
                       {t.dictionaryHowToAdd || "➕ How to add words to your vocabulary?"}
                     </h3>
-                    <p className="text-gray-700">
+                    <p className="text-muted-foreground">
                       {t.dictionaryHowToAddDesc || "Click the + button next to any word to add it to your personal vocabulary for practice and memorization."}
                     </p>
                   </div>
@@ -188,10 +188,10 @@ export default function Dictionary() {
                     <Volume2 className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg text-gray-900 mb-1">
+                    <h3 className="font-bold text-lg text-foreground mb-1">
                       {t.dictionaryHowToListen || "🔊 How to listen?"}
                     </h3>
-                    <p className="text-gray-700">
+                    <p className="text-muted-foreground">
                       {t.dictionaryHowToListenDesc || "Click the speaker icon to hear the correct pronunciation of each word."}
                     </p>
                   </div>
@@ -209,8 +209,8 @@ export default function Dictionary() {
               </div>
 
               {/* Stats */}
-              <div className="mt-8 pt-6 border-t border-blue-200">
-                <p className="text-center text-sm text-gray-600">
+              <div className="mt-8 pt-6 border-t border-blue-200 dark:border-blue-800">
+                <p className="text-center text-sm text-muted-foreground">
                   {t.dictionaryStats || "📊 Contains thousands of B1-level Dutch words with translations in Arabic, English, and Turkish"}
                 </p>
               </div>
@@ -219,7 +219,7 @@ export default function Dictionary() {
         )}
 
         {words && words.length === 0 && searchQuery.length >= 2 && (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-muted-foreground">
             {t.noResultsFound}
           </div>
         )}
@@ -227,14 +227,14 @@ export default function Dictionary() {
         {words && words.length > 0 && (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {words.map((word) => (
-              <div key={word.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div key={word.id} className="border border-border rounded-lg p-4 hover:shadow-md transition-shadow bg-card">
                 {/* Word Header */}
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-xl font-bold text-gray-900">{word.word}</h3>
+                  <h3 className="text-xl font-bold text-foreground">{word.word}</h3>
                   <div className="flex gap-2">
                     <button
                       onClick={() => playAudio(word.audio_url, word.word)}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                      className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-full transition-colors"
                       title={t.playAudio}
                     >
                       <Volume2 size={20} />
@@ -242,7 +242,7 @@ export default function Dictionary() {
                     <button
                       onClick={() => addToVocabularyMutation.mutate({ word: word.word })}
                       disabled={addToVocabularyMutation.isPending}
-                      className="p-2 text-green-600 hover:bg-green-50 rounded-full transition-colors disabled:opacity-50"
+                      className="p-2 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950 rounded-full transition-colors disabled:opacity-50"
                       title={t.addToVocabulary}
                     >
                       {addToVocabularyMutation.isPending ? (
@@ -256,39 +256,39 @@ export default function Dictionary() {
 
                 {/* Dutch Definition */}
                 {word.definition_nl && (
-                  <div className="mb-3 p-2 bg-blue-50 rounded">
-                    <p className="text-sm text-gray-700">{word.definition_nl}</p>
+                  <div className="mb-3 p-2 bg-blue-50 dark:bg-blue-950 rounded">
+                    <p className="text-sm text-muted-foreground">{word.definition_nl}</p>
                   </div>
                 )}
 
                 {/* Primary Translation (based on user language) */}
                 {getPreferredTranslation(word) && (
                   <div className="mb-3">
-                    <span className="text-xs font-semibold text-gray-500 uppercase">{translationLabel}:</span>
-                    <p className="text-base font-medium text-gray-900 mt-1">{getPreferredTranslation(word)}</p>
+                    <span className="text-xs font-semibold text-muted-foreground uppercase">{translationLabel}:</span>
+                    <p className="text-base font-medium text-foreground mt-1">{getPreferredTranslation(word)}</p>
                   </div>
                 )}
 
                 {/* Other Translations (collapsed) */}
                 <details className="text-sm">
-                  <summary className="cursor-pointer text-gray-500 hover:text-gray-700">Other translations</summary>
+                  <summary className="cursor-pointer text-muted-foreground hover:text-foreground">Other translations</summary>
                   <div className="space-y-1 mt-2 pl-2">
                     {word.translation_ar && language !== 'ar' && (
                       <div>
-                        <span className="text-xs font-semibold text-gray-500">AR:</span>
-                        <span className="text-sm text-gray-700 ml-2">{word.translation_ar}</span>
+                        <span className="text-xs font-semibold text-muted-foreground">AR:</span>
+                        <span className="text-sm text-foreground ml-2">{word.translation_ar}</span>
                       </div>
                     )}
                     {word.translation_en && language !== 'en' && (
                       <div>
-                        <span className="text-xs font-semibold text-gray-500">EN:</span>
-                        <span className="text-sm text-gray-700 ml-2">{word.translation_en}</span>
+                        <span className="text-xs font-semibold text-muted-foreground">EN:</span>
+                        <span className="text-sm text-foreground ml-2">{word.translation_en}</span>
                       </div>
                     )}
                     {word.translation_tr && language !== 'tr' && (
                       <div>
-                        <span className="text-xs font-semibold text-gray-500">TR:</span>
-                        <span className="text-sm text-gray-700 ml-2">{word.translation_tr}</span>
+                        <span className="text-xs font-semibold text-muted-foreground">TR:</span>
+                        <span className="text-sm text-foreground ml-2">{word.translation_tr}</span>
                       </div>
                     )}
                   </div>
