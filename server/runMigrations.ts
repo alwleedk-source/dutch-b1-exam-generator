@@ -31,20 +31,45 @@ async function runMigrations() {
   for (const migrationFile of migrations) {
     try {
       console.log(`[Migrations] Checking ${migrationFile}...`);
-      const migrationPath = join(process.cwd(), "migrations", migrationFile);
 
-      // Check if file exists
-      try {
-        const fs = await import("fs");
-        if (!fs.existsSync(migrationPath)) {
-          console.error(`[Migrations] ❌ File not found: ${migrationPath}`);
-          // Try looking in dist/migrations or ../migrations just in case
+      let migrationPath = join(process.cwd(), "migrations", migrationFile);
+      const fs = await import("fs");
+
+      // Try multiple paths
+      if (!fs.existsSync(migrationPath)) {
+        const altPath1 = join(process.cwd(), "dist", "migrations", migrationFile);
+        const altPath2 = join(process.cwd(), "..", "migrations", migrationFile);
+
+        if (fs.existsSync(altPath1)) {
+          migrationPath = altPath1;
+        } else if (fs.existsSync(altPath2)) {
+          migrationPath = altPath2;
+        } else {
+          console.error(`[Migrations] ❌ File not found in any location: ${migrationFile}`);
+
+          // Fallback: If it's the topic suggestions migration, try to run the SQL directly
+          if (migrationFile === "007_add_topic_suggestions.sql") {
+            console.log("[Migrations] ⚠️ Attempting to create topic_suggestions table directly...");
+            await db.execute(`
+               CREATE TABLE IF NOT EXISTS "topic_suggestions" (
+                 "id" serial PRIMARY KEY NOT NULL,
+                 "user_id" integer NOT NULL,
+                 "topic" varchar(70) NOT NULL,
+                 "created_at" timestamp DEFAULT now() NOT NULL
+               );
+               DO $$ BEGIN
+                ALTER TABLE "topic_suggestions" ADD CONSTRAINT "topic_suggestions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+               EXCEPTION
+                WHEN duplicate_object THEN null;
+               END $$;
+             `);
+            console.log("[Migrations] ✅ topic_suggestions table created directly.");
+          }
           continue;
         }
-      } catch (e) {
-        // ignore fs check error
       }
 
+      console.log(`[Migrations] Found file at: ${migrationPath}`);
       const sql = readFileSync(migrationPath, "utf-8");
 
       await db.execute(sql);
@@ -52,8 +77,6 @@ async function runMigrations() {
       console.log(`[Migrations] ✅ ${migrationFile} executed successfully`);
     } catch (error) {
       console.error(`[Migrations] ❌ Failed to run ${migrationFile}:`, error);
-      // Don't throw, just log. Some migrations might fail if columns already exist.
-      // throw error; 
     }
   }
 
