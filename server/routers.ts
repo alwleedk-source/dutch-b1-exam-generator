@@ -529,12 +529,15 @@ export const appRouter = router({
           });
         } catch (error: any) {
           console.error("[suggestTopic] Failed to create suggestion:", error);
+          console.error("[suggestTopic] Error code:", error.code);
+          console.error("[suggestTopic] Error message:", error.message);
 
-          // Self-healing: If table doesn't exist, create it and retry
-          if (error.message?.includes('relation "topic_suggestions" does not exist') || error.code === '42P01') {
-            console.log("[suggestTopic] ⚠️ Table missing, attempting to create it...");
-            const dbInstance = await db.getDb();
-            if (dbInstance) {
+          // Self-healing: Attempt to create table on ANY error to be safe
+          // This is a "nuclear" fix for the persistent deployment issue
+          console.log("[suggestTopic] ⚠️ Attempting to create topic_suggestions table (Self-Healing)...");
+          const dbInstance = await db.getDb();
+          if (dbInstance) {
+            try {
               await dbInstance.execute(db.sql`
                 CREATE TABLE IF NOT EXISTS "topic_suggestions" (
                   "id" serial PRIMARY KEY NOT NULL,
@@ -548,7 +551,7 @@ export const appRouter = router({
                  WHEN duplicate_object THEN null;
                 END $$;
               `);
-              console.log("[suggestTopic] ✅ Table created, retrying insertion...");
+              console.log("[suggestTopic] ✅ Table creation attempted.");
 
               // Retry insertion
               await db.createTopicSuggestion({
@@ -556,6 +559,9 @@ export const appRouter = router({
                 topic: input.topic,
               });
               return { success: true };
+            } catch (retryError) {
+              console.error("[suggestTopic] ❌ Retry failed:", retryError);
+              throw retryError;
             }
           }
           throw error;
