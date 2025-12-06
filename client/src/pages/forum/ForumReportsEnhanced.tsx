@@ -23,21 +23,21 @@ export default function ForumReportsEnhanced() {
   const [status, setStatus] = useState<"pending" | "resolved" | "all">("pending");
   const [reasonFilter, setReasonFilter] = useState<string>("all");
   const [contentTypeFilter, setContentTypeFilter] = useState<string>("all");
-  
+
   // Dialog states
   const [detailsReportId, setDetailsReportId] = useState<number | null>(null);
   const [banUserId, setBanUserId] = useState<number | null>(null);
   const [banDuration, setBanDuration] = useState<"1day" | "1week" | "1month" | "permanent">("1week");
   const [banReason, setBanReason] = useState("");
   const [userContentUserId, setUserContentUserId] = useState<number | null>(null);
-  
+
   // Quick action states
   const [showDeleteBanDialog, setShowDeleteBanDialog] = useState(false);
   const [showHideWarnDialog, setShowHideWarnDialog] = useState(false);
   const [quickActionData, setQuickActionData] = useState<any>(null);
   const [warnReason, setWarnReason] = useState("");
   const [warnSeverity, setWarnSeverity] = useState<"low" | "medium" | "high">("medium");
-  
+
   const utils = trpc.useUtils();
   const { data: reports, isLoading } = trpc.forum.getReports.useQuery({ status });
   const { data: reportDetails } = trpc.forum.getReportDetails.useQuery(
@@ -56,7 +56,7 @@ export default function ForumReportsEnhanced() {
     { userId: reportDetails?.userStats?.id || 0 },
     { enabled: !!reportDetails?.userStats?.id }
   );
-  
+
   const resolveReportMutation = trpc.forum.resolveReport.useMutation({
     onSuccess: () => {
       toast.success("Report resolved");
@@ -67,7 +67,7 @@ export default function ForumReportsEnhanced() {
       toast.error(error.message);
     },
   });
-  
+
   const dismissReportMutation = trpc.forum.dismissReport.useMutation({
     onSuccess: () => {
       toast.success("Report dismissed");
@@ -78,7 +78,7 @@ export default function ForumReportsEnhanced() {
       toast.error(error.message);
     },
   });
-  
+
   const deleteAndBanMutation = trpc.forumModeration.deleteAndBan.useMutation({
     onSuccess: () => {
       toast.success("Content deleted and user banned");
@@ -90,7 +90,7 @@ export default function ForumReportsEnhanced() {
       toast.error(error.message);
     },
   });
-  
+
   const hideAndWarnMutation = trpc.forumModeration.hideAndWarn.useMutation({
     onSuccess: () => {
       toast.success("Content hidden and user warned");
@@ -102,7 +102,7 @@ export default function ForumReportsEnhanced() {
       toast.error(error.message);
     },
   });
-  
+
   const addNoteMutation = trpc.forumModeration.addModeratorNote.useMutation({
     onSuccess: () => {
       toast.success("Note added");
@@ -112,7 +112,7 @@ export default function ForumReportsEnhanced() {
       toast.error(error.message);
     },
   });
-  
+
   const deleteContentMutation = trpc.forum.deleteContent.useMutation({
     onSuccess: () => {
       toast.success("Content deleted successfully");
@@ -123,7 +123,7 @@ export default function ForumReportsEnhanced() {
       toast.error(error.message);
     },
   });
-  
+
   const bulkDeleteMutation = trpc.forum.bulkDeleteUserContent.useMutation({
     onSuccess: () => {
       toast.success("User content deleted successfully");
@@ -133,7 +133,7 @@ export default function ForumReportsEnhanced() {
       toast.error(error.message);
     },
   });
-  
+
   // Check if user is moderator or admin
   if (!user || (user.role !== "moderator" && user.role !== "admin")) {
     return (
@@ -152,11 +152,11 @@ export default function ForumReportsEnhanced() {
       </div>
     );
   }
-  
+
   // Filter reports
   const filteredReports = useMemo(() => {
     if (!reports) return [];
-    
+
     return reports.filter(report => {
       if (reasonFilter !== "all" && report.reason !== reasonFilter) return false;
       if (contentTypeFilter === "topic" && !report.topic_id) return false;
@@ -164,7 +164,7 @@ export default function ForumReportsEnhanced() {
       return true;
     });
   }, [reports, reasonFilter, contentTypeFilter]);
-  
+
   const getReasonText = (reason: string) => {
     const reasons: Record<string, string> = {
       spam: "Spam",
@@ -175,7 +175,7 @@ export default function ForumReportsEnhanced() {
     };
     return reasons[reason] || reason;
   };
-  
+
   const getDurationText = (duration: string) => {
     const durations: Record<string, string> = {
       "1day": "1 Day",
@@ -185,7 +185,7 @@ export default function ForumReportsEnhanced() {
     };
     return durations[duration] || duration;
   };
-  
+
   const getSeverityColor = (severity: string) => {
     const colors: Record<string, string> = {
       low: "bg-yellow-500/20 text-yellow-700 dark:text-yellow-300",
@@ -194,11 +194,11 @@ export default function ForumReportsEnhanced() {
     };
     return colors[severity] || colors.medium;
   };
-  
+
   return (
     <div className="min-h-screen bg-gradient-bg">
       <AppHeader />
-      
+
       <main className="container mx-auto px-4 py-8 max-w-5xl">
         <Link href="/forum/moderator">
           <Button variant="ghost" size="sm" className="mb-4">
@@ -206,12 +206,12 @@ export default function ForumReportsEnhanced() {
             Back to Moderator Panel
           </Button>
         </Link>
-        
+
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between flex-wrap gap-4">
               <CardTitle className="text-2xl">Reports Management</CardTitle>
-              
+
               <div className="flex items-center gap-2 flex-wrap">
                 <Select value={reasonFilter} onValueChange={setReasonFilter}>
                   <SelectTrigger className="w-40">
@@ -227,7 +227,7 @@ export default function ForumReportsEnhanced() {
                     <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
-                
+
                 <Select value={contentTypeFilter} onValueChange={setContentTypeFilter}>
                   <SelectTrigger className="w-40">
                     <SelectValue placeholder="Type" />
@@ -238,7 +238,7 @@ export default function ForumReportsEnhanced() {
                     <SelectItem value="post">Posts</SelectItem>
                   </SelectContent>
                 </Select>
-                
+
                 <Select value={status} onValueChange={(v: any) => setStatus(v)}>
                   <SelectTrigger className="w-40">
                     <SelectValue />
@@ -252,7 +252,7 @@ export default function ForumReportsEnhanced() {
               </div>
             </div>
           </CardHeader>
-          
+
           <CardContent>
             {isLoading ? (
               <div className="text-center py-8 text-muted-foreground">Loading...</div>
@@ -272,34 +272,33 @@ export default function ForumReportsEnhanced() {
                             <Badge variant={report.topic_id ? "default" : "secondary"}>
                               {report.topic_id ? "Topic" : "Post"}
                             </Badge>
-                            <span className={`text-xs px-2 py-1 rounded ${
-                              report.status === "pending" 
-                                ? "bg-yellow-500/20 text-yellow-700 dark:text-yellow-300" 
+                            <span className={`text-xs px-2 py-1 rounded ${report.status === "pending"
+                                ? "bg-yellow-500/20 text-yellow-700 dark:text-yellow-300"
                                 : report.status === "resolved"
-                                ? "bg-green-500/20 text-green-700 dark:text-green-300"
-                                : "bg-gray-500/20 text-gray-700 dark:text-gray-300"
-                            }`}>
+                                  ? "bg-green-500/20 text-green-700 dark:text-green-300"
+                                  : "bg-gray-500/20 text-gray-700 dark:text-gray-300"
+                              }`}>
                               {report.status}
                             </span>
                           </div>
-                          
+
                           <p className="text-sm text-muted-foreground mb-2">
                             Reported by: {report.reporter_name || "Unknown"}
                           </p>
-                          
+
                           {report.details && (
                             <p className="text-sm mb-2 text-muted-foreground italic">
                               "{report.details.substring(0, 100)}{report.details.length > 100 ? '...' : ''}"
                             </p>
                           )}
-                          
+
                           <div className="flex gap-2 text-sm text-muted-foreground">
                             <span>
                               {report.created_at && formatDistanceToNow(new Date(report.created_at), { addSuffix: true })}
                             </span>
                           </div>
                         </div>
-                        
+
                         <div className="flex gap-2">
                           <Button
                             variant="outline"
@@ -319,7 +318,7 @@ export default function ForumReportsEnhanced() {
           </CardContent>
         </Card>
       </main>
-      
+
       {/* Report Details Modal - Enhanced with warnings and notes */}
       <Dialog open={!!detailsReportId} onOpenChange={(open) => !open && setDetailsReportId(null)}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -327,7 +326,7 @@ export default function ForumReportsEnhanced() {
             <DialogTitle>Report Details</DialogTitle>
             <DialogDescription>Review reported content and take action</DialogDescription>
           </DialogHeader>
-          
+
           {reportDetails && (
             <div className="space-y-4">
               {/* Report Info */}
@@ -342,7 +341,7 @@ export default function ForumReportsEnhanced() {
                   <p><span className="font-medium">Status:</span> {reportDetails.status}</p>
                 </div>
               </div>
-              
+
               {/* Reported Content */}
               {reportDetails.content && (
                 <div className="p-4 border rounded-lg">
@@ -351,10 +350,10 @@ export default function ForumReportsEnhanced() {
                     <p className="text-sm"><span className="font-medium">Type:</span> {reportDetails.content.type}</p>
                     <p className="text-sm"><span className="font-medium">Author:</span> {reportDetails.content.user_name}</p>
                     {reportDetails.content.type === "topic" && (
-                      <p className="text-sm"><span className="font-medium">Title:</span> {reportDetails.content.title}</p>
+                      <p className="text-sm"><span className="font-medium">Title:</span> {(reportDetails.content as any).title}</p>
                     )}
                     <div className="mt-2 p-3 bg-muted rounded max-h-64 overflow-y-auto">
-                      <div 
+                      <div
                         className="prose prose-sm dark:prose-invert max-w-none"
                         dangerouslySetInnerHTML={{ __html: reportDetails.content.content }}
                       />
@@ -362,7 +361,7 @@ export default function ForumReportsEnhanced() {
                   </div>
                 </div>
               )}
-              
+
               {/* User Stats */}
               {reportDetails.userStats && (
                 <div className="p-4 bg-muted rounded-lg">
@@ -383,7 +382,7 @@ export default function ForumReportsEnhanced() {
                     <div>
                       <p className="text-muted-foreground">Account Age</p>
                       <p className="text-sm">
-                        {reportDetails.userStats.created_at && 
+                        {reportDetails.userStats.created_at &&
                           formatDistanceToNow(new Date(reportDetails.userStats.created_at), { addSuffix: true })}
                       </p>
                     </div>
@@ -398,7 +397,7 @@ export default function ForumReportsEnhanced() {
                   </div>
                 </div>
               )}
-              
+
               {/* User Warnings */}
               {userWarnings && userWarnings.length > 0 && (
                 <div className="p-4 border-l-4 border-orange-500 bg-orange-50 dark:bg-orange-950/20 rounded">
@@ -426,7 +425,7 @@ export default function ForumReportsEnhanced() {
                   </div>
                 </div>
               )}
-              
+
               {/* Moderator Notes */}
               {moderatorNotes && moderatorNotes.length > 0 && (
                 <div className="p-4 border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-950/20 rounded">
@@ -445,7 +444,7 @@ export default function ForumReportsEnhanced() {
               )}
             </div>
           )}
-          
+
           <DialogFooter className="flex-wrap gap-2">
             {reportDetails?.status === "pending" && (
               <>
@@ -462,7 +461,7 @@ export default function ForumReportsEnhanced() {
                   <Ban className="h-4 w-4 mr-1" />
                   Delete & Ban
                 </Button>
-                
+
                 <Button
                   variant="outline"
                   size="sm"
@@ -475,7 +474,7 @@ export default function ForumReportsEnhanced() {
                   <EyeOff className="h-4 w-4 mr-1" />
                   Hide & Warn
                 </Button>
-                
+
                 {/* Standard Actions */}
                 <Button
                   variant="outline"
@@ -494,7 +493,7 @@ export default function ForumReportsEnhanced() {
                   <Trash2 className="h-4 w-4 mr-1" />
                   Delete Only
                 </Button>
-                
+
                 <Button
                   variant="outline"
                   size="sm"
@@ -507,7 +506,7 @@ export default function ForumReportsEnhanced() {
                   <User className="h-4 w-4 mr-1" />
                   View User Content
                 </Button>
-                
+
                 <Button
                   variant="default"
                   size="sm"
@@ -516,7 +515,7 @@ export default function ForumReportsEnhanced() {
                   <CheckCircle className="h-4 w-4 mr-1" />
                   Resolve
                 </Button>
-                
+
                 <Button
                   variant="ghost"
                   size="sm"
@@ -530,7 +529,7 @@ export default function ForumReportsEnhanced() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       {/* Delete & Ban Dialog */}
       <Dialog open={showDeleteBanDialog} onOpenChange={setShowDeleteBanDialog}>
         <DialogContent>
@@ -538,7 +537,7 @@ export default function ForumReportsEnhanced() {
             <DialogTitle>Delete Content & Ban User</DialogTitle>
             <DialogDescription>This will delete the reported content and ban the user</DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div>
               <Label>Ban Duration</Label>
@@ -561,7 +560,7 @@ export default function ForumReportsEnhanced() {
                 </div>
               </RadioGroup>
             </div>
-            
+
             <div>
               <Label>Reason (required)</Label>
               <Textarea
@@ -572,7 +571,7 @@ export default function ForumReportsEnhanced() {
               />
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button variant="ghost" onClick={() => setShowDeleteBanDialog(false)}>Cancel</Button>
             <Button
@@ -599,7 +598,7 @@ export default function ForumReportsEnhanced() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       {/* Hide & Warn Dialog */}
       <Dialog open={showHideWarnDialog} onOpenChange={setShowHideWarnDialog}>
         <DialogContent>
@@ -607,7 +606,7 @@ export default function ForumReportsEnhanced() {
             <DialogTitle>Hide Content & Warn User</DialogTitle>
             <DialogDescription>This will hide the content and send a warning to the user</DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div>
               <Label>Warning Severity</Label>
@@ -626,7 +625,7 @@ export default function ForumReportsEnhanced() {
                 </div>
               </RadioGroup>
             </div>
-            
+
             <div>
               <Label>Warning Reason (required)</Label>
               <Textarea
@@ -637,7 +636,7 @@ export default function ForumReportsEnhanced() {
               />
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button variant="ghost" onClick={() => setShowHideWarnDialog(false)}>Cancel</Button>
             <Button
@@ -664,7 +663,7 @@ export default function ForumReportsEnhanced() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       {/* User Content Dialog - Same as before */}
       <Dialog open={!!userContentUserId} onOpenChange={(open) => !open && setUserContentUserId(null)}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -672,7 +671,7 @@ export default function ForumReportsEnhanced() {
             <DialogTitle>User Content</DialogTitle>
             <DialogDescription>All topics and posts by this user</DialogDescription>
           </DialogHeader>
-          
+
           {userContent && (
             <div className="space-y-4">
               {/* Topics */}
@@ -710,7 +709,7 @@ export default function ForumReportsEnhanced() {
                   </div>
                 )}
               </div>
-              
+
               {/* Posts */}
               <div>
                 <h3 className="font-semibold mb-2">Posts ({userContent.posts.length})</h3>
@@ -723,7 +722,7 @@ export default function ForumReportsEnhanced() {
                         <CardContent className="pt-4">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1">
-                              <div 
+                              <div
                                 className="text-sm prose prose-sm dark:prose-invert max-w-none line-clamp-2"
                                 dangerouslySetInnerHTML={{ __html: post.content }}
                               />
@@ -756,7 +755,7 @@ export default function ForumReportsEnhanced() {
               </div>
             </div>
           )}
-          
+
           <DialogFooter>
             <Button
               variant="destructive"

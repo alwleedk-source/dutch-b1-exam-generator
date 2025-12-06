@@ -20,14 +20,14 @@ export default function ForumReports() {
   const { t } = useLanguage();
   const [, setLocation] = useLocation();
   const [status, setStatus] = useState<"pending" | "resolved" | "all">("pending");
-  
+
   // Dialog states
   const [detailsReportId, setDetailsReportId] = useState<number | null>(null);
   const [banUserId, setBanUserId] = useState<number | null>(null);
   const [banDuration, setBanDuration] = useState<"1day" | "1week" | "1month" | "permanent">("1week");
   const [banReason, setBanReason] = useState("");
   const [userContentUserId, setUserContentUserId] = useState<number | null>(null);
-  
+
   const utils = trpc.useUtils();
   const { data: reports, isLoading } = trpc.forum.getReports.useQuery({ status });
   const { data: reportDetails } = trpc.forum.getReportDetails.useQuery(
@@ -38,7 +38,7 @@ export default function ForumReports() {
     { userId: userContentUserId! },
     { enabled: !!userContentUserId }
   );
-  
+
   const resolveReportMutation = trpc.forum.resolveReport.useMutation({
     onSuccess: () => {
       toast.success("Report resolved");
@@ -49,7 +49,7 @@ export default function ForumReports() {
       toast.error(error.message);
     },
   });
-  
+
   const dismissReportMutation = trpc.forum.dismissReport.useMutation({
     onSuccess: () => {
       toast.success("Report dismissed");
@@ -60,7 +60,7 @@ export default function ForumReports() {
       toast.error(error.message);
     },
   });
-  
+
   const banUserMutation = trpc.forum.banUser.useMutation({
     onSuccess: () => {
       toast.success("User banned successfully");
@@ -73,7 +73,7 @@ export default function ForumReports() {
       toast.error(error.message);
     },
   });
-  
+
   const deleteContentMutation = trpc.forum.deleteContent.useMutation({
     onSuccess: () => {
       toast.success("Content deleted successfully");
@@ -84,7 +84,7 @@ export default function ForumReports() {
       toast.error(error.message);
     },
   });
-  
+
   const bulkDeleteMutation = trpc.forum.bulkDeleteUserContent.useMutation({
     onSuccess: () => {
       toast.success("User content deleted successfully");
@@ -94,7 +94,7 @@ export default function ForumReports() {
       toast.error(error.message);
     },
   });
-  
+
   // Check if user is moderator or admin
   if (!user || (user.role !== "moderator" && user.role !== "admin")) {
     return (
@@ -113,7 +113,7 @@ export default function ForumReports() {
       </div>
     );
   }
-  
+
   const getReasonText = (reason: string) => {
     const reasons: Record<string, string> = {
       spam: "Spam",
@@ -124,7 +124,7 @@ export default function ForumReports() {
     };
     return reasons[reason] || reason;
   };
-  
+
   const getDurationText = (duration: string) => {
     const durations: Record<string, string> = {
       "1day": "1 Day",
@@ -134,11 +134,11 @@ export default function ForumReports() {
     };
     return durations[duration] || duration;
   };
-  
+
   return (
     <div className="min-h-screen bg-gradient-bg">
       <AppHeader />
-      
+
       <main className="container mx-auto px-4 py-8 max-w-5xl">
         <Link href="/forum/moderator">
           <Button variant="ghost" size="sm" className="mb-4">
@@ -146,12 +146,12 @@ export default function ForumReports() {
             Back to Moderator Panel
           </Button>
         </Link>
-        
+
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-2xl">Reports Management</CardTitle>
-              
+
               <Select value={status} onValueChange={(v: any) => setStatus(v)}>
                 <SelectTrigger className="w-40">
                   <SelectValue />
@@ -164,7 +164,7 @@ export default function ForumReports() {
               </Select>
             </div>
           </CardHeader>
-          
+
           <CardContent>
             {isLoading ? (
               <div className="text-center py-8 text-muted-foreground">Loading...</div>
@@ -179,34 +179,33 @@ export default function ForumReports() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
                             <span className="font-semibold">{getReasonText(report.reason)}</span>
-                            <span className={`text-xs px-2 py-1 rounded ${
-                              report.status === "pending" 
-                                ? "bg-yellow-500/20 text-yellow-700 dark:text-yellow-300" 
+                            <span className={`text-xs px-2 py-1 rounded ${report.status === "pending"
+                                ? "bg-yellow-500/20 text-yellow-700 dark:text-yellow-300"
                                 : report.status === "resolved"
-                                ? "bg-green-500/20 text-green-700 dark:text-green-300"
-                                : "bg-gray-500/20 text-gray-700 dark:text-gray-300"
-                            }`}>
+                                  ? "bg-green-500/20 text-green-700 dark:text-green-300"
+                                  : "bg-gray-500/20 text-gray-700 dark:text-gray-300"
+                              }`}>
                               {report.status}
                             </span>
                           </div>
-                          
+
                           <p className="text-sm text-muted-foreground mb-2">
                             Reported by: {report.reporter_name || "Unknown"}
                           </p>
-                          
+
                           {report.details && (
                             <p className="text-sm mb-2 text-muted-foreground italic">
                               "{report.details.substring(0, 100)}{report.details.length > 100 ? '...' : ''}"
                             </p>
                           )}
-                          
+
                           <div className="flex gap-2 text-sm text-muted-foreground">
                             <span>
                               {report.created_at && formatDistanceToNow(new Date(report.created_at), { addSuffix: true })}
                             </span>
                           </div>
                         </div>
-                        
+
                         <div className="flex gap-2">
                           <Button
                             variant="outline"
@@ -226,7 +225,7 @@ export default function ForumReports() {
           </CardContent>
         </Card>
       </main>
-      
+
       {/* Report Details Modal */}
       <Dialog open={!!detailsReportId} onOpenChange={(open) => !open && setDetailsReportId(null)}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -234,7 +233,7 @@ export default function ForumReports() {
             <DialogTitle>Report Details</DialogTitle>
             <DialogDescription>Review reported content and take action</DialogDescription>
           </DialogHeader>
-          
+
           {reportDetails && (
             <div className="space-y-4">
               {/* Report Info */}
@@ -249,7 +248,7 @@ export default function ForumReports() {
                   <p><span className="font-medium">Status:</span> {reportDetails.status}</p>
                 </div>
               </div>
-              
+
               {/* Reported Content */}
               {reportDetails.content && (
                 <div className="p-4 border rounded-lg">
@@ -258,10 +257,10 @@ export default function ForumReports() {
                     <p className="text-sm"><span className="font-medium">Type:</span> {reportDetails.content.type === "topic" ? "Topic" : "Post"}</p>
                     <p className="text-sm"><span className="font-medium">Author:</span> {reportDetails.content.user_name}</p>
                     {reportDetails.content.type === "topic" && (
-                      <p className="text-sm"><span className="font-medium">Title:</span> {reportDetails.content.title}</p>
+                      <p className="text-sm"><span className="font-medium">Title:</span> {(reportDetails.content as any).title}</p>
                     )}
                     <div className="mt-2 p-3 bg-muted rounded">
-                      <div 
+                      <div
                         className="prose prose-sm dark:prose-invert max-w-none"
                         dangerouslySetInnerHTML={{ __html: reportDetails.content.content }}
                       />
@@ -269,7 +268,7 @@ export default function ForumReports() {
                   </div>
                 </div>
               )}
-              
+
               {/* User Stats */}
               {reportDetails.userStats && (
                 <div className="p-4 bg-muted rounded-lg">
@@ -290,7 +289,7 @@ export default function ForumReports() {
                     <div>
                       <p className="text-muted-foreground">Account Age</p>
                       <p className="text-sm">
-                        {reportDetails.userStats.created_at && 
+                        {reportDetails.userStats.created_at &&
                           formatDistanceToNow(new Date(reportDetails.userStats.created_at), { addSuffix: true })}
                       </p>
                     </div>
@@ -307,7 +306,7 @@ export default function ForumReports() {
               )}
             </div>
           )}
-          
+
           <DialogFooter className="flex-wrap gap-2">
             {reportDetails?.status === "pending" && (
               <>
@@ -324,7 +323,7 @@ export default function ForumReports() {
                   <Ban className="h-4 w-4 mr-1" />
                   Ban User
                 </Button>
-                
+
                 <Button
                   variant="outline"
                   size="sm"
@@ -342,7 +341,7 @@ export default function ForumReports() {
                   <Trash2 className="h-4 w-4 mr-1" />
                   Delete Content
                 </Button>
-                
+
                 <Button
                   variant="outline"
                   size="sm"
@@ -355,7 +354,7 @@ export default function ForumReports() {
                   <User className="h-4 w-4 mr-1" />
                   View User Content
                 </Button>
-                
+
                 <Button
                   variant="default"
                   size="sm"
@@ -364,7 +363,7 @@ export default function ForumReports() {
                   <CheckCircle className="h-4 w-4 mr-1" />
                   Resolve
                 </Button>
-                
+
                 <Button
                   variant="ghost"
                   size="sm"
@@ -378,7 +377,7 @@ export default function ForumReports() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       {/* Ban User Dialog */}
       <Dialog open={!!banUserId} onOpenChange={(open) => !open && setBanUserId(null)}>
         <DialogContent>
@@ -386,7 +385,7 @@ export default function ForumReports() {
             <DialogTitle>Ban User</DialogTitle>
             <DialogDescription>Select ban duration and provide a reason</DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div>
               <Label>Duration</Label>
@@ -409,7 +408,7 @@ export default function ForumReports() {
                 </div>
               </RadioGroup>
             </div>
-            
+
             <div>
               <Label>Reason (required)</Label>
               <Textarea
@@ -420,7 +419,7 @@ export default function ForumReports() {
               />
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button variant="ghost" onClick={() => setBanUserId(null)}>Cancel</Button>
             <Button
@@ -443,7 +442,7 @@ export default function ForumReports() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       {/* User Content Dialog */}
       <Dialog open={!!userContentUserId} onOpenChange={(open) => !open && setUserContentUserId(null)}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -451,7 +450,7 @@ export default function ForumReports() {
             <DialogTitle>User Content</DialogTitle>
             <DialogDescription>All topics and posts by this user</DialogDescription>
           </DialogHeader>
-          
+
           {userContent && (
             <div className="space-y-4">
               {/* Topics */}
@@ -489,7 +488,7 @@ export default function ForumReports() {
                   </div>
                 )}
               </div>
-              
+
               {/* Posts */}
               <div>
                 <h3 className="font-semibold mb-2">Posts ({userContent.posts.length})</h3>
@@ -502,7 +501,7 @@ export default function ForumReports() {
                         <CardContent className="pt-4">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1">
-                              <div 
+                              <div
                                 className="text-sm prose prose-sm dark:prose-invert max-w-none line-clamp-2"
                                 dangerouslySetInnerHTML={{ __html: post.content }}
                               />
@@ -535,7 +534,7 @@ export default function ForumReports() {
               </div>
             </div>
           )}
-          
+
           <DialogFooter>
             <Button
               variant="destructive"

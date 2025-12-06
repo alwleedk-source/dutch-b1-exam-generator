@@ -12,6 +12,7 @@ export interface Translations {
   progress: string;
   vocabulary: string;
   admin: string;
+  dictionary: string;
 
   // Auth
   login: string;
@@ -62,6 +63,7 @@ export interface Translations {
   startExam: string;
   submitExam: string;
   question: string;
+  questions: string;
   of: string;
   timeSpent: string;
   score: string;
@@ -151,6 +153,8 @@ export interface Translations {
   success: string;
   confirm: string;
   close: string;
+  optional: string;
+  note: string;
   correct: string;
   incorrect: string;
   checkingDuplicate: string;
@@ -318,6 +322,9 @@ export interface Translations {
   examReview: string;
   yourAnswer: string;
   correctAnswer: string;
+  notAnswered: string;
+  explanation: string;
+  evidenceFromText: string;
 
   // Progress page
   noProgressYet: string;
@@ -359,6 +366,7 @@ export interface Translations {
   forumTitle: string;
   forumDescription: string;
   createNewTopic: string;
+  newTopic: string;
   backToForum: string;
   topics: string;
   noTopicsYet: string;
@@ -637,6 +645,7 @@ export const translations: Record<Language, Translations> = {
     progress: "Voortgang",
     vocabulary: "Woordenschat",
     admin: "Beheer",
+    dictionary: "Woordenboek",
 
     // Auth
     login: "Inloggen",
@@ -687,6 +696,7 @@ export const translations: Record<Language, Translations> = {
     startExam: "Examen Starten",
     submitExam: "Examen Indienen",
     question: "Vraag",
+    questions: "Vragen",
     of: "van",
     timeSpent: "Tijd besteed",
     score: "Score",
@@ -771,6 +781,8 @@ export const translations: Record<Language, Translations> = {
     success: "Succes",
     confirm: "Bevestigen",
     close: "Sluiten",
+    optional: "Optioneel",
+    note: "Opmerking",
     correct: "Correct",
     incorrect: "Onjuist",
     checkingDuplicate: "Controleren op dubbele tekst...",
@@ -938,6 +950,9 @@ export const translations: Record<Language, Translations> = {
     examReview: "Examen Beoordeling",
     yourAnswer: "Jouw Antwoord",
     correctAnswer: "Correct Antwoord",
+    notAnswered: "Niet beantwoord",
+    explanation: "Uitleg",
+    evidenceFromText: "Bewijs uit de tekst",
 
     // Progress page
     noProgressYet: "Nog geen voortgang",
@@ -979,6 +994,7 @@ export const translations: Record<Language, Translations> = {
     forumTitle: "Community",
     forumDescription: "Discussieer, deel ervaringen en stel vragen",
     createNewTopic: "Nieuw Onderwerp",
+    newTopic: "Nieuw",
     backToForum: "Terug naar Community",
     topics: "Onderwerpen",
     noTopicsYet: "Nog geen onderwerpen. Wees de eerste om een discussie te starten!",
@@ -986,7 +1002,7 @@ export const translations: Record<Language, Translations> = {
     replies: "Reacties",
     postReply: "Plaats Reactie",
     writeYourReply: "Schrijf je reactie...",
-    posting: "Plaatsen...",
+    posting: "Aan het plaatsen...",
     replyPosted: "Reactie succesvol geplaatst!",
     replyCannotBeEmpty: "Reactie kan niet leeg zijn",
     topicNotFound: "Onderwerp niet gevonden",
@@ -997,7 +1013,7 @@ export const translations: Record<Language, Translations> = {
     enterTopicTitle: "Voer een beschrijvende titel in...",
     content: "Inhoud",
     writeYourTopic: "Schrijf je onderwerp...",
-    creating: "Aanmaken...",
+    creating: "Aan het aanmaken...",
     topicCreated: "Onderwerp succesvol aangemaakt!",
     fillAllFields: "Vul alle velden in",
     category: "Categorie",
@@ -1248,6 +1264,7 @@ export const translations: Record<Language, Translations> = {
     progress: "التقدم",
     vocabulary: "المفردات",
     admin: "الإدارة",
+    dictionary: "القاموس",
 
     // Auth
     login: "تسجيل الدخول",
@@ -1298,6 +1315,7 @@ export const translations: Record<Language, Translations> = {
     startExam: "بدء الامتحان",
     submitExam: "تقديم الامتحان",
     question: "سؤال",
+    questions: "أسئلة",
     of: "من",
     timeSpent: "الوقت المستغرق",
     score: "النتيجة",
@@ -1382,6 +1400,8 @@ export const translations: Record<Language, Translations> = {
     success: "نجاح",
     confirm: "تأكيد",
     close: "إغلاق",
+    optional: "اختياري",
+    note: "ملاحظة",
     correct: "صحيح",
     incorrect: "خطأ",
     checkingDuplicate: "التحقق من النص المكرر...",
@@ -1547,6 +1567,9 @@ export const translations: Record<Language, Translations> = {
     examReview: "مراجعة الامتحان",
     yourAnswer: "إجابتك",
     correctAnswer: "الإجابة الصحيحة",
+    notAnswered: "لم تتم الإجابة",
+    explanation: "التفسير",
+    evidenceFromText: "الدليل من النص",
 
     // Progress page
     noProgressYet: "لا يوجد تقدم بعد",
@@ -1588,6 +1611,7 @@ export const translations: Record<Language, Translations> = {
     forumTitle: "المجتمع",
     forumDescription: "ناقش وشارك التجارب واطرح الأسئلة",
     createNewTopic: "موضوع جديد",
+    newTopic: "جديد",
     backToForum: "العودة للمجتمع",
     topics: "مواضيع",
     noTopicsYet: "لا توجد مواضيع بعد. كن أول من يبدأ نقاشًا!",
@@ -1857,6 +1881,7 @@ export const translations: Record<Language, Translations> = {
     progress: "Progress",
     vocabulary: "Vocabulary",
     admin: "Admin",
+    dictionary: "Dictionary",
 
     // Auth
     login: "Login",
@@ -1907,6 +1932,7 @@ export const translations: Record<Language, Translations> = {
     startExam: "Start Exam",
     submitExam: "Submit Exam",
     question: "Question",
+    questions: "Questions",
     of: "of",
     timeSpent: "Time spent",
     score: "Score",
@@ -1991,6 +2017,8 @@ export const translations: Record<Language, Translations> = {
     success: "Success",
     confirm: "Confirm",
     close: "Close",
+    optional: "Optional",
+    note: "Note",
     correct: "Correct",
     incorrect: "Incorrect",
     checkingDuplicate: "Checking for duplicate text...",
@@ -2157,6 +2185,9 @@ export const translations: Record<Language, Translations> = {
     examReview: "Exam Review",
     yourAnswer: "Your Answer",
     correctAnswer: "Correct Answer",
+    notAnswered: "Not answered",
+    explanation: "Explanation",
+    evidenceFromText: "Evidence from text",
 
     // Progress page
     noProgressYet: "No progress yet",
@@ -2198,6 +2229,7 @@ export const translations: Record<Language, Translations> = {
     forumTitle: "Community",
     forumDescription: "Discuss, share experiences and ask questions",
     createNewTopic: "New Topic",
+    newTopic: "New",
     backToForum: "Back to Community",
     topics: "Topics",
     noTopicsYet: "No topics yet. Be the first to start a discussion!",
@@ -2467,6 +2499,7 @@ export const translations: Record<Language, Translations> = {
     progress: "İlerleme",
     vocabulary: "Kelime Bilgisi",
     admin: "Yönetim",
+    dictionary: "Sözlük",
 
     // Auth
     login: "Giriş Yap",
@@ -2517,6 +2550,7 @@ export const translations: Record<Language, Translations> = {
     startExam: "Sınava Başla",
     submitExam: "Sınavı Gönder",
     question: "Soru",
+    questions: "Sorular",
     of: "/",
     timeSpent: "Harcanan süre",
     score: "Puan",
@@ -2601,6 +2635,8 @@ export const translations: Record<Language, Translations> = {
     success: "Başarılı",
     confirm: "Onayla",
     close: "Kapat",
+    optional: "İsteğe bağlı",
+    note: "Not",
     correct: "Doğru",
     incorrect: "Yanlış",
     checkingDuplicate: "Yinelenen metin kontrol ediliyor...",
@@ -2768,6 +2804,9 @@ export const translations: Record<Language, Translations> = {
     examReview: "Sınav İncelemesi",
     yourAnswer: "Cevabınız",
     correctAnswer: "Doğru Cevap",
+    notAnswered: "Cevaplanmadı",
+    explanation: "Açıklama",
+    evidenceFromText: "Metinden kanıt",
 
     // Progress page
     noProgressYet: "Henüz ilerleme yok",
@@ -2809,6 +2848,7 @@ export const translations: Record<Language, Translations> = {
     forumTitle: "Topluluk",
     forumDescription: "Tartışın, deneyimleri paylaşın ve sorular sorun",
     createNewTopic: "Yeni Konu",
+    newTopic: "Yeni",
     backToForum: "Topluluğa Dön",
     topics: "Konular",
     noTopicsYet: "Henüz konu yok. Tartışmayı başlatan ilk kişi olun!",

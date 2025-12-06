@@ -116,7 +116,7 @@ export default function ExamReview() {
                     </div>
                     <div className="flex items-center gap-1.5">
                       <XCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-500" />
-                      <span className="text-sm sm:text-base font-semibold">{exam.total_questions - exam.correct_answers} {t.incorrect}</span>
+                      <span className="text-sm sm:text-base font-semibold">{exam.total_questions - (exam.correct_answers ?? 0)} {t.incorrect}</span>
                     </div>
                   </div>
                 </div>
@@ -161,13 +161,12 @@ export default function ExamReview() {
                         return (
                           <div
                             key={optIndex}
-                            className={`p-2.5 sm:p-3 rounded-lg border-2 ${
-                              isCorrectOption
+                            className={`p-2.5 sm:p-3 rounded-lg border-2 ${isCorrectOption
                                 ? 'border-green-500 bg-green-500/10'
                                 : isUserAnswer
-                                ? 'border-red-500 bg-red-500/10'
-                                : 'border-border'
-                            }`}
+                                  ? 'border-red-500 bg-red-500/10'
+                                  : 'border-border'
+                              }`}
                           >
                             <div className="flex items-start gap-2">
                               <span className="font-semibold text-sm sm:text-base flex-shrink-0">{optionLetter}.</span>

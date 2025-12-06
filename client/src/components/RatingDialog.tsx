@@ -17,12 +17,12 @@ interface RatingDialogProps {
   existingRating?: { rating: number; comment?: string };
 }
 
-export function RatingDialog({ 
-  open, 
-  onOpenChange, 
-  textId, 
+export function RatingDialog({
+  open,
+  onOpenChange,
+  textId,
   textTitle,
-  existingRating 
+  existingRating
 }: RatingDialogProps) {
   const { t } = useLanguage();
   const queryClient = useQueryClient();
@@ -48,7 +48,7 @@ export function RatingDialog({
       toast.error("Please select a rating");
       return;
     }
-    
+
     rateTextMutation.mutate({
       text_id: textId,
       rating,
@@ -132,11 +132,11 @@ export function RatingDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={handleSubmit}
-            disabled={rating === 0 || rateTextMutation.isLoading}
+            disabled={rating === 0 || rateTextMutation.isPending}
           >
-            {rateTextMutation.isLoading ? "Submitting..." : "Submit Rating"}
+            {rateTextMutation.isPending ? "Submitting..." : "Submit Rating"}
           </Button>
         </DialogFooter>
       </DialogContent>

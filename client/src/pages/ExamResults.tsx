@@ -80,27 +80,27 @@ export default function ExamResults() {
   let performanceAnalysis: any = null;
   let recommendations: string[] = [];
   let skillAnalysis: any = null;
-  
+
   try {
-    if (typeof examData.performance_analysis === 'string') {
-      performanceAnalysis = JSON.parse(examData.performance_analysis);
+    if (typeof (examData as any).performance_analysis === 'string') {
+      performanceAnalysis = JSON.parse((examData as any).performance_analysis);
     } else {
-      performanceAnalysis = examData.performance_analysis;
+      performanceAnalysis = (examData as any).performance_analysis;
     }
-    if (typeof examData.recommendations === 'string') {
-      recommendations = JSON.parse(examData.recommendations);
-    } else if (Array.isArray(examData.recommendations)) {
-      recommendations = examData.recommendations;
+    if (typeof (examData as any).recommendations === 'string') {
+      recommendations = JSON.parse((examData as any).recommendations);
+    } else if (Array.isArray((examData as any).recommendations)) {
+      recommendations = (examData as any).recommendations;
     }
-    if (typeof examData.skill_analysis === 'string') {
-      skillAnalysis = JSON.parse(examData.skill_analysis);
+    if (typeof (examData as any).skill_analysis === 'string') {
+      skillAnalysis = JSON.parse((examData as any).skill_analysis);
     } else {
-      skillAnalysis = examData.skill_analysis;
+      skillAnalysis = (examData as any).skill_analysis;
     }
   } catch (e) {
     console.error('Error parsing performance data:', e);
   }
-  
+
   // Skill icons and names
   const skillIcons: Record<string, string> = {
     hoofdgedachte: '🎯',
@@ -109,7 +109,7 @@ export default function ExamResults() {
     conclusie: '💡',
     woordenschat: '📚',
   };
-  
+
   const skillColors: Record<string, string> = {
     excellent: 'bg-green-500',
     good: 'bg-blue-500',
@@ -141,7 +141,7 @@ export default function ExamResults() {
                 {t.yourResult || "Your Result"}
               </CardTitle>
               <CardDescription className="text-sm sm:text-base px-4">
-                {passed 
+                {passed
                   ? (t.examPassedMessage || "Well done! Keep practicing to improve your skills")
                   : (t.examFailedMessage || "Keep practicing, you're on the right track!")}
               </CardDescription>
@@ -183,7 +183,7 @@ export default function ExamResults() {
                   {skillAnalysis.bySkill.map((skill: any) => {
                     const icon = skillIcons[skill.skillType] || '📚';
                     const colorClass = skillColors[skill.level] || 'bg-gray-500';
-                    
+
                     return (
                       <div key={skill.skillType} className="p-4 rounded-lg border bg-card">
                         <div className="flex items-start justify-between mb-3">
@@ -206,15 +206,15 @@ export default function ExamResults() {
                             </div>
                           </div>
                         </div>
-                        <Progress 
-                          value={skill.percentage} 
+                        <Progress
+                          value={skill.percentage}
                           className="h-2"
                         />
                       </div>
                     );
                   })}
                 </div>
-                
+
                 {/* Strengths and Weaknesses */}
                 {(skillAnalysis.strengths.length > 0 || skillAnalysis.weaknesses.length > 0) && (
                   <div className="grid md:grid-cols-2 gap-4 pt-4 border-t">
@@ -252,7 +252,7 @@ export default function ExamResults() {
                     )}
                   </div>
                 )}
-                
+
                 {/* Skill-based Recommendations */}
                 {skillAnalysis.recommendations && skillAnalysis.recommendations.length > 0 && (
                   <div className="pt-4 border-t">
@@ -289,7 +289,7 @@ export default function ExamResults() {
                 {performanceAnalysis && Object.entries(performanceAnalysis).map(([type, data]: [string, any]) => {
                   const percentage = data.total > 0 ? (data.correct / data.total) * 100 : 0;
                   const isStrong = percentage >= 70;
-                  
+
                   return (
                     <div key={type} className="space-y-2">
                       <div className="flex items-center justify-between">
@@ -305,8 +305,8 @@ export default function ExamResults() {
                           {data.correct}/{data.total} correct ({Math.round(percentage)}%)
                         </span>
                       </div>
-                      <Progress 
-                        value={percentage} 
+                      <Progress
+                        value={percentage}
                         className={`h-2 ${isStrong ? 'bg-green-100' : 'bg-red-100'}`}
                       />
                     </div>
@@ -352,8 +352,8 @@ export default function ExamResults() {
               </Button>
             </Link>
             {!userRating && (
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="lg"
                 onClick={() => setShowRatingDialog(true)}
               >
@@ -379,11 +379,12 @@ export default function ExamResults() {
               </Button>
             </Link>
           </div>
-          
+
           {/* Rating Dialog */}
           {examData.text_id && (
             <RatingDialog
               textId={examData.text_id}
+              textTitle={(examData as any).title || `Exam #${examData.text_id}`}
               open={showRatingDialog}
               onOpenChange={setShowRatingDialog}
             />
