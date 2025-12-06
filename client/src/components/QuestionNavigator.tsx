@@ -23,11 +23,11 @@ export function QuestionNavigator({
     <div className="fixed left-4 top-24 hidden lg:block w-20">
       <div className="bg-sidebar dark:bg-card border border-sidebar-border dark:border-border rounded-xl p-3 shadow-lg max-h-[calc(100vh-120px)] overflow-y-auto scrollbar-hide">
         {/* Sticky header with text button and counter */}
-        <div className="sticky top-0 z-10 bg-sidebar dark:bg-card pb-3 -mt-3 pt-3">
+        <div className="sticky top-0 z-10 bg-sidebar dark:bg-card pb-2 -mt-3 pt-3">
           {/* Back to text button */}
           <button
             onClick={onBackToText}
-            className="w-full mb-3 py-2 px-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary font-medium text-xs transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary flex items-center justify-center gap-1"
+            className="w-full mb-2 py-2 px-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary font-medium text-xs transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary flex items-center justify-center gap-1"
             aria-label="Back to text"
             title="Scroll back to the Dutch text"
           >
@@ -36,7 +36,7 @@ export function QuestionNavigator({
           </button>
           
           {/* Progress indicator */}
-          <div className="text-xs text-center mb-3 font-medium text-muted-foreground">
+          <div className="text-xs text-center mb-1 font-medium text-muted-foreground">
             {answeredCount}/{totalQuestions}
           </div>
         </div>
