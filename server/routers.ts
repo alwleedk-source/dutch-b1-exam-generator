@@ -1445,6 +1445,17 @@ export const appRouter = router({
 
   // Admin dashboard
   admin: router({
+    getTopicSuggestions: adminProcedure.query(async () => {
+      return await db.getTopicSuggestions();
+    }),
+
+    deleteTopicSuggestion: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteTopicSuggestion(input.id);
+        return { success: true };
+      }),
+
     getStats: adminProcedure.query(async () => {
       const allTexts = await db.getAllTexts();
       const allUsers = await db.getAllUsers();

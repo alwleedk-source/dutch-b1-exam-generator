@@ -1702,3 +1702,28 @@ export async function createTopicSuggestion(suggestion: InsertTopicSuggestion) {
   const result = await db.insert(topicSuggestions).values(suggestion).returning();
   return result;
 }
+
+export async function getTopicSuggestions() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select({
+      id: topicSuggestions.id,
+      topic: topicSuggestions.topic,
+      created_at: topicSuggestions.created_at,
+      user_id: topicSuggestions.user_id,
+      user_name: users.name,
+      user_email: users.email,
+    })
+    .from(topicSuggestions)
+    .leftJoin(users, eq(topicSuggestions.user_id, users.id))
+    .orderBy(desc(topicSuggestions.created_at));
+}
+
+export async function deleteTopicSuggestion(id: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.delete(topicSuggestions).where(eq(topicSuggestions.id, id));
+}

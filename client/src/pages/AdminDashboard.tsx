@@ -9,9 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Users, FileText, AlertCircle, CheckCircle, XCircle, Loader2, Search, Trash2, Eye, 
-  BookOpen, TrendingUp, Activity, UserCog, Filter, X, Settings 
+import {
+  Users, FileText, AlertCircle, CheckCircle, XCircle, Loader2, Search, Trash2, Eye,
+  BookOpen, TrendingUp, Activity, UserCog, Filter, X, Settings, MessageSquare
 } from "lucide-react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -22,13 +22,13 @@ export default function AdminDashboard() {
   const { user, loading } = useAuth();
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("overview");
-  
+
   // Search and filter states
   const [examSearch, setExamSearch] = useState("");
   const [textSearch, setTextSearch] = useState("");
   const [textStatusFilter, setTextStatusFilter] = useState<string>("all");
   const [userSearch, setUserSearch] = useState("");
-  
+
   // Dialog states
   const [examToDelete, setExamToDelete] = useState<number | null>(null);
   const [examToView, setExamToView] = useState<number | null>(null);
@@ -36,7 +36,8 @@ export default function AdminDashboard() {
   const [textToView, setTextToView] = useState<number | null>(null);
   const [userToView, setUserToView] = useState<number | null>(null);
   const [userToDelete, setUserToDelete] = useState<number | null>(null);
-  
+  const [suggestionToDelete, setSuggestionToDelete] = useState<number | null>(null);
+
   // Pagination states
   const [examsPage, setExamsPage] = useState(1);
   const [textsPage, setTextsPage] = useState(1);
@@ -46,15 +47,16 @@ export default function AdminDashboard() {
   const { data: stats } = trpc.admin.getDashboardStats.useQuery(undefined, { enabled: !!user && user.role === 'admin' });
   const { data: recentActivity } = trpc.admin.getRecentActivity.useQuery({ limit: 10 }, { enabled: !!user && user.role === 'admin' });
   const { data: allUsers, refetch: refetchUsers } = trpc.admin.getAllUsers.useQuery(undefined, { enabled: !!user && user.role === 'admin' });
+  const { data: topicSuggestions, refetch: refetchSuggestions } = trpc.admin.getTopicSuggestions.useQuery(undefined, { enabled: !!user && user.role === 'admin' });
   const { data: allExams, refetch: refetchExams } = trpc.admin.getAllExams.useQuery(
     { search: examSearch },
     { enabled: !!user && user.role === 'admin' }
   );
   const { data: filteredTexts, refetch: refetchTexts } = trpc.admin.getTextsFiltered.useQuery(
-    { 
+    {
       search: textSearch || undefined,
       status: textStatusFilter !== "all" ? textStatusFilter as any : undefined,
-      limit: 100 
+      limit: 100
     },
     { enabled: !!user && user.role === 'admin' }
   );
@@ -72,6 +74,16 @@ export default function AdminDashboard() {
   );
 
   // Mutations
+  const deleteTopicSuggestionMutation = trpc.admin.deleteTopicSuggestion.useMutation({
+    onSuccess: () => {
+      toast.success("Suggestion deleted successfully");
+      setSuggestionToDelete(null);
+      refetchSuggestions();
+    },
+    onError: (error) => {
+      toast.error("Failed to delete suggestion: " + error.message);
+    },
+  });
   const approveTextMutation = trpc.admin.approveText.useMutation({
     onSuccess: () => {
       toast.success("Text approved successfully");
@@ -156,7 +168,7 @@ export default function AdminDashboard() {
   }
 
   // Filter users by search
-  const filteredUsers = allUsers?.filter((u: any) => 
+  const filteredUsers = allUsers?.filter((u: any) =>
     u.name?.toLowerCase().includes(userSearch.toLowerCase()) ||
     u.email?.toLowerCase().includes(userSearch.toLowerCase())
   ) || [];
@@ -181,7 +193,7 @@ export default function AdminDashboard() {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="overview">
                 <Activity className="h-4 w-4 mr-2" />
                 Overview
@@ -197,6 +209,10 @@ export default function AdminDashboard() {
               <TabsTrigger value="users">
                 <Users className="h-4 w-4 mr-2" />
                 Users ({allUsers?.length || 0})
+              </TabsTrigger>
+              <TabsTrigger value="suggestions">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Suggestions ({topicSuggestions?.length || 0})
               </TabsTrigger>
             </TabsList>
 
@@ -216,7 +232,7 @@ export default function AdminDashboard() {
                   </Card>
                 </Link>
               </div>
-              
+
               {/* Statistics Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card>
@@ -384,7 +400,7 @@ export default function AdminDashboard() {
                     </TableHeader>
                     <TableBody>
                       {paginatedTexts.map((text: any) => (
-                        <TableRow 
+                        <TableRow
                           key={text.id}
                           className="cursor-pointer hover:bg-muted/50"
                           onClick={() => setTextToView(text.id)}
@@ -398,11 +414,11 @@ export default function AdminDashboard() {
                           </TableCell>
                           <TableCell className="text-sm">{text.word_count || '—'}</TableCell>
                           <TableCell>
-                            <Badge 
+                            <Badge
                               variant={
-                                text.status === 'approved' ? 'default' : 
-                                text.status === 'rejected' ? 'destructive' : 
-                                'secondary'
+                                text.status === 'approved' ? 'default' :
+                                  text.status === 'rejected' ? 'destructive' :
+                                    'secondary'
                               }
                             >
                               {text.status}
@@ -474,7 +490,7 @@ export default function AdminDashboard() {
                     <div className="relative">
                       <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                       <Input
-                          placeholder={t.searchExams}
+                        placeholder={t.searchExams}
                         className="pl-8 w-[250px]"
                         value={examSearch}
                         onChange={(e) => setExamSearch(e.target.value)}
@@ -497,7 +513,7 @@ export default function AdminDashboard() {
                     </TableHeader>
                     <TableBody>
                       {paginatedExams.map((exam: any) => (
-                        <TableRow 
+                        <TableRow
                           key={exam.id}
                           className="cursor-pointer hover:bg-muted/50"
                           onClick={() => setExamToView(exam.id)}
@@ -585,7 +601,7 @@ export default function AdminDashboard() {
                     <div className="relative">
                       <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                       <Input
-                          placeholder={t.searchUsers}
+                        placeholder={t.searchUsers}
                         className="pl-8 w-[250px]"
                         value={userSearch}
                         onChange={(e) => setUserSearch(e.target.value)}
@@ -609,7 +625,7 @@ export default function AdminDashboard() {
                     </TableHeader>
                     <TableBody>
                       {filteredUsers.map((u: any) => (
-                        <TableRow 
+                        <TableRow
                           key={u.id}
                           className="cursor-pointer hover:bg-muted/50"
                           onClick={() => setUserToView(u.id)}
@@ -649,6 +665,61 @@ export default function AdminDashboard() {
                           </TableCell>
                         </TableRow>
                       ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Suggestions Tab */}
+            <TabsContent value="suggestions" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Topic Suggestions</CardTitle>
+                  <CardDescription>
+                    Review topic suggestions from users
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>ID</TableHead>
+                        <TableHead>User</TableHead>
+                        <TableHead>Topic</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {topicSuggestions?.map((suggestion: any) => (
+                        <TableRow key={suggestion.id}>
+                          <TableCell className="font-mono text-sm">{suggestion.id}</TableCell>
+                          <TableCell className="text-sm">
+                            {suggestion.user_name || suggestion.user_email || `User #${suggestion.user_id}`}
+                          </TableCell>
+                          <TableCell className="font-medium">{suggestion.topic}</TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {new Date(suggestion.created_at).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setSuggestionToDelete(suggestion.id)}
+                            >
+                              <Trash2 className="h-4 w-4 text-red-600" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                      {(!topicSuggestions || topicSuggestions.length === 0) && (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                            No suggestions found
+                          </TableCell>
+                        </TableRow>
+                      )}
                     </TableBody>
                   </Table>
                 </CardContent>
@@ -697,7 +768,7 @@ export default function AdminDashboard() {
                 <h3 className="font-semibold mb-2">Dutch Text (Formatted)</h3>
                 <div className="bg-white p-6 rounded-lg max-h-[500px] overflow-y-auto border">
                   {textDetails.formatted_html ? (
-                    <div 
+                    <div
                       className="prose prose-sm max-w-none"
                       dangerouslySetInnerHTML={{ __html: textDetails.formatted_html }}
                     />
@@ -769,7 +840,7 @@ export default function AdminDashboard() {
                 <div>
                   <p className="text-sm text-muted-foreground">Score</p>
                   <p className="font-medium text-lg">
-                    {examDetails.score}/{examDetails.total_questions} 
+                    {examDetails.score}/{examDetails.total_questions}
                     ({Math.round((examDetails.score / examDetails.total_questions) * 100)}%)
                   </p>
                 </div>
@@ -884,8 +955,8 @@ export default function AdminDashboard() {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setExamToDelete(null)}>{t.cancel}</Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={() => deleteExamMutation.mutate({ exam_id: examToDelete! })}
               disabled={deleteExamMutation.isPending}
             >
@@ -910,8 +981,8 @@ export default function AdminDashboard() {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setTextToDelete(null)}>{t.cancel}</Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={() => deleteTextMutation.mutate({ text_id: textToDelete! })}
               disabled={deleteTextMutation.isPending}
             >
@@ -936,12 +1007,38 @@ export default function AdminDashboard() {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setUserToDelete(null)}>{t.cancel}</Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={() => deleteUserMutation.mutate({ userId: userToDelete! })}
               disabled={deleteUserMutation.isPending}
             >
               {deleteUserMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              {t.confirmDeleteButton}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!suggestionToDelete} onOpenChange={(open) => !open && setSuggestionToDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t.confirmDeleteTitle}</DialogTitle>
+            <DialogDescription>
+              {t.confirmDeleteMessage}
+              <br />
+              <span className="text-destructive font-medium mt-2 block">
+                {t.thisActionCannotBeUndone}
+              </span>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSuggestionToDelete(null)}>{t.cancel}</Button>
+            <Button
+              variant="destructive"
+              onClick={() => deleteTopicSuggestionMutation.mutate({ id: suggestionToDelete! })}
+              disabled={deleteTopicSuggestionMutation.isPending}
+            >
+              {deleteTopicSuggestionMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               {t.confirmDeleteButton}
             </Button>
           </DialogFooter>
