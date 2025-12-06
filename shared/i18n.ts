@@ -317,6 +317,14 @@ export interface Translations {
   selectCorrectTranslation: string;
   practiceComplete: string;
   audioError: string;
+  // New practice modes
+  reverseQuiz: string;
+  listeningQuiz: string;
+  whichDutchWord: string;
+  selectCorrectDutchWord: string;
+  listenAndChoose: string;
+  playing: string;
+  clickToListen: string;
 
   // Review mode
   reviewMode: string;
@@ -961,6 +969,14 @@ export const translations: Record<Language, Translations> = {
     selectCorrectTranslation: "Selecteer de juiste vertaling:",
     practiceComplete: "Oefening voltooid",
     audioError: "Kan audio niet afspelen",
+    // New practice modes
+    reverseQuiz: "Omgekeerde Quiz",
+    listeningQuiz: "Luisterquiz",
+    whichDutchWord: "Welk Nederlands woord betekent:",
+    selectCorrectDutchWord: "Selecteer het juiste Nederlandse woord:",
+    listenAndChoose: "Luister naar het woord en kies de juiste vertaling:",
+    playing: "Afspelen...",
+    clickToListen: "Klik om te luisteren",
 
     // Review mode
     reviewMode: "Herzienmodus",
@@ -1595,6 +1611,14 @@ export const translations: Record<Language, Translations> = {
     selectCorrectTranslation: "اختر الترجمة الصحيحة:",
     practiceComplete: "اكتمل التدريب",
     audioError: "فشل تشغيل الصوت",
+    // New practice modes
+    reverseQuiz: "اختبار عكسي",
+    listeningQuiz: "اختبار استماع",
+    whichDutchWord: "أي كلمة هولندية تعني:",
+    selectCorrectDutchWord: "اختر الكلمة الهولندية الصحيحة:",
+    listenAndChoose: "استمع للكلمة واختر الترجمة الصحيحة:",
+    playing: "جاري التشغيل...",
+    clickToListen: "اضغط للاستماع",
 
     // Review mode
     reviewMode: "وضع المراجعة",
@@ -2228,6 +2252,14 @@ export const translations: Record<Language, Translations> = {
     selectCorrectTranslation: "Select the correct translation:",
     practiceComplete: "Practice complete",
     audioError: "Failed to play audio",
+    // New practice modes
+    reverseQuiz: "Reverse Quiz",
+    listeningQuiz: "Listening Quiz",
+    whichDutchWord: "Which Dutch word means:",
+    selectCorrectDutchWord: "Select the correct Dutch word:",
+    listenAndChoose: "Listen to the word and choose the correct translation:",
+    playing: "Playing...",
+    clickToListen: "Click to listen",
 
     // Review mode
     reviewMode: "Review Mode",
@@ -2863,6 +2895,14 @@ export const translations: Record<Language, Translations> = {
     selectCorrectTranslation: "Doğru çeviriyi seçin:",
     practiceComplete: "Pratik tamamlandı",
     audioError: "Ses çalınamadı",
+    // New practice modes
+    reverseQuiz: "Ters Quiz",
+    listeningQuiz: "Dinleme Testi",
+    whichDutchWord: "Hangi Hollandaca kelime anlama gelir:",
+    selectCorrectDutchWord: "Doğru Hollandaca kelimeyi seçin:",
+    listenAndChoose: "Kelimeyi dinleyin ve doğru çeviriyi seçin:",
+    playing: "Oynatılıyor...",
+    clickToListen: "Dinlemek için tıklayın",
 
     // Review mode
     reviewMode: "Gözden Geçirme Modu",

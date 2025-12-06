@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
-import { Volume2, ChevronLeft, ChevronRight, RotateCcw, SkipForward, Archive } from "lucide-react";
+import { Volume2, ChevronLeft, ChevronRight, RotateCcw, SkipForward, Archive, Headphones, RotateCw } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
 import { trpc } from "../lib/trpc";
 import { toast } from "sonner";
@@ -15,7 +15,7 @@ interface PracticeModalProps {
   onComplete: () => void;
 }
 
-type PracticeMode = "flashcard" | "multiple-choice";
+type PracticeMode = "flashcard" | "multiple-choice" | "reverse-choice" | "listening";
 
 export function PracticeModal({ open, onOpenChange, wordId, specificWordId, onComplete }: PracticeModalProps) {
   // Use either wordId or specificWordId
@@ -28,6 +28,10 @@ export function PracticeModal({ open, onOpenChange, wordId, specificWordId, onCo
   const [playingAudio, setPlayingAudio] = useState(false);
   const [choices, setChoices] = useState<any[]>([]);
   const [stats, setStats] = useState({ correct: 0, incorrect: 0 });
+  // New: Swipe gesture state
+  const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
 
   // Get all user vocabulary
   const { data: allVocabulary } = trpc.vocabulary.getMyVocabularyProgress.useQuery(
@@ -84,7 +88,7 @@ export function PracticeModal({ open, onOpenChange, wordId, specificWordId, onCo
 
   // Generate multiple choice options when mode changes or word changes
   useEffect(() => {
-    if (mode === "multiple-choice" && currentWord && words.length >= 4) {
+    if ((mode === "multiple-choice" || mode === "reverse-choice" || mode === "listening") && currentWord && words.length >= 4) {
       generateChoices();
     }
   }, [mode, currentIndex, words]);
@@ -157,6 +161,8 @@ export function PracticeModal({ open, onOpenChange, wordId, specificWordId, onCo
   const resetCard = () => {
     setShowAnswer(false);
     setSelectedChoice(null);
+    setSwipeDirection(null);
+    setIsFlipped(false);
   };
 
   const handleFlashcardRating = async (isCorrect: boolean) => {
@@ -269,7 +275,7 @@ export function PracticeModal({ open, onOpenChange, wordId, specificWordId, onCo
                 <span className="text-red-600 font-medium">✗ {stats.incorrect}</span>
               </div>
               {/* Mode Toggle */}
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-1">
                 <Button
                   variant={mode === "flashcard" ? "default" : "outline"}
                   size="sm"
@@ -277,8 +283,9 @@ export function PracticeModal({ open, onOpenChange, wordId, specificWordId, onCo
                     setMode("flashcard");
                     resetCard();
                   }}
+                  title="Flashcards"
                 >
-                  {t.flashcards || "Flashcards"}
+                  🎴
                 </Button>
                 <Button
                   variant={mode === "multiple-choice" ? "default" : "outline"}
@@ -288,8 +295,33 @@ export function PracticeModal({ open, onOpenChange, wordId, specificWordId, onCo
                     resetCard();
                   }}
                   disabled={words.length < 4}
+                  title={t.multipleChoice || "Multiple Choice"}
                 >
-                  {t.multipleChoice || "Multiple Choice"}
+                  🔤
+                </Button>
+                <Button
+                  variant={mode === "reverse-choice" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => {
+                    setMode("reverse-choice");
+                    resetCard();
+                  }}
+                  disabled={words.length < 4}
+                  title={t.reverseQuiz || "Reverse Quiz"}
+                >
+                  <RotateCw className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={mode === "listening" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => {
+                    setMode("listening");
+                    resetCard();
+                  }}
+                  disabled={words.length < 4}
+                  title={t.listeningQuiz || "Listening Quiz"}
+                >
+                  <Headphones className="h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -465,6 +497,113 @@ export function PracticeModal({ open, onOpenChange, wordId, specificWordId, onCo
                     buttonClass = "border-green-500 bg-green-50 text-green-900";
                   } else if (isSelected) {
                     buttonClass = "border-red-500 bg-red-50 text-red-900";
+                  }
+                }
+
+                return (
+                  <Button
+                    key={choice.id}
+                    variant="outline"
+                    className={`w-full text-lg py-6 ${buttonClass}`}
+                    onClick={() => handleChoiceSelect(choice)}
+                    disabled={selectedChoice !== null}
+                  >
+                    {getTranslation(choice)}
+                    {showResult && isCorrectChoice && " ✓"}
+                    {showResult && isSelected && !isCorrectChoice && " ✗"}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Reverse Choice Mode - Show translation, pick Dutch word */}
+        {mode === "reverse-choice" && choices.length === 4 && (
+          <div className="space-y-6">
+            <Card className="min-h-[200px] flex items-center justify-center bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950 dark:to-indigo-950">
+              <CardContent className="p-8 text-center">
+                <div className="text-sm text-muted-foreground mb-2">
+                  {t.whichDutchWord || "Which Dutch word means:"}
+                </div>
+                <h2 className="text-3xl font-bold mb-4">{currentTranslation}</h2>
+                {currentWord.dutchDefinition && (
+                  <p className="text-muted-foreground text-lg italic mb-4">{currentWord.dutchDefinition}</p>
+                )}
+              </CardContent>
+            </Card>
+
+            <div className="space-y-3">
+              <p className="text-center text-muted-foreground mb-4">
+                {t.selectCorrectDutchWord || "Select the correct Dutch word:"}
+              </p>
+              {choices.map((choice) => {
+                const isSelected = selectedChoice === choice.id;
+                const isCorrectChoice = choice.id === currentWord.id;
+                const showResult = selectedChoice !== null;
+
+                let buttonClass = "";
+                if (showResult) {
+                  if (isCorrectChoice) {
+                    buttonClass = "border-green-500 bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-100";
+                  } else if (isSelected) {
+                    buttonClass = "border-red-500 bg-red-50 text-red-900 dark:bg-red-950 dark:text-red-100";
+                  }
+                }
+
+                return (
+                  <Button
+                    key={choice.id}
+                    variant="outline"
+                    className={`w-full text-lg py-6 ${buttonClass}`}
+                    onClick={() => handleChoiceSelect(choice)}
+                    disabled={selectedChoice !== null}
+                  >
+                    {choice.word}
+                    {showResult && isCorrectChoice && " ✓"}
+                    {showResult && isSelected && !isCorrectChoice && " ✗"}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Listening Mode - Hear word, select translation */}
+        {mode === "listening" && choices.length === 4 && (
+          <div className="space-y-6">
+            <Card className="min-h-[200px] flex items-center justify-center bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950 dark:to-cyan-950">
+              <CardContent className="p-8 text-center">
+                <div className="text-sm text-muted-foreground mb-4">
+                  {t.listenAndChoose || "Listen to the word and choose the correct translation:"}
+                </div>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={handlePlayAudio}
+                  disabled={playingAudio}
+                  className={`h-20 w-20 rounded-full ${playingAudio ? 'listening-pulse' : ''}`}
+                >
+                  <Volume2 className="h-10 w-10" />
+                </Button>
+                <p className="text-muted-foreground text-sm mt-4">
+                  {playingAudio ? (t.playing || "Playing...") : (t.clickToListen || "Click to listen")}
+                </p>
+              </CardContent>
+            </Card>
+
+            <div className="space-y-3">
+              {choices.map((choice) => {
+                const isSelected = selectedChoice === choice.id;
+                const isCorrectChoice = choice.id === currentWord.id;
+                const showResult = selectedChoice !== null;
+
+                let buttonClass = "";
+                if (showResult) {
+                  if (isCorrectChoice) {
+                    buttonClass = "border-green-500 bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-100";
+                  } else if (isSelected) {
+                    buttonClass = "border-red-500 bg-red-50 text-red-900 dark:bg-red-950 dark:text-red-100";
                   }
                 }
 

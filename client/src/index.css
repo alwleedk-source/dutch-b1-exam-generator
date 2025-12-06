@@ -204,6 +204,85 @@
   .animate-slide-up { animation: slideUp 0.5s ease-out; }
   .animate-scale-in { animation: scaleIn 0.3s ease-out; }
 
+  /* Flashcard 3D Flip Animation */
+  .flashcard-container {
+    perspective: 1000px;
+  }
+  
+  .flashcard {
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .flashcard.flipped {
+    transform: rotateY(180deg);
+  }
+  
+  .flashcard-front,
+  .flashcard-back {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  
+  .flashcard-back {
+    transform: rotateY(180deg);
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Swipe Gesture Animations */
+  .swipe-card {
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+    touch-action: pan-y;
+  }
+  
+  .swipe-card.swiping-right {
+    transform: translateX(30px) rotate(5deg);
+    box-shadow: 0 0 30px rgba(34, 197, 94, 0.4);
+  }
+  
+  .swipe-card.swiping-left {
+    transform: translateX(-30px) rotate(-5deg);
+    box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+  }
+  
+  .swipe-card.swiped-right {
+    animation: swipeRight 0.4s ease-out forwards;
+  }
+  
+  .swipe-card.swiped-left {
+    animation: swipeLeft 0.4s ease-out forwards;
+  }
+  
+  @keyframes swipeRight {
+    to {
+      transform: translateX(150%) rotate(15deg);
+      opacity: 0;
+    }
+  }
+  
+  @keyframes swipeLeft {
+    to {
+      transform: translateX(-150%) rotate(-15deg);
+      opacity: 0;
+    }
+  }
+  
+  /* Listening Quiz Pulse Animation */
+  .listening-pulse {
+    animation: listeningPulse 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes listeningPulse {
+    0%, 100% { 
+      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+    }
+    50% { 
+      box-shadow: 0 0 0 20px rgba(59, 130, 246, 0);
+    }
+  }
+
   /**
    * Custom container utility that centers content and adds responsive padding.
    *
