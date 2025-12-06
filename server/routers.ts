@@ -21,7 +21,7 @@ const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
 
 export const appRouter = router({
   system: systemRouter,
-  
+
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(async ({ ctx }) => {
@@ -34,7 +34,7 @@ export const appRouter = router({
               reject(err);
               return;
             }
-            
+
             // Also destroy the session completely
             if (ctx.req.session) {
               ctx.req.session.destroy((err) => {
@@ -43,11 +43,11 @@ export const appRouter = router({
                 }
               });
             }
-            
+
             // Clear the cookie
             const cookieOptions = getSessionCookieOptions(ctx.req);
             ctx.res.clearCookie(COOKIE_NAME, cookieOptions);
-            
+
             console.log('[Logout] Session destroyed successfully');
             resolve({ success: true } as const);
           });
@@ -77,16 +77,16 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         const { extractTextFromImage, validateExtractedText } = await import("./lib/ocr");
-        
+
         // Extract text from image
         const result = await extractTextFromImage(input.imageBase64);
-        
+
         // Validate extracted text
         const validation = validateExtractedText(result.text);
         if (!validation.isValid) {
           throw new TRPCError({ code: "BAD_REQUEST", message: validation.reason });
         }
-        
+
         return {
           text: result.text,
           confidence: result.confidence,
@@ -101,7 +101,7 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         const { checkDuplicate } = await import("./lib/minhash");
-        
+
         // Get all existing texts with their signatures
         const allTexts = await db.getAllTexts();
         const textsWithSignatures = allTexts
@@ -111,10 +111,10 @@ export const appRouter = router({
             title: t.title || `Text #${t.id}`,
             signature: JSON.parse(t.min_hash_signature!),
           }));
-        
+
         // Check for duplicates
         const duplicateCheck = checkDuplicate(input.text, textsWithSignatures);
-        
+
         return {
           isDuplicate: duplicateCheck.isDuplicate,
           similarTexts: duplicateCheck.similarTexts.map(t => ({
@@ -141,7 +141,7 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         const { calculateMinHash } = await import("./lib/minhash");
-        
+
         // Check daily limit for non-admin users
         const user = await db.getUserById(ctx.user.id);
         if (user?.role !== 'admin') {
@@ -149,7 +149,7 @@ export const appRouter = router({
           const today = new Date();
           today.setHours(0, 0, 0, 0);
           const textsToday = await db.getUserTextsCreatedAfter(ctx.user.id, today);
-          
+
           if (textsToday.length >= 3) {
             throw new TRPCError({
               code: "TOO_MANY_REQUESTS",
@@ -157,11 +157,11 @@ export const appRouter = router({
             });
           }
         }
-        
+
         // ✅ Check if text is in Dutch language FIRST (before any processing)
         console.log('[Text Creation] Validating language...');
         const languageValidation = await gemini.validateDutchText(input.dutch_text);
-        
+
         if (!languageValidation.isDutch) {
           throw new TRPCError({
             code: "BAD_REQUEST",
@@ -169,11 +169,11 @@ export const appRouter = router({
           });
         }
         console.log('[Text Creation] ✅ Language validation passed: Dutch text confirmed');
-        
+
         // ✅ Check for duplicate texts (80% similarity threshold)
         console.log('[Text Creation] Checking for duplicate texts...');
         const { checkDuplicate } = await import("./lib/minhash");
-        
+
         // Get all existing texts with their signatures
         const allTexts = await db.getAllTexts();
         const textsWithSignatures = allTexts
@@ -183,46 +183,46 @@ export const appRouter = router({
             title: t.title || `Text #${t.id}`,
             signature: JSON.parse(t.min_hash_signature!),
           }));
-        
+
         // Check for duplicates
         const duplicateCheck = checkDuplicate(input.dutch_text, textsWithSignatures);
-        
+
         if (duplicateCheck.isDuplicate) {
           const similarTextsInfo = duplicateCheck.similarTexts
             .map(t => `"${t.title}" (${Math.round(t.similarity * 100)}% similar)`)
             .join(', ');
-          
+
           throw new TRPCError({
             code: "BAD_REQUEST",
             message: `This text is too similar to existing text(s): ${similarTextsInfo}. Please use original content with at least 20% difference.`,
           });
         }
         console.log('[Text Creation] ✅ Duplicate check passed: Text is original');
-        
+
         // Calculate dynamic question count based on text length
         const { calculateQuestionCount, calculateExamTime } = await import("./lib/questionCount");
         const questionCount = calculateQuestionCount(input.dutch_text.length);
         const examTimeMinutes = calculateExamTime(input.dutch_text.length, questionCount);
         console.log(`[Text Creation] Calculated question count: ${questionCount}, exam time: ${examTimeMinutes} minutes for ${input.dutch_text.length} characters`);
-        
+
         // ✨ OPTIMIZED: Process text completely in ONE Gemini API call (saves 80% tokens!)
         // For large texts (>= 8000 chars), use separate calls for better reliability
         const TEXT_SIZE_THRESHOLD = 8000;
         const useSeparateCalls = input.dutch_text.length >= TEXT_SIZE_THRESHOLD;
-        
+
         let cleanedText = input.dutch_text;
         let finalTitle = input.title;
         let examData: any;
         let vocabData: any;
-        
+
         if (useSeparateCalls) {
           console.log(`[Text Creation] Large text detected (${input.dutch_text.length} chars), using separate calls for better reliability...`);
-          
+
           // Use separate calls for large texts (more reliable)
           try {
             cleanedText = await gemini.cleanAndFormatText(input.dutch_text);
             console.log(`[Text Creation] ✅ Text cleaned: ${cleanedText.length} chars`);
-            
+
             // 🚨 CRITICAL: Validate that text was actually cleaned before proceeding
             const pdfFooterPatterns = [
               /©\s*CvTE/i,
@@ -231,36 +231,36 @@ export const appRouter = router({
               /Staatsexamen/i,
               /Examen\s+NT2/i,
             ];
-            
+
             const hasFooters = pdfFooterPatterns.some(pattern => pattern.test(cleanedText));
             const hasHTML = cleanedText.includes('<h1>') || cleanedText.includes('<h2>') || cleanedText.includes('<p>');
-            
+
             if (hasFooters || !hasHTML) {
               console.error('[Text Creation] ❌ Text cleaning FAILED validation:');
               if (hasFooters) console.error('  - Still contains PDF footers');
               if (!hasHTML) console.error('  - Does not contain HTML formatting');
-              
-              throw new TRPCError({ 
-                code: "INTERNAL_SERVER_ERROR", 
-                message: "Text cleaning failed. The AI could not properly clean and format your text. Please try again or contact support if the issue persists." 
+
+              throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Text cleaning failed. The AI could not properly clean and format your text. Please try again or contact support if the issue persists."
               });
             }
-            
+
             console.log('[Text Creation] ✅ Text validation passed - proceeding with exam generation');
           } catch (e: any) {
             // If it's already a TRPCError (validation failed), re-throw it
             if (e.code) {
               throw e;
             }
-            
+
             // Otherwise, it's a different error
             console.error('[Text Creation] ❌ Text cleaning failed with error:', e);
-            throw new TRPCError({ 
-              code: "INTERNAL_SERVER_ERROR", 
-              message: `Text cleaning failed: ${e.message}` 
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: `Text cleaning failed: ${e.message}`
             });
           }
-          
+
           if (!finalTitle || finalTitle.trim() === "") {
             try {
               finalTitle = await gemini.generateTitle(cleanedText);
@@ -270,18 +270,18 @@ export const appRouter = router({
               finalTitle = cleanedText.substring(0, 50).trim() + "...";
             }
           }
-          
+
           try {
             examData = await gemini.generateExamQuestions(cleanedText, questionCount);
             console.log(`[Text Creation] ✅ Questions generated: ${examData.questions.length}`);
           } catch (e: any) {
             console.error('[Text Creation] ❌ Question generation failed:', e);
-            throw new TRPCError({ 
-              code: "INTERNAL_SERVER_ERROR", 
-              message: `Failed to generate exam: ${e.message}` 
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: `Failed to generate exam: ${e.message}`
             });
           }
-          
+
           try {
             // Strip HTML tags for vocabulary extraction (Gemini needs plain text)
             const plainText = cleanedText.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -293,7 +293,7 @@ export const appRouter = router({
           }
         } else {
           console.log(`[Text Creation] Processing text with unified Gemini call (${input.dutch_text.length} chars)...`);
-          
+
           try {
             const result = await gemini.processTextComplete(input.dutch_text, questionCount);
             cleanedText = result.cleanedText;
@@ -307,14 +307,14 @@ export const appRouter = router({
             console.log(`[Text Creation] - Vocabulary: ${result.vocabulary.length} words`);
           } catch (error: any) {
             console.error('[Text Creation] ❌ Unified processing failed, falling back to separate calls:', error);
-            
+
             // Fallback to old method if unified processing fails
             try {
               cleanedText = await gemini.cleanAndFormatText(input.dutch_text);
             } catch (e) {
               cleanedText = input.dutch_text;
             }
-            
+
             if (!finalTitle || finalTitle.trim() === "") {
               try {
                 finalTitle = await gemini.generateTitle(cleanedText);
@@ -322,16 +322,16 @@ export const appRouter = router({
                 finalTitle = cleanedText.substring(0, 50).trim() + "...";
               }
             }
-            
+
             try {
               examData = await gemini.generateExamQuestions(cleanedText, questionCount);
             } catch (e: any) {
-              throw new TRPCError({ 
-                code: "INTERNAL_SERVER_ERROR", 
-                message: `Failed to generate exam: ${e.message}` 
+              throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: `Failed to generate exam: ${e.message}`
               });
             }
-            
+
             try {
               // Strip HTML tags for vocabulary extraction (Gemini needs plain text)
               const plainText = cleanedText.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -341,11 +341,11 @@ export const appRouter = router({
             }
           }
         }
-        
+
         // Calculate word count and reading time (using cleaned text)
         const wordCount = cleanedText.split(/\s+/).length;
         const estimatedReadingMinutes = Math.ceil(wordCount / 200);
-        
+
         // Calculate MinHash signature for storage (using cleaned text)
         const minHashSignature = duplicateCheck.signature; // Reuse signature from duplicate check
         const minHashSignatureJson = JSON.stringify(minHashSignature);
@@ -387,19 +387,19 @@ export const appRouter = router({
         // vocabData already extracted in unified call above
         try {
           console.log('[Vocabulary] Processing vocabulary from unified call...');
-          
+
           let newWordsCount = 0;
           let sharedWordsCount = 0;
-          
+
           for (const word of vocabData.vocabulary) {
             // Check if this word+context combination already exists
             const existingVocab = await db.findVocabularyByWordAndContext(
               word.dutch,
               word.context || 'general'
             );
-            
+
             let vocabularyId;
-            
+
             if (existingVocab) {
               // Word+context exists, reuse it
               vocabularyId = existingVocab.id;
@@ -423,17 +423,17 @@ export const appRouter = router({
               newWordsCount++;
               console.log(`[Vocabulary] Created new: ${word.dutch} (${word.context})`);
             }
-            
+
             // Link vocabulary to this text
             await db.linkVocabularyToText(textId, vocabularyId);
           }
-          
+
           console.log(`[Vocabulary] Extraction complete: ${newWordsCount} new, ${sharedWordsCount} shared`);
         } catch (error) {
           console.error('[Vocabulary] Auto-extraction failed:', error);
           // Don't fail the request if vocabulary extraction fails
         }
-        
+
         // Notify admin about new text submission
         try {
           const { notifyOwner } = await import("./_core/notification");
@@ -446,8 +446,8 @@ export const appRouter = router({
           // Don't fail the request if notification fails
         }
 
-        return { 
-          success: true, 
+        return {
+          success: true,
           text_id: textId,
           exam_id: examResult[0].id,
           word_count: wordCount,
@@ -517,6 +517,18 @@ export const appRouter = router({
         return { success: true, cached: false };
       }),
 
+    suggestTopic: protectedProcedure
+      .input(z.object({
+        topic: z.string().max(70, "Topic must be 70 characters or less"),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await db.createTopicSuggestion({
+          user_id: ctx.user.id,
+          topic: input.topic,
+        });
+        return { success: true };
+      }),
+
     getMyTexts: protectedProcedure.query(async ({ ctx }) => {
       return await db.getTextsByUser(ctx.user.id);
     }),
@@ -532,12 +544,12 @@ export const appRouter = router({
       .query(async ({ input }) => {
         // Get all approved texts with exam statistics
         const texts = await db.getApprovedTexts();
-        
+
         // Filter by reason if provided
         if (input?.reason) {
           return await db.getTextsByReason(texts.map(t => t.id), input.reason);
         }
-        
+
         return texts;
       }),
 
@@ -618,19 +630,19 @@ export const appRouter = router({
 
         // Debug logging
         console.log('[submitExam] Exam user_id:', exam.user_id, 'Current user id:', ctx.user.id);
-        
+
         // Allow dev user (999) to submit any exam when DISABLE_AUTH is enabled
         const DISABLE_AUTH = process.env.DISABLE_AUTH === "true";
         const isDevUser = ctx.user.id === 999;
-        
+
         if (exam.user_id !== ctx.user.id && !(DISABLE_AUTH && isDevUser)) {
           console.error('[submitExam] User mismatch! Exam belongs to user', exam.user_id, 'but current user is', ctx.user.id);
-          throw new TRPCError({ 
-            code: "FORBIDDEN", 
-            message: `This exam belongs to another user. Exam user: ${exam.user_id}, Your user: ${ctx.user.id}` 
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: `This exam belongs to another user. Exam user: ${exam.user_id}, Your user: ${ctx.user.id}`
           });
         }
-        
+
         if (DISABLE_AUTH && isDevUser && exam.user_id !== ctx.user.id) {
           console.log('[submitExam] Dev user bypassing ownership check');
         }
@@ -647,13 +659,13 @@ export const appRouter = router({
         });
 
         const score_percentage = Math.round((correctCount / questions.length) * 100);
-        
+
         // Calculate official Staatsexamen score
         const { calculateStaatsexamenScore, analyzePerformanceByType, generateRecommendations } = await import("./lib/scoring");
         const staatsexamen_score = calculateStaatsexamenScore(correctCount);
         const performanceAnalysis = analyzePerformanceByType(questions, input.answers);
         const recommendations = generateRecommendations(performanceAnalysis);
-        
+
         // Calculate skill-based analysis
         const { analyzeSkillPerformance } = await import("./lib/skillAnalysis");
         const userAnswerIndices = input.answers.map(ans => ans.charCodeAt(0) - 65); // A->0, B->1, etc.
@@ -680,7 +692,7 @@ export const appRouter = router({
           total_time_spent_minutes: Number(userStats?.totalTimeMinutes || 0),
           last_activity_date: new Date(),
         });
-        
+
         // Update user streak
         await db.updateUserStreak(ctx.user.id);
 
@@ -712,7 +724,7 @@ export const appRouter = router({
 
         // Get text details including formatted_html
         const text = await db.getTextById(exam.text_id);
-        
+
         return {
           ...exam,
           formatted_html: text?.formatted_html,
@@ -741,7 +753,7 @@ export const appRouter = router({
 
     getDetailedAnalysis: protectedProcedure.query(async ({ ctx }) => {
       const completedExams = await db.getCompletedExamsByUser(ctx.user.id);
-      
+
       // Initialize counters for each question type
       const questionTypeStats: Record<string, { correct: number; total: number }> = {
         main_idea: { correct: 0, total: 0 },
@@ -757,14 +769,14 @@ export const appRouter = router({
       // Analyze each exam
       for (const exam of completedExams) {
         if (!exam.answers || !exam.questions) continue;
-        
+
         const questions = JSON.parse(exam.questions);
         const userAnswers = JSON.parse(exam.answers);
 
         questions.forEach((q: any, idx: number) => {
           // Map questionType from Gemini (camelCase) to our format (snake_case)
           let questionType = q.skillType || q.question_type || q.questionType || 'search';
-          
+
           // Normalize question type names
           const typeMapping: Record<string, string> = {
             // English (for backward compatibility)
@@ -773,7 +785,7 @@ export const appRouter = router({
             'Sequencing': 'sequence',
             'Inference': 'inference',
             'Vocabulary': 'vocabulary',
-            
+
             // Dutch (primary format)
             'hoofdgedachte': 'main_idea',
             'zoeken': 'search',
@@ -781,9 +793,9 @@ export const appRouter = router({
             'conclusie': 'inference',
             'woordenschat': 'vocabulary',
           };
-          
+
           questionType = typeMapping[questionType] || questionType.toLowerCase().replace(/ /g, '_');
-          
+
           // Convert correctAnswerIndex to letter (A, B, C, D) for comparison
           const correctAnswerLetter = String.fromCharCode(65 + (q.correctAnswerIndex || 0));
           const isCorrect = userAnswers[idx] === correctAnswerLetter;
@@ -815,7 +827,7 @@ export const appRouter = router({
 
       Object.entries(questionTypeStats).forEach(([type, stats]) => {
         if (stats.total === 0) return;
-        
+
         const percentage = (stats.correct / stats.total) * 100;
         const label = typeLabels[type];
 
@@ -823,7 +835,7 @@ export const appRouter = router({
           strengths.push(`Uitstekend in ${label} (${percentage.toFixed(0)}%)`);
         } else if (percentage < 60) {
           weaknesses.push(`Verbeter ${label} (${percentage.toFixed(0)}%)`);
-          
+
           // Add specific recommendations
           if (type === 'main_idea') {
             recommendations.push("Oefen met het identificeren van de hoofdgedachte door te vragen: 'Waar gaat deze tekst vooral over?'");
@@ -882,7 +894,7 @@ export const appRouter = router({
         if (vocab?.audioUrl) {
           return { audioUrl: vocab.audioUrl, audioKey: vocab.audioKey || '' };
         }
-        
+
         // 2. Check if word exists in dictionary with audio (TRUSTED SOURCE ONLY)
         const dictionaryEntry = await db.getDictionaryWord(input.word);
         if (dictionaryEntry?.audio_url) {
@@ -890,7 +902,7 @@ export const appRouter = router({
           await db.updateVocabularyAudio(input.vocabId, dictionaryEntry.audio_url, dictionaryEntry.audio_key || '');
           return { audioUrl: dictionaryEntry.audio_url, audioKey: dictionaryEntry.audio_key || '' };
         }
-        
+
         // 3. Generate new audio (DO NOT copy from other users to avoid propagating errors)
         const { generateDutchSpeech } = await import("./lib/tts");
         const { audioUrl, audioKey } = await generateDutchSpeech(input.word);
@@ -926,10 +938,10 @@ export const appRouter = router({
         for (const word of vocabData.vocabulary) {
           // 1. Check if word exists in dictionary
           const dictionaryEntry = await db.getDictionaryWord(word.dutch);
-          
+
           // 2. Check if word already exists in vocabulary
           let vocabEntry = await db.getVocabularyByWord(word.dutch);
-          
+
           if (!vocabEntry) {
             // 3. Word is new - create it
             const vocabData = {
@@ -944,11 +956,11 @@ export const appRouter = router({
               audioUrl: dictionaryEntry?.audio_url || null,
               audioKey: dictionaryEntry?.audio_key || null,
             };
-            
+
             const result = await db.createVocabulary(vocabData);
             vocabEntry = result[0];
             newWords++;
-            
+
             // 4. Generate audio if not from dictionary
             if (!dictionaryEntry?.audio_url) {
               try {
@@ -963,13 +975,13 @@ export const appRouter = router({
           } else {
             // Word exists - check if we need to backfill missing translations from dictionary
             if (dictionaryEntry) {
-              const needsUpdate = 
+              const needsUpdate =
                 (!vocabEntry.arabicTranslation && dictionaryEntry.translation_ar) ||
                 (!vocabEntry.englishTranslation && dictionaryEntry.translation_en) ||
                 (!vocabEntry.turkishTranslation && dictionaryEntry.translation_tr) ||
                 (!vocabEntry.dutchDefinition && dictionaryEntry.definition_nl) ||
                 (!vocabEntry.audioUrl && dictionaryEntry.audio_url);
-              
+
               if (needsUpdate) {
                 await db.updateVocabulary(vocabEntry.id, {
                   arabicTranslation: vocabEntry.arabicTranslation || dictionaryEntry.translation_ar || null,
@@ -985,7 +997,7 @@ export const appRouter = router({
             }
             existingWords++;
           }
-          
+
           // 5. Link vocabulary to text (many-to-many)
           await db.linkVocabularyToText(input.text_id, vocabEntry.id);
         }
@@ -1019,7 +1031,7 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         const { calculateNextReview } = await import("./lib/srs");
-        
+
         const userVocab = await db.getUserVocabularyById(input.userVocabId);
         if (!userVocab || userVocab.user_id !== ctx.user.id) {
           throw new TRPCError({ code: "NOT_FOUND", message: "Vocabulary not found" });
@@ -1056,39 +1068,39 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         // Get the vocabulary entry for this word from this text
         const vocabList = await db.getVocabularyByTextId(input.textId);
-        
+
         // Check if vocabulary list is empty or undefined
         if (!vocabList || vocabList.length === 0) {
-          throw new TRPCError({ 
-            code: "NOT_FOUND", 
-            message: "No vocabulary found for this text. Please extract vocabulary first." 
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "No vocabulary found for this text. Please extract vocabulary first."
           });
         }
-        
-        const vocabEntry = vocabList.find((v: any) => 
+
+        const vocabEntry = vocabList.find((v: any) =>
           v.dutchWord.toLowerCase() === input.dutchWord.toLowerCase()
         );
-        
+
         if (!vocabEntry) {
-          throw new TRPCError({ 
-            code: "NOT_FOUND", 
-            message: "Word not found in this text's vocabulary" 
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Word not found in this text's vocabulary"
           });
         }
-        
+
         // Check if user already has this word
         const existingUserVocab = await db.getUserVocabularyByVocabId(
-          ctx.user.id, 
+          ctx.user.id,
           vocabEntry.id
         );
-        
+
         if (existingUserVocab) {
-          throw new TRPCError({ 
-            code: "CONFLICT", 
-            message: "You already have this word in your vocabulary" 
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "You already have this word in your vocabulary"
           });
         }
-        
+
         // Add to user's vocabulary
         await db.createUserVocabulary({
           user_id: ctx.user.id,
@@ -1101,7 +1113,7 @@ export const appRouter = router({
           interval: 0,
           repetitions: 0,
         });
-        
+
         return { success: true };
       }),
 
@@ -1112,7 +1124,7 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         const { calculateNextReview } = await import("./lib/srs");
-        
+
         const userVocab = await db.getUserVocabularyById(input.userVocabId);
         if (!userVocab || userVocab.user_id !== ctx.user.id) {
           throw new TRPCError({ code: "NOT_FOUND", message: "Vocabulary not found" });
@@ -1156,7 +1168,7 @@ export const appRouter = router({
         }
 
         await db.deleteUserVocabulary(input.userVocabId);
-        
+
         // Update user's vocabulary count
         await db.updateUserVocabularyCount(ctx.user.id);
 
@@ -1225,16 +1237,16 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         // Get word from dictionary
         const dictWord = await db.getDictionaryWord(input.word);
-        
+
         if (!dictWord) {
           throw new TRPCError({ code: "NOT_FOUND", message: "Word not found in dictionary" });
         }
-        
+
         // Check if vocabulary entry exists
         const existingVocab = await db.getVocabularyByWord(dictWord.word);
-        
+
         let vocabularyId: number;
-        
+
         if (!existingVocab) {
           // Create new vocabulary entry
           try {
@@ -1252,26 +1264,26 @@ export const appRouter = router({
               audioUrl: dictWord.audio_url || null,
               audioKey: dictWord.audio_key || null,
             });
-            
+
             console.log('[addFromDictionary] createVocabulary result:', newVocab);
-            
+
             // createVocabulary returns an array - ensure it's not empty
             if (!newVocab || newVocab.length === 0) {
               console.error('[addFromDictionary] createVocabulary returned empty array');
-              throw new TRPCError({ 
-                code: "INTERNAL_SERVER_ERROR", 
-                message: "Failed to create vocabulary entry - empty result" 
+              throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Failed to create vocabulary entry - empty result"
               });
             }
-            
+
             if (!newVocab[0] || !newVocab[0].id) {
               console.error('[addFromDictionary] createVocabulary result missing id:', newVocab[0]);
-              throw new TRPCError({ 
-                code: "INTERNAL_SERVER_ERROR", 
-                message: "Failed to create vocabulary entry - missing id" 
+              throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Failed to create vocabulary entry - missing id"
               });
             }
-            
+
             vocabularyId = newVocab[0].id;
           } catch (error) {
             console.error('[addFromDictionary] Error creating vocabulary:', error);
@@ -1283,9 +1295,9 @@ export const appRouter = router({
         } else {
           vocabularyId = existingVocab.id;
         }
-        
+
         console.log('[addFromDictionary] vocabularyId:', vocabularyId);
-        
+
         // Check if user already has this word
         console.log('[addFromDictionary] Checking if user already has word...');
         const existingUserVocab = await db.getUserVocabularyByVocabId(
@@ -1293,14 +1305,14 @@ export const appRouter = router({
           vocabularyId
         );
         console.log('[addFromDictionary] existingUserVocab:', existingUserVocab);
-        
+
         if (existingUserVocab) {
-          throw new TRPCError({ 
-            code: "CONFLICT", 
-            message: "You already have this word in your vocabulary" 
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "You already have this word in your vocabulary"
           });
         }
-        
+
         // Add to user's vocabulary
         console.log('[addFromDictionary] Adding to user vocabulary...');
         try {
@@ -1323,12 +1335,12 @@ export const appRouter = router({
             message: `Failed to add word to user vocabulary: ${error instanceof Error ? error.message : 'Unknown error'}`
           });
         }
-        
+
         // Update user's vocabulary count
         console.log('[addFromDictionary] Updating user vocabulary count...');
         await db.updateUserVocabularyCount(ctx.user.id);
         console.log('[addFromDictionary] User vocabulary count updated');
-        
+
         console.log('[addFromDictionary] Successfully added word to user vocabulary');
         return { success: true, vocabularyId };
       }),
@@ -1396,7 +1408,7 @@ export const appRouter = router({
     getStats: adminProcedure.query(async () => {
       const allTexts = await db.getAllTexts();
       const allUsers = await db.getAllUsers();
-      
+
       return {
         pending: allTexts.filter((t: any) => t.status === 'pending').length,
         approved: allTexts.filter((t: any) => t.status === 'approved').length,
@@ -1417,10 +1429,10 @@ export const appRouter = router({
         if (!user) {
           throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
         }
-        
+
         const userExams = await db.getUserExams(input.userId);
         const userTexts = await db.getUserTexts(input.userId);
-        
+
         return {
           user,
           exams: userExams,
@@ -1558,13 +1570,13 @@ export const appRouter = router({
         if (!exam) {
           throw new TRPCError({ code: "NOT_FOUND", message: "Exam not found" });
         }
-        
+
         // Get text details
         const text = await db.getTextById(exam.text_id);
-        
+
         // Get user details
         const user = await db.getUserById(exam.user_id);
-        
+
         return {
           ...exam,
           text,
@@ -1584,7 +1596,8 @@ export const appRouter = router({
   }),
 
   // User management
-  user: router({    updatePreferredLanguage: protectedProcedure
+  user: router({
+    updatePreferredLanguage: protectedProcedure
       .input(z.object({
         language: z.enum(["ar", "en", "tr", "nl"]),
       }))
@@ -1623,7 +1636,7 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         const result = await db.rateText(ctx.user.id, input.text_id, input.rating, input.reason, input.comment);
-        
+
         // Send notification to exam creator
         try {
           const text = await db.getTextById(input.text_id);
@@ -1643,7 +1656,7 @@ export const appRouter = router({
         } catch (error) {
           console.error('[Notification] Failed to send exam rating notification:', error);
         }
-        
+
         return result;
       }),
 
@@ -1683,13 +1696,13 @@ export const appRouter = router({
 
   // Forum router
   forum: forumRouter,
-  
+
   // Forum moderation enhancements
   forumModeration: forumModerationEnhancementsRouter,
-  
+
   // Notifications router
   notifications: notificationsRouter,
-  
+
   // Settings router (admin)
   settings: settingsRouter,
 });

@@ -9,22 +9,23 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { BookOpen, Loader2, CheckCircle, AlertCircle, Sparkles, Upload, Image as ImageIcon, AlertTriangle, X } from "lucide-react";
+import { BookOpen, Loader2, CheckCircle, AlertCircle, Sparkles, Upload, Image as ImageIcon, AlertTriangle, X, Lightbulb } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { cleanPastedText, formatDutchText, countWords, estimateReadingTime, isTextLongEnough } from "@/lib/textCleaner";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function CreateExam() {
   const { user, logout } = useAuth();
   const { t } = useLanguage();
   const [, setLocation] = useLocation();
-  
+
   // Check if exam creation is enabled
   const { data: examCreationStatus } = trpc.settings.isExamCreationEnabled.useQuery();
-  
+
   const [dutchText, setDutchText] = useState("");
   const [title, setTitle] = useState("");
   const [textId, setTextId] = useState<number | null>(null);
@@ -39,6 +40,8 @@ export default function CreateExam() {
   const [agreedToPublic, setAgreedToPublic] = useState(false);
   const [similarTexts, setSimilarTexts] = useState<Array<{ id: number; title: string; similarity: number }>>([]);
   const [isExtracting, setIsExtracting] = useState(false);
+  const [isSuggestionOpen, setIsSuggestionOpen] = useState(false);
+  const [suggestionTopic, setSuggestionTopic] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const extractFromImageMutation = trpc.text.extractFromImage.useMutation({
@@ -46,7 +49,7 @@ export default function CreateExam() {
       setDutchText(data.text);
       setIsExtracting(false);
       toast.success(`Text extracted! ${data.characterCount} characters${data.isTruncated ? ' (truncated to 10,100)' : ''}`);
-      
+
       // Check for duplicates after extraction
       checkDuplicateMutation.mutate({ text: data.text });
     },
@@ -95,7 +98,7 @@ export default function CreateExam() {
 
     setIsExtracting(true);
     toast.info("Extracting text from pasted image...");
-    
+
     const reader = new FileReader();
     reader.onload = () => {
       const base64 = reader.result as string;
@@ -106,7 +109,7 @@ export default function CreateExam() {
 
   const handleTextChange = (text: string) => {
     setDutchText(text);
-    
+
     // Check for duplicates when text changes (debounced)
     if (text.length > 100) {
       checkDuplicateMutation.mutate({ text });
@@ -118,7 +121,7 @@ export default function CreateExam() {
   const createTextMutation = trpc.text.create.useMutation({
     onMutate: () => {
       setStep("generating");
-      
+
       // Initialize processing steps
       const steps = [
         { id: 'clean', label: t.stepCleanText, status: 'processing' as const },
@@ -128,33 +131,33 @@ export default function CreateExam() {
         { id: 'format', label: t.stepFormatText, status: 'pending' as const },
       ];
       setProcessingSteps(steps);
-      
+
       // Simulate step progression (since we use unified call, we estimate timing)
       setTimeout(() => {
-        setProcessingSteps(prev => prev.map((s, i) => 
-          i === 0 ? { ...s, status: 'completed' } : 
-          i === 1 ? { ...s, status: 'processing' } : s
+        setProcessingSteps(prev => prev.map((s, i) =>
+          i === 0 ? { ...s, status: 'completed' } :
+            i === 1 ? { ...s, status: 'processing' } : s
         ));
       }, 2000);
-      
+
       setTimeout(() => {
-        setProcessingSteps(prev => prev.map((s, i) => 
-          i <= 1 ? { ...s, status: 'completed' } : 
-          i === 2 ? { ...s, status: 'processing' } : s
+        setProcessingSteps(prev => prev.map((s, i) =>
+          i <= 1 ? { ...s, status: 'completed' } :
+            i === 2 ? { ...s, status: 'processing' } : s
         ));
       }, 4000);
-      
+
       setTimeout(() => {
-        setProcessingSteps(prev => prev.map((s, i) => 
-          i <= 2 ? { ...s, status: 'completed' } : 
-          i === 3 ? { ...s, status: 'processing' } : s
+        setProcessingSteps(prev => prev.map((s, i) =>
+          i <= 2 ? { ...s, status: 'completed' } :
+            i === 3 ? { ...s, status: 'processing' } : s
         ));
       }, 7000);
-      
+
       setTimeout(() => {
-        setProcessingSteps(prev => prev.map((s, i) => 
-          i <= 3 ? { ...s, status: 'completed' } : 
-          i === 4 ? { ...s, status: 'processing' } : s
+        setProcessingSteps(prev => prev.map((s, i) =>
+          i <= 3 ? { ...s, status: 'completed' } :
+            i === 4 ? { ...s, status: 'processing' } : s
         ));
       }, 9000);
     },
@@ -204,6 +207,22 @@ export default function CreateExam() {
     },
   });
 
+  const suggestTopicMutation = trpc.text.suggestTopic.useMutation({
+    onSuccess: () => {
+      toast.success(t.suggestionSubmitted || "Suggestion submitted!");
+      setIsSuggestionOpen(false);
+      setSuggestionTopic("");
+    },
+    onError: (error) => {
+      toast.error((t.suggestionFailed || "Failed to submit suggestion") + ": " + error.message);
+    },
+  });
+
+  const handleSuggestTopic = () => {
+    if (!suggestionTopic.trim()) return;
+    suggestTopicMutation.mutate({ topic: suggestionTopic });
+  };
+
   const handleSubmit = () => {
     if (!dutchText.trim()) {
       toast.error("Please enter Dutch text");
@@ -246,7 +265,7 @@ export default function CreateExam() {
     <div className="min-h-screen bg-gradient-bg">
       {/* Header */}
       <AppHeader />
-      
+
       {/* Exam Creation Disabled Overlay */}
       {examCreationStatus && !examCreationStatus.enabled && user?.role !== 'admin' && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -259,7 +278,7 @@ export default function CreateExam() {
             >
               <X className="w-6 h-6" />
             </button>
-            
+
             <CardHeader className="text-center">
               <div className="mx-auto mb-4 w-16 h-16 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center">
                 <AlertTriangle className="w-8 h-8 text-orange-600 dark:text-orange-400" />
@@ -272,16 +291,24 @@ export default function CreateExam() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button 
-                className="w-full" 
+              <Button
+                className="w-full"
                 size="lg"
                 onClick={() => setLocation("/public-exams")}
               >
                 <BookOpen className="w-5 h-5 mr-2" />
                 {t.browseExams}
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => setIsSuggestionOpen(true)}
+              >
+                <Lightbulb className="w-5 h-5 mr-2" />
+                {t.suggestTopic || "Suggest Missing Topic"}
+              </Button>
+              <Button
+                variant="ghost"
                 className="w-full"
                 onClick={() => setLocation("/dashboard")}
               >
@@ -291,6 +318,40 @@ export default function CreateExam() {
           </Card>
         </div>
       )}
+
+      <Dialog open={isSuggestionOpen} onOpenChange={setIsSuggestionOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t.suggestTopic || "Suggest Missing Topic"}</DialogTitle>
+            <DialogDescription>
+              {t.topicSuggestionPlaceholder || "Describe the topic you would like to see added..."}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Textarea
+              value={suggestionTopic}
+              onChange={(e) => setSuggestionTopic(e.target.value)}
+              placeholder={t.topicSuggestionPlaceholder || "Describe the topic..."}
+              maxLength={70}
+            />
+            <p className="text-xs text-muted-foreground mt-2 text-right">
+              {suggestionTopic.length}/70
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsSuggestionOpen(false)}>
+              {t.cancel || "Cancel"}
+            </Button>
+            <Button
+              onClick={handleSuggestTopic}
+              disabled={!suggestionTopic.trim() || suggestTopicMutation.isPending}
+            >
+              {suggestTopicMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t.submitSuggestion || "Submit"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
@@ -538,10 +599,10 @@ export default function CreateExam() {
                     </span>
                   </div>
                   <div className="h-3 bg-secondary rounded-full overflow-hidden">
-                    <div 
+                    <div
                       className="h-full bg-gradient-to-r from-primary to-primary/80 transition-all duration-500 ease-out"
-                      style={{ 
-                        width: `${(processingSteps.filter(s => s.status === 'completed').length / processingSteps.length) * 100}%` 
+                      style={{
+                        width: `${(processingSteps.filter(s => s.status === 'completed').length / processingSteps.length) * 100}%`
                       }}
                     />
                   </div>
@@ -550,16 +611,16 @@ export default function CreateExam() {
                 {/* Processing Steps */}
                 <div className="space-y-4">
                   {processingSteps.map((step, index) => (
-                    <div 
+                    <div
                       key={step.id}
                       className="flex items-center gap-4 p-4 rounded-lg border transition-all duration-300"
                       style={{
-                        backgroundColor: step.status === 'completed' ? 'hsl(var(--primary) / 0.1)' : 
-                                       step.status === 'processing' ? 'hsl(var(--primary) / 0.05)' : 
-                                       'transparent',
-                        borderColor: step.status === 'completed' ? 'hsl(var(--primary) / 0.3)' : 
-                                    step.status === 'processing' ? 'hsl(var(--primary) / 0.2)' : 
-                                    'hsl(var(--border))',
+                        backgroundColor: step.status === 'completed' ? 'hsl(var(--primary) / 0.1)' :
+                          step.status === 'processing' ? 'hsl(var(--primary) / 0.05)' :
+                            'transparent',
+                        borderColor: step.status === 'completed' ? 'hsl(var(--primary) / 0.3)' :
+                          step.status === 'processing' ? 'hsl(var(--primary) / 0.2)' :
+                            'hsl(var(--border))',
                       }}
                     >
                       {/* Step Icon */}
@@ -582,9 +643,9 @@ export default function CreateExam() {
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
                           <span className="font-medium" style={{
-                            color: step.status === 'completed' ? 'hsl(var(--primary))' : 
-                                   step.status === 'processing' ? 'hsl(var(--foreground))' : 
-                                   'hsl(var(--muted-foreground))'
+                            color: step.status === 'completed' ? 'hsl(var(--primary))' :
+                              step.status === 'processing' ? 'hsl(var(--foreground))' :
+                                'hsl(var(--muted-foreground))'
                           }}>
                             {step.label}
                           </span>

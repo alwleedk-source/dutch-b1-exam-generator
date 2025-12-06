@@ -23,6 +23,8 @@ import {
   achievements,
   InsertAchievement,
   b1Dictionary,
+  topicSuggestions,
+  InsertTopicSuggestion,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -162,7 +164,7 @@ export async function getAllUsers() {
   if (!db) return [];
 
   const allUsers = await db.select().from(users).orderBy(desc(users.created_at));
-  
+
   // Add comprehensive stats for each user
   const usersWithStats = await Promise.all(
     allUsers.map(async (user) => {
@@ -171,21 +173,21 @@ export async function getAllUsers() {
         .select()
         .from(exams)
         .where(and(eq(exams.user_id, user.id), eq(exams.status, 'completed')));
-      
+
       // Count created texts
       const createdTexts = await db
         .select()
         .from(texts)
         .where(eq(texts.created_by, user.id));
-      
+
       // Calculate average score
-      const examsWithScores = completedExams.filter(e => e.score !== null && e.total_questions !== null);
+      const examsWithScores = completedExams.filter(e => e.score_percentage !== null);
       const avgScore = examsWithScores.length > 0
         ? Math.round(
-            examsWithScores.reduce((sum, e) => sum + ((e.score! / e.total_questions!) * 100), 0) / examsWithScores.length
-          )
+          examsWithScores.reduce((sum, e) => sum + e.score_percentage!, 0) / examsWithScores.length
+        )
         : 0;
-      
+
       return {
         ...user,
         totalExamsCompleted: completedExams.length,
@@ -194,7 +196,7 @@ export async function getAllUsers() {
       };
     })
   );
-  
+
   return usersWithStats;
 }
 
@@ -213,7 +215,7 @@ export async function checkDuplicateText(minHashSignature: number[], userId: num
   if (!db) return false;
 
   const minHashSignatureJson = JSON.stringify(minHashSignature);
-  
+
   // Check if a text with the same MinHash signature exists for this user
   const result = await db
     .select()
@@ -225,7 +227,7 @@ export async function checkDuplicateText(minHashSignature: number[], userId: num
       )
     )
     .limit(1);
-  
+
   return result.length > 0;
 }
 
@@ -396,7 +398,7 @@ export async function getExamById(id: number) {
     .leftJoin(texts, eq(exams.text_id, texts.id))
     .where(eq(exams.id, id))
     .limit(1);
-    
+
   return result.length > 0 ? result[0] : undefined;
 }
 
@@ -532,7 +534,7 @@ export async function linkVocabularyToText(textId: number, vocabularyId: number)
     text_id: textId,
     vocabulary_id: vocabularyId,
   }).onConflictDoNothing();
-  
+
   return result;
 }
 
@@ -606,15 +608,15 @@ export async function updateUserVocabularyCount(user_id: number) {
     .select({ count: count() })
     .from(userVocabulary)
     .where(eq(userVocabulary.user_id, user_id));
-  
+
   const vocabularyCount = result[0]?.count || 0;
-  
+
   // Update user stats
   await db
     .update(users)
-    .set({ 
+    .set({
       total_vocabulary_learned: Number(vocabularyCount),
-      updated_at: new Date() 
+      updated_at: new Date()
     })
     .where(eq(users.id, user_id));
 }
@@ -628,20 +630,20 @@ export async function updateUserStreak(user_id: number) {
 
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  
+
   // Get last activity date
   const lastActivity = user.last_activity_date ? new Date(user.last_activity_date) : null;
   const lastActivityDay = lastActivity ? new Date(lastActivity.getFullYear(), lastActivity.getMonth(), lastActivity.getDate()) : null;
-  
+
   let newStreak = user.current_streak || 0;
   let newLongestStreak = user.longest_streak || 0;
-  
+
   if (!lastActivityDay) {
     // First activity ever
     newStreak = 1;
   } else {
     const daysDiff = Math.floor((today.getTime() - lastActivityDay.getTime()) / (1000 * 60 * 60 * 24));
-    
+
     if (daysDiff === 0) {
       // Same day, no change to streak
       return;
@@ -653,16 +655,16 @@ export async function updateUserStreak(user_id: number) {
       newStreak = 1;
     }
   }
-  
+
   // Update longest streak if current is higher
   if (newStreak > newLongestStreak) {
     newLongestStreak = newStreak;
   }
-  
+
   // Update user stats
   await db
     .update(users)
-    .set({ 
+    .set({
       current_streak: newStreak,
       longest_streak: newLongestStreak,
       last_activity_date: now,
@@ -677,12 +679,12 @@ export async function createUserVocabulary(userVocab: InsertUserVocabulary) {
 
   // Convert ease_factor from integer (2500) to decimal (2.5) for database
   const easeFactor = userVocab.ease_factor ? userVocab.ease_factor / 1000 : 2.5;
-  
+
   // Convert next_review_at to ISO string if it's a Date
-  const nextReviewDate = userVocab.next_review_at instanceof Date 
-    ? userVocab.next_review_at.toISOString() 
+  const nextReviewDate = userVocab.next_review_at instanceof Date
+    ? userVocab.next_review_at.toISOString()
     : userVocab.next_review_at;
-    
+
   const result = await db.execute(sql`
     INSERT INTO "user_vocabulary" (
       "user_id", "vocabulary_id", "status", "correct_count", "incorrect_count",
@@ -694,13 +696,13 @@ export async function createUserVocabulary(userVocab: InsertUserVocabulary) {
       ${userVocab.interval}, ${userVocab.repetitions}
     )
   `);
-  
+
   // Update user's total vocabulary count
   await updateUserVocabularyCount(userVocab.user_id);
-  
+
   // Update user's streak
   await updateUserStreak(userVocab.user_id);
-  
+
   return result;
 }
 
@@ -931,7 +933,7 @@ export async function getLeaderboard(period: 'week' | 'month' | 'all', limit: nu
 
   const now = new Date();
   let dateThreshold: Date | null = null;
-  
+
   if (period === 'week') {
     dateThreshold = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   } else if (period === 'month') {
@@ -958,10 +960,10 @@ export async function getLeaderboard(period: 'week' | 'month' | 'all', limit: nu
 
     // Group by user and calculate stats
     const userStats = new Map<number, { name: string; scores: number[] }>();
-    
+
     for (const exam of completedExams) {
       if (!exam.score_percentage) continue;
-      
+
       if (!userStats.has(exam.user_id)) {
         userStats.set(exam.user_id, { name: exam.userName || "Anonymous", scores: [] });
       }
@@ -1034,7 +1036,7 @@ export async function updateUserVocabularySRS(
     .update(userVocabulary)
     .set({ ...data, ease_factor: easeFactor })
     .where(eq(userVocabulary.id, userVocabId));
-  
+
   // Get user_id from userVocabulary to update streak
   const userVocab = await getUserVocabularyById(userVocabId);
   if (userVocab) {
@@ -1089,7 +1091,7 @@ export async function getAllExams(options?: {
       user_id: exams.user_id,
       text_id: exams.text_id,
       status: exams.status,
-      score: exams.score,
+      score_percentage: exams.score_percentage,
       total_questions: exams.total_questions,
       created_at: exams.created_at,
       completed_at: exams.completed_at,
@@ -1103,7 +1105,8 @@ export async function getAllExams(options?: {
     .from(exams)
     .leftJoin(users, eq(exams.user_id, users.id))
     .leftJoin(texts, eq(exams.text_id, texts.id))
-    .orderBy(desc(exams.created_at));
+    .orderBy(desc(exams.created_at))
+    .$dynamic();
 
   // Apply status filter
   if (options?.status && options.status !== "all") {
@@ -1123,7 +1126,7 @@ export async function getAllExams(options?: {
   // Apply search filter (client-side for simplicity)
   if (options?.search && options.search.trim()) {
     const searchLower = options.search.toLowerCase();
-    return results.filter((exam: any) => 
+    return results.filter((exam: any) =>
       exam.text_title?.toLowerCase().includes(searchLower) ||
       exam.user_name?.toLowerCase().includes(searchLower) ||
       exam.user_email?.toLowerCase().includes(searchLower) ||
@@ -1139,8 +1142,8 @@ export async function deleteExam(examId: number) {
   if (!db) return;
 
   // Delete related records first
-  await db.delete(userAnswers).where(eq(userAnswers.exam_id, examId));
-  
+  // Note: userAnswers are stored in the exams table, so no separate table to delete
+
   // Delete the exam
   await db.delete(exams).where(eq(exams.id, examId));
 }
@@ -1153,7 +1156,7 @@ export async function deleteText(textId: number) {
   // Delete related records first
   await db.delete(exams).where(eq(exams.text_id, textId));
   await db.delete(reports).where(eq(reports.text_id, textId));
-  
+
   // Delete the text
   await db.delete(texts).where(eq(texts.id, textId));
 }
@@ -1201,13 +1204,13 @@ export async function searchDictionary(options: {
   const db = await getDb();
   if (!db) return [];
 
-  let queryBuilder = db.select().from(b1Dictionary);
+  let queryBuilder = db.select().from(b1Dictionary).$dynamic();
 
   // Apply filters
   // If both query and letter are provided, use query (search takes precedence)
   // If only letter is provided, filter by letter
   // If only query is provided, search by query
-  
+
   if (options.query && options.query.length >= 2) {
     queryBuilder = queryBuilder.where(ilike(b1Dictionary.word, `%${options.query}%`));
   } else if (options.letter) {
@@ -1230,13 +1233,13 @@ export async function searchDictionary(options: {
 export async function getUserExams(userId: number) {
   const db = await getDb();
   if (!db) return [];
-  
+
   return await db
     .select({
       id: exams.id,
       text_id: exams.text_id,
       status: exams.status,
-      score: exams.score,
+      score_percentage: exams.score_percentage,
       total_questions: exams.total_questions,
       time_spent_minutes: exams.time_spent_minutes,
       created_at: exams.created_at,
@@ -1254,7 +1257,7 @@ export async function getUserExams(userId: number) {
 export async function getUserTexts(userId: number) {
   const db = await getDb();
   if (!db) return [];
-  
+
   return await db
     .select()
     .from(texts)
@@ -1268,19 +1271,19 @@ export async function getUserTexts(userId: number) {
 export async function deleteUser(userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  
+
   // Delete user's vocabulary first (foreign key constraint)
   await db.delete(userVocabulary).where(eq(userVocabulary.user_id, userId));
-  
+
   // Delete user's exam results
-  await db.delete(examResults).where(eq(examResults.user_id, userId));
-  
+  // Delete user's exam results (if any separate table exists, otherwise covered by exams)
+
   // Delete user's exams
   await db.delete(exams).where(eq(exams.user_id, userId));
-  
+
   // Delete user's texts
   await db.delete(texts).where(eq(texts.created_by, userId));
-  
+
   // Finally delete the user
   await db.delete(users).where(eq(users.id, userId));
 }
@@ -1291,7 +1294,7 @@ export async function deleteUser(userId: number) {
 export async function updateUserRole(userId: number, role: 'user' | 'admin' | 'moderator') {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  
+
   await db
     .update(users)
     .set({ role, updated_at: new Date() })
@@ -1304,12 +1307,12 @@ export async function updateUserRole(userId: number, role: 'user' | 'admin' | 'm
 export async function updateUserBanStatus(userId: number, isBanned: boolean) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  
+
   await db
     .update(users)
-    .set({ 
+    .set({
       // Assuming there's a banned field, if not we'll add it
-      updated_at: new Date() 
+      updated_at: new Date()
     })
     .where(eq(users.id, userId));
 }
@@ -1329,7 +1332,7 @@ export async function getTextsFiltered(options: {
 }) {
   const db = await getDb();
   if (!db) return [];
-  
+
   let query = db
     .select({
       id: texts.id,
@@ -1347,10 +1350,10 @@ export async function getTextsFiltered(options: {
     })
     .from(texts)
     .leftJoin(users, eq(texts.created_by, users.id));
-  
+
   // Apply filters
   const conditions = [];
-  
+
   if (options.search) {
     conditions.push(
       or(
@@ -1359,25 +1362,25 @@ export async function getTextsFiltered(options: {
       )
     );
   }
-  
+
   if (options.status) {
     conditions.push(eq(texts.status, options.status));
   }
-  
+
   if (options.userId) {
     conditions.push(eq(texts.created_by, options.userId));
   }
-  
+
   if (conditions.length > 0) {
     query = query.where(and(...conditions)) as any;
   }
-  
+
   // Apply ordering and pagination
   const result = await query
     .orderBy(desc(texts.created_at))
     .limit(options.limit || 50)
     .offset(options.offset || 0);
-  
+
   return result;
 }
 
@@ -1387,7 +1390,7 @@ export async function getTextsFiltered(options: {
 export async function getTextWithDetails(textId: number) {
   const db = await getDb();
   if (!db) return null;
-  
+
   const text = await db
     .select({
       id: texts.id,
@@ -1409,16 +1412,16 @@ export async function getTextWithDetails(textId: number) {
     .leftJoin(users, eq(texts.created_by, users.id))
     .where(eq(texts.id, textId))
     .limit(1);
-  
+
   if (text.length === 0) return null;
-  
+
   // Get associated exam (questions)
   const exam = await db
     .select()
     .from(exams)
     .where(eq(exams.text_id, textId))
     .limit(1);
-  
+
   return {
     ...text[0],
     questions: exam.length > 0 ? exam[0].questions : null,
@@ -1433,13 +1436,13 @@ export async function getTextWithDetails(textId: number) {
 export async function getAdminStats() {
   const db = await getDb();
   if (!db) return null;
-  
+
   const totalUsers = await db.select().from(users);
   const totalTexts = await db.select().from(texts);
   const totalExams = await db.select().from(exams);
   const pendingTexts = await db.select().from(texts).where(eq(texts.status, 'pending'));
   const completedExams = await db.select().from(exams).where(eq(exams.status, 'completed'));
-  
+
   return {
     totalUsers: totalUsers.length,
     totalTexts: totalTexts.length,
@@ -1456,7 +1459,7 @@ export async function getAdminStats() {
 export async function getRecentActivity(limit: number = 10) {
   const db = await getDb();
   if (!db) return { recentTexts: [], recentExams: [] };
-  
+
   const recentTexts = await db
     .select({
       id: texts.id,
@@ -1469,14 +1472,14 @@ export async function getRecentActivity(limit: number = 10) {
     .leftJoin(users, eq(texts.created_by, users.id))
     .orderBy(desc(texts.created_at))
     .limit(limit);
-  
+
   const recentExams = await db
     .select({
       id: exams.id,
       text_id: exams.text_id,
       created_at: exams.created_at,
       status: exams.status,
-      score: exams.score,
+      score_percentage: exams.score_percentage,
       total_questions: exams.total_questions,
       user_name: users.name,
       user_email: users.email,
@@ -1487,7 +1490,7 @@ export async function getRecentActivity(limit: number = 10) {
     .leftJoin(texts, eq(exams.text_id, texts.id))
     .orderBy(desc(exams.created_at))
     .limit(limit);
-  
+
   return {
     recentTexts,
     recentExams,
@@ -1502,7 +1505,7 @@ export async function getRecentActivity(limit: number = 10) {
 export async function rateText(userId: number, textId: number, rating: number, reason?: string, comment?: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  
+
   // Check if user already rated this text
   const existingRating = await db
     .select()
@@ -1512,13 +1515,13 @@ export async function rateText(userId: number, textId: number, rating: number, r
       eq(textRatings.user_id, userId)
     ))
     .limit(1);
-  
+
   if (existingRating.length > 0) {
     // Update existing rating
     await db
       .update(textRatings)
-      .set({ 
-        rating, 
+      .set({
+        rating,
         reason: reason || null,
         comment: comment || null,
         updated_at: new Date()
@@ -1539,16 +1542,16 @@ export async function rateText(userId: number, textId: number, rating: number, r
         comment: comment || null
       });
   }
-  
+
   // Calculate and update average rating and total ratings
   const allRatings = await db
     .select()
     .from(textRatings)
     .where(eq(textRatings.text_id, textId));
-  
+
   const avgRating = allRatings.reduce((sum, r) => sum + r.rating, 0) / allRatings.length;
   const totalRatings = allRatings.length;
-  
+
   await db
     .update(texts)
     .set({
@@ -1556,7 +1559,7 @@ export async function rateText(userId: number, textId: number, rating: number, r
       total_ratings: totalRatings
     })
     .where(eq(texts.id, textId));
-  
+
   return { success: true };
 }
 
@@ -1566,7 +1569,7 @@ export async function rateText(userId: number, textId: number, rating: number, r
 export async function getUserRating(userId: number, textId: number) {
   const db = await getDb();
   if (!db) return null;
-  
+
   const result = await db
     .select()
     .from(textRatings)
@@ -1575,7 +1578,7 @@ export async function getUserRating(userId: number, textId: number) {
       eq(textRatings.user_id, userId)
     ))
     .limit(1);
-  
+
   return result[0] || null;
 }
 
@@ -1585,7 +1588,7 @@ export async function getUserRating(userId: number, textId: number) {
 export async function getTextRatings(textId: number) {
   const db = await getDb();
   if (!db) return [];
-  
+
   const result = await db
     .select({
       id: textRatings.id,
@@ -1602,7 +1605,7 @@ export async function getTextRatings(textId: number) {
     .leftJoin(users, eq(textRatings.user_id, users.id))
     .where(eq(textRatings.text_id, textId))
     .orderBy(desc(textRatings.created_at));
-  
+
   return result;
 }
 
@@ -1612,11 +1615,11 @@ export async function getTextRatings(textId: number) {
 export async function deleteRating(ratingId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  
+
   await db
     .delete(textRatings)
     .where(eq(textRatings.id, ratingId));
-  
+
   // Trigger will automatically update texts table
   return { success: true };
 }
@@ -1627,7 +1630,7 @@ export async function deleteRating(ratingId: number) {
 export async function getTextsByReason(textIds: number[], reason: string) {
   const db = await getDb();
   if (!db) return [];
-  
+
   // Get text IDs that have ratings with the specified reason
   const ratingsWithReason = await db
     .select({ text_id: textRatings.text_id })
@@ -1637,15 +1640,25 @@ export async function getTextsByReason(textIds: number[], reason: string) {
       eq(textRatings.reason, reason)
     ))
     .groupBy(textRatings.text_id);
-  
+
   const filteredTextIds = ratingsWithReason.map(r => r.text_id);
-  
+
   if (filteredTextIds.length === 0) return [];
-  
+
   // Get the actual texts
   return await db
     .select()
     .from(texts)
     .where(inArray(texts.id, filteredTextIds))
     .orderBy(desc(texts.created_at));
+}
+
+// ==================== TOPIC SUGGESTION FUNCTIONS ====================
+
+export async function createTopicSuggestion(suggestion: InsertTopicSuggestion) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(topicSuggestions).values(suggestion).returning();
+  return result;
 }

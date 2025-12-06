@@ -12,13 +12,13 @@ export interface Translations {
   progress: string;
   vocabulary: string;
   admin: string;
-  
+
   // Auth
   login: string;
   logout: string;
   welcome: string;
   welcomeBack: string;
-  
+
   // Landing page
   appTitle: string;
   appSubtitle: string;
@@ -26,7 +26,7 @@ export interface Translations {
   learnMore: string;
   features: string;
   howItWorks: string;
-  
+
   // Features
   feature1Title: string;
   feature1Desc: string;
@@ -36,7 +36,7 @@ export interface Translations {
   feature3Desc: string;
   feature4Title: string;
   feature4Desc: string;
-  
+
   // Text creation
   createNewExam: string;
   browsePublicExams: string;
@@ -47,7 +47,7 @@ export interface Translations {
   textTooShort: string;
   validateText: string;
   translating: string;
-  
+
   // Validation
   validatingText: string;
   textValidated: string;
@@ -57,7 +57,7 @@ export interface Translations {
   levelWarning: string;
   wordCount: string;
   estimatedTime: string;
-  
+
   // Exam
   startExam: string;
   submitExam: string;
@@ -88,7 +88,7 @@ export interface Translations {
   examNotCompleted: string;
   examNotCompletedDesc: string;
   takeExam: string;
-  
+
   // Progress
   myProgress: string;
   totalExams: string;
@@ -103,14 +103,14 @@ export interface Translations {
   performanceByType: string;
   performanceByTypeDesc: string;
   personalizedTips: string;
-  
+
   // Vocabulary
   myVocabulary: string;
   newWords: string;
   learning: string;
   mastered: string;
   reviewNow: string;
-  
+
   // Reporting
   reportIssue: string;
   levelIssue: string;
@@ -122,7 +122,7 @@ export interface Translations {
   notDutch: string;
   other: string;
   reportSubmitted: string;
-  
+
   // Admin
   userManagement: string;
   textModeration: string;
@@ -133,10 +133,14 @@ export interface Translations {
   pending: string;
   approved: string;
   rejected: string;
-  
+
   // Common
   save: string;
   cancel: string;
+  reason: string;
+  harassment: string;
+  misinformation: string;
+  enterBanReason: string;
   delete: string;
   edit: string;
   back: string;
@@ -172,7 +176,7 @@ export interface Translations {
   minRead: string;
   remaining: string;
   characters: string;
-  
+
   // Homepage - New comprehensive translations
   staatsexamenPrep: string;
   officialExamFormat: string;
@@ -180,7 +184,7 @@ export interface Translations {
   comprehensivePreparation: string;
   whyChooseUs: string;
   keyFeatures: string;
-  
+
   // Features - Detailed
   feature5Title: string;
   feature5Desc: string;
@@ -190,7 +194,7 @@ export interface Translations {
   feature7Desc: string;
   feature8Title: string;
   feature8Desc: string;
-  
+
   // Benefits
   benefit1Title: string;
   benefit1Desc: string;
@@ -204,7 +208,7 @@ export interface Translations {
   benefit5Desc: string;
   benefit6Title: string;
   benefit6Desc: string;
-  
+
   // How it works - Detailed steps
   step1Title: string;
   step1Desc: string;
@@ -214,17 +218,17 @@ export interface Translations {
   step3Desc: string;
   step4Title: string;
   step4Desc: string;
-  
+
   // CTA
   readyToStart: string;
   joinLearners: string;
   startLearningNow: string;
-  
+
   // Stats
   languagesSupported: string;
   aiPowered: string;
   levelFocus: string;
-  
+
   // Progress bar for exam generation
   processingWithAI: string;
   processingWithGemini: string;
@@ -233,14 +237,14 @@ export interface Translations {
   completedStatus: string;
   unifiedProcessing: string;
   unifiedProcessingDesc: string;
-  
+
   // Processing steps
   stepCleanText: string;
   stepGenerateTitle: string;
   stepCreateQuestions: string;
   stepExtractVocabulary: string;
   stepFormatText: string;
-  
+
   // Vocabulary page
   yourVocabulary: string;
   wordsLearned: string;
@@ -259,7 +263,7 @@ export interface Translations {
   sortMastery: string;
   sortNextReview: string;
   masteryLevel: string;
-  reviewNow: string;
+
   practice: string;
   noResults: string;
   tryDifferentFilter: string;
@@ -273,12 +277,12 @@ export interface Translations {
   failedToSaveWord: string;
   archive: string;
   restore: string;
-  mastered: string;
+
   confirmDelete: string;
   confirmArchive: string;
   skip: string;
   dontShowAgain: string;
-  
+
   // Practice mode
   flashcards: string;
   multipleChoice: string;
@@ -293,21 +297,15 @@ export interface Translations {
   selectCorrectTranslation: string;
   practiceComplete: string;
   audioError: string;
-  
+
   // Review mode
   reviewMode: string;
   simpleReview: string;
   startPractice: string;
-  showDefinition: string;
-  hideDefinition: string;
-  
+
+
   // Exam Results page
-  examNotFound: string;
-  examNotFoundDesc: string;
-  examNotCompleted: string;
-  examNotCompletedDesc: string;
-  takeExam: string;
-  loadingResults: string;
+
   passed: string;
   failed: string;
   needsImprovement: string;
@@ -315,27 +313,27 @@ export interface Translations {
   performanceAnalysis: string;
   recommendations: string;
   reviewAnswers: string;
-  
+
   // Exam Review page
   examReview: string;
   yourAnswer: string;
   correctAnswer: string;
-  
+
   // Progress page
   noProgressYet: string;
   takeFirstExam: string;
-  
+
   // Leaderboard page
   leaderboard: string;
   topScorers: string;
   rank: string;
   player: string;
-  
+
   // Not Found page
   pageNotFound: string;
   pageNotFoundDesc: string;
   goHome: string;
-  
+
   // Exam Timer
   practiceMode: string;
   examMode: string;
@@ -352,11 +350,11 @@ export interface Translations {
   resumeTimer: string;
   noTimeLimit: string;
   pleaseAnswerAll: string;
-  officialExamFormat: string;
+
   withWordTranslations: string;
   noWordTranslations: string;
   searchTexts: string;
-  
+
   // Forum
   forumTitle: string;
   forumDescription: string;
@@ -384,7 +382,7 @@ export interface Translations {
   fillAllFields: string;
   category: string;
   selectCategory: string;
-  characters: string;
+
   forumLoginPrompt: string;
   topicDeleted: string;
   postDeleted: string;
@@ -395,17 +393,17 @@ export interface Translations {
   repliedToYourTopic: string;
   upvotedYourTopic: string;
   upvotedYourPost: string;
-  
+
   // Moderator
   moderatorPanel: string;
   moderatorPanelDesc: string;
   moderatorAccessRequired: string;
   reportsManagement: string;
   reportsManagementDesc: string;
-  userManagement: string;
+
   userManagementDesc: string;
   reportResolved: string;
-  pending: string;
+
   resolved: string;
   all: string;
   noReports: string;
@@ -423,15 +421,9 @@ export interface Translations {
   report: string;
   reportContent: string;
   reportDescription: string;
-  reportSubmitted: string;
+
   selectReportReason: string;
-  reason: string;
-  selectReason: string;
-  spam: string;
-  harassment: string;
-  inappropriate: string;
-  misinformation: string;
-  other: string;
+
   topicPinToggled: string;
   topicLockToggled: string;
   topicHideToggled: string;
@@ -448,7 +440,7 @@ export interface Translations {
   reportReasonInappropriate: string;
   reportReasonMisinformation: string;
   reportReasonOther: string;
-  
+
   // User Management
   adminAccessRequired: string;
   backToModeratorPanel: string;
@@ -456,7 +448,7 @@ export interface Translations {
   status: string;
   joined: string;
   actions: string;
-  admin: string;
+  adminRole: string;
   moderator: string;
   banned: string;
   unban: string;
@@ -465,15 +457,13 @@ export interface Translations {
   addModerator: string;
   banUser: string;
   banUserDescription: string;
-  reason: string;
-  enterBanReason: string;
-  cancel: string;
+
   userBanned: string;
   userUnbanned: string;
   moderatorAdded: string;
   moderatorRemoved: string;
   banReasonRequired: string;
-  
+
   // Forum categories
   category_exams_tips: string;
   category_exams_tips_desc: string;
@@ -487,7 +477,7 @@ export interface Translations {
   "forum.category.experiences_desc": string;
   "forum.category.questions": string;
   "forum.category.questions_desc": string;
-  
+
   // Dictionary page
   searchForWord: string;
   allLetters: string;
@@ -511,7 +501,7 @@ export interface Translations {
   translation: string;
   chooseLanguage: string;
   forumEditorPlaceholder: string;
-  
+
   // Admin Settings
   adminSettings: string;
   systemSettings: string;
@@ -525,41 +515,42 @@ export interface Translations {
   disableExamCreation: string;
   settingUpdated: string;
   backToDashboard: string;
-  
+
+
   // Admin Dashboard
   filterByStatus: string;
   allStatus: string;
-  searchTexts: string;
+  adminSearchTexts: string;
   searchExams: string;
   searchUsers: string;
   id: string;
   title: string;
   createdBy: string;
   date: string;
-  
+
   // Report Dialog
   otherIssue: string;
   additionalDetails: string;
   provideMoreInfo: string;
-  
+
   // Rating Dialog
   shareThoughts: string;
-  
+
   // Create Exam
   pasteOrTypeDutchText: string;
-  
+
   // Forum Editor
   bold: string;
   italic: string;
   heading: string;
   bulletList: string;
   numberedList: string;
-  
+
   // Accessibility
   toggleSidebar: string;
   goToPreviousPage: string;
   goToNextPage: string;
-  
+
   // Confirmation messages
   confirmDeleteTitle: string;
   confirmDeleteMessage: string;
@@ -608,7 +599,7 @@ export interface Translations {
   page: string;
   previousPage: string;
   nextPage: string;
-  
+
   // Rating
   rateThisExam: string;
   ratingReason: string;
@@ -621,8 +612,19 @@ export interface Translations {
   reasonOther: string;
   filterByReason: string;
   allReasons: string;
+
+  selectRatingReason: string;
   showDefinition: string;
+  showRatingDefinition: string;
   hideDefinition: string;
+  hideRatingDefinition: string;
+
+
+  suggestTopic: string;
+  topicSuggestionPlaceholder: string;
+  submitSuggestion: string;
+  suggestionSubmitted: string;
+  suggestionFailed: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -635,13 +637,13 @@ export const translations: Record<Language, Translations> = {
     progress: "Voortgang",
     vocabulary: "Woordenschat",
     admin: "Beheer",
-    
+
     // Auth
     login: "Inloggen",
     logout: "Uitloggen",
     welcome: "Welkom",
     welcomeBack: "Welkom terug",
-    
+
     // Landing page
     appTitle: "Dutch B1 Exam Generator",
     appSubtitle: "Beheers Nederlands B1 Lezen met AI-gestuurde Oefenexamens",
@@ -649,7 +651,7 @@ export const translations: Record<Language, Translations> = {
     learnMore: "Meer Info",
     features: "Functies",
     howItWorks: "Hoe Het Werkt",
-    
+
     // Features
     feature1Title: "AI-Gestuurde Examens",
     feature1Desc: "Automatisch gegenereerde leestoetsen op B1-niveau",
@@ -659,7 +661,7 @@ export const translations: Record<Language, Translations> = {
     feature3Desc: "Volg je scores, woordenschat en studietijd",
     feature4Title: "Woordenschat Leren",
     feature4Desc: "Leer nieuwe woorden met audio en vertalingen",
-    
+
     // Text creation
     createNewExam: "Examen Aanmaken",
     browsePublicExams: "Openbare Examens Bekijken",
@@ -670,7 +672,7 @@ export const translations: Record<Language, Translations> = {
     textTooShort: "Tekst moet minimaal 50 tekens bevatten",
     validateText: "Tekst Valideren",
     translating: "Vertalen...",
-    
+
     // Validation
     validatingText: "Tekst valideren...",
     textValidated: "Tekst gevalideerd",
@@ -680,7 +682,7 @@ export const translations: Record<Language, Translations> = {
     levelWarning: "Let op: Deze tekst is niet B1-niveau",
     wordCount: "Aantal woorden",
     estimatedTime: "Geschatte leestijd",
-    
+
     // Exam
     startExam: "Examen Starten",
     submitExam: "Examen Indienen",
@@ -711,7 +713,7 @@ export const translations: Record<Language, Translations> = {
     examNotCompleted: "Examen Niet Voltooid",
     examNotCompletedDesc: "Dit examen is nog niet voltooid",
     takeExam: "Examen Maken",
-    
+
     // Progress
     myProgress: "Mijn Voortgang",
     totalExams: "Totaal Examens",
@@ -726,12 +728,12 @@ export const translations: Record<Language, Translations> = {
     performanceByType: "Prestaties per Vraagtype",
     performanceByTypeDesc: "Zie waar je sterk bent en waar je kunt verbeteren",
     personalizedTips: "Gepersonaliseerde tips om je Nederlands te verbeteren",
-    
+
     // Vocabulary
     myVocabulary: "Mijn Woordenschat",
     newWords: "Nieuwe woorden",
     learning: "Aan het leren",
-    
+
     // Reporting
     reportIssue: "Probleem Melden",
     levelIssue: "Niveauprobleem",
@@ -743,9 +745,10 @@ export const translations: Record<Language, Translations> = {
     notDutch: "Geen Nederlands",
     other: "Anders",
     reportSubmitted: "Melding ingediend",
-    
+
     // Admin
     userManagement: "Gebruikersbeheer",
+    userManagementDesc: "Beheer gebruikers en moderators",
     textModeration: "Tekstmoderatie",
     reportManagement: "Meldingenbeheer",
     statistics: "Statistieken",
@@ -754,7 +757,7 @@ export const translations: Record<Language, Translations> = {
     pending: "In behandeling",
     approved: "Goedgekeurd",
     rejected: "Afgewezen",
-    
+
     // Common
     save: "Opslaan",
     cancel: "Annuleren",
@@ -793,7 +796,7 @@ export const translations: Record<Language, Translations> = {
     minRead: "min lezen",
     remaining: "Resterend",
     characters: "tekens",
-    
+
     // Homepage - New comprehensive translations
     staatsexamenPrep: "Staatsexamen Voorbereiding",
     officialExamFormat: "Officieel Examenformaat",
@@ -801,7 +804,7 @@ export const translations: Record<Language, Translations> = {
     comprehensivePreparation: "Oefen met vragen op hetzelfde niveau en in dezelfde stijl als het officiële Staatsexamen",
     whyChooseUs: "Waarom voor ons kiezen?",
     keyFeatures: "Belangrijkste Kenmerken",
-    
+
     // Features - Detailed
     feature5Title: "Staatsexamen-stijl Vragen",
     feature5Desc: "Oefen met vragen die exact hetzelfde formaat hebben als het officiële staatsexamen",
@@ -811,7 +814,7 @@ export const translations: Record<Language, Translations> = {
     feature7Desc: "Krijg uitgebreide uitleg bij elk antwoord om je begrip te verbeteren",
     feature8Title: "B1 Woordenboek & Vertaling",
     feature8Desc: "Klik op elk woord voor directe vertaling en voeg toe aan je persoonlijke B1 woordenboek",
-    
+
     // Benefits
     benefit1Title: "Verbeter je Leesvaardigheid",
     benefit1Desc: "Train jezelf om Nederlandse teksten sneller en beter te begrijpen",
@@ -825,7 +828,7 @@ export const translations: Record<Language, Translations> = {
     benefit5Desc: "Interface beschikbaar in Nederlands, Arabisch, Engels en Turks",
     benefit6Title: "Woordenschat Memorisatie",
     benefit6Desc: "Bouw je B1 woordenschat op met spaced repetition systeem en persoonlijk woordenboek",
-    
+
     // How it works - Detailed steps
     step1Title: "Voeg Nederlandse Tekst Toe",
     step1Desc: "Plak, upload of scan elke Nederlandse tekst op B1-niveau (2.000-10.100 tekens)",
@@ -835,17 +838,17 @@ export const translations: Record<Language, Translations> = {
     step3Desc: "Beantwoord de vragen en krijg direct feedback met gedetailleerde uitleg",
     step4Title: "Leer en Verbeter",
     step4Desc: "Bekijk je resultaten, leer nieuwe woorden en volg je voortgang in de tijd",
-    
+
     // CTA
     readyToStart: "Klaar om te beginnen?",
     joinLearners: "Sluit je aan bij duizenden leerlingen die zich voorbereiden op hun Nederlands inburgeringsexamen",
     startLearningNow: "Begin Nu met Leren",
-    
+
     // Stats
     languagesSupported: "Talen",
     aiPowered: "AI-Aangedreven",
     levelFocus: "Niveau Focus",
-    
+
     // Progress bar for exam generation
     processingWithAI: "Tekst verwerken...",
     processingWithGemini: "De tekst wordt volledig verwerkt",
@@ -854,14 +857,14 @@ export const translations: Record<Language, Translations> = {
     completedStatus: "✓ Voltooid",
     unifiedProcessing: "Slimme geïntegreerde verwerking",
     unifiedProcessingDesc: "Alle stappen worden in één aanroep verwerkt om tijd te besparen en de beste kwaliteit te garanderen",
-    
+
     // Processing steps
     stepCleanText: "Tekst opschonen en corrigeren",
     stepGenerateTitle: "Slimme titel genereren",
     stepCreateQuestions: "B1-niveau vragen maken",
     stepExtractVocabulary: "Belangrijke woordenschat extraheren",
     stepFormatText: "Definitieve tekst formatteren",
-    
+
     // Vocabulary page
     yourVocabulary: "Jouw Woordenschat",
     wordsLearned: "woorden geleerd",
@@ -899,7 +902,7 @@ export const translations: Record<Language, Translations> = {
     confirmArchive: "Dit woord archiveren? Het verschijnt niet vaak in oefeningen.",
     skip: "Overslaan",
     dontShowAgain: "Niet meer tonen",
-    
+
     // Practice mode
     flashcards: "Flashcards",
     multipleChoice: "Meerkeuzevragen",
@@ -914,14 +917,14 @@ export const translations: Record<Language, Translations> = {
     selectCorrectTranslation: "Selecteer de juiste vertaling:",
     practiceComplete: "Oefening voltooid",
     audioError: "Kan audio niet afspelen",
-    
+
     // Review mode
     reviewMode: "Herzienmodus",
     simpleReview: "Eenvoudige Herziening",
     startPractice: "Start Oefening",
     showDefinition: "Toon Nederlandse Definitie",
     hideDefinition: "Verberg Definitie",
-    
+
     // Exam Results page (additional fields)
     passed: "Geslaagd",
     failed: "Niet Geslaagd",
@@ -930,27 +933,27 @@ export const translations: Record<Language, Translations> = {
     performanceAnalysis: "Prestatie-analyse",
     recommendations: "Aanbevelingen",
     reviewAnswers: "Antwoorden Bekijken",
-    
+
     // Exam Review page
     examReview: "Examen Beoordeling",
     yourAnswer: "Jouw Antwoord",
     correctAnswer: "Correct Antwoord",
-    
+
     // Progress page
     noProgressYet: "Nog geen voortgang",
     takeFirstExam: "Maak je eerste examen om je voortgang bij te houden",
-    
+
     // Leaderboard page
     leaderboard: "Klassement",
     topScorers: "Top Scorers",
     rank: "Rang",
     player: "Speler",
-    
+
     // Not Found page
     pageNotFound: "Pagina Niet Gevonden",
     pageNotFoundDesc: "De pagina die je zoekt bestaat niet.",
     goHome: "Naar Home",
-    
+
     // Exam Timer
     practiceMode: "Oefenmodus",
     examMode: "Examenmodus",
@@ -967,11 +970,11 @@ export const translations: Record<Language, Translations> = {
     resumeTimer: "Hervat Timer",
     noTimeLimit: "Geen tijdslimiet",
     pleaseAnswerAll: "Beantwoord alle vragen",
-    officialExamFormat: "Officieel examenformaat",
     withWordTranslations: "Met woordvertalingen",
     noWordTranslations: "Zonder woordvertalingen",
+
     searchTexts: "Zoek naar tekst...",
-    
+
     // Forum
     forumTitle: "Community",
     forumDescription: "Discussieer, deel ervaringen en stel vragen",
@@ -999,7 +1002,7 @@ export const translations: Record<Language, Translations> = {
     fillAllFields: "Vul alle velden in",
     category: "Categorie",
     selectCategory: "Selecteer een categorie",
-    characters: "tekens",
+
     forumLoginPrompt: "Log in om onderwerpen aan te maken en deel te nemen aan discussies",
     topicDeleted: "Onderwerp verwijderd",
     postDeleted: "Reactie verwijderd",
@@ -1010,7 +1013,7 @@ export const translations: Record<Language, Translations> = {
     repliedToYourTopic: "heeft op je onderwerp gereageerd",
     upvotedYourTopic: "heeft je onderwerp geliket",
     upvotedYourPost: "heeft je reactie geliket",
-    
+
     // Moderator
     moderatorPanel: "Moderatorpaneel",
     moderatorPanelDesc: "Beheer foruminhoud en gebruikers",
@@ -1056,7 +1059,7 @@ export const translations: Record<Language, Translations> = {
     reportReasonInappropriate: "Ongepaste inhoud",
     reportReasonMisinformation: "Desinformatie",
     reportReasonOther: "Overig",
-    
+
     // User Management
     adminAccessRequired: "Admin toegang vereist",
     backToModeratorPanel: "Terug naar Moderatorpaneel",
@@ -1064,7 +1067,7 @@ export const translations: Record<Language, Translations> = {
     status: "Status",
     joined: "Lid sinds",
     actions: "Acties",
-    admin: "Admin",
+    adminRole: "Admin",
     moderator: "Moderator",
     banned: "Verbannen",
     unban: "Ontbannen",
@@ -1079,7 +1082,7 @@ export const translations: Record<Language, Translations> = {
     moderatorAdded: "Moderator succesvol toegevoegd",
     moderatorRemoved: "Moderator succesvol verwijderd",
     banReasonRequired: "Verbanningsreden is verplicht",
-    
+
     // Forum categories
     category_exams_tips: "Examens & Tips",
     category_exams_tips_desc: "Deel tips en strategieën voor het B1 examen",
@@ -1093,7 +1096,7 @@ export const translations: Record<Language, Translations> = {
     "forum.category.experiences_desc": "Deel je ervaringen met het leren van Nederlands",
     "forum.category.questions": "Vragen & Antwoorden",
     "forum.category.questions_desc": "Stel vragen en help anderen",
-    
+
     // Dictionary page
     searchForWord: "Zoek naar een woord...",
     allLetters: "Alle",
@@ -1117,7 +1120,7 @@ export const translations: Record<Language, Translations> = {
     translation: "Vertaling",
     chooseLanguage: "Kies je taal",
     forumEditorPlaceholder: "Schrijf de inhoud van je onderwerp hier...",
-    
+
     // Admin Settings
     adminSettings: "Beheerdersinstellingen",
     systemSettings: "Systeeminstellingen",
@@ -1125,47 +1128,52 @@ export const translations: Record<Language, Translations> = {
     examCreationEnabled: "Examen aanmaken ingeschakeld",
     examCreationDisabled: "Examen aanmaken uitgeschakeld",
     examCreationDisabledTitle: "⏸️ Examen aanmaken tijdelijk uitgeschakeld",
-    examCreationDisabledMessage: "Je kunt de huidige examens gebruiken en examens zoeken als je wilt oefenen met een specifiek onderwerp.",
-    browseExams: "Examens bekijken",
-    enableExamCreation: "Examen aanmaken inschakelen",
-    disableExamCreation: "Examen aanmaken uitschakelen",
+    examCreationDisabledMessage: "We hebben het toevoegen van nieuwe examens gepauzeerd omdat we alle noodzakelijke onderwerpen hebben behandeld om de kwaliteit van de website te waarborgen. Heb je toch een suggestie? Laat het ons weten!",
+    browseExams: "Openbare Examens Bekijken",
+    enableExamCreation: "Examen Aanmaken Inschakelen",
+    disableExamCreation: "Examen Aanmaken Uitschakelen",
     settingUpdated: "Instelling bijgewerkt",
-    backToDashboard: "Terug naar dashboard",
-    
+    backToDashboard: "Terug naar Dashboard",
+    suggestTopic: "Onderwerp Voorstellen",
+    topicSuggestionPlaceholder: "Beschrijf het ontbrekende onderwerp (max 70 tekens)...",
+    submitSuggestion: "Versturen",
+    suggestionSubmitted: "Suggestie verstuurd!",
+    suggestionFailed: "Versturen mislukt",
+
     // Admin Dashboard
     filterByStatus: "Filter op status",
     allStatus: "Alle Status",
-    searchTexts: "Zoek teksten...",
+    adminSearchTexts: "Zoek teksten...",
     searchExams: "Zoek examens...",
     searchUsers: "Zoek gebruikers...",
     id: "ID",
     title: "Titel",
     createdBy: "Gemaakt door",
     date: "Datum",
-    
+
     // Report Dialog
     otherIssue: "Ander probleem",
     additionalDetails: "Aanvullende details",
     provideMoreInfo: "Geef meer informatie over het probleem...",
-    
+
     // Rating Dialog
     shareThoughts: "Deel je gedachten over dit examen...",
-    
+
     // Create Exam
     pasteOrTypeDutchText: "Plak of typ hier Nederlandse tekst...",
-    
+
     // Forum Editor
     bold: "Vet",
     italic: "Cursief",
     heading: "Kop",
     bulletList: "Opsommingslijst",
     numberedList: "Genummerde lijst",
-    
+
     // Accessibility
     toggleSidebar: "Zijbalk wisselen",
     goToPreviousPage: "Ga naar vorige pagina",
     goToNextPage: "Ga naar volgende pagina",
-    
+
     // Confirmation messages
     confirmDeleteTitle: "Verwijderen bevestigen",
     confirmDeleteMessage: "Weet je zeker dat je dit wilt verwijderen?",
@@ -1214,11 +1222,11 @@ export const translations: Record<Language, Translations> = {
     page: "Pagina",
     previousPage: "Vorige",
     nextPage: "Volgende",
-    
+
     // Rating
     rateThisExam: "Beoordeel dit examen",
     ratingReason: "Reden voor beoordeling",
-    selectReason: "Selecteer een reden (optioneel)",
+    selectRatingReason: "Selecteer een reden (optioneel)",
     reasonHelpful: "Nuttige tekst",
     reasonClear: "Duidelijke vragen",
     reasonGoodLevel: "Geschikt niveau",
@@ -1227,10 +1235,10 @@ export const translations: Record<Language, Translations> = {
     reasonOther: "Andere reden",
     filterByReason: "Filter op reden",
     allReasons: "Alle redenen",
-    showDefinition: "Toon definitie (Nederlands)",
-    hideDefinition: "Verberg definitie",
+    showRatingDefinition: "Toon definitie (Nederlands)",
+    hideRatingDefinition: "Verberg definitie",
   },
-  
+
   ar: {
     // Navigation
     home: "الرئيسية",
@@ -1240,13 +1248,13 @@ export const translations: Record<Language, Translations> = {
     progress: "التقدم",
     vocabulary: "المفردات",
     admin: "الإدارة",
-    
+
     // Auth
     login: "تسجيل الدخول",
     logout: "تسجيل الخروج",
     welcome: "مرحباً",
     welcomeBack: "مرحباً بعودتك",
-    
+
     // Landing page
     appTitle: "مولد امتحانات الهولندية B1",
     appSubtitle: "أتقن القراءة الهولندية B1 مع امتحانات تدريبية مدعومة بالذكاء الاصطناعي",
@@ -1254,7 +1262,7 @@ export const translations: Record<Language, Translations> = {
     learnMore: "معرفة المزيد",
     features: "الميزات",
     howItWorks: "كيف يعمل",
-    
+
     // Features
     feature1Title: "امتحانات بالذكاء الاصطناعي",
     feature1Desc: "اختبارات قراءة مستوى B1 يتم إنشاؤها تلقائياً",
@@ -1264,7 +1272,7 @@ export const translations: Record<Language, Translations> = {
     feature3Desc: "تتبع درجاتك ومفرداتك ووقت الدراسة",
     feature4Title: "تعلم المفردات",
     feature4Desc: "تعلم كلمات جديدة مع الصوت والترجمات",
-    
+
     // Text creation
     createNewExam: "إنشاء امتحان جديد",
     browsePublicExams: "تصفح الامتحانات العامة",
@@ -1275,7 +1283,7 @@ export const translations: Record<Language, Translations> = {
     textTooShort: "يجب أن يحتوي النص على 50 حرفاً على الأقل",
     validateText: "التحقق من النص",
     translating: "جاري الترجمة...",
-    
+
     // Validation
     validatingText: "جاري التحقق من النص...",
     textValidated: "تم التحقق من النص",
@@ -1285,7 +1293,7 @@ export const translations: Record<Language, Translations> = {
     levelWarning: "تنبيه: هذا النص ليس بمستوى B1",
     wordCount: "عدد الكلمات",
     estimatedTime: "وقت القراءة المقدر",
-    
+
     // Exam
     startExam: "بدء الامتحان",
     submitExam: "تقديم الامتحان",
@@ -1316,7 +1324,7 @@ export const translations: Record<Language, Translations> = {
     examNotCompleted: "الامتحان غير مكتمل",
     examNotCompletedDesc: "هذا الامتحان لم يكتمل بعد",
     takeExam: "بدء الامتحان",
-    
+
     // Progress
     myProgress: "تقدمي",
     totalExams: "إجمالي الامتحانات",
@@ -1331,12 +1339,12 @@ export const translations: Record<Language, Translations> = {
     performanceByType: "الأداء حسب نوع السؤال",
     performanceByTypeDesc: "انظر أين أنت قوي وأين يمكنك التحسين",
     personalizedTips: "نصائح مخصصة لتحسين الهولندية",
-    
+
     // Vocabulary
     myVocabulary: "مفرداتي",
     newWords: "كلمات جديدة",
     learning: "قيد التعلم",
-    
+
     // Reporting
     reportIssue: "الإبلاغ عن مشكلة",
     levelIssue: "مشكلة في المستوى",
@@ -1348,9 +1356,10 @@ export const translations: Record<Language, Translations> = {
     notDutch: "ليس هولندياً",
     other: "أخرى",
     reportSubmitted: "تم إرسال البلاغ",
-    
+
     // Admin
     userManagement: "إدارة المستخدمين",
+    userManagementDesc: "إدارة المستخدمين والمشرفين",
     textModeration: "إشراف النصوص",
     reportManagement: "إدارة البلاغات",
     statistics: "الإحصائيات",
@@ -1359,7 +1368,7 @@ export const translations: Record<Language, Translations> = {
     pending: "قيد الانتظار",
     approved: "موافق عليه",
     rejected: "مرفوض",
-    
+
     // Common
     save: "حفظ",
     cancel: "إلغاء",
@@ -1398,7 +1407,7 @@ export const translations: Record<Language, Translations> = {
     minRead: "دقيقة قراءة",
     remaining: "متبقي",
     characters: "حرف",
-    
+
     // Homepage - New comprehensive translations
     staatsexamenPrep: "التحضير لامتحان Staatsexamen",
     officialExamFormat: "نفس صيغة الامتحان الرسمي",
@@ -1406,7 +1415,7 @@ export const translations: Record<Language, Translations> = {
     comprehensivePreparation: "تدرّب على أسئلة بنفس مستوى الصعوبة والطريقة مثل امتحان Staatsexamen الرسمي",
     whyChooseUs: "لماذا تختارنا؟",
     keyFeatures: "الميزات الرئيسية",
-    
+
     // Features - Detailed
     feature5Title: "أسئلة بنفس نمط Staatsexamen",
     feature5Desc: "تدرّب على أسئلة بنفس الصيغة التي تأتي في الامتحان الرسمي",
@@ -1416,7 +1425,7 @@ export const translations: Record<Language, Translations> = {
     feature7Desc: "احصل على شرح مفصّل لكل إجابة لتحسين فهمك",
     feature8Title: "قاموس B1 والترجمة",
     feature8Desc: "اضغط على أي كلمة للحصول على الترجمة الفورية وأضفها إلى قاموسك الشخصي لمستوى B1",
-    
+
     // Benefits
     benefit1Title: "حسّن مهارة القراءة",
     benefit1Desc: "درّب نفسل على فهم النصوص الهولندية بشكل أسرع وأفضل",
@@ -1430,7 +1439,7 @@ export const translations: Record<Language, Translations> = {
     benefit5Desc: "الواجهة متوفرة بالهولندية، العربية، الإنجليزية والتركية",
     benefit6Title: "حفظ المفردات",
     benefit6Desc: "ابنِ مفرداتك لمستوى B1 مع نظام التكرار المتباعد وقاموسك الشخصي",
-    
+
     // How it works - Detailed steps
     step1Title: "أضف نصاً هولندياً",
     step1Desc: "الصق أو ارفع أو امسح أي نص هولندي بمستوى B1 (2,000-10,100 حرف)",
@@ -1440,17 +1449,17 @@ export const translations: Record<Language, Translations> = {
     step3Desc: "أجب على الأسئلة واحصل على ملاحظات فورية مع شرح مفصّل",
     step4Title: "تعلّم وتحسّن",
     step4Desc: "اطلع على نتائجك، تعلّم كلمات جديدة وتابع تقدّمك بمرور الوقت",
-    
+
     // CTA
     readyToStart: "هل أنت جاهز للبدء؟",
     joinLearners: "انضم إلى آلاف المتعلمين الذين يستعدون لامتحان الاندماج الهولندي",
     startLearningNow: "ابدأ التعلّم الآن",
-    
+
     // Stats
     languagesSupported: "لغات",
     aiPowered: "مدعوم بالذكاء الاصطناعي",
     levelFocus: "التركيز على المستوى",
-    
+
     // Progress bar for exam generation
     processingWithAI: "جاري معالجة النص...",
     processingWithGemini: "يتم معالجة النص بشكل كامل",
@@ -1459,14 +1468,14 @@ export const translations: Record<Language, Translations> = {
     completedStatus: "✓ تم",
     unifiedProcessing: "معالجة ذكية موحدة",
     unifiedProcessingDesc: "يتم معالجة جميع الخطوات في استدعاء واحد لتوفير الوقت وضمان أفضل جودة",
-    
+
     // Processing steps
     stepCleanText: "تنظيف وتصحيح النص",
     stepGenerateTitle: "توليد عنوان ذكي",
     stepCreateQuestions: "إنشاء أسئلة مستوى B1",
     stepExtractVocabulary: "استخراج المفردات المهمة",
     stepFormatText: "تنسيق النص النهائي",
-     // Vocabulary page
+    // Vocabulary page
     yourVocabulary: "مفرداتك",
     wordsLearned: "كلمات تعلمتها",
     noVocabularyYet: "لا توجد مفردات بعد",
@@ -1503,7 +1512,7 @@ export const translations: Record<Language, Translations> = {
     confirmArchive: "أرشفة هذه الكلمة؟ لن تظهر كثيراً في التدريب.",
     skip: "تخطي",
     dontShowAgain: "لا تظهر مرة أخرى",
-    
+
     // Practice mode
     flashcards: "بطاقات تعليمية",
     multipleChoice: "اختيار من متعدد",
@@ -1518,42 +1527,42 @@ export const translations: Record<Language, Translations> = {
     selectCorrectTranslation: "اختر الترجمة الصحيحة:",
     practiceComplete: "اكتمل التدريب",
     audioError: "فشل تشغيل الصوت",
-    
+
     // Review mode
     reviewMode: "وضع المراجعة",
     simpleReview: "مراجعة بسيطة",
     startPractice: "بدء التدريب",
     showDefinition: "إظهار الشرح بالهولندية",
     hideDefinition: "إخفاء التعريف",
-    
+
     // Exam Results page (additional fields)
     passed: "ناجح",
-    failed: "راسب",   needsImprovement: "يحتاج تحسين",
+    failed: "راسب", needsImprovement: "يحتاج تحسين",
     excellent: "ممتاز",
     performanceAnalysis: "تحليل الأداء",
     recommendations: "التوصيات",
     reviewAnswers: "مراجعة الإجابات",
-    
+
     // Exam Review page
     examReview: "مراجعة الامتحان",
     yourAnswer: "إجابتك",
     correctAnswer: "الإجابة الصحيحة",
-    
+
     // Progress page
     noProgressYet: "لا يوجد تقدم بعد",
     takeFirstExam: "خذ امتحانك الأول لتتبع تقدمك",
-    
+
     // Leaderboard page
     leaderboard: "لوحة المتصدرين",
     topScorers: "أعلى النقاط",
     rank: "الترتيب",
     player: "اللاعب",
-    
+
     // Not Found page
     pageNotFound: "الصفحة غير موجودة",
     pageNotFoundDesc: "الصفحة التي تبحث عنها غير موجودة.",
     goHome: "العودة للرئيسية",
-    
+
     // Exam Timer
     practiceMode: "وضع التدريب",
     examMode: "وضع الامتحان",
@@ -1570,11 +1579,11 @@ export const translations: Record<Language, Translations> = {
     resumeTimer: "استئناف المؤقت",
     noTimeLimit: "بدون حد زمني",
     pleaseAnswerAll: "يرجى الإجابة على جميع الأسئلة",
-    officialExamFormat: "صيغة الامتحان الرسمي",
     withWordTranslations: "مع ترجمة الكلمات",
     noWordTranslations: "بدون ترجمة الكلمات",
+
     searchTexts: "ابحث عن نص...",
-    
+
     // Forum
     forumTitle: "المجتمع",
     forumDescription: "ناقش وشارك التجارب واطرح الأسئلة",
@@ -1602,7 +1611,7 @@ export const translations: Record<Language, Translations> = {
     fillAllFields: "املأ جميع الحقول",
     category: "الفئة",
     selectCategory: "اختر فئة",
-    characters: "حرف",
+
     forumLoginPrompt: "سجل الدخول لإنشاء مواضيع والمشاركة في النقاشات",
     topicDeleted: "تم حذف الموضوع",
     postDeleted: "تم حذف الرد",
@@ -1613,7 +1622,7 @@ export const translations: Record<Language, Translations> = {
     repliedToYourTopic: "رد على موضوعك",
     upvotedYourTopic: "أعجب بموضوعك",
     upvotedYourPost: "أعجب بردك",
-    
+
     // Moderator
     moderatorPanel: "لوحة المشرفين",
     moderatorPanelDesc: "إدارة محتوى المجتمع والمستخدمين",
@@ -1659,7 +1668,7 @@ export const translations: Record<Language, Translations> = {
     reportReasonInappropriate: "محتوى غير لائق",
     reportReasonMisinformation: "معلومات خاطئة",
     reportReasonOther: "أخرى",
-    
+
     // User Management
     adminAccessRequired: "يتطلب صلاحية إداري",
     backToModeratorPanel: "العودة إلى لوحة المشرفين",
@@ -1667,7 +1676,7 @@ export const translations: Record<Language, Translations> = {
     status: "الحالة",
     joined: "تاريخ الانضمام",
     actions: "الإجراءات",
-    admin: "إداري",
+    adminRole: "إداري",
     moderator: "مشرف",
     banned: "محظور",
     unban: "إلغاء الحظر",
@@ -1682,7 +1691,7 @@ export const translations: Record<Language, Translations> = {
     moderatorAdded: "تم إضافة المشرف بنجاح",
     moderatorRemoved: "تم إزالة المشرف بنجاح",
     banReasonRequired: "سبب الحظر مطلوب",
-    
+
     // Forum categories
     category_exams_tips: "نصائح وإرشادات الامتحان",
     category_exams_tips_desc: "شارك نصائح واستراتيجيات لامتحان B1",
@@ -1696,7 +1705,7 @@ export const translations: Record<Language, Translations> = {
     "forum.category.experiences_desc": "شارك تجربتك في تعلم الهولندية",
     "forum.category.questions": "أسئلة وأجوبة",
     "forum.category.questions_desc": "اطرح الأسئلة وساعد الآخرين",
-    
+
     // Dictionary page
     searchForWord: "ابحث عن كلمة...",
     allLetters: "الكل",
@@ -1720,7 +1729,7 @@ export const translations: Record<Language, Translations> = {
     translation: "الترجمة",
     chooseLanguage: "اختر لغتك",
     forumEditorPlaceholder: "اكتب محتوى موضوعك هنا...",
-    
+
     // Admin Settings
     adminSettings: "إعدادات المدير",
     systemSettings: "إعدادات النظام",
@@ -1728,47 +1737,52 @@ export const translations: Record<Language, Translations> = {
     examCreationEnabled: "إضافة الامتحانات مفعّلة",
     examCreationDisabled: "إضافة الامتحانات موقفة",
     examCreationDisabledTitle: "⏸️ تم إيقاف إضافة الامتحانات مؤقتاً",
-    examCreationDisabledMessage: "يمكنك استخدام الامتحانات الحالية والبحث في الامتحانات إذا أردت أن تتدرب في موضوع معين.",
-    browseExams: "تصفح الامتحانات",
-    enableExamCreation: "تفعيل إضافة الامتحانات",
-    disableExamCreation: "إيقاف إضافة الامتحانات",
+    examCreationDisabledMessage: "لقد أوقفنا إضافة امتحانات جديدة لأننا قمنا بتغطية جميع المواضيع الضرورية لضمان جودة الموقع. ومع ذلك، إذا كان لديك اقتراح لموضوع مفقود، يرجى إخبارنا!",
+    browseExams: "تصفح الامتحانات العامة",
+    enableExamCreation: "تفعيل إنشاء الامتحانات",
+    disableExamCreation: "تعطيل إنشاء الامتحانات",
     settingUpdated: "تم تحديث الإعداد",
     backToDashboard: "العودة للوحة التحكم",
-    
+    suggestTopic: "اقترح موضوعاً",
+    topicSuggestionPlaceholder: "صف الموضوع المفقود (بحد أقصى 70 حرفاً)...",
+    submitSuggestion: "إرسال",
+    suggestionSubmitted: "تم إرسال الاقتراح!",
+    suggestionFailed: "فشل الإرسال",
+
     // Admin Dashboard
     filterByStatus: "تصفية حسب الحالة",
     allStatus: "جميع الحالات",
-    searchTexts: "بحث في النصوص...",
+    adminSearchTexts: "بحث في النصوص...",
     searchExams: "بحث في الامتحانات...",
     searchUsers: "بحث في المستخدمين...",
     id: "المعرف",
     title: "العنوان",
     createdBy: "أنشئ بواسطة",
     date: "التاريخ",
-    
+
     // Report Dialog
     otherIssue: "مشكلة أخرى",
     additionalDetails: "تفاصيل إضافية",
     provideMoreInfo: "يرجى تقديم المزيد من المعلومات حول المشكلة...",
-    
+
     // Rating Dialog
     shareThoughts: "شارك رأيك حول هذا الامتحان...",
-    
+
     // Create Exam
     pasteOrTypeDutchText: "الصق أو اكتب نصاً هولندياً هنا...",
-    
+
     // Forum Editor
     bold: "عريض",
     italic: "مائل",
     heading: "عنوان",
     bulletList: "قائمة نقطية",
     numberedList: "قائمة مرقمة",
-    
+
     // Accessibility
     toggleSidebar: "تبديل الشريط الجانبي",
     goToPreviousPage: "الانتقال إلى الصفحة السابقة",
     goToNextPage: "الانتقال إلى الصفحة التالية",
-    
+
     // Confirmation messages
     confirmDeleteTitle: "تأكيد الحذف",
     confirmDeleteMessage: "هل أنت متأكد أنك تريد حذف هذا؟",
@@ -1817,11 +1831,11 @@ export const translations: Record<Language, Translations> = {
     page: "صفحة",
     previousPage: "السابق",
     nextPage: "التالي",
-    
+
     // Rating
     rateThisExam: "قيّم هذا الامتحان",
     ratingReason: "سبب التقييم",
-    selectReason: "اختر سبباً (اختياري)",
+    selectRatingReason: "اختر سبباً (اختياري)",
     reasonHelpful: "نص مفيد",
     reasonClear: "أسئلة واضحة",
     reasonGoodLevel: "مستوى مناسب",
@@ -1830,10 +1844,10 @@ export const translations: Record<Language, Translations> = {
     reasonOther: "سبب آخر",
     filterByReason: "تصفية حسب السبب",
     allReasons: "جميع الأسباب",
-    showDefinition: "عرض التعريف (بالهولندية)",
-    hideDefinition: "إخفاء التعريف",
+    showRatingDefinition: "عرض التعريف (بالهولندية)",
+    hideRatingDefinition: "إخفاء التعريف",
   },
-  
+
   en: {
     // Navigation
     home: "Home",
@@ -1843,13 +1857,13 @@ export const translations: Record<Language, Translations> = {
     progress: "Progress",
     vocabulary: "Vocabulary",
     admin: "Admin",
-    
+
     // Auth
     login: "Login",
     logout: "Logout",
     welcome: "Welcome",
     welcomeBack: "Welcome back",
-    
+
     // Landing page
     appTitle: "Dutch B1 Exam Generator",
     appSubtitle: "Master Dutch B1 Reading with AI-Powered Practice Exams",
@@ -1857,7 +1871,7 @@ export const translations: Record<Language, Translations> = {
     learnMore: "Learn More",
     features: "Features",
     howItWorks: "How It Works",
-    
+
     // Features
     feature1Title: "AI-Powered Exams",
     feature1Desc: "Automatically generated B1-level reading comprehension tests",
@@ -1867,7 +1881,7 @@ export const translations: Record<Language, Translations> = {
     feature3Desc: "Monitor your scores, vocabulary, and study time",
     feature4Title: "Learn Vocabulary",
     feature4Desc: "Learn new words with audio and translations",
-    
+
     // Text creation
     createNewExam: "Create New Exam",
     browsePublicExams: "Browse Public Exams",
@@ -1878,7 +1892,7 @@ export const translations: Record<Language, Translations> = {
     textTooShort: "Text must be at least 50 characters",
     validateText: "Validate Text",
     translating: "Translating...",
-    
+
     // Validation
     validatingText: "Validating text...",
     textValidated: "Text validated",
@@ -1888,7 +1902,7 @@ export const translations: Record<Language, Translations> = {
     levelWarning: "Warning: This text is not B1 level",
     wordCount: "Word count",
     estimatedTime: "Estimated reading time",
-    
+
     // Exam
     startExam: "Start Exam",
     submitExam: "Submit Exam",
@@ -1919,7 +1933,7 @@ export const translations: Record<Language, Translations> = {
     examNotCompleted: "Exam Not Completed",
     examNotCompletedDesc: "This exam has not been completed yet",
     takeExam: "Take Exam",
-    
+
     // Progress
     myProgress: "My Progress",
     totalExams: "Total Exams",
@@ -1934,12 +1948,12 @@ export const translations: Record<Language, Translations> = {
     performanceByType: "Performance by Question Type",
     performanceByTypeDesc: "See where you're strong and where you can improve",
     personalizedTips: "Personalized tips to improve your Dutch",
-    
+
     // Vocabulary
     myVocabulary: "My Vocabulary",
     newWords: "New words",
     learning: "Learning",
-    
+
     // Reporting
     reportIssue: "Report Issue",
     levelIssue: "Level Issue",
@@ -1951,9 +1965,10 @@ export const translations: Record<Language, Translations> = {
     notDutch: "Not Dutch",
     other: "Other",
     reportSubmitted: "Report submitted",
-    
+
     // Admin
     userManagement: "User Management",
+    userManagementDesc: "Manage users and moderators",
     textModeration: "Text Moderation",
     reportManagement: "Report Management",
     statistics: "Statistics",
@@ -1962,7 +1977,7 @@ export const translations: Record<Language, Translations> = {
     pending: "Pending",
     approved: "Approved",
     rejected: "Rejected",
-    
+
     // Common
     save: "Save",
     cancel: "Cancel",
@@ -2001,7 +2016,7 @@ export const translations: Record<Language, Translations> = {
     minRead: "min read",
     remaining: "Remaining",
     characters: "characters",
-    
+
     // Homepage - New comprehensive translations
     staatsexamenPrep: "Staatsexamen Preparation",
     officialExamFormat: "Official Exam Format",
@@ -2009,7 +2024,7 @@ export const translations: Record<Language, Translations> = {
     comprehensivePreparation: "Practice with questions at the same difficulty level and format as the official Staatsexamen",
     whyChooseUs: "Why Choose Us?",
     keyFeatures: "Key Features",
-    
+
     // Features - Detailed
     feature5Title: "Staatsexamen-Style Questions",
     feature5Desc: "Practice with questions that match the exact format of the official staatsexamen",
@@ -2019,7 +2034,7 @@ export const translations: Record<Language, Translations> = {
     feature7Desc: "Get comprehensive explanations for each answer to improve your understanding",
     feature8Title: "B1 Dictionary & Translation",
     feature8Desc: "Click any word for instant translation and add it to your personal B1 dictionary",
-    
+
     // Benefits
     benefit1Title: "Improve Reading Skills",
     benefit1Desc: "Train yourself to understand Dutch texts faster and better",
@@ -2033,7 +2048,7 @@ export const translations: Record<Language, Translations> = {
     benefit5Desc: "Interface available in Dutch, Arabic, English, and Turkish",
     benefit6Title: "Vocabulary Memorization",
     benefit6Desc: "Build your B1 vocabulary with spaced repetition system and personal dictionary",
-    
+
     // How it works - Detailed steps
     step1Title: "Add Dutch Text",
     step1Desc: "Paste, upload, or scan any Dutch text at B1 level (2,000-10,100 characters)",
@@ -2043,17 +2058,17 @@ export const translations: Record<Language, Translations> = {
     step3Desc: "Answer the questions and get instant feedback with detailed explanations",
     step4Title: "Learn and Improve",
     step4Desc: "Review your results, learn new words, and track your progress over time",
-    
+
     // CTA
     readyToStart: "Ready to Get Started?",
     joinLearners: "Join thousands of learners preparing for their Dutch integration exam",
     startLearningNow: "Start Learning Now",
-    
+
     // Stats
     languagesSupported: "Languages",
     aiPowered: "AI-Powered",
     levelFocus: "Level Focus",
-    
+
     // Progress bar for exam generation
     processingWithAI: "Processing text...",
     processingWithGemini: "Processing the text completely",
@@ -2062,14 +2077,14 @@ export const translations: Record<Language, Translations> = {
     completedStatus: "✓ Done",
     unifiedProcessing: "Smart unified processing",
     unifiedProcessingDesc: "All steps are processed in a single call to save time and ensure best quality",
-    
+
     // Processing steps
     stepCleanText: "Clean and correct text",
     stepGenerateTitle: "Generate smart title",
     stepCreateQuestions: "Create B1 level questions",
     stepExtractVocabulary: "Extract important vocabulary",
     stepFormatText: "Format final text",
-       // Vocabulary page
+    // Vocabulary page
     yourVocabulary: "Your Vocabulary",
     wordsLearned: "words learned",
     noVocabularyYet: "No vocabulary yet",
@@ -2106,7 +2121,7 @@ export const translations: Record<Language, Translations> = {
     confirmArchive: "Archive this word? It won't appear in practice often.",
     skip: "Skip",
     dontShowAgain: "Don't show again",
-    
+
     // Practice mode
     flashcards: "Flashcards",
     multipleChoice: "Multiple Choice",
@@ -2121,14 +2136,14 @@ export const translations: Record<Language, Translations> = {
     selectCorrectTranslation: "Select the correct translation:",
     practiceComplete: "Practice complete",
     audioError: "Failed to play audio",
-    
+
     // Review mode
     reviewMode: "Review Mode",
     simpleReview: "Simple Review",
     startPractice: "Start Practice",
     showDefinition: "Show Dutch Definition",
     hideDefinition: "Hide Definition",
-    
+
     // Exam Results page (additional fields)
     passed: "Passed",
     failed: "Failed",
@@ -2137,27 +2152,27 @@ export const translations: Record<Language, Translations> = {
     performanceAnalysis: "Performance Analysis",
     recommendations: "Recommendations",
     reviewAnswers: "Review Answers",
-    
+
     // Exam Review page
     examReview: "Exam Review",
     yourAnswer: "Your Answer",
     correctAnswer: "Correct Answer",
-    
+
     // Progress page
     noProgressYet: "No progress yet",
     takeFirstExam: "Take your first exam to track your progress",
-    
+
     // Leaderboard page
     leaderboard: "Leaderboard",
     topScorers: "Top Scorers",
     rank: "Rank",
     player: "Player",
-    
+
     // Not Found page
     pageNotFound: "Page Not Found",
     pageNotFoundDesc: "The page you're looking for doesn't exist.",
     goHome: "Go Home",
-    
+
     // Exam Timer
     practiceMode: "Practice Mode",
     examMode: "Exam Mode",
@@ -2174,11 +2189,11 @@ export const translations: Record<Language, Translations> = {
     resumeTimer: "Resume Timer",
     noTimeLimit: "No time limit",
     pleaseAnswerAll: "Please answer all questions",
-    officialExamFormat: "Official exam format",
     withWordTranslations: "With word translations",
     noWordTranslations: "No word translations",
+
     searchTexts: "Search for text...",
-    
+
     // Forum
     forumTitle: "Community",
     forumDescription: "Discuss, share experiences and ask questions",
@@ -2206,7 +2221,7 @@ export const translations: Record<Language, Translations> = {
     fillAllFields: "Fill all fields",
     category: "Category",
     selectCategory: "Select a category",
-    characters: "characters",
+
     forumLoginPrompt: "Log in to create topics and participate in discussions",
     topicDeleted: "Topic deleted",
     postDeleted: "Post deleted",
@@ -2217,7 +2232,7 @@ export const translations: Record<Language, Translations> = {
     repliedToYourTopic: "replied to your topic",
     upvotedYourTopic: "upvoted your topic",
     upvotedYourPost: "upvoted your post",
-    
+
     // Moderator
     moderatorPanel: "Moderator Panel",
     moderatorPanelDesc: "Manage forum content and users",
@@ -2263,7 +2278,7 @@ export const translations: Record<Language, Translations> = {
     reportReasonInappropriate: "Inappropriate content",
     reportReasonMisinformation: "Misinformation",
     reportReasonOther: "Other",
-    
+
     // User Management
     adminAccessRequired: "Admin access required",
     backToModeratorPanel: "Back to Moderator Panel",
@@ -2271,7 +2286,7 @@ export const translations: Record<Language, Translations> = {
     status: "Status",
     joined: "Joined",
     actions: "Actions",
-    admin: "Admin",
+    adminRole: "Admin",
     moderator: "Moderator",
     banned: "Banned",
     unban: "Unban",
@@ -2286,7 +2301,7 @@ export const translations: Record<Language, Translations> = {
     moderatorAdded: "Moderator added successfully",
     moderatorRemoved: "Moderator removed successfully",
     banReasonRequired: "Ban reason is required",
-    
+
     // Forum categories
     category_exams_tips: "Exams & Tips",
     category_exams_tips_desc: "Share tips and strategies for the B1 exam",
@@ -2300,7 +2315,7 @@ export const translations: Record<Language, Translations> = {
     "forum.category.experiences_desc": "Share your experience learning Dutch",
     "forum.category.questions": "Questions & Answers",
     "forum.category.questions_desc": "Ask questions and help others",
-    
+
     // Dictionary page
     searchForWord: "Search for a word...",
     allLetters: "All",
@@ -2324,7 +2339,7 @@ export const translations: Record<Language, Translations> = {
     translation: "Translation",
     chooseLanguage: "Choose your language",
     forumEditorPlaceholder: "Write your topic content here...",
-    
+
     // Admin Settings
     adminSettings: "Admin Settings",
     systemSettings: "System Settings",
@@ -2332,47 +2347,52 @@ export const translations: Record<Language, Translations> = {
     examCreationEnabled: "Exam creation enabled",
     examCreationDisabled: "Exam creation disabled",
     examCreationDisabledTitle: "⏸️ Exam Creation Temporarily Disabled",
-    examCreationDisabledMessage: "You can use the current exams and search for exams if you want to practice a specific topic.",
-    browseExams: "Browse Exams",
+    examCreationDisabledMessage: "We have paused adding new exams because we have covered all necessary topics to ensure the quality of the website. However, if you have a suggestion for a missing topic, please let us know!",
+    browseExams: "Browse Public Exams",
     enableExamCreation: "Enable Exam Creation",
     disableExamCreation: "Disable Exam Creation",
     settingUpdated: "Setting updated",
     backToDashboard: "Back to Dashboard",
-    
+    suggestTopic: "Suggest Topic",
+    topicSuggestionPlaceholder: "Describe the missing topic (max 70 chars)...",
+    submitSuggestion: "Submit",
+    suggestionSubmitted: "Suggestion submitted!",
+    suggestionFailed: "Submission failed",
+
     // Admin Dashboard
     filterByStatus: "Filter by status",
     allStatus: "All Status",
-    searchTexts: "Search texts...",
+    adminSearchTexts: "Search texts...",
     searchExams: "Search exams...",
     searchUsers: "Search users...",
     id: "ID",
     title: "Title",
     createdBy: "Created By",
     date: "Date",
-    
+
     // Report Dialog
     otherIssue: "Other issue",
     additionalDetails: "Additional details",
     provideMoreInfo: "Please provide more information about the issue...",
-    
+
     // Rating Dialog
     shareThoughts: "Share your thoughts about this exam...",
-    
+
     // Create Exam
     pasteOrTypeDutchText: "Paste or type Dutch text here...",
-    
+
     // Forum Editor
     bold: "Bold",
     italic: "Italic",
     heading: "Heading",
     bulletList: "Bullet List",
     numberedList: "Numbered List",
-    
+
     // Accessibility
     toggleSidebar: "Toggle Sidebar",
     goToPreviousPage: "Go to previous page",
     goToNextPage: "Go to next page",
-    
+
     // Confirmation messages
     confirmDeleteTitle: "Confirm Delete",
     confirmDeleteMessage: "Are you sure you want to delete this?",
@@ -2421,11 +2441,11 @@ export const translations: Record<Language, Translations> = {
     page: "Page",
     previousPage: "Previous",
     nextPage: "Next",
-    
+
     // Rating
     rateThisExam: "Rate this exam",
     ratingReason: "Rating reason",
-    selectReason: "Select a reason (optional)",
+    selectRatingReason: "Select a reason (optional)",
     reasonHelpful: "Helpful text",
     reasonClear: "Clear questions",
     reasonGoodLevel: "Appropriate level",
@@ -2434,10 +2454,10 @@ export const translations: Record<Language, Translations> = {
     reasonOther: "Other reason",
     filterByReason: "Filter by Reason",
     allReasons: "All Reasons",
-    showDefinition: "Show definition (Dutch)",
-    hideDefinition: "Hide definition",
+    showRatingDefinition: "Show definition (Dutch)",
+    hideRatingDefinition: "Hide definition",
   },
-  
+
   tr: {
     // Navigation
     home: "Ana Sayfa",
@@ -2447,13 +2467,13 @@ export const translations: Record<Language, Translations> = {
     progress: "İlerleme",
     vocabulary: "Kelime Bilgisi",
     admin: "Yönetim",
-    
+
     // Auth
     login: "Giriş Yap",
     logout: "Çıkış Yap",
     welcome: "Hoş geldiniz",
     welcomeBack: "Tekrar hoş geldiniz",
-    
+
     // Landing page
     appTitle: "Hollandaca B1 Sınav Oluşturucu",
     appSubtitle: "Yapay Zeka Destekli Alıştırma Sınavlarıyla Hollandaca B1 Okumada Ustalaşın",
@@ -2461,7 +2481,7 @@ export const translations: Record<Language, Translations> = {
     learnMore: "Daha Fazla Bilgi",
     features: "Özellikler",
     howItWorks: "Nasıl Çalışır",
-    
+
     // Features
     feature1Title: "Yapay Zeka Destekli Sınavlar",
     feature1Desc: "Otomatik oluşturulan B1 seviyesi okuma anlama testleri",
@@ -2471,7 +2491,7 @@ export const translations: Record<Language, Translations> = {
     feature3Desc: "Puanlarınızı, kelime bilginizi ve çalışma sürenizi izleyin",
     feature4Title: "Kelime Öğrenin",
     feature4Desc: "Ses ve çevirilerle yeni kelimeler öğrenin",
-    
+
     // Text creation
     createNewExam: "Yeni Sınav Oluştur",
     browsePublicExams: "Genel Sınavlara Göz At",
@@ -2482,7 +2502,7 @@ export const translations: Record<Language, Translations> = {
     textTooShort: "Metin en az 50 karakter olmalıdır",
     validateText: "Metni Doğrula",
     translating: "Çevriliyor...",
-    
+
     // Validation
     validatingText: "Metin doğrulanıyor...",
     textValidated: "Metin doğrulandı",
@@ -2492,7 +2512,7 @@ export const translations: Record<Language, Translations> = {
     levelWarning: "Uyarı: Bu metin B1 seviyesinde değil",
     wordCount: "Kelime sayısı",
     estimatedTime: "Tahmini okuma süresi",
-    
+
     // Exam
     startExam: "Sınava Başla",
     submitExam: "Sınavı Gönder",
@@ -2523,7 +2543,7 @@ export const translations: Record<Language, Translations> = {
     examNotCompleted: "Sınav Tamamlanmadı",
     examNotCompletedDesc: "Bu sınav henüz tamamlanmadı",
     takeExam: "Sınava Başla",
-    
+
     // Progress
     myProgress: "İlerleme",
     totalExams: "Toplam Sınavlar",
@@ -2538,12 +2558,12 @@ export const translations: Record<Language, Translations> = {
     performanceByType: "Soru Türüne Göre Performans",
     performanceByTypeDesc: "Güçlü olduğunuz ve geliştirebileceğiniz alanları görün",
     personalizedTips: "Hollandcanızı geliştirmek için kişiselleştirilmiş ipuçları",
-    
+
     // Vocabulary
     myVocabulary: "Kelime Bilgim",
     newWords: "Yeni kelimeler",
     learning: "Öğreniliyor",
-    
+
     // Reporting
     reportIssue: "Sorun Bildir",
     levelIssue: "Seviye Sorunu",
@@ -2555,9 +2575,10 @@ export const translations: Record<Language, Translations> = {
     notDutch: "Hollandaca değil",
     other: "Diğer",
     reportSubmitted: "Rapor gönderildi",
-    
+
     // Admin
     userManagement: "Kullanıcı Yönetimi",
+    userManagementDesc: "Kullanıcıları ve moderatörleri yönet",
     textModeration: "Metin Moderasyonu",
     reportManagement: "Rapor Yönetimi",
     statistics: "İstatistikler",
@@ -2566,7 +2587,7 @@ export const translations: Record<Language, Translations> = {
     pending: "Beklemede",
     approved: "Onaylandı",
     rejected: "Reddedildi",
-    
+
     // Common
     save: "Kaydet",
     cancel: "İptal",
@@ -2605,7 +2626,7 @@ export const translations: Record<Language, Translations> = {
     minRead: "dakika okuma",
     remaining: "Kalan",
     characters: "karakter",
-    
+
     // Homepage - New comprehensive translations
     staatsexamenPrep: "Staatsexamen Hazırlığı",
     officialExamFormat: "Resmi Sınav Formatı",
@@ -2613,7 +2634,7 @@ export const translations: Record<Language, Translations> = {
     comprehensivePreparation: "Resmi Staatsexamen ile aynı zorluk seviyesi ve formatta sorularla pratik yapın",
     whyChooseUs: "Neden Bizi Seçmelisiniz?",
     keyFeatures: "Temel Özellikler",
-    
+
     // Features - Detailed
     feature5Title: "Staatsexamen Tarzı Sorular",
     feature5Desc: "Resmi staatsexamen ile aynı formatta sorularla pratik yapın",
@@ -2623,7 +2644,7 @@ export const translations: Record<Language, Translations> = {
     feature7Desc: "Anlayışınızı geliştirmek için her yanıt için kapsamlı açıklamalar alın",
     feature8Title: "B1 Sözlük & Çeviri",
     feature8Desc: "Anlık çeviri için herhangi bir kelimeye tıklayın ve kişisel B1 sözlüğünüze ekleyin",
-    
+
     // Benefits
     benefit1Title: "Okuma Becerilerini Geliştir",
     benefit1Desc: "Hollandaca metinleri daha hızlı ve daha iyi anlamak için kendinizi eğitin",
@@ -2637,7 +2658,7 @@ export const translations: Record<Language, Translations> = {
     benefit5Desc: "Arayüz Hollandaca, Arapça, İngilizce ve Türkçe olarak kullanılabilir",
     benefit6Title: "Kelime Ezberlemesi",
     benefit6Desc: "Aralıklı tekrar sistemi ve kişisel sözlük ile B1 kelime bilginizi geliştirin",
-    
+
     // How it works - Detailed steps
     step1Title: "Hollandaca Metin Ekle",
     step1Desc: "B1 seviyesinde herhangi bir Hollandaca metni yapıştırın, yükleyin veya tarayın (2.000-10.100 karakter)",
@@ -2647,17 +2668,17 @@ export const translations: Record<Language, Translations> = {
     step3Desc: "Soruları yanıtlayın ve ayrıntılı açıklamalarla anında geri bildirim alın",
     step4Title: "Öğren ve Geliş",
     step4Desc: "Sonuçlarınızı inceleyin, yeni kelimeler öğrenin ve zaman içinde ilerlemenizi takip edin",
-    
+
     // CTA
     readyToStart: "Başlamaya Hazır mısınız?",
     joinLearners: "Hollanda entegrasyon sınavına hazırlanan binlerce öğrenciye katılın",
     startLearningNow: "Şimdi Öğrenmeye Başla",
-    
+
     // Stats
     languagesSupported: "Diller",
     aiPowered: "Yapay Zeka Destekli",
     levelFocus: "Seviye Odak",
-    
+
     // Progress bar for exam generation
     processingWithAI: "Metin işleniyor...",
     processingWithGemini: "Metin tamamen işleniyor",
@@ -2666,15 +2687,15 @@ export const translations: Record<Language, Translations> = {
     completedStatus: "✓ Tamamlandı",
     unifiedProcessing: "Akıllı birleşik işleme",
     unifiedProcessingDesc: "Zaman kazanmak ve en iyi kaliteyi sağlamak için tüm adımlar tek bir çağrıda işlenir",
-    
+
     // Processing steps
     stepCleanText: "Metni temizle ve düzelt",
     stepGenerateTitle: "Akıllı başlık oluştur",
     stepCreateQuestions: "B1 seviyesi sorular oluştur",
     stepExtractVocabulary: "Önemli kelimeleri çıkar",
     stepFormatText: "Son metni biçimlendir",
-    
-     // Vocabulary page
+
+    // Vocabulary page
     yourVocabulary: "Kelime Hazneniz",
     wordsLearned: "kelime öğrenildi",
     noVocabularyYet: "Henüz kelime yok",
@@ -2711,7 +2732,7 @@ export const translations: Record<Language, Translations> = {
     confirmArchive: "Bu kelimeyi arşivle? Pratikte sık görünmeyecek.",
     skip: "Atla",
     dontShowAgain: "Bir daha gösterme",
-    
+
     // Practice mode
     flashcards: "Flashcards",
     multipleChoice: "Çoktan Seçmeli",
@@ -2726,14 +2747,14 @@ export const translations: Record<Language, Translations> = {
     selectCorrectTranslation: "Doğru çeviriyi seçin:",
     practiceComplete: "Pratik tamamlandı",
     audioError: "Ses çalınamadı",
-    
+
     // Review mode
     reviewMode: "Gözden Geçirme Modu",
     simpleReview: "Basit Gözden Geçirme",
     startPractice: "Pratik Başlat",
     showDefinition: "Hollandaca Tanımı Göster",
     hideDefinition: "Tanımı Gizle",
-    
+
     // Exam Results page (additional fields)
     passed: "Geçti",
     failed: "Kaldı",
@@ -2742,27 +2763,27 @@ export const translations: Record<Language, Translations> = {
     performanceAnalysis: "Performans Analizi",
     recommendations: "Öneriler",
     reviewAnswers: "Cevapları İncele",
-    
+
     // Exam Review page
     examReview: "Sınav İncelemesi",
     yourAnswer: "Cevabınız",
     correctAnswer: "Doğru Cevap",
-    
+
     // Progress page
     noProgressYet: "Henüz ilerleme yok",
     takeFirstExam: "İlerlemenizi takip etmek için ilk sınavınızı yapın",
-    
+
     // Leaderboard page
     leaderboard: "Lider Tablosu",
     topScorers: "En Yüksek Puanlar",
     rank: "Sıra",
     player: "Oyuncu",
-    
+
     // Not Found page
     pageNotFound: "Sayfa Bulunamadı",
     pageNotFoundDesc: "Aradığınız sayfa mevcut değil.",
     goHome: "Ana Sayfaya Dön",
-    
+
     // Exam Timer
     practiceMode: "Alıştırma Modu",
     examMode: "Sınav Modu",
@@ -2779,11 +2800,11 @@ export const translations: Record<Language, Translations> = {
     resumeTimer: "Zamanlayıcıyı Devam Ettir",
     noTimeLimit: "Zaman sınırı yok",
     pleaseAnswerAll: "Lütfen tüm soruları cevaplayın",
-    officialExamFormat: "Resmi sınav formatı",
+
     withWordTranslations: "Kelime çevirileriyle",
     noWordTranslations: "Kelime çevirisi olmadan",
     searchTexts: "Metin ara...",
-    
+
     // Forum
     forumTitle: "Topluluk",
     forumDescription: "Tartışın, deneyimleri paylaşın ve sorular sorun",
@@ -2811,7 +2832,7 @@ export const translations: Record<Language, Translations> = {
     fillAllFields: "Tüm alanları doldurun",
     category: "Kategori",
     selectCategory: "Bir kategori seçin",
-    characters: "karakter",
+
     forumLoginPrompt: "Konu oluşturmak ve tartışmalara katılmak için giriş yapın",
     topicDeleted: "Konu silindi",
     postDeleted: "Yanıt silindi",
@@ -2822,7 +2843,7 @@ export const translations: Record<Language, Translations> = {
     repliedToYourTopic: "konunuza yanıt verdi",
     upvotedYourTopic: "konunuzu beğendi",
     upvotedYourPost: "yanıtınızı beğendi",
-    
+
     // Moderator
     moderatorPanel: "Moderator Paneli",
     moderatorPanelDesc: "Forum içeriğini ve kullanıcıları yönetin",
@@ -2868,7 +2889,7 @@ export const translations: Record<Language, Translations> = {
     reportReasonInappropriate: "Uygunsuz içerik",
     reportReasonMisinformation: "Yanlış bilgi",
     reportReasonOther: "Diğer",
-    
+
     // User Management
     adminAccessRequired: "Admin erişimi gerekli",
     backToModeratorPanel: "Moderator Paneline Dön",
@@ -2876,7 +2897,7 @@ export const translations: Record<Language, Translations> = {
     status: "Durum",
     joined: "Katıldı",
     actions: "İşlemler",
-    admin: "Admin",
+    adminRole: "Admin",
     moderator: "Moderator",
     banned: "Yasaklı",
     unban: "Yasak Kaldır",
@@ -2891,7 +2912,7 @@ export const translations: Record<Language, Translations> = {
     moderatorAdded: "Moderator başarıyla eklendi",
     moderatorRemoved: "Moderator başarıyla kaldırıldı",
     banReasonRequired: "Yasaklama nedeni gerekli",
-    
+
     // Forum categories
     category_exams_tips: "Sınavlar ve İpuçları",
     category_exams_tips_desc: "B1 sınavı için ipuçları ve stratejileri paylaşın",
@@ -2905,7 +2926,7 @@ export const translations: Record<Language, Translations> = {
     "forum.category.experiences_desc": "Hollandaca öğrenme deneyiminizi paylaşın",
     "forum.category.questions": "Sorular ve Cevaplar",
     "forum.category.questions_desc": "Sorular sorun ve başkalarına yardım edin",
-    
+
     // Dictionary page
     searchForWord: "Bir kelime arayın...",
     allLetters: "Tümü",
@@ -2925,11 +2946,11 @@ export const translations: Record<Language, Translations> = {
     dictionaryStats: "📊 Arapça, İngilizce ve Türkçe çevirileriyle binlerce B1 seviyesi Hollandaca kelime içerir",
     wordAddedSuccess: "✅ Kelime dağarcığınıza eklendi!",
     wordAlreadyExists: "ℹ️ Bu kelime zaten kelime dağarcığınızda",
-    wordAddFailed: "❌ Kelime eklenemedi",
+    wordAddFailed: "❌ Kelime kaydedilemedi",
     translation: "Çeviri",
     chooseLanguage: "Dilinizi seçin",
     forumEditorPlaceholder: "Konu içeriğinizi buraya yazın...",
-    
+
     // Admin Settings
     adminSettings: "Yönetici Ayarları",
     systemSettings: "Sistem Ayarları",
@@ -2937,47 +2958,48 @@ export const translations: Record<Language, Translations> = {
     examCreationEnabled: "Sınav oluşturma etkin",
     examCreationDisabled: "Sınav oluşturma devre dışı",
     examCreationDisabledTitle: "⏸️ Sınav Oluşturma Geçici Olarak Devre Dışı",
-    examCreationDisabledMessage: "Mevcut sınavları kullanabilir ve belirli bir konuda çalışmak istiyorsanız sınavları arayabilirsiniz.",
-    browseExams: "Sınavlara Göz At",
+    examCreationDisabledMessage: "Web sitesinin kalitesini sağlamak için gerekli tüm konuları kapsadığımızdan yeni sınav eklemeyi durdurduk. Ancak, eksik bir konu için öneriniz varsa, lütfen bize bildirin!",
+    browseExams: "Herkese Açık Sınavlara Göz At",
     enableExamCreation: "Sınav Oluşturmayı Etkinleştir",
     disableExamCreation: "Sınav Oluşturmayı Devre Dışı Bırak",
-    settingUpdated: "Ayar güncellendi",
+    settingUpdated: "Ayarlar güncellendi",
     backToDashboard: "Panoya Dön",
-    
+
+
     // Admin Dashboard
     filterByStatus: "Duruma göre filtrele",
     allStatus: "Tüm Durumlar",
-    searchTexts: "Metinlerde ara...",
+    adminSearchTexts: "Metinlerde ara...",
     searchExams: "Sınavlarda ara...",
     searchUsers: "Kullanıcılarda ara...",
     id: "ID",
     title: "Başlık",
     createdBy: "Oluşturan",
     date: "Tarih",
-    
+
     // Report Dialog
     otherIssue: "Diğer sorun",
     additionalDetails: "Ek detaylar",
     provideMoreInfo: "Lütfen sorun hakkında daha fazla bilgi verin...",
-    
+
     // Rating Dialog
     shareThoughts: "Bu sınav hakkındaki düşüncelerinizi paylaşın...",
-    
+
     // Create Exam
     pasteOrTypeDutchText: "Hollandaca metni buraya yapıştırın veya yazın...",
-    
+
     // Forum Editor
     bold: "Kalın",
     italic: "İtalik",
     heading: "Başlık",
     bulletList: "Madde İşaretli Liste",
     numberedList: "Numaralı Liste",
-    
+
     // Accessibility
     toggleSidebar: "Kenar çubuğunu aç/kapat",
     goToPreviousPage: "Önceki sayfaya git",
     goToNextPage: "Sonraki sayfaya git",
-    
+
     // Confirmation messages
     confirmDeleteTitle: "Silmeyi Onayla",
     confirmDeleteMessage: "Bunu silmek istediğinizden emin misiniz?",
@@ -3026,11 +3048,11 @@ export const translations: Record<Language, Translations> = {
     page: "Sayfa",
     previousPage: "Önceki",
     nextPage: "Sonraki",
-    
+
     // Rating
     rateThisExam: "Bu sınavı değerlendir",
     ratingReason: "Değerlendirme nedeni",
-    selectReason: "Bir neden seçin (isteğe bağlı)",
+    selectRatingReason: "Bir neden seçin (isteğe bağlı)",
     reasonHelpful: "Faydalı metin",
     reasonClear: "Açık sorular",
     reasonGoodLevel: "Uygun seviye",
@@ -3039,9 +3061,17 @@ export const translations: Record<Language, Translations> = {
     reasonOther: "Diğer neden",
     filterByReason: "Nedene göre filtrele",
     allReasons: "Tüm nedenler",
-    showDefinition: "Tanımı göster (Hollandaca)",
-    hideDefinition: "Tanımı gizle",
+    showRatingDefinition: "Tanımı göster (Hollandaca)",
+    hideRatingDefinition: "Tanımı gizle",
+
+    suggestTopic: "Konu Öner",
+    topicSuggestionPlaceholder: "Eksik konuyu tanımlayın (maks 70 karakter)...",
+    submitSuggestion: "Gönder",
+    suggestionSubmitted: "Öneri gönderildi!",
+    suggestionFailed: "Gönderim başarısız",
   },
+
+
 };
 
 // Helper function to get translations for a specific language
