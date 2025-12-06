@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { BookOpen, Menu, LogOut, FileText, BookMarked, TrendingUp, Library, Plus, MessageSquare, Shield } from "lucide-react";
+import { BookOpen, Menu, LogOut, FileText, BookMarked, TrendingUp, Library, Plus, MessageSquare, Shield, Moon, Sun } from "lucide-react";
 import { Link } from "wouter";
 import {
   DropdownMenu,
@@ -13,6 +13,7 @@ import {
 import LanguageSwitcher from "./LanguageSwitcher";
 import { NotificationsDropdown } from "./NotificationsDropdown";
 import { trpc } from "@/lib/trpc";
+import { useTheme } from "@/contexts/ThemeContext";
 
 /**
  * Shared application header with navigation
@@ -21,6 +22,7 @@ import { trpc } from "@/lib/trpc";
 export function AppHeader() {
   const { user, logout } = useAuth();
   const { t } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
   const { data: examCreationStatus } = trpc.settings.isExamCreationEnabled.useQuery();
 
   return (
@@ -33,7 +35,7 @@ export function AppHeader() {
               <h1 className="text-lg sm:text-2xl font-bold gradient-text">StaatKlaar</h1>
             </div>
           </Link>
-          
+
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-2">
             <Link href="/create-exam">
@@ -70,6 +72,15 @@ export function AppHeader() {
             )}
             <NotificationsDropdown />
             <LanguageSwitcher />
+            {/* Dark Mode Toggle */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleTheme}
+              title={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+            >
+              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
             <Button variant="ghost" size="sm" onClick={logout}>
               {t.logout || "Logout"}
             </Button>
@@ -79,6 +90,14 @@ export function AppHeader() {
           <div className="flex md:hidden items-center gap-1.5">
             <NotificationsDropdown />
             <LanguageSwitcher />
+            {/* Dark Mode Toggle */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleTheme}
+            >
+              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm">
