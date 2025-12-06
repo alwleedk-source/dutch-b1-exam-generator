@@ -45,14 +45,72 @@ export {
     deleteOldIncompleteExams,
 } from "./exams";
 
-// TODO: The following functions still need to be migrated from db.ts:
-// - Translation functions (createTranslation, getTranslationByTextId, updateTranslation)
-// - Vocabulary functions (createVocabulary, findVocabularyByWordAndContext, etc.)
-// - User Vocabulary functions (createUserVocabulary, getUserVocabularyProgress, etc.)
-// - Report functions (createReport, getReportsByTextId, etc.)
-// - Achievement functions (createAchievement, getUserAchievements, etc.)
-// - Leaderboard functions (getLeaderboard)
-// - SRS functions (getUserVocabularyById, updateUserVocabularySRS, etc.)
-// - Admin functions (getUserExams, getUserTexts, deleteUser, etc.)
-// - Text Rating functions (rateText, getTextsWithRatings, etc.)
-// - Topic Suggestion functions (createTopicSuggestion, getTopicSuggestions, etc.)
+// Re-export translation functions
+export {
+    createTranslation,
+    getTranslationByTextId,
+    updateTranslation,
+} from "./translations";
+
+// Re-export vocabulary functions
+export {
+    createVocabulary,
+    findVocabularyByWordAndContext,
+    linkVocabularyToText,
+    getVocabularyByTextId,
+    getVocabularyById,
+    updateVocabularyAudio,
+    updateVocabulary,
+} from "./vocabulary";
+
+// Re-export user vocabulary functions (SRS)
+export {
+    updateUserVocabularyCount,
+    updateUserStreak,
+    createUserVocabulary,
+    getUserVocabularyByVocabId,
+    getUserVocabularyCount,
+    getUserVocabularyProgress,
+    updateUserVocabularyProgress,
+    getUserVocabularyById,
+    updateUserVocabularySRS,
+    deleteUserVocabulary,
+    updateUserVocabularyStatus,
+} from "./userVocabulary";
+
+// Re-export report functions
+export {
+    createReport,
+    getReportsByTextId,
+    getPendingReports,
+    updateReportStatus,
+} from "./reports";
+
+// Re-export achievement functions
+export {
+    createAchievement,
+    getUserAchievements,
+    updateAchievementProgress,
+} from "./achievements";
+
+// Re-export leaderboard functions
+export { getLeaderboard } from "./leaderboard";
+
+// Re-export admin functions
+export {
+    getUserExams,
+    getUserTexts,
+    deleteUser,
+    updateUserRole,
+    updateUserBanStatus,
+    getTextsFiltered,
+    getTextWithDetails,
+    getAdminStats,
+    getRecentActivity,
+    getDictionaryWord,
+    searchDictionary,
+    rateText,
+    getUserRating,
+    getTextRatings,
+    deleteRating,
+} from "./admin";
