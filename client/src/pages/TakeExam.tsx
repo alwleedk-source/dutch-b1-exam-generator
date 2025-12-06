@@ -353,7 +353,7 @@ export default function TakeExam() {
                   <span className="text-xs sm:text-sm font-medium text-primary">
                     {t.question} {index + 1}
                   </span>
-                  <p className="text-base sm:text-lg font-medium mt-1.5 sm:mt-2" dir="ltr">{q.question}</p>
+                  <p className={`font-medium mt-1.5 sm:mt-2 ${getFontSizeClass()}`} dir="ltr">{q.question}</p>
                 </div>
 
                 <RadioGroup
@@ -368,7 +368,7 @@ export default function TakeExam() {
                           <RadioGroupItem value={optionLetter} id={`q${index}-opt${optIndex}`} className="flex-shrink-0" />
                           <Label
                             htmlFor={`q${index}-opt${optIndex}`}
-                            className="flex-1 cursor-pointer text-sm sm:text-base leading-snug"
+                            className={`flex-1 cursor-pointer leading-snug ${getFontSizeClass()}`}
                             dir="ltr"
                           >
                             {option}
