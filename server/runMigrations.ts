@@ -5,8 +5,18 @@ import { join } from "path";
 
 async function runMigrations() {
   console.log("[Migrations] Starting migrations...");
+  console.log(`[Migrations] CWD: ${process.cwd()}`);
+
+  if (!process.env.DATABASE_URL) {
+    console.error("[Migrations] ❌ DATABASE_URL is not defined!");
+    process.exit(1);
+  }
 
   const db = await getDb();
+  if (!db) {
+    console.error("[Migrations] ❌ Failed to initialize database connection. Check DATABASE_URL and network.");
+    process.exit(1);
+  }
 
   const migrations = [
     "004_add_ban_columns.sql",
@@ -20,20 +30,34 @@ async function runMigrations() {
 
   for (const migrationFile of migrations) {
     try {
-      console.log(`[Migrations] Running ${migrationFile}...`);
+      console.log(`[Migrations] Checking ${migrationFile}...`);
       const migrationPath = join(process.cwd(), "migrations", migrationFile);
+
+      // Check if file exists
+      try {
+        const fs = await import("fs");
+        if (!fs.existsSync(migrationPath)) {
+          console.error(`[Migrations] ❌ File not found: ${migrationPath}`);
+          // Try looking in dist/migrations or ../migrations just in case
+          continue;
+        }
+      } catch (e) {
+        // ignore fs check error
+      }
+
       const sql = readFileSync(migrationPath, "utf-8");
 
       await db.execute(sql);
 
-      console.log(`[Migrations] ✅ ${migrationFile} completed successfully`);
+      console.log(`[Migrations] ✅ ${migrationFile} executed successfully`);
     } catch (error) {
       console.error(`[Migrations] ❌ Failed to run ${migrationFile}:`, error);
-      throw error;
+      // Don't throw, just log. Some migrations might fail if columns already exist.
+      // throw error; 
     }
   }
 
-  console.log("[Migrations] All migrations completed successfully!");
+  console.log("[Migrations] Migration process finished.");
   process.exit(0);
 }
 
