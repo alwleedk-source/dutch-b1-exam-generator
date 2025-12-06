@@ -153,6 +153,12 @@ export interface Translations {
   success: string;
   confirm: string;
   close: string;
+  submit: string;
+  name: string;
+  topicUpdated: string;
+  postUpdated: string;
+  editTopic: string;
+  topicContent: string;
   optional: string;
   note: string;
   correct: string;
@@ -781,6 +787,12 @@ export const translations: Record<Language, Translations> = {
     success: "Succes",
     confirm: "Bevestigen",
     close: "Sluiten",
+    submit: "Verzenden",
+    name: "Naam",
+    topicUpdated: "Onderwerp bijgewerkt",
+    postUpdated: "Bericht bijgewerkt",
+    editTopic: "Onderwerp bewerken",
+    topicContent: "Inhoud van onderwerp",
     optional: "Optioneel",
     note: "Opmerking",
     correct: "Correct",
@@ -1400,6 +1412,12 @@ export const translations: Record<Language, Translations> = {
     success: "نجاح",
     confirm: "تأكيد",
     close: "إغلاق",
+    submit: "إرسال",
+    name: "الاسم",
+    topicUpdated: "تم تحديث الموضوع",
+    postUpdated: "تم تحديث المشاركة",
+    editTopic: "تعديل الموضوع",
+    topicContent: "محتوى الموضوع",
     optional: "اختياري",
     note: "ملاحظة",
     correct: "صحيح",
@@ -2017,6 +2035,12 @@ export const translations: Record<Language, Translations> = {
     success: "Success",
     confirm: "Confirm",
     close: "Close",
+    submit: "Submit",
+    name: "Name",
+    topicUpdated: "Topic updated",
+    postUpdated: "Post updated",
+    editTopic: "Edit topic",
+    topicContent: "Topic content",
     optional: "Optional",
     note: "Note",
     correct: "Correct",
@@ -2635,6 +2659,12 @@ export const translations: Record<Language, Translations> = {
     success: "Başarılı",
     confirm: "Onayla",
     close: "Kapat",
+    submit: "Gönder",
+    name: "İsim",
+    topicUpdated: "Konu güncellendi",
+    postUpdated: "Gönderi güncellendi",
+    editTopic: "Konuyu düzenle",
+    topicContent: "Konu içeriği",
     optional: "İsteğe bağlı",
     note: "Not",
     correct: "Doğru",
