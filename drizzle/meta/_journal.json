@@ -50,6 +50,13 @@
       "when": 1763938399976,
       "tag": "0006_perpetual_deathbird",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1765044015343,
+      "tag": "0007_colorful_dexter_bennett",
+      "breakpoints": true
     }
   ]
 }
