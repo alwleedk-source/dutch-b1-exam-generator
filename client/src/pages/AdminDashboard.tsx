@@ -329,7 +329,7 @@ export default function AdminDashboard() {
                             <p className="text-sm font-medium truncate">{exam.text_title || `Text #${exam.text_id}`}</p>
                             <p className="text-xs text-muted-foreground">
                               by {exam.user_name || exam.user_email || 'Unknown'}
-                              {exam.score !== null && ` • ${exam.score}/${exam.total_questions}`}
+                              {exam.correct_answers !== null && ` • ${exam.correct_answers}/${exam.total_questions}`}
                             </p>
                           </div>
                           <Button
@@ -531,8 +531,8 @@ export default function AdminDashboard() {
                             </Badge>
                           </TableCell>
                           <TableCell className="font-medium">
-                            {exam.score !== null && exam.score !== undefined
-                              ? `${exam.score}/${exam.total_questions} (${Math.round((exam.score / exam.total_questions) * 100)}%)`
+                            {exam.correct_answers !== null && exam.correct_answers !== undefined
+                              ? `${exam.correct_answers}/${exam.total_questions} (${exam.score_percentage}%)`
                               : '—'}
                           </TableCell>
                           <TableCell className="text-sm text-muted-foreground">
@@ -840,8 +840,8 @@ export default function AdminDashboard() {
                 <div>
                   <p className="text-sm text-muted-foreground">Score</p>
                   <p className="font-medium text-lg">
-                    {examDetails.score}/{examDetails.total_questions}
-                    ({Math.round((examDetails.score / examDetails.total_questions) * 100)}%)
+                    {examDetails.correct_answers}/{examDetails.total_questions}
+                    ({examDetails.score_percentage}%)
                   </p>
                 </div>
                 <div>
@@ -921,7 +921,7 @@ export default function AdminDashboard() {
                       <div key={exam.id} className="flex items-center justify-between p-2 bg-muted rounded">
                         <span className="text-sm">{exam.text_title || `Text #${exam.text_id}`}</span>
                         <span className="text-sm font-medium">
-                          {exam.score !== null ? `${exam.score}/${exam.total_questions}` : '—'}
+                          {exam.correct_answers !== null ? `${exam.correct_answers}/${exam.total_questions}` : '—'}
                         </span>
                       </div>
                     ))}
