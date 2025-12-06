@@ -522,10 +522,44 @@ export const appRouter = router({
         topic: z.string().max(70, "Topic must be 70 characters or less"),
       }))
       .mutation(async ({ ctx, input }) => {
-        await db.createTopicSuggestion({
-          user_id: ctx.user.id,
-          topic: input.topic,
-        });
+        try {
+          await db.createTopicSuggestion({
+            user_id: ctx.user.id,
+            topic: input.topic,
+          });
+        } catch (error: any) {
+          console.error("[suggestTopic] Failed to create suggestion:", error);
+
+          // Self-healing: If table doesn't exist, create it and retry
+          if (error.message?.includes('relation "topic_suggestions" does not exist') || error.code === '42P01') {
+            console.log("[suggestTopic] ⚠️ Table missing, attempting to create it...");
+            const dbInstance = await db.getDb();
+            if (dbInstance) {
+              await dbInstance.execute(db.sql`
+                CREATE TABLE IF NOT EXISTS "topic_suggestions" (
+                  "id" serial PRIMARY KEY NOT NULL,
+                  "user_id" integer NOT NULL,
+                  "topic" varchar(70) NOT NULL,
+                  "created_at" timestamp DEFAULT now() NOT NULL
+                );
+                DO $$ BEGIN
+                 ALTER TABLE "topic_suggestions" ADD CONSTRAINT "topic_suggestions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+                EXCEPTION
+                 WHEN duplicate_object THEN null;
+                END $$;
+              `);
+              console.log("[suggestTopic] ✅ Table created, retrying insertion...");
+
+              // Retry insertion
+              await db.createTopicSuggestion({
+                user_id: ctx.user.id,
+                topic: input.topic,
+              });
+              return { success: true };
+            }
+          }
+          throw error;
+        }
         return { success: true };
       }),
 
