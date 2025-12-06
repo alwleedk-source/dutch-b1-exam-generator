@@ -143,6 +143,16 @@ export default function AdminDashboard() {
     },
   });
 
+  const cleanupExamsMutation = trpc.admin.cleanupExams.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Cleanup successful! Deleted ${data.deletedCount} incomplete exams older than 2 days.`);
+      refetchExams();
+    },
+    onError: (error) => {
+      toast.error("Failed to cleanup exams: " + error.message);
+    },
+  });
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-bg">
@@ -218,10 +228,10 @@ export default function AdminDashboard() {
 
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-6">
-              {/* Quick Actions */}
-              <div className="mb-6">
+              {/* Quick Actions Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <Link href="/admin/settings">
-                  <Card className="cursor-pointer hover:shadow-lg transition-shadow border-primary/20">
+                  <Card className="cursor-pointer hover:shadow-lg transition-shadow border-primary/20 h-full">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                       <div>
                         <CardTitle className="text-lg">{t.systemSettings}</CardTitle>
@@ -231,13 +241,30 @@ export default function AdminDashboard() {
                     </CardHeader>
                   </Card>
                 </Link>
-              </div>
 
-              {/* Statistics Cards */}
+                <Card
+                  className="cursor-pointer hover:shadow-lg transition-shadow border-red-200 hover:border-red-400 h-full"
+                  onClick={() => {
+                    if (confirm("Are you sure you want to delete all incomplete exams older than 2 days? This cannot be undone.")) {
+                      cleanupExamsMutation.mutate({ days: 2 });
+                    }
+                  }}
+                >
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <div>
+                      <CardTitle className="text-lg text-red-600">Cleanup Database</CardTitle>
+                      <CardDescription>Delete incomplete exams older than 2 days</CardDescription>
+                    </div>
+                    <Trash2 className="h-8 w-8 text-red-500" />
+                  </CardHeader>
+                </Card>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+                    <div>
+                      <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+                    </div>
                     <Users className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
@@ -733,10 +760,11 @@ export default function AdminDashboard() {
             </TabsContent>
           </Tabs>
         </div>
-      </main>
+      </main >
 
       {/* Text Details Dialog */}
-      <Dialog open={!!textToView} onOpenChange={(open) => !open && setTextToView(null)}>
+      < Dialog open={!!textToView
+      } onOpenChange={(open) => !open && setTextToView(null)}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Text Details</DialogTitle>
@@ -825,10 +853,10 @@ export default function AdminDashboard() {
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog >
 
       {/* Exam Details Dialog */}
-      <Dialog open={!!examToView} onOpenChange={(open) => !open && setExamToView(null)}>
+      < Dialog open={!!examToView} onOpenChange={(open) => !open && setExamToView(null)}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Exam Result Details</DialogTitle>
@@ -876,10 +904,10 @@ export default function AdminDashboard() {
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog >
 
       {/* User Details Dialog */}
-      <Dialog open={!!userToView} onOpenChange={(open) => !open && setUserToView(null)}>
+      < Dialog open={!!userToView} onOpenChange={(open) => !open && setUserToView(null)}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>User Details</DialogTitle>
@@ -953,10 +981,10 @@ export default function AdminDashboard() {
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog >
 
       {/* Delete Confirmations */}
-      <Dialog open={!!examToDelete} onOpenChange={(open) => !open && setExamToDelete(null)}>
+      < Dialog open={!!examToDelete} onOpenChange={(open) => !open && setExamToDelete(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t.confirmDeleteTitle}</DialogTitle>
@@ -980,7 +1008,7 @@ export default function AdminDashboard() {
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog >
 
       <Dialog open={!!textToDelete} onOpenChange={(open) => !open && setTextToDelete(null)}>
         <DialogContent>
@@ -1059,6 +1087,6 @@ export default function AdminDashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </div >
   );
 }

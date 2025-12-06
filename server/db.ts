@@ -1461,6 +1461,26 @@ export async function getAdminStats() {
 }
 
 /**
+ * Delete old incomplete exams
+ */
+export async function deleteOldIncompleteExams(olderThan: Date) {
+  const db = await getDb();
+  if (!db) return 0;
+
+  const result = await db
+    .delete(exams)
+    .where(
+      and(
+        eq(exams.status, "in_progress"),
+        sql`${exams.created_at} < ${olderThan.toISOString()}`
+      )
+    )
+    .returning({ id: exams.id });
+
+  return result.length;
+}
+
+/**
  * Get recent activity
  */
 export async function getRecentActivity(limit: number = 10) {

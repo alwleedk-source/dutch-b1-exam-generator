@@ -1644,6 +1644,19 @@ export const appRouter = router({
         await db.deleteExam(input.exam_id);
         return { success: true };
       }),
+
+    // Cleanup old incomplete exams
+    cleanupExams: adminProcedure
+      .input(z.object({
+        days: z.number().min(1).default(2),
+      }))
+      .mutation(async ({ input }) => {
+        const dateThreshold = new Date();
+        dateThreshold.setDate(dateThreshold.getDate() - input.days);
+
+        const deletedCount = await db.deleteOldIncompleteExams(dateThreshold);
+        return { success: true, deletedCount };
+      }),
   }),
 
   // User management
