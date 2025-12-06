@@ -329,7 +329,11 @@ export default function AdminDashboard() {
                             <p className="text-sm font-medium truncate">{exam.text_title || `Text #${exam.text_id}`}</p>
                             <p className="text-xs text-muted-foreground">
                               by {exam.user_name || exam.user_email || 'Unknown'}
-                              {exam.correct_answers !== null && ` • ${exam.correct_answers}/${exam.total_questions}`}
+                              {(exam.correct_answers !== null && exam.correct_answers !== undefined)
+                                ? ` • ${exam.correct_answers}/${exam.total_questions}`
+                                : (exam.score_percentage !== null && exam.score_percentage !== undefined)
+                                  ? ` • ${Math.round((exam.score_percentage / 100) * exam.total_questions)}/${exam.total_questions}`
+                                  : ''}
                             </p>
                           </div>
                           <Button
@@ -531,9 +535,11 @@ export default function AdminDashboard() {
                             </Badge>
                           </TableCell>
                           <TableCell className="font-medium">
-                            {exam.correct_answers !== null && exam.correct_answers !== undefined
+                            {(exam.correct_answers !== null && exam.correct_answers !== undefined)
                               ? `${exam.correct_answers}/${exam.total_questions} (${exam.score_percentage}%)`
-                              : '—'}
+                              : (exam.score_percentage !== null && exam.score_percentage !== undefined)
+                                ? `${Math.round((exam.score_percentage / 100) * exam.total_questions)}/${exam.total_questions} (${exam.score_percentage}%)`
+                                : '—'}
                           </TableCell>
                           <TableCell className="text-sm text-muted-foreground">
                             {new Date(exam.created_at).toLocaleDateString()}
@@ -840,8 +846,13 @@ export default function AdminDashboard() {
                 <div>
                   <p className="text-sm text-muted-foreground">Score</p>
                   <p className="font-medium text-lg">
-                    {examDetails.correct_answers}/{examDetails.total_questions}
-                    ({examDetails.score_percentage}%)
+                    {(examDetails.correct_answers !== null && examDetails.correct_answers !== undefined)
+                      ? examDetails.correct_answers
+                      : (examDetails.score_percentage !== null && examDetails.score_percentage !== undefined)
+                        ? Math.round((examDetails.score_percentage / 100) * examDetails.total_questions)
+                        : '—'}
+                    /{examDetails.total_questions}
+                    ({examDetails.score_percentage !== null ? examDetails.score_percentage : '—'}%)
                   </p>
                 </div>
                 <div>
@@ -921,7 +932,11 @@ export default function AdminDashboard() {
                       <div key={exam.id} className="flex items-center justify-between p-2 bg-muted rounded">
                         <span className="text-sm">{exam.text_title || `Text #${exam.text_id}`}</span>
                         <span className="text-sm font-medium">
-                          {exam.correct_answers !== null ? `${exam.correct_answers}/${exam.total_questions}` : '—'}
+                          {(exam.correct_answers !== null && exam.correct_answers !== undefined)
+                            ? `${exam.correct_answers}/${exam.total_questions}`
+                            : (exam.score_percentage !== null && exam.score_percentage !== undefined)
+                              ? `${Math.round((exam.score_percentage / 100) * exam.total_questions)}/${exam.total_questions}`
+                              : '—'}
                         </span>
                       </div>
                     ))}
