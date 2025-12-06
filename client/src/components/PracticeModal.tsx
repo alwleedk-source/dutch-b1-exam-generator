@@ -11,12 +11,15 @@ interface PracticeModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   wordId?: number;
+  specificWordId?: number; // Alias for wordId
   onComplete: () => void;
 }
 
 type PracticeMode = "flashcard" | "multiple-choice";
 
-export function PracticeModal({ open, onOpenChange, wordId, onComplete }: PracticeModalProps) {
+export function PracticeModal({ open, onOpenChange, wordId, specificWordId, onComplete }: PracticeModalProps) {
+  // Use either wordId or specificWordId
+  const effectiveWordId = wordId ?? specificWordId;
   const { t, language } = useLanguage();
   const [mode, setMode] = useState<PracticeMode>("flashcard");
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -71,13 +74,13 @@ export function PracticeModal({ open, onOpenChange, wordId, onComplete }: Practi
 
   // Initialize current index based on wordId
   useEffect(() => {
-    if (wordId && words.length > 0) {
-      const index = words.findIndex((w: any) => w.id === wordId);
+    if (effectiveWordId && words.length > 0) {
+      const index = words.findIndex((w: any) => w.id === effectiveWordId);
       if (index !== -1) {
         setCurrentIndex(index);
       }
     }
-  }, [wordId, words]);
+  }, [effectiveWordId, words]);
 
   // Generate multiple choice options when mode changes or word changes
   useEffect(() => {
@@ -130,9 +133,9 @@ export function PracticeModal({ open, onOpenChange, wordId, onComplete }: Practi
       }
     } else {
       // Generate audio if not available
-      generateAudioMutation.mutate({ 
-        vocabId: currentWord.vocabulary_id || currentWord.vocabularyId, 
-        word: currentWord.word 
+      generateAudioMutation.mutate({
+        vocabId: currentWord.vocabulary_id || currentWord.vocabularyId,
+        word: currentWord.word
       });
     }
   };
@@ -233,7 +236,7 @@ export function PracticeModal({ open, onOpenChange, wordId, onComplete }: Practi
 
   const getTranslation = (word: any) => {
     if (!word) return "";
-    
+
     // Get translation based on user's preferred language
     switch (language) {
       case "ar":
@@ -297,7 +300,7 @@ export function PracticeModal({ open, onOpenChange, wordId, onComplete }: Practi
         <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
           <span>{currentIndex + 1} / {words.length}</span>
           <div className="flex-1 mx-4 bg-secondary rounded-full h-2">
-            <div 
+            <div
               className="bg-primary h-full rounded-full transition-all"
               style={{ width: `${((currentIndex + 1) / words.length) * 100}%` }}
             />
@@ -307,7 +310,7 @@ export function PracticeModal({ open, onOpenChange, wordId, onComplete }: Practi
         {/* Flashcard Mode */}
         {mode === "flashcard" && (
           <div className="space-y-6">
-            <Card 
+            <Card
               className="cursor-pointer hover:shadow-lg transition-all min-h-[300px] flex items-center justify-center"
               onClick={() => setShowAnswer(!showAnswer)}
             >
@@ -398,7 +401,7 @@ export function PracticeModal({ open, onOpenChange, wordId, onComplete }: Practi
                   <ChevronRight className="h-4 w-4 ml-2" />
                 </Button>
               </div>
-              
+
               {/* Skip and Archive Buttons */}
               <div className="flex gap-2">
                 <Button

@@ -11,10 +11,13 @@ interface ReviewModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   wordId?: number;
+  specificWordId?: number; // Alias for wordId
   onComplete: () => void;
 }
 
-export function ReviewModal({ open, onOpenChange, wordId, onComplete }: ReviewModalProps) {
+export function ReviewModal({ open, onOpenChange, wordId, specificWordId, onComplete }: ReviewModalProps) {
+  // Use either wordId or specificWordId
+  const effectiveWordId = wordId ?? specificWordId;
   const { t, language } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showDefinition, setShowDefinition] = useState(false);
@@ -46,16 +49,16 @@ export function ReviewModal({ open, onOpenChange, wordId, onComplete }: ReviewMo
     if (open) {
       setShowDefinition(false);
       setPlayingAudio(false);
-      
+
       // If wordId is provided, start from that word
-      if (wordId && words.length > 0) {
-        const index = words.findIndex((w: any) => w.id === wordId);
+      if (effectiveWordId && words.length > 0) {
+        const index = words.findIndex((w: any) => w.id === effectiveWordId);
         if (index !== -1) {
           setCurrentIndex(index);
         }
       }
     }
-  }, [open, wordId, words.length]);
+  }, [open, effectiveWordId, words.length]);
 
   // Reset definition when moving to next/previous word
   useEffect(() => {
@@ -81,9 +84,9 @@ export function ReviewModal({ open, onOpenChange, wordId, onComplete }: ReviewMo
         toast.error(t.audioError || "Failed to play audio");
       }
     } else {
-      generateAudioMutation.mutate({ 
-        vocabId: currentWord.vocabulary_id || currentWord.vocabularyId, 
-        word: currentWord.word 
+      generateAudioMutation.mutate({
+        vocabId: currentWord.vocabulary_id || currentWord.vocabularyId,
+        word: currentWord.word
       });
     }
   };
@@ -204,7 +207,7 @@ export function ReviewModal({ open, onOpenChange, wordId, onComplete }: ReviewMo
               <ChevronLeft className="h-4 w-4 mr-2" />
               {t.previous || "Previous"}
             </Button>
-            
+
             <Button
               variant="ghost"
               onClick={onComplete}

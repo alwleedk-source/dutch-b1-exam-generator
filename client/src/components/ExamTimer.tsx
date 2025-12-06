@@ -101,26 +101,7 @@ export default function ExamTimer({ mode, timeLimitMinutes, onTimeUp }: ExamTime
           </div>
         </div>
 
-        {mode === "practice" && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={togglePause}
-            className="gap-2"
-          >
-            {isPaused ? (
-              <>
-                <Play className="h-4 w-4" />
-                {t.resumeTimer}
-              </>
-            ) : (
-              <>
-                <Pause className="h-4 w-4" />
-                {t.pauseTimer}
-              </>
-            )}
-          </Button>
-        )}
+        {/* Pause button only shown in practice mode - but we return early for practice mode above */}
       </div>
 
       {/* Progress bar */}
