@@ -31,7 +31,7 @@ export async function generateWithGemini(options: GeminiGenerateOptions): Promis
 
   try {
     // Use gemini-2.0-flash for fast responses
-    const model = genAI.getGenerativeModel({ 
+    const model = genAI.getGenerativeModel({
       model: "gemini-2.0-flash",
       generationConfig: {
         temperature: options.temperature || 0.7,
@@ -147,7 +147,7 @@ ${text}
   });
 
   let cleanedText = response.trim();
-  
+
   // Strip code blocks if AI added them despite instructions
   if (cleanedText.startsWith('```html')) {
     cleanedText = cleanedText.replace(/^```html\s*/i, '').replace(/```\s*$/, '').trim();
@@ -156,7 +156,7 @@ ${text}
     cleanedText = cleanedText.replace(/^```\s*/i, '').replace(/```\s*$/, '').trim();
     console.log('[cleanAndFormatText] Stripped code block wrapper from response');
   }
-  
+
   // Validate that the text was actually cleaned (check for common PDF footers)
   const pdfFooterPatterns = [
     /©\s*CvTE/i,
@@ -165,20 +165,20 @@ ${text}
     /Staatsexamen/i,
     /Examen\s+NT2/i,
   ];
-  
+
   const hasFooters = pdfFooterPatterns.some(pattern => pattern.test(cleanedText));
-  
+
   if (hasFooters) {
     console.warn('[cleanAndFormatText] Warning: Text still contains PDF footers after cleaning');
     console.warn('[cleanAndFormatText] This may indicate the AI failed to clean properly');
   }
-  
+
   // Validate HTML format
   if (!cleanedText.includes('<h1>') && !cleanedText.includes('<h2>') && !cleanedText.includes('<p>')) {
     console.warn('[cleanAndFormatText] Warning: Text does not contain HTML tags');
     console.warn('[cleanAndFormatText] AI may have returned Markdown or plain text instead');
   }
-  
+
   return cleanedText;
 }
 
@@ -377,6 +377,10 @@ ZORG ERVOOR dat elke vraag EXACT één skillType heeft en volg de percentages!
    - Alle opties moeten vergelijkbare lengte hebben
    - Geen overduidelijk foute opties
    - Geen patronen (bijv. altijd C correct)
+   - **BELANGRIJK: VARIEER DE POSITIE VAN HET CORRECTE ANTWOORD!**
+     * Zet het correcte antwoord NIET altijd op positie A (index 0)
+     * Verdeel correct antwoorden gelijkmatig over A, B, C, D
+     * Gebruik willekeurige posities: soms A, soms B, soms C, soms D
 
 4. MOEILIJKHEIDSGRAAD:
    - Gemakkelijk (60%): Antwoord staat duidelijk in de tekst
@@ -400,7 +404,7 @@ Respond in JSON format:
     {
       "question": "Vraag tekst in het Nederlands",
       "options": ["Optie A", "Optie B", "Optie C", "Optie D"],
-      "correctAnswerIndex": 0,
+      "correctAnswerIndex": 2,
       "skillType": "hoofdgedachte" | "zoeken" | "volgorde" | "conclusie" | "woordenschat",
       "difficulty": "easy" | "medium" | "hard",
       "explanation": "Waarom dit het correcte antwoord is",
@@ -413,6 +417,7 @@ ZORG ERVOOR:
 - Vragen testen begrip van de hele tekst
 - Elke vraag heeft PRECIES 4 opties
 - Antwoorden zijn duidelijk correct of incorrect
+- **VARIEER correctAnswerIndex tussen 0, 1, 2, 3 (verdeel gelijk over A, B, C, D)**
 - Volg de officiële NT2 Lezen I examennormen nauwkeurig`,
       },
     ],
@@ -433,7 +438,7 @@ export async function extractVocabulary(dutchText: string, maxWords?: number) {
     const wordCount = dutchText.split(/\s+/).length;
     maxWords = Math.min(Math.max(Math.floor(wordCount * 0.15), 25), 45);
   }
-  
+
   const response = await generateWithGemini({
     messages: [
       {
@@ -633,6 +638,10 @@ VERDELING VAN ${questionCount} VRAGEN:
   * Type 3: Logisch maar niet vermeld in de tekst
 - Alle opties moeten vergelijkbare lengte hebben
 - Geen overduidelijk foute opties
+- **BELANGRIJK: VARIEER DE POSITIE VAN HET CORRECTE ANTWOORD!**
+  * Zet het correcte antwoord NIET altijd op positie A (index 0)
+  * Verdeel correct antwoorden gelijkmatig over A, B, C, D
+  * Gebruik willekeurige posities: soms A, soms B, soms C, soms D
 
 **MOEILIJKHEIDSGRAAD:**
 - Gemakkelijk (60%): Antwoord staat duidelijk in de tekst
@@ -695,8 +704,8 @@ Respond in JSON format:
   "questions": [
     {
       "question": "Vraag tekst in het Nederlands",
-      "options": ["...", "...", "..."],
-      "correctAnswerIndex": 0,
+      "options": ["...", "...", "...", "..."],
+      "correctAnswerIndex": 1,
       "skillType": "hoofdgedachte" | "zoeken" | "volgorde" | "conclusie" | "woordenschat",
       "difficulty": "easy" | "medium" | "hard",
       "explanation": "Waarom dit het correcte antwoord is (in het Nederlands)",
