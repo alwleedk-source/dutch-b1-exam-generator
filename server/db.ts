@@ -1,4 +1,5 @@
 import { eq, desc, and, sql, or, gte, ilike, count, inArray } from "drizzle-orm";
+export { sql };
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import {
@@ -463,6 +464,10 @@ export async function updateExam(
     answers?: string;
     correct_answers?: number;
     score_percentage?: number;
+    staatsexamen_score?: number;
+    performance_analysis?: string;
+    recommendations?: string;
+    skill_analysis?: string;
     completed_at?: Date;
     time_spent_minutes?: number;
     status?: "in_progress" | "completed" | "abandoned";
@@ -1555,12 +1560,47 @@ export async function rateText(userId: number, textId: number, rating: number, r
   await db
     .update(texts)
     .set({
-      average_rating: avgRating,
+      average_rating: Math.round(avgRating), // Store as integer as per schema
       total_ratings: totalRatings
     })
     .where(eq(texts.id, textId));
 
   return { success: true };
+}
+
+/**
+ * Get texts with ratings and filtering
+ */
+export async function getTextsWithRatings(options: {
+  minRating?: number;
+  sortBy?: 'rating' | 'date' | 'popular';
+  limit?: number;
+  offset?: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  let query = db.select().from(texts).$dynamic();
+
+  // Filter by min rating
+  if (options.minRating) {
+    query = query.where(gte(texts.average_rating, Math.floor(options.minRating)));
+  }
+
+  // Sort
+  if (options.sortBy === 'rating') {
+    query = query.orderBy(desc(texts.average_rating));
+  } else if (options.sortBy === 'popular') {
+    query = query.orderBy(desc(texts.total_ratings));
+  } else {
+    query = query.orderBy(desc(texts.created_at));
+  }
+
+  // Limit and offset
+  if (options.limit) query = query.limit(options.limit);
+  if (options.offset) query = query.offset(options.offset);
+
+  return await query;
 }
 
 /**
