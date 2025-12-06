@@ -8,9 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Users, FileText, AlertCircle, CheckCircle, XCircle, Loader2, Search, Trash2, Eye, 
-  BookOpen, TrendingUp, Activity, UserCog, Filter, X 
+import {
+  Users, FileText, AlertCircle, CheckCircle, XCircle, Loader2, Search, Trash2, Eye,
+  BookOpen, TrendingUp, Activity, UserCog, Filter, X
 } from "lucide-react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -20,13 +20,13 @@ import { useState } from "react";
 export default function AdminDashboard() {
   const { user, loading } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
-  
+
   // Search and filter states
   const [examSearch, setExamSearch] = useState("");
   const [textSearch, setTextSearch] = useState("");
   const [textStatusFilter, setTextStatusFilter] = useState<string>("all");
   const [userSearch, setUserSearch] = useState("");
-  
+
   // Dialog states
   const [examToDelete, setExamToDelete] = useState<number | null>(null);
   const [examToView, setExamToView] = useState<number | null>(null);
@@ -34,7 +34,7 @@ export default function AdminDashboard() {
   const [textToView, setTextToView] = useState<number | null>(null);
   const [userToView, setUserToView] = useState<number | null>(null);
   const [userToDelete, setUserToDelete] = useState<number | null>(null);
-  
+
   // Pagination states
   const [examsPage, setExamsPage] = useState(1);
   const [textsPage, setTextsPage] = useState(1);
@@ -49,10 +49,10 @@ export default function AdminDashboard() {
     { enabled: !!user && user.role === 'admin' }
   );
   const { data: filteredTexts, refetch: refetchTexts } = trpc.admin.getTextsFiltered.useQuery(
-    { 
+    {
       search: textSearch || undefined,
       status: textStatusFilter !== "all" ? textStatusFilter as any : undefined,
-      limit: 100 
+      limit: 100
     },
     { enabled: !!user && user.role === 'admin' }
   );
@@ -154,7 +154,7 @@ export default function AdminDashboard() {
   }
 
   // Filter users by search
-  const filteredUsers = allUsers?.filter((u: any) => 
+  const filteredUsers = allUsers?.filter((u: any) =>
     u.name?.toLowerCase().includes(userSearch.toLowerCase()) ||
     u.email?.toLowerCase().includes(userSearch.toLowerCase())
   ) || [];
@@ -367,7 +367,7 @@ export default function AdminDashboard() {
                     </TableHeader>
                     <TableBody>
                       {paginatedTexts.map((text: any) => (
-                        <TableRow 
+                        <TableRow
                           key={text.id}
                           className="cursor-pointer hover:bg-muted/50"
                           onClick={() => setTextToView(text.id)}
@@ -381,11 +381,11 @@ export default function AdminDashboard() {
                           </TableCell>
                           <TableCell className="text-sm">{text.word_count || '—'}</TableCell>
                           <TableCell>
-                            <Badge 
+                            <Badge
                               variant={
-                                text.status === 'approved' ? 'default' : 
-                                text.status === 'rejected' ? 'destructive' : 
-                                'secondary'
+                                text.status === 'approved' ? 'default' :
+                                  text.status === 'rejected' ? 'destructive' :
+                                    'secondary'
                               }
                             >
                               {text.status}
@@ -480,7 +480,7 @@ export default function AdminDashboard() {
                     </TableHeader>
                     <TableBody>
                       {paginatedExams.map((exam: any) => (
-                        <TableRow 
+                        <TableRow
                           key={exam.id}
                           className="cursor-pointer hover:bg-muted/50"
                           onClick={() => setExamToView(exam.id)}
@@ -592,7 +592,7 @@ export default function AdminDashboard() {
                     </TableHeader>
                     <TableBody>
                       {filteredUsers.map((u: any) => (
-                        <TableRow 
+                        <TableRow
                           key={u.id}
                           className="cursor-pointer hover:bg-muted/50"
                           onClick={() => setUserToView(u.id)}
@@ -745,8 +745,8 @@ export default function AdminDashboard() {
                 <div>
                   <p className="text-sm text-muted-foreground">Score</p>
                   <p className="font-medium text-lg">
-                    {examDetails.score}/{examDetails.total_questions} 
-                    ({Math.round((examDetails.score / examDetails.total_questions) * 100)}%)
+                    {examDetails.correct_answers || 0}/{examDetails.total_questions}
+                    ({Math.round(((examDetails.correct_answers || 0) / examDetails.total_questions) * 100)}%)
                   </p>
                 </div>
                 <div>
@@ -856,8 +856,8 @@ export default function AdminDashboard() {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setExamToDelete(null)}>Cancel</Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={() => deleteExamMutation.mutate({ exam_id: examToDelete! })}
             >
               Delete
@@ -876,8 +876,8 @@ export default function AdminDashboard() {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setTextToDelete(null)}>Cancel</Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={() => deleteTextMutation.mutate({ text_id: textToDelete! })}
             >
               Delete
@@ -896,8 +896,8 @@ export default function AdminDashboard() {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setUserToDelete(null)}>Cancel</Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={() => deleteUserMutation.mutate({ userId: userToDelete! })}
             >
               Delete User

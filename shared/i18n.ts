@@ -186,6 +186,16 @@ export interface Translations {
   minRead: string;
   remaining: string;
   characters: string;
+  completed: string;
+  inProgress: string;
+  sortBy: string;
+  oldestFirst: string;
+  highestScore: string;
+  lowestScore: string;
+  generatingExam: string;
+  view: string;
+  markMastered: string;
+  email: string;
 
   // Homepage - New comprehensive translations
   staatsexamenPrep: string;
@@ -820,6 +830,16 @@ export const translations: Record<Language, Translations> = {
     minRead: "min lezen",
     remaining: "Resterend",
     characters: "tekens",
+    completed: "Voltooid",
+    inProgress: "Bezig",
+    sortBy: "Sorteren op",
+    oldestFirst: "Oudste eerst",
+    highestScore: "Hoogste score",
+    lowestScore: "Laagste score",
+    generatingExam: "Examen genereren...",
+    view: "Bekijken",
+    markMastered: "Als beheerst markeren",
+    email: "E-mail",
 
     // Homepage - New comprehensive translations
     staatsexamenPrep: "Staatsexamen Voorbereiding",
@@ -1445,6 +1465,16 @@ export const translations: Record<Language, Translations> = {
     minRead: "دقيقة قراءة",
     remaining: "متبقي",
     characters: "حرف",
+    completed: "مكتمل",
+    inProgress: "قيد التنفيذ",
+    sortBy: "ترتيب حسب",
+    oldestFirst: "الأقدم أولاً",
+    highestScore: "أعلى درجة",
+    lowestScore: "أدنى درجة",
+    generatingExam: "جاري إنشاء الامتحان...",
+    view: "عرض",
+    markMastered: "تحديد كمتقن",
+    email: "البريد الإلكتروني",
 
     // Homepage - New comprehensive translations
     staatsexamenPrep: "التحضير لامتحان Staatsexamen",
@@ -2068,6 +2098,16 @@ export const translations: Record<Language, Translations> = {
     minRead: "min read",
     remaining: "Remaining",
     characters: "characters",
+    completed: "Completed",
+    inProgress: "In Progress",
+    sortBy: "Sort by",
+    oldestFirst: "Oldest first",
+    highestScore: "Highest score",
+    lowestScore: "Lowest score",
+    generatingExam: "Generating exam...",
+    view: "View",
+    markMastered: "Mark as mastered",
+    email: "Email",
 
     // Homepage - New comprehensive translations
     staatsexamenPrep: "Staatsexamen Preparation",
@@ -2692,6 +2732,16 @@ export const translations: Record<Language, Translations> = {
     minRead: "dakika okuma",
     remaining: "Kalan",
     characters: "karakter",
+    completed: "Tamamlandı",
+    inProgress: "Devam Ediyor",
+    sortBy: "Sırala",
+    oldestFirst: "En eski önce",
+    highestScore: "En yüksek puan",
+    lowestScore: "En düşük puan",
+    generatingExam: "Sınav oluşturuluyor...",
+    view: "Görüntüle",
+    markMastered: "Ustalık olarak işaretle",
+    email: "E-posta",
 
     // Homepage - New comprehensive translations
     staatsexamenPrep: "Staatsexamen Hazırlığı",

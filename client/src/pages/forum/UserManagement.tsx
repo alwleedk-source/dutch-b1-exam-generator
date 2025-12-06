@@ -35,10 +35,10 @@ export default function UserManagement() {
   const [banDialogOpen, setBanDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [banReason, setBanReason] = useState("");
-  
+
   const utils = trpc.useUtils();
   const { data: users, isLoading } = trpc.forum.getAllUsers.useQuery({ limit: 100 });
-  
+
   const banUserMutation = trpc.forum.banUser.useMutation({
     onSuccess: () => {
       toast.success(t.userBanned || "User banned successfully");
@@ -51,7 +51,7 @@ export default function UserManagement() {
       toast.error(error.message);
     },
   });
-  
+
   const unbanUserMutation = trpc.forum.unbanUser.useMutation({
     onSuccess: () => {
       toast.success(t.userUnbanned || "User unbanned successfully");
@@ -61,7 +61,7 @@ export default function UserManagement() {
       toast.error(error.message);
     },
   });
-  
+
   const addModeratorMutation = trpc.forum.addModerator.useMutation({
     onSuccess: () => {
       toast.success(t.moderatorAdded || "Moderator added successfully");
@@ -71,7 +71,7 @@ export default function UserManagement() {
       toast.error(error.message);
     },
   });
-  
+
   const removeModeratorMutation = trpc.forum.removeModerator.useMutation({
     onSuccess: () => {
       toast.success(t.moderatorRemoved || "Moderator removed successfully");
@@ -81,7 +81,7 @@ export default function UserManagement() {
       toast.error(error.message);
     },
   });
-  
+
   // Check if user is admin
   if (!user || user.role !== "admin") {
     return (
@@ -100,28 +100,29 @@ export default function UserManagement() {
       </div>
     );
   }
-  
+
   const handleBanClick = (user: any) => {
     setSelectedUser(user);
     setBanDialogOpen(true);
   };
-  
+
   const handleBanConfirm = () => {
     if (!selectedUser || !banReason.trim()) {
       toast.error(t.banReasonRequired || "Ban reason is required");
       return;
     }
-    
+
     banUserMutation.mutate({
       userId: selectedUser.id,
       reason: banReason,
+      duration: "permanent",
     });
   };
-  
+
   return (
     <div className="min-h-screen bg-gradient-bg">
       <AppHeader />
-      
+
       <main className="container mx-auto px-4 py-8 max-w-7xl">
         <Link href="/forum/moderator">
           <Button variant="ghost" size="sm" className="mb-4">
@@ -129,7 +130,7 @@ export default function UserManagement() {
             {t.backToModeratorPanel || "Back to Moderator Panel"}
           </Button>
         </Link>
-        
+
         <Card>
           <CardHeader>
             <div className="flex items-center gap-3">
@@ -142,7 +143,7 @@ export default function UserManagement() {
               {t.userManagementDesc || "Ban/unban users and manage moderators"}
             </p>
           </CardHeader>
-          
+
           <CardContent>
             {isLoading ? (
               <div className="text-center py-8 text-muted-foreground">
@@ -221,7 +222,7 @@ export default function UserManagement() {
                                 )}
                               </>
                             )}
-                            
+
                             {/* Add/Remove Moderator */}
                             {u.role !== "admin" && !u.is_banned && (
                               <>
@@ -259,7 +260,7 @@ export default function UserManagement() {
           </CardContent>
         </Card>
       </main>
-      
+
       {/* Ban Dialog */}
       <Dialog open={banDialogOpen} onOpenChange={setBanDialogOpen}>
         <DialogContent>
@@ -269,7 +270,7 @@ export default function UserManagement() {
               {t.banUserDescription || "Please provide a reason for banning this user."}
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <div>
               <Label htmlFor="banReason">{t.reason || "Reason"}</Label>
@@ -281,13 +282,13 @@ export default function UserManagement() {
               />
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setBanDialogOpen(false)}>
               {t.cancel || "Cancel"}
             </Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={handleBanConfirm}
               disabled={banUserMutation.isPending || !banReason.trim()}
             >

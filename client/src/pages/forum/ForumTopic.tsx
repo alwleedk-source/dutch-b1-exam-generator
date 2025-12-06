@@ -26,7 +26,7 @@ import { trpc } from "@/lib/trpc";
 import { truncateName } from "@/lib/utils";
 import { UserAvatar } from "@/components/UserAvatar";
 import { ArrowLeft, ThumbsUp, ThumbsDown, Send, Edit, Trash2, Pin, Lock, EyeOff, Flag } from "lucide-react";
-import { Link, useParams } from "wouter";
+import { Link, useParams, useLocation } from "wouter";
 import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -35,26 +35,27 @@ export default function ForumTopic() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const { t } = useLanguage();
-  
+
   const topicId = parseInt(id || "0");
   const [replyContent, setReplyContent] = useState("");
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [reportContentType, setReportContentType] = useState<"topic" | "post">("topic");
   const [reportContentId, setReportContentId] = useState<number>(0);
-  const [reportReason, setReportReason] = useState<string>("");
+  const [reportReason, setReportReason] = useState<"spam" | "harassment" | "inappropriate" | "misinformation" | "other" | "">("");
   const [isEditingTopic, setIsEditingTopic] = useState(false);
   const [editTopicTitle, setEditTopicTitle] = useState("");
   const [editTopicContent, setEditTopicContent] = useState("");
   const [editingPostId, setEditingPostId] = useState<number | null>(null);
   const [editPostContent, setEditPostContent] = useState("");
-  
+
+  const [, setLocation] = useLocation();
   const utils = trpc.useUtils();
   const { data, isLoading } = trpc.forum.getTopic.useQuery({
     topicId,
     page: 1,
     limit: 20,
   });
-  
+
   const createPostMutation = trpc.forum.createPost.useMutation({
     onSuccess: () => {
       toast.success(t.replyPosted || "Reply posted successfully!");
@@ -65,13 +66,13 @@ export default function ForumTopic() {
       toast.error(error.message);
     },
   });
-  
+
   const voteMutation = trpc.forum.vote.useMutation({
     onSuccess: () => {
       utils.forum.getTopic.invalidate({ topicId });
     },
   });
-  
+
   const deleteTopicMutation = trpc.forum.deleteTopic.useMutation({
     onSuccess: () => {
       toast.success(t.topicDeleted || "Topic deleted successfully!");
@@ -81,7 +82,7 @@ export default function ForumTopic() {
       toast.error(error.message);
     },
   });
-  
+
   const updateTopicMutation = trpc.forum.updateTopic.useMutation({
     onSuccess: () => {
       toast.success(t.topicUpdated || "Topic updated successfully!");
@@ -92,7 +93,7 @@ export default function ForumTopic() {
       toast.error(error.message);
     },
   });
-  
+
   const deletePostMutation = trpc.forum.deletePost.useMutation({
     onSuccess: () => {
       toast.success(t.postDeleted || "Post deleted successfully");
@@ -102,7 +103,7 @@ export default function ForumTopic() {
       toast.error(error.message);
     },
   });
-  
+
   const updatePostMutation = trpc.forum.updatePost.useMutation({
     onSuccess: () => {
       toast.success(t.postUpdated || "Post updated successfully!");
@@ -114,7 +115,7 @@ export default function ForumTopic() {
       toast.error(error.message);
     },
   });
-  
+
   const togglePinMutation = trpc.forum.togglePinTopic.useMutation({
     onSuccess: () => {
       toast.success(t.topicPinToggled || "Topic pin toggled");
@@ -124,7 +125,7 @@ export default function ForumTopic() {
       toast.error(error.message);
     },
   });
-  
+
   const toggleLockMutation = trpc.forum.toggleLockTopic.useMutation({
     onSuccess: () => {
       toast.success(t.topicLockToggled || "Topic lock toggled");
@@ -134,7 +135,7 @@ export default function ForumTopic() {
       toast.error(error.message);
     },
   });
-  
+
   const toggleHideMutation = trpc.forum.toggleHideTopic.useMutation({
     onSuccess: () => {
       toast.success(t.topicHideToggled || "Topic visibility toggled");
@@ -144,7 +145,7 @@ export default function ForumTopic() {
       toast.error(error.message);
     },
   });
-  
+
   const reportMutation = trpc.forum.reportContent.useMutation({
     onSuccess: () => {
       toast.success(t.reportSubmitted || "Report submitted successfully");
@@ -155,34 +156,34 @@ export default function ForumTopic() {
       toast.error(error.message);
     },
   });
-  
+
   const canEditOrDelete = (createdAt: string, userId: number) => {
     if (!user) return false;
     if (user.role === "moderator" || user.role === "admin") return true;
     if (user.id !== userId) return false;
-    
+
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     return new Date(createdAt) > fiveMinutesAgo;
   };
-  
+
   const isModerator = user && (user.role === "moderator" || user.role === "admin");
-  
+
   const handleReportClick = (contentType: "topic" | "post", contentId: number) => {
     setReportContentType(contentType);
     setReportContentId(contentId);
     setReportDialogOpen(true);
   };
-  
+
   const handleReportSubmit = () => {
     if (!reportReason) {
       toast.error(t.selectReportReason || "Please select a reason");
       return;
     }
-    
+
     reportMutation.mutate({
       topicId: reportContentType === "topic" ? reportContentId : undefined,
       postId: reportContentType === "post" ? reportContentId : undefined,
-      reason: reportReason,
+      reason: reportReason as "spam" | "harassment" | "inappropriate" | "misinformation" | "other",
     });
   };
 
@@ -191,7 +192,7 @@ export default function ForumTopic() {
       toast.error(t.replyCannotBeEmpty || "Reply cannot be empty");
       return;
     }
-    
+
     createPostMutation.mutate({
       topicId,
       content: replyContent,
@@ -231,7 +232,7 @@ export default function ForumTopic() {
   return (
     <div className="min-h-screen bg-gradient-bg">
       <AppHeader />
-      
+
       <main className="container mx-auto px-4 py-6 sm:py-8">
         <Link href="/forum">
           <Button variant="ghost" size="sm" className="mb-4">
@@ -252,7 +253,7 @@ export default function ForumTopic() {
                 </Badge>
               )}
             </div>
-            
+
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground mb-4">
               <UserAvatar name={data.topic.user_name} size="sm" />
               <span title={data.topic.user_name || "Unknown"}>{truncateName(data.topic.user_name)}</span>
@@ -261,12 +262,12 @@ export default function ForumTopic() {
                 {data.topic.created_at && formatDistanceToNow(new Date(data.topic.created_at), { addSuffix: true })}
               </span>
             </div>
-            
-            <div 
+
+            <div
               className="prose prose-sm sm:prose dark:prose-invert max-w-none mb-4 break-words"
               dangerouslySetInnerHTML={{ __html: data.topic.content }}
             />
-            
+
             <div className="flex flex-wrap gap-2">
               <Button
                 variant="outline"
@@ -287,7 +288,7 @@ export default function ForumTopic() {
               >
                 <ThumbsDown className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
-              
+
               {user && (
                 <Button
                   variant="outline"
@@ -299,8 +300,8 @@ export default function ForumTopic() {
                   <span className="hidden xs:inline">{t.report || "Report"}</span>
                 </Button>
               )}
-              
-              {canEditOrDelete(data.topic.created_at, data.topic.user_id) && (
+
+              {canEditOrDelete(String(data.topic.created_at), data.topic.user_id) && (
                 <>
                   <Button
                     variant="outline"
@@ -315,7 +316,7 @@ export default function ForumTopic() {
                     <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                     <span className="hidden xs:inline">{t.edit}</span>
                   </Button>
-                  
+
                   <Button
                     variant="outline"
                     size="sm"
@@ -332,7 +333,7 @@ export default function ForumTopic() {
                   </Button>
                 </>
               )}
-              
+
               {isModerator && (
                 <>
                   <Button
@@ -345,7 +346,7 @@ export default function ForumTopic() {
                     <Pin className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
                     <span className="hidden sm:inline">{data.topic.is_pinned ? (t.unpin || "Unpin") : (t.pin || "Pin")}</span>
                   </Button>
-                  
+
                   <Button
                     variant="outline"
                     size="sm"
@@ -356,7 +357,7 @@ export default function ForumTopic() {
                     <Lock className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
                     <span className="hidden sm:inline">{data.topic.is_locked ? (t.unlock || "Unlock") : (t.lock || "Lock")}</span>
                   </Button>
-                  
+
                   <Button
                     variant="outline"
                     size="sm"
@@ -378,7 +379,7 @@ export default function ForumTopic() {
           <h2 className="text-lg sm:text-xl font-semibold">
             {t.replies || "Replies"} ({data.posts.length})
           </h2>
-          
+
           {data.posts.map((post) => (
             <Card key={post.id}>
               <CardContent className="pt-4 sm:pt-6 px-4 sm:px-6">
@@ -390,7 +391,7 @@ export default function ForumTopic() {
                     {post.created_at && formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
                   </span>
                 </div>
-                
+
                 {editingPostId === post.id ? (
                   <div className="mb-3">
                     <ForumEditor
@@ -425,12 +426,12 @@ export default function ForumTopic() {
                     </div>
                   </div>
                 ) : (
-                  <div 
+                  <div
                     className="prose prose-sm sm:prose dark:prose-invert max-w-none mb-3 break-words"
                     dangerouslySetInnerHTML={{ __html: post.content }}
                   />
                 )}
-                
+
                 <div className="flex flex-wrap gap-2">
                   <Button
                     variant="outline"
@@ -442,7 +443,7 @@ export default function ForumTopic() {
                     <ThumbsUp className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                     {post.upvote_count}
                   </Button>
-                  
+
                   {user && (
                     <Button
                       variant="outline"
@@ -454,8 +455,8 @@ export default function ForumTopic() {
                       <span className="hidden xs:inline">{t.report || "Report"}</span>
                     </Button>
                   )}
-                  
-                  {canEditOrDelete(post.created_at, post.user_id) && (
+
+                  {canEditOrDelete(String(post.created_at), post.user_id) && (
                     <>
                       <Button
                         variant="outline"
@@ -469,7 +470,7 @@ export default function ForumTopic() {
                         <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                         <span className="hidden xs:inline">{t.edit}</span>
                       </Button>
-                      
+
                       <Button
                         variant="outline"
                         size="sm"
@@ -499,14 +500,14 @@ export default function ForumTopic() {
               <h3 className="text-base sm:text-lg font-semibold mb-4">
                 {t.postReply || "Post a Reply"}
               </h3>
-              
+
               <ForumEditor
                 value={replyContent}
                 onChange={setReplyContent}
                 placeholder={t.writeYourReply || "Write your reply..."}
                 className="mb-4"
               />
-              
+
               <Button
                 onClick={handleReply}
                 disabled={createPostMutation.isPending || !replyContent.trim()}
@@ -526,14 +527,14 @@ export default function ForumTopic() {
           </Card>
         )}
       </main>
-      
+
       {/* Edit Topic Dialog */}
       <Dialog open={isEditingTopic} onOpenChange={setIsEditingTopic}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>{t.editTopic || "Edit Topic"}</DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div>
               <Label>{t.title || "Title"}</Label>
@@ -543,7 +544,7 @@ export default function ForumTopic() {
                 placeholder={t.topicTitle || "Topic title"}
               />
             </div>
-            
+
             <div>
               <Label>{t.content || "Content"}</Label>
               <ForumEditor
@@ -553,12 +554,12 @@ export default function ForumTopic() {
               />
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditingTopic(false)}>
               {t.cancel || "Cancel"}
             </Button>
-            <Button 
+            <Button
               onClick={() => {
                 updateTopicMutation.mutate({
                   topicId,
@@ -573,7 +574,7 @@ export default function ForumTopic() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       {/* Report Dialog */}
       <Dialog open={reportDialogOpen} onOpenChange={setReportDialogOpen}>
         <DialogContent>
@@ -583,11 +584,11 @@ export default function ForumTopic() {
               {t.reportDescription || "Please select a reason for reporting this content."}
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div>
               <Label>{t.reason || "Reason"}</Label>
-              <Select value={reportReason} onValueChange={setReportReason}>
+              <Select value={reportReason} onValueChange={(v) => setReportReason(v as any)}>
                 <SelectTrigger>
                   <SelectValue placeholder={t.selectReason || "Select a reason"} />
                 </SelectTrigger>
@@ -601,7 +602,7 @@ export default function ForumTopic() {
               </Select>
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setReportDialogOpen(false)}>
               {t.cancel || "Cancel"}

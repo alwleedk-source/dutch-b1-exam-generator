@@ -7,9 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { 
-  BookOpen, Clock, CheckCircle, XCircle, TrendingUp, RotateCcw, 
-  Award, Target, Calendar, Search, Trophy, Star, ChevronDown, ChevronUp 
+import {
+  BookOpen, Clock, CheckCircle, XCircle, TrendingUp, RotateCcw,
+  Award, Target, Calendar, Search, Trophy, Star, ChevronDown, ChevronUp
 } from "lucide-react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -49,7 +49,7 @@ export default function MyExams() {
 
     exams.forEach(exam => {
       const textId = exam.text_id;
-      
+
       if (!groups.has(textId)) {
         groups.set(textId, {
           textId,
@@ -67,7 +67,7 @@ export default function MyExams() {
       const group = groups.get(textId)!;
       group.attempts.push(exam);
       group.totalAttempts++;
-      
+
       if (exam.status === 'completed') {
         group.completedAttempts++;
         if ((exam.score_percentage || 0) > group.bestScore) {
@@ -86,7 +86,7 @@ export default function MyExams() {
       const completedScores = group.attempts
         .filter(a => a.status === 'completed')
         .map(a => a.score_percentage || 0);
-      
+
       if (completedScores.length > 0) {
         group.avgScore = Math.round(
           completedScores.reduce((sum, score) => sum + score, 0) / completedScores.length
@@ -94,7 +94,7 @@ export default function MyExams() {
       }
 
       // Sort attempts by date (newest first)
-      group.attempts.sort((a, b) => 
+      group.attempts.sort((a, b) =>
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
     });
@@ -108,10 +108,10 @@ export default function MyExams() {
 
     const completed = exams.filter(e => e.status === 'completed');
     const inProgress = exams.filter(e => e.status === 'in_progress');
-    
+
     const totalScore = completed.reduce((sum, e) => sum + (e.score_percentage || 0), 0);
     const avgScore = completed.length > 0 ? Math.round(totalScore / completed.length) : 0;
-    
+
     const totalTime = completed.reduce((sum, e) => sum + (e.time_spent_minutes || 0), 0);
 
     return {
@@ -127,36 +127,36 @@ export default function MyExams() {
   // Filter and sort grouped exams
   const filteredAndSortedGroups = useMemo(() => {
     let filtered = [...groupedExams];
-    
+
     // Filter by tab
     if (activeTab === 'completed') {
       filtered = filtered.filter(g => g.completedAttempts > 0);
     } else if (activeTab === 'in_progress') {
-      filtered = filtered.filter(g => 
+      filtered = filtered.filter(g =>
         g.attempts.some(a => a.status === 'in_progress')
       );
     }
-    
+
     // Filter by search
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(g => 
+      filtered = filtered.filter(g =>
         g.title.toLowerCase().includes(query) ||
         g.dutchText.toLowerCase().includes(query)
       );
     }
-    
+
     // Sort
     switch (sortBy) {
       case 'newest':
-        filtered.sort((a, b) => 
-          new Date(b.latestAttempt.created_at).getTime() - 
+        filtered.sort((a, b) =>
+          new Date(b.latestAttempt.created_at).getTime() -
           new Date(a.latestAttempt.created_at).getTime()
         );
         break;
       case 'oldest':
-        filtered.sort((a, b) => 
-          new Date(a.latestAttempt.created_at).getTime() - 
+        filtered.sort((a, b) =>
+          new Date(a.latestAttempt.created_at).getTime() -
           new Date(b.latestAttempt.created_at).getTime()
         );
         break;
@@ -170,7 +170,7 @@ export default function MyExams() {
         filtered.sort((a, b) => b.totalAttempts - a.totalAttempts);
         break;
     }
-    
+
     return filtered;
   }, [groupedExams, activeTab, searchQuery, sortBy]);
 
@@ -187,7 +187,7 @@ export default function MyExams() {
     const then = new Date(date);
     const diffMs = now.getTime() - then.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 0) return t.today || 'Vandaag';
     if (diffDays === 1) return t.yesterday || 'Gisteren';
     if (diffDays < 7) return `${diffDays} ${t.daysAgo || 'dagen geleden'}`;
@@ -241,7 +241,7 @@ export default function MyExams() {
                 <h3 className="text-xl font-semibold mb-2">{t.noExamsYet}</h3>
                 <p className="text-muted-foreground mb-4">{t.createFirstExam}</p>
                 <Link href="/create-exam">
-                  <Button>{t.createExam || "Maak je eerste examen"}</Button>
+                  <Button>{t.createNewExam || "Maak je eerste examen"}</Button>
                 </Link>
               </CardContent>
             </Card>
@@ -267,7 +267,7 @@ export default function MyExams() {
                       </div>
                     </CardContent>
                   </Card>
-                  
+
                   <Card>
                     <CardContent className="pt-6">
                       <div className="text-center">
@@ -276,15 +276,14 @@ export default function MyExams() {
                       </div>
                     </CardContent>
                   </Card>
-                  
+
                   <Card>
                     <CardContent className="pt-6">
                       <div className="text-center">
-                        <div className={`text-3xl font-bold mb-1 ${
-                          stats.avgScore >= 80 ? 'text-green-500' :
-                          stats.avgScore >= 60 ? 'text-yellow-500' :
-                          'text-red-500'
-                        }`}>
+                        <div className={`text-3xl font-bold mb-1 ${stats.avgScore >= 80 ? 'text-green-500' :
+                            stats.avgScore >= 60 ? 'text-yellow-500' :
+                              'text-red-500'
+                          }`}>
                           {stats.avgScore}%
                         </div>
                         <p className="text-sm text-muted-foreground">{t.averageScore || "Gemiddelde"}</p>
@@ -314,7 +313,7 @@ export default function MyExams() {
                 <div className="flex-1 relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder={t.searchExam || "Zoek examen..."}
+                    placeholder={t.searchExams || "Zoek examen..."}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10"
@@ -347,8 +346,8 @@ export default function MyExams() {
                   <div className="grid gap-4 mb-6">
                     {paginatedGroups.map((group) => {
                       const isExpanded = expandedGroups.has(group.textId);
-                      const latestBadge = group.latestAttempt.status === 'completed' 
-                        ? getScoreBadge(group.latestAttempt.score_percentage || 0) 
+                      const latestBadge = group.latestAttempt.status === 'completed'
+                        ? getScoreBadge(group.latestAttempt.score_percentage || 0)
                         : null;
 
                       return (
@@ -397,15 +396,15 @@ export default function MyExams() {
                             <div className="flex flex-wrap gap-2 mb-3">
                               <Link href={`/exam/${group.latestAttempt.id}${group.latestAttempt.status === 'completed' ? '/results' : ''}`}>
                                 <Button variant="default" size="sm">
-                                  {group.latestAttempt.status === 'completed' 
-                                    ? (t.viewLatest || 'Bekijk Laatste') 
+                                  {group.latestAttempt.status === 'completed'
+                                    ? (t.viewLatest || 'Bekijk Laatste')
                                     : (t.continue || 'Doorgaan')
                                   }
                                 </Button>
                               </Link>
                               {group.totalAttempts > 1 && (
-                                <Button 
-                                  variant="outline" 
+                                <Button
+                                  variant="outline"
                                   size="sm"
                                   onClick={() => toggleGroup(group.textId)}
                                 >
@@ -429,13 +428,13 @@ export default function MyExams() {
                               <div className="mt-4 space-y-2 border-t pt-4">
                                 <h4 className="font-semibold text-sm mb-3">{t.allAttempts || 'Alle Pogingen'}:</h4>
                                 {group.attempts.map((attempt, index) => {
-                                  const attemptBadge = attempt.status === 'completed' 
-                                    ? getScoreBadge(attempt.score_percentage || 0) 
+                                  const attemptBadge = attempt.status === 'completed'
+                                    ? getScoreBadge(attempt.score_percentage || 0)
                                     : null;
 
                                   return (
-                                    <div 
-                                      key={attempt.id} 
+                                    <div
+                                      key={attempt.id}
                                       className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
                                     >
                                       <div className="flex-1">
