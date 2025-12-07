@@ -162,10 +162,10 @@ export default function ExamReview() {
                           <div
                             key={optIndex}
                             className={`p-2.5 sm:p-3 rounded-lg border-2 ${isCorrectOption
-                                ? 'border-green-500 bg-green-500/10'
-                                : isUserAnswer
-                                  ? 'border-red-500 bg-red-500/10'
-                                  : 'border-border'
+                              ? 'border-green-500 bg-green-500/10'
+                              : isUserAnswer
+                                ? 'border-red-500 bg-red-500/10'
+                                : 'border-border'
                               }`}
                           >
                             <div className="flex items-start gap-2">
@@ -237,7 +237,7 @@ export default function ExamReview() {
                 {t.viewResults || "View results"}
               </Button>
             </Link>
-            <Link href={`/study/${exam.text_id}`}>
+            <Link href={`/study/${examId}`}>
               <Button variant="outline" className="w-full sm:w-auto">
                 <BookOpen className="h-4 w-4 mr-2" />
                 {t.studyText || "Study text"}
