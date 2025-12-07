@@ -42,7 +42,7 @@ export default function StudyMode() {
 
   const handleSubmit = () => {
     if (!examData?.id) return;
-    
+
     const answers = Object.entries(selectedAnswers).map(([questionIndex, answer]) => answer);
 
     if (answers.length < questions.length) {
@@ -133,16 +133,18 @@ export default function StudyMode() {
     );
   }
 
-  const questions = Array.isArray(examData?.questions) 
-    ? examData.questions 
+  const questions = Array.isArray(examData?.questions)
+    ? examData.questions
     : (typeof examData?.questions === 'string' ? JSON.parse(examData.questions) : []);
   const wordCount = text?.text?.word_count || 0;
   const readingTime = text?.text?.estimated_reading_minutes || Math.ceil(wordCount / 200);
 
   return (
     <>
-      <AppHeader />
-      <main className="container py-8 max-w-5xl no-print">
+      <div className="no-print">
+        <AppHeader />
+      </div>
+      <main className="container py-8 max-w-5xl print-container">
         {/* Header with Print Button */}
         <div className="flex justify-between items-center mb-6 no-print">
           <div>
@@ -157,24 +159,32 @@ export default function StudyMode() {
           </Button>
         </div>
 
+        {/* Print Header - only visible when printing */}
+        <div className="print-only hidden print:block mb-8">
+          <h1 className="text-2xl font-bold mb-2">{text?.text?.title}</h1>
+          <p className="text-sm text-gray-600">
+            {wordCount} {t.words || "words"} • {readingTime} {t.minRead || "min read"}
+          </p>
+        </div>
+
         {/* Dutch Text */}
-        <Card className="mb-8">
-          <CardHeader>
+        <Card className="mb-8 print-card">
+          <CardHeader className="print:pb-4">
             <CardTitle>{t.dutchText || "Dutch Text"}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="prose prose-lg max-w-none">
               {text?.text?.formatted_html ? (
-                <div 
-                  className="formatted-text-container text-foreground"
+                <div
+                  className="formatted-text-container text-foreground print-text"
                   dir="ltr"
                   dangerouslySetInnerHTML={{
                     __html: text.text.formatted_html
                   }}
                 />
               ) : (
-                <div 
-                  className="text-foreground"
+                <div
+                  className="text-foreground print-text"
                   dir="ltr"
                   style={{
                     whiteSpace: 'pre-wrap',
@@ -194,13 +204,13 @@ export default function StudyMode() {
 
         {/* Questions */}
         {questions.length > 0 && (
-          <Card>
-            <CardHeader>
+          <Card className="print-card">
+            <CardHeader className="print:pb-4">
               <CardTitle>{t.question || "Questions"} ({questions.length})</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {(questions as any[]).map((q: any, index: number) => (
-                <div key={index} className="border-b pb-6 last:border-0">
+                <div key={index} className="border-b pb-6 last:border-0 print-question">
                   <h3 className="font-semibold mb-3">
                     {index + 1}. {q.question}
                   </h3>
@@ -211,22 +221,23 @@ export default function StudyMode() {
                     {q.options.map((option: string, optIndex: number) => {
                       const optionLetter = String.fromCharCode(65 + optIndex); // A, B, C, D
                       return (
-                      <div key={optIndex} className="flex items-center space-x-2 mb-2">
-                        <RadioGroupItem value={optionLetter} id={`q${index}-opt${optIndex}`} />
-                        <Label htmlFor={`q${index}-opt${optIndex}`} className="cursor-pointer">
-                          {option}
-                        </Label>
-                      </div>
-                    );
+                        <div key={optIndex} className="flex items-center space-x-2 mb-2 print-option">
+                          <RadioGroupItem value={optionLetter} id={`q${index}-opt${optIndex}`} className="print:hidden" />
+                          <span className="hidden print:inline-block w-5 h-5 border border-gray-400 rounded-full mr-2"></span>
+                          <Label htmlFor={`q${index}-opt${optIndex}`} className="cursor-pointer">
+                            <span className="print:font-normal">{optionLetter}.</span> {option}
+                          </Label>
+                        </div>
+                      );
                     })}
                   </RadioGroup>
                 </div>
               ))}
 
-              <Button 
-                onClick={handleSubmit} 
+              <Button
+                onClick={handleSubmit}
                 disabled={submitExamMutation.isPending}
-                className="w-full"
+                className="w-full no-print"
                 size="lg"
               >
                 {submitExamMutation.isPending ? (
@@ -246,16 +257,82 @@ export default function StudyMode() {
       {/* Print Styles */}
       <style>{`
         @media print {
+          /* Hide non-printable elements */
           .no-print {
             display: none !important;
           }
-          body {
-            background: white;
-            color: black;
+          
+          /* Show print-only elements */
+          .print-only {
+            display: block !important;
           }
+          
+          /* Reset body and page styles */
+          body {
+            background: white !important;
+            color: black !important;
+            font-size: 12pt !important;
+            line-height: 1.5 !important;
+          }
+          
+          /* Reset all colors */
           * {
             color: black !important;
             background: white !important;
+            box-shadow: none !important;
+          }
+          
+          /* Container styling */
+          .print-container {
+            max-width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+          }
+          
+          /* Card styling for print */
+          .print-card {
+            border: 1px solid #ccc !important;
+            margin-bottom: 20px !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+          
+          /* Text styling */
+          .print-text {
+            font-size: 11pt !important;
+            line-height: 1.6 !important;
+          }
+          
+          /* Question styling - prevent page breaks inside questions */
+          .print-question {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            padding-top: 12px !important;
+            padding-bottom: 12px !important;
+            border-bottom: 1px solid #eee !important;
+          }
+          
+          /* Option styling */
+          .print-option {
+            margin-bottom: 8px !important;
+          }
+          
+          /* Headers */
+          h1, h2, h3 {
+            page-break-after: avoid !important;
+            break-after: avoid !important;
+          }
+          
+          /* Page settings */
+          @page {
+            margin: 2cm;
+            size: A4;
+          }
+          
+          /* Ensure formatted text doesn't break awkwardly */
+          .formatted-text-container p {
+            orphans: 3;
+            widows: 3;
           }
         }
       `}</style>
