@@ -44,7 +44,8 @@
 
 :root {
   /* Modern Dutch B1 Color Palette - Light Mode */
-  --primary: oklch(0.65 0.18 35); /* Dutch Orange */
+  --primary: oklch(0.65 0.18 35);
+  /* Dutch Orange */
   --primary-foreground: oklch(1 0 0);
   --sidebar-primary: oklch(0.65 0.18 35);
   --sidebar-primary-foreground: oklch(1 0 0);
@@ -60,7 +61,8 @@
   --card-foreground: oklch(0.20 0.015 260);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.20 0.015 260);
-  --secondary: oklch(0.60 0.15 220); /* Dutch Blue */
+  --secondary: oklch(0.60 0.15 220);
+  /* Dutch Blue */
   --secondary-foreground: oklch(1 0 0);
   --muted: oklch(0.96 0.002 260);
   --muted-foreground: oklch(0.50 0.015 260);
@@ -81,7 +83,8 @@
 
 .dark {
   /* Modern Dutch B1 Color Palette - Dark Mode */
-  --primary: oklch(0.65 0.18 35); /* Dutch Orange */
+  --primary: oklch(0.65 0.18 35);
+  /* Dutch Orange */
   --primary-foreground: oklch(1 0 0);
   --sidebar-primary: oklch(0.65 0.18 35);
   --sidebar-primary-foreground: oklch(1 0 0);
@@ -91,7 +94,8 @@
   --card-foreground: oklch(0.95 0.005 260);
   --popover: oklch(0.18 0.010 260);
   --popover-foreground: oklch(0.95 0.005 260);
-  --secondary: oklch(0.60 0.15 220); /* Dutch Blue */
+  --secondary: oklch(0.60 0.15 220);
+  /* Dutch Blue */
   --secondary-foreground: oklch(1 0 0);
   --muted: oklch(0.25 0.010 260);
   --muted-foreground: oklch(0.65 0.015 260);
@@ -122,13 +126,13 @@
     @apply border-border outline-ring/50;
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   }
-  
+
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
-  
+
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
   [type="button"]:not(:disabled),
@@ -142,26 +146,64 @@
   }
 
   /* Typography */
-  h1 { @apply text-4xl font-bold tracking-tight; }
-  h2 { @apply text-3xl font-semibold tracking-tight; }
-  h3 { @apply text-2xl font-semibold tracking-tight; }
-  h4 { @apply text-xl font-semibold tracking-tight; }
-  h5 { @apply text-lg font-semibold; }
-  h6 { @apply text-base font-semibold; }
+  h1 {
+    @apply text-4xl font-bold tracking-tight;
+  }
+
+  h2 {
+    @apply text-3xl font-semibold tracking-tight;
+  }
+
+  h3 {
+    @apply text-2xl font-semibold tracking-tight;
+  }
+
+  h4 {
+    @apply text-xl font-semibold tracking-tight;
+  }
+
+  h5 {
+    @apply text-lg font-semibold;
+  }
+
+  h6 {
+    @apply text-base font-semibold;
+  }
 
   /* Custom scrollbar */
-  ::-webkit-scrollbar { width: 10px; height: 10px; }
-  ::-webkit-scrollbar-track { @apply bg-muted; }
-  ::-webkit-scrollbar-thumb { @apply bg-muted-foreground/30 rounded-lg; }
-  ::-webkit-scrollbar-thumb:hover { @apply bg-muted-foreground/50; }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-lg;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
 
   /* RTL support */
-  [dir="rtl"] { direction: rtl; }
-  [dir="rtl"] .text-left { text-align: right; }
-  [dir="rtl"] .text-right { text-align: left; }
+  [dir="rtl"] {
+    direction: rtl;
+  }
+
+  [dir="rtl"] .text-left {
+    text-align: right;
+  }
+
+  [dir="rtl"] .text-right {
+    text-align: left;
+  }
 }
 
 @layer components {
+
   /* Glassmorphism effect */
   .glass {
     @apply bg-background/80 backdrop-blur-lg border border-border/50;
@@ -189,42 +231,72 @@
 
   /* Animations */
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
   }
+
   @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
+
   @keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
-  .animate-fade-in { animation: fadeIn 0.5s ease-in-out; }
-  .animate-slide-up { animation: slideUp 0.5s ease-out; }
-  .animate-scale-in { animation: scaleIn 0.3s ease-out; }
+
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease-out;
+  }
 
   /* Flashcard 3D Flip Animation */
   .flashcard-container {
     perspective: 1000px;
   }
-  
+
   .flashcard {
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .flashcard.flipped {
     transform: rotateY(180deg);
   }
-  
+
   .flashcard-front,
   .flashcard-back {
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
   }
-  
+
   .flashcard-back {
     transform: rotateY(180deg);
     position: absolute;
@@ -236,49 +308,52 @@
     transition: transform 0.3s ease-out, opacity 0.3s ease-out;
     touch-action: pan-y;
   }
-  
+
   .swipe-card.swiping-right {
     transform: translateX(30px) rotate(5deg);
     box-shadow: 0 0 30px rgba(34, 197, 94, 0.4);
   }
-  
+
   .swipe-card.swiping-left {
     transform: translateX(-30px) rotate(-5deg);
     box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
   }
-  
+
   .swipe-card.swiped-right {
     animation: swipeRight 0.4s ease-out forwards;
   }
-  
+
   .swipe-card.swiped-left {
     animation: swipeLeft 0.4s ease-out forwards;
   }
-  
+
   @keyframes swipeRight {
     to {
       transform: translateX(150%) rotate(15deg);
       opacity: 0;
     }
   }
-  
+
   @keyframes swipeLeft {
     to {
       transform: translateX(-150%) rotate(-15deg);
       opacity: 0;
     }
   }
-  
+
   /* Listening Quiz Pulse Animation */
   .listening-pulse {
     animation: listeningPulse 1.5s ease-in-out infinite;
   }
-  
+
   @keyframes listeningPulse {
-    0%, 100% { 
+
+    0%,
+    100% {
       box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
     }
-    50% { 
+
+    50% {
       box-shadow: 0 0 0 20px rgba(59, 130, 246, 0);
     }
   }
@@ -300,7 +375,8 @@
     width: 100%;
     margin-left: auto;
     margin-right: auto;
-    padding-left: 1rem; /* 16px - mobile padding */
+    padding-left: 1rem;
+    /* 16px - mobile padding */
     padding-right: 1rem;
   }
 
@@ -311,28 +387,36 @@
 
   @media (min-width: 640px) {
     .container {
-      padding-left: 1.5rem; /* 24px - tablet padding */
+      padding-left: 1.5rem;
+      /* 24px - tablet padding */
       padding-right: 1.5rem;
     }
   }
 
   @media (min-width: 1024px) {
     .container {
-      padding-left: 2rem; /* 32px - desktop padding */
+      padding-left: 2rem;
+      /* 32px - desktop padding */
       padding-right: 2rem;
-      max-width: 1280px; /* Standard content width */
+      max-width: 1280px;
+      /* Standard content width */
     }
   }
-  
+
   /* Hide scrollbar but keep functionality */
   .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
   }
+
   .scrollbar-hide::-webkit-scrollbar {
-    display: none;  /* Chrome, Safari and Opera */
+    display: none;
+    /* Chrome, Safari and Opera */
   }
 }
+
 /* ==================== FORMATTED TEXT STYLES ==================== */
 .formatted-text-container {
   font-family: 'Georgia', 'Times New Roman', serif;
@@ -440,16 +524,95 @@
   .formatted-text-container {
     font-size: 15px;
   }
-  
+
   .formatted-text-container p {
     text-align: left;
     margin-bottom: 1em;
   }
-  
+
   .formatted-text-container .section-heading,
   .formatted-text-container h3 {
     font-size: 1.15em;
     margin-top: 1.5em;
     margin-bottom: 0.6em;
+  }
+}
+
+/* ==================== EXAM FONT SIZE CONTROLS ==================== */
+/* These classes override the base font sizes for exam content */
+
+/* Font size: Small */
+.exam-font-sm,
+.exam-font-sm .formatted-text-container,
+.exam-font-sm p,
+.exam-font-sm span,
+.exam-font-sm label {
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+}
+
+/* Font size: Base (default) */
+.exam-font-base,
+.exam-font-base .formatted-text-container,
+.exam-font-base p,
+.exam-font-base span,
+.exam-font-base label {
+  font-size: 16px !important;
+  line-height: 1.7 !important;
+}
+
+/* Font size: Large */
+.exam-font-lg,
+.exam-font-lg .formatted-text-container,
+.exam-font-lg p,
+.exam-font-lg span,
+.exam-font-lg label {
+  font-size: 18px !important;
+  line-height: 1.75 !important;
+}
+
+/* Font size: Extra Large */
+.exam-font-xl,
+.exam-font-xl .formatted-text-container,
+.exam-font-xl p,
+.exam-font-xl span,
+.exam-font-xl label {
+  font-size: 20px !important;
+  line-height: 1.8 !important;
+}
+
+/* Mobile adjustments for font sizes */
+@media (max-width: 640px) {
+
+  .exam-font-sm,
+  .exam-font-sm .formatted-text-container,
+  .exam-font-sm p,
+  .exam-font-sm span,
+  .exam-font-sm label {
+    font-size: 13px !important;
+  }
+
+  .exam-font-base,
+  .exam-font-base .formatted-text-container,
+  .exam-font-base p,
+  .exam-font-base span,
+  .exam-font-base label {
+    font-size: 15px !important;
+  }
+
+  .exam-font-lg,
+  .exam-font-lg .formatted-text-container,
+  .exam-font-lg p,
+  .exam-font-lg span,
+  .exam-font-lg label {
+    font-size: 17px !important;
+  }
+
+  .exam-font-xl,
+  .exam-font-xl .formatted-text-container,
+  .exam-font-xl p,
+  .exam-font-xl span,
+  .exam-font-xl label {
+    font-size: 19px !important;
   }
 }

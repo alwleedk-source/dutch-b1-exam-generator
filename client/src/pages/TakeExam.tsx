@@ -44,11 +44,11 @@ export default function TakeExam() {
   // Map font size to CSS class
   const getFontSizeClass = () => {
     switch (fontSize) {
-      case 1: return 'text-sm';
-      case 2: return 'text-base';
-      case 3: return 'text-lg';
-      case 4: return 'text-xl';
-      default: return 'text-base';
+      case 1: return 'exam-font-sm';
+      case 2: return 'exam-font-base';
+      case 3: return 'exam-font-lg';
+      case 4: return 'exam-font-xl';
+      default: return 'exam-font-base';
     }
   };
 
