@@ -35,16 +35,61 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
-  
+
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   app.use(cookieParser());
-  
+
+  // Security headers
+  app.use((req, res, next) => {
+    // Basic security headers
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    if (process.env.NODE_ENV === 'production') {
+      res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    }
+    next();
+  });
+
+  // Simple rate limiting for API endpoints
+  const apiRequestCounts = new Map<string, { count: number; resetTime: number }>();
+  const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
+  const RATE_LIMIT_MAX_REQUESTS = 100; // 100 requests per minute
+
+  app.use('/api', (req, res, next) => {
+    const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
+    const now = Date.now();
+
+    const record = apiRequestCounts.get(clientIp);
+    if (!record || now > record.resetTime) {
+      apiRequestCounts.set(clientIp, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    } else {
+      record.count++;
+      if (record.count > RATE_LIMIT_MAX_REQUESTS) {
+        res.setHeader('Retry-After', Math.ceil((record.resetTime - now) / 1000).toString());
+        return res.status(429).json({ error: 'Too many requests, please try again later' });
+      }
+    }
+    next();
+  });
+
+  // Clean up old rate limit entries every 5 minutes
+  setInterval(() => {
+    const now = Date.now();
+    for (const [ip, record] of apiRequestCounts.entries()) {
+      if (now > record.resetTime) {
+        apiRequestCounts.delete(ip);
+      }
+    }
+  }, 5 * 60 * 1000);
+
   // Trust proxy for secure cookies (Coolify/Railway)
   // Always trust proxy in production
   app.set('trust proxy', 1);
-  
+
   // Session configuration
   app.use(
     session({
@@ -63,10 +108,10 @@ async function startServer() {
       name: 'connect.sid', // Explicit session cookie name
     })
   );
-  
+
   // Run auto-migration to ensure tables exist
   await autoMigrate();
-  
+
   // Debug middleware to log session info
   app.use((req, res, next) => {
     if (req.path.includes('/auth') || req.path.includes('/api')) {
@@ -78,14 +123,14 @@ async function startServer() {
     }
     next();
   });
-  
+
   // Initialize Passport
   app.use(passport.initialize());
   app.use(passport.session());
-  
+
   // Google OAuth routes
   app.use(authRoutes);
-  
+
   // Manus OAuth callback (keep for compatibility)
   registerOAuthRoutes(app);
   // tRPC API
