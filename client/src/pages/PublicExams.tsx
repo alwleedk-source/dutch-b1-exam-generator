@@ -334,9 +334,13 @@ export default function PublicExams() {
                         <div className="mb-4 p-4 bg-muted/50 rounded-lg">
                           <p className="text-sm text-muted-foreground line-clamp-3">
                             {(() => {
-                              const plainText = text.dutch_text ||
-                                (text.formatted_html?.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim());
-                              return plainText?.substring(0, 200) + '...';
+                              // Strip HTML tags properly
+                              let plainText = text.dutch_text || text.formatted_html || '';
+                              // Remove all HTML tags
+                              plainText = plainText.replace(/<[^>]+>/g, ' ');
+                              // Clean up whitespace
+                              plainText = plainText.replace(/\s+/g, ' ').trim();
+                              return plainText.substring(0, 200) + (plainText.length > 200 ? '...' : '');
                             })()}
                           </p>
                         </div>

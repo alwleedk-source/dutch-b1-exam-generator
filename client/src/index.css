@@ -581,6 +581,22 @@
   line-height: 1.8 !important;
 }
 
+/* Vocab words inside headings should inherit parent font size */
+.formatted-text-container h1 .vocab-word,
+.formatted-text-container h1 .vocab-word-wrapper,
+.formatted-text-container h2 .vocab-word,
+.formatted-text-container h2 .vocab-word-wrapper,
+.formatted-text-container h3 .vocab-word,
+.formatted-text-container h3 .vocab-word-wrapper,
+h1 .vocab-word,
+h1 .vocab-word-wrapper,
+h2 .vocab-word,
+h2 .vocab-word-wrapper {
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  line-height: inherit !important;
+}
+
 /* Mobile adjustments for font sizes */
 @media (max-width: 640px) {
 
