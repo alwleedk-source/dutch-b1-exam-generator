@@ -177,11 +177,16 @@ const POINTS_CONFIG = {
   examComplete: 10,
   examScore80Plus: 5,
   examScore100: 10,
-  wordLearned: 2,
-  wordReviewed: 1,
-  wordMastered: 5,
+  wordLearned: 0,      // No points for just adding words
+  wordReviewed: 1,     // 1 point for correct review
+  wordMastered: 3,     // 3 points for mastering (5+ correct reviews)
   dailyStreak: 3,
   weekStreak: 20,
+};
+
+// Daily limits to prevent gaming
+const DAILY_LIMITS = {
+  vocabPoints: 20,     // Max 20 points from vocabulary per day
 };
 
 // Level thresholds
@@ -219,11 +224,42 @@ export type PointAction =
   | "dailyStreak"
   | "weekStreak";
 
+// Track daily vocab points (simple in-memory cache, resets on server restart)
+const dailyVocabPoints: Map<string, number> = new Map();
+
+function getDailyVocabKey(userId: number): string {
+  const today = new Date().toISOString().split('T')[0];
+  return `${userId}-${today}`;
+}
+
 export async function addPoints(user_id: number, action: PointAction): Promise<{ points: number; newTotal: number; levelUp: boolean; newLevel: string | null }> {
   const db = await getDb();
   if (!db) return { points: 0, newTotal: 0, levelUp: false, newLevel: null };
 
-  const pointsToAdd = POINTS_CONFIG[action];
+  let pointsToAdd = POINTS_CONFIG[action];
+
+  // Skip if no points for this action (e.g., wordLearned = 0)
+  if (pointsToAdd === 0) {
+    return { points: 0, newTotal: 0, levelUp: false, newLevel: null };
+  }
+
+  // Apply daily limit for vocabulary actions
+  if (action === "wordReviewed" || action === "wordMastered") {
+    const key = getDailyVocabKey(user_id);
+    const currentDailyPoints = dailyVocabPoints.get(key) || 0;
+
+    if (currentDailyPoints >= DAILY_LIMITS.vocabPoints) {
+      // Daily limit reached, no more points
+      return { points: 0, newTotal: 0, levelUp: false, newLevel: null };
+    }
+
+    // Cap points to not exceed daily limit
+    const remaining = DAILY_LIMITS.vocabPoints - currentDailyPoints;
+    pointsToAdd = Math.min(pointsToAdd, remaining);
+
+    // Update daily counter
+    dailyVocabPoints.set(key, currentDailyPoints + pointsToAdd);
+  }
 
   // Get current user data
   const user = await getUserById(user_id);
