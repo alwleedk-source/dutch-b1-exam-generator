@@ -68,6 +68,13 @@ export async function generateWithGemini(options: GeminiGenerateOptions): Promis
     if (options.responseFormat === "json") {
       // Remove markdown code blocks if present
       text = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+
+      // Fix common JSON issues from AI responses
+      // Remove trailing commas before ] or }
+      text = text.replace(/,\s*]/g, ']');
+      text = text.replace(/,\s*}/g, '}');
+      // Fix empty values with trailing commas like ["value", ]
+      text = text.replace(/,\s*,/g, ',');
     }
 
     return text;
