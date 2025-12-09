@@ -1226,7 +1226,7 @@ export const translations: Record<Language, Translations> = {
     onboardingStep4Title: "🧠 Slim Oefenen, Snel Onthouden",
     onboardingStep4Desc: "Oefen je woorden met flashcards en quizzen. Ons slimme systeem herhaalt moeilijke woorden vaker - zo onthoud je alles beter en sneller!",
     onboardingStep5Title: "👥 Samen Leren = Beter Leren",
-    onboardingStep5Desc: "Stel vragen, deel tips en leer van anderen in het forum. Je kunt schrijven in je eigen taal - wij begrijpen Nederlands, Engels, Arabisch en Turks!",
+    onboardingStep5Desc: "Stel vragen, deel tips en leer van anderen in het forum!",
 
     // Admin Dashboard
     filterByStatus: "Filter op status",
@@ -1879,7 +1879,7 @@ export const translations: Record<Language, Translations> = {
     onboardingStep4Title: "🧠 تدرب بذكاء، احفظ بسرعة",
     onboardingStep4Desc: "تدرب على كلماتك بالبطاقات التعليمية والاختبارات السريعة. نظامنا الذكي يكرر الكلمات الصعبة أكثر - فتحفظ كل شيء أفضل وأسرع!",
     onboardingStep5Title: "👥 التعلم معاً = تعلم أفضل",
-    onboardingStep5Desc: "اطرح أسئلتك، شارك النصائح، وتعلم من الآخرين في المنتدى. اكتب بلغتك - نحن نفهم العربية والإنجليزية والتركية والهولندية!",
+    onboardingStep5Desc: "اطرح أسئلتك، شارك النصائح، وتعلم من الآخرين في المنتدى!",
 
     // Admin Dashboard
     filterByStatus: "تصفية حسب الحالة",
@@ -2533,7 +2533,7 @@ export const translations: Record<Language, Translations> = {
     onboardingStep4Title: "🧠 Practice Smart, Remember Fast",
     onboardingStep4Desc: "Practice your words with flashcards and quizzes. Our smart system repeats difficult words more often - so you remember everything better and faster!",
     onboardingStep5Title: "👥 Learn Together = Learn Better",
-    onboardingStep5Desc: "Ask questions, share tips, and learn from others in the forum. Write in your own language - we understand Dutch, English, Arabic, and Turkish!",
+    onboardingStep5Desc: "Ask questions, share tips, and learn from others in the forum!",
 
     // Admin Dashboard
     filterByStatus: "Filter by status",
@@ -3288,7 +3288,7 @@ export const translations: Record<Language, Translations> = {
     onboardingStep4Title: "🧠 Akıllıca Çalışın, Hızlı Hatırlayın",
     onboardingStep4Desc: "Kelimelerinizi bilgi kartları ve sınavlarla çalışın. Akıllı sistemimiz zor kelimeleri daha sık tekrarlar - böylece her şeyi daha iyi ve hızlı hatırlarsınız!",
     onboardingStep5Title: "👥 Birlikte Öğrenin = Daha İyi Öğrenin",
-    onboardingStep5Desc: "Forumda soru sorun, ipuçlarını paylaşın ve başkalarından öğrenin. Kendi dilinizde yazın - Türkçe, Hollandaca, İngilizce ve Arapça anlıyoruz!",
+    onboardingStep5Desc: "Forumda soru sorun, ipuçlarını paylaşın ve başkalarından öğrenin!",
   },
 
 
