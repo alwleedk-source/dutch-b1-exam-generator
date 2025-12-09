@@ -690,6 +690,8 @@ export interface Translations {
   noCompletedYet: string;
   checkBackLater: string;
   startPracticing: string;
+  daysStreak: string;
+  pointsMilestone: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -1367,6 +1369,8 @@ export const translations: Record<Language, Translations> = {
     noCompletedYet: "Je hebt nog geen teksten geoefend",
     checkBackLater: "Kom later terug voor nieuwe teksten",
     startPracticing: "Begin met oefenen",
+    daysStreak: "dagen op rij",
+    pointsMilestone: "punten bereikt!",
   },
 
   ar: {
@@ -2039,8 +2043,10 @@ export const translations: Record<Language, Translations> = {
     tryAgain: "أعد المحاولة",
     allTextsPracticed: "لقد تدربت على جميع النصوص! 🎉",
     noCompletedYet: "لم تتدرب على أي نص بعد",
-    checkBackLater: "تحقق لاحقاً لنصوص جديدة",
+    checkBackLater: "عد لاحقاً للنصوص الجديدة",
     startPracticing: "ابدأ بالتدريب",
+    daysStreak: "يوم متتالي",
+    pointsMilestone: "نقطة مكتملة!",
   },
 
   en: {
@@ -2716,6 +2722,8 @@ export const translations: Record<Language, Translations> = {
     noCompletedYet: "You haven't practiced any text yet",
     checkBackLater: "Check back later for new texts",
     startPracticing: "Start practicing",
+    daysStreak: "days streak",
+    pointsMilestone: "points reached!",
   },
 
   tr: {
@@ -2824,7 +2832,7 @@ export const translations: Record<Language, Translations> = {
     // Vocabulary
     myVocabulary: "Kelime Bilgim",
     newWords: "Yeni kelimeler",
-    learning: "Öğreniliyor",
+    learning: "Öğreniyor",
 
     // Reporting
     reportIssue: "Sorun Bildir",
@@ -3392,8 +3400,10 @@ export const translations: Record<Language, Translations> = {
     tryAgain: "Tekrar dene",
     allTextsPracticed: "Tüm metinlerde pratik yaptınız! 🎉",
     noCompletedYet: "Henüz hiçbir metinde pratik yapmadınız",
-    checkBackLater: "Yeni metinler için daha sonra kontrol edin",
+    checkBackLater: "Yeni metinler için daha sonra tekrar gel",
     startPracticing: "Pratik yapmaya başla",
+    daysStreak: "gün üst üste",
+    pointsMilestone: "puan kazanıldı!",
   },
 
 

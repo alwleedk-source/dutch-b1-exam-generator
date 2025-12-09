@@ -232,15 +232,15 @@ function getDailyVocabKey(userId: number): string {
   return `${userId}-${today}`;
 }
 
-export async function addPoints(user_id: number, action: PointAction): Promise<{ points: number; newTotal: number; levelUp: boolean; newLevel: string | null }> {
+export async function addPoints(user_id: number, action: PointAction): Promise<{ points: number; newTotal: number; levelUp: boolean; newLevel: string | null; milestone: number | null }> {
   const db = await getDb();
-  if (!db) return { points: 0, newTotal: 0, levelUp: false, newLevel: null };
+  if (!db) return { points: 0, newTotal: 0, levelUp: false, newLevel: null, milestone: null };
 
   let pointsToAdd = POINTS_CONFIG[action];
 
   // Skip if no points for this action (e.g., wordLearned = 0)
   if (pointsToAdd === 0) {
-    return { points: 0, newTotal: 0, levelUp: false, newLevel: null };
+    return { points: 0, newTotal: 0, levelUp: false, newLevel: null, milestone: null };
   }
 
   // Apply daily limit for vocabulary actions
@@ -250,7 +250,7 @@ export async function addPoints(user_id: number, action: PointAction): Promise<{
 
     if (currentDailyPoints >= DAILY_LIMITS.vocabPoints) {
       // Daily limit reached, no more points
-      return { points: 0, newTotal: 0, levelUp: false, newLevel: null };
+      return { points: 0, newTotal: 0, levelUp: false, newLevel: null, milestone: null };
     }
 
     // Cap points to not exceed daily limit
@@ -263,7 +263,7 @@ export async function addPoints(user_id: number, action: PointAction): Promise<{
 
   // Get current user data
   const user = await getUserById(user_id);
-  if (!user) return { points: 0, newTotal: 0, levelUp: false, newLevel: null };
+  if (!user) return { points: 0, newTotal: 0, levelUp: false, newLevel: null, milestone: null };
 
   const currentPoints = user.total_points || 0;
   const newTotal = currentPoints + pointsToAdd;
@@ -283,11 +283,22 @@ export async function addPoints(user_id: number, action: PointAction): Promise<{
     })
     .where(eq(users.id, user_id));
 
+  // Check for milestone achievements
+  const MILESTONES = [50, 100, 250, 500, 1000];
+  let milestone: number | null = null;
+  for (const m of MILESTONES) {
+    if (currentPoints < m && newTotal >= m) {
+      milestone = m;
+      break;
+    }
+  }
+
   return {
     points: pointsToAdd,
     newTotal,
     levelUp,
     newLevel: levelUp ? newLevelData.name : null,
+    milestone,
   };
 }
 
@@ -832,16 +843,26 @@ export async function updateUserStreak(user_id: number) {
     })
     .where(eq(users.id, user_id));
 
-  // Award streak points
+  // Award streak points and check for celebrations
+  let streakCelebration: number | null = null;
+  const STREAK_MILESTONES = [7, 14, 30, 60, 100];
+
   if (streakIncremented) {
     // Daily streak points
     await addPoints(user_id, 'dailyStreak');
+
+    // Check for streak celebration (7, 14, 30, 60, 100 days)
+    if (STREAK_MILESTONES.includes(newStreak)) {
+      streakCelebration = newStreak;
+    }
 
     // Weekly streak bonus (every 7 days)
     if (newStreak > 0 && newStreak % 7 === 0) {
       await addPoints(user_id, 'weekStreak');
     }
   }
+
+  return { newStreak, streakCelebration };
 }
 
 export async function createUserVocabulary(userVocab: InsertUserVocabulary) {

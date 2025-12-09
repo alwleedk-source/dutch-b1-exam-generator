@@ -799,7 +799,7 @@ export const appRouter = router({
         });
 
         // Update user streak
-        await db.updateUserStreak(ctx.user.id);
+        const streakResult = await db.updateUserStreak(ctx.user.id);
 
         return {
           success: true,
@@ -810,6 +810,8 @@ export const appRouter = router({
           skillAnalysis,
           performanceAnalysis,
           recommendations,
+          streakCelebration: streakResult?.streakCelebration || null,
+          currentStreak: streakResult?.newStreak || 0,
         };
       }),
 

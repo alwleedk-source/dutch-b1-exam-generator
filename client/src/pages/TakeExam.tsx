@@ -61,6 +61,17 @@ export default function TakeExam() {
   const submitExamMutation = trpc.exam.submitExam.useMutation({
     onSuccess: (data) => {
       toast.success(`${t.examCompleted}! ${t.score}: ${data.correct_answers}/${data.total_questions}`);
+
+      // Show streak celebration if applicable
+      if (data.streakCelebration) {
+        setTimeout(() => {
+          toast.success(`🔥 ${data.streakCelebration} ${t.daysStreak || 'days streak'}!`, {
+            duration: 5000,
+            icon: '🎉',
+          });
+        }, 1500);
+      }
+
       setLocation(`/exam/${examId}/results`);
     },
     onError: (error) => {
