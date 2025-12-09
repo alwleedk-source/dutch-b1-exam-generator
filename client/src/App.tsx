@@ -71,7 +71,7 @@ function Router() {
         <Route path="/achievements" component={Achievements} />
         <Route path="/study/:examId" component={StudyMode} />
         <Route path="/review" component={ReviewPractice} />
-        <Route path="/my-exams" component={MyExams} />
+        <Route path="/my-exams">{() => { window.location.href = '/public-exams?tab=completed'; return null; }}</Route>
         <Route path="/public-exams" component={PublicExams} />
         <Route path="/forum" component={ForumHome} />
         <Route path="/forum/category/:id" component={ForumCategory} />

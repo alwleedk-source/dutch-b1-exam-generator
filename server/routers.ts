@@ -1269,6 +1269,9 @@ export const appRouter = router({
           next_review_at: userVocab.next_review_at || new Date(),
         });
 
+        const wasMastered = userVocab.status === 'mastered';
+        const isNowMastered = srsResult.repetitions >= 5;
+
         // Update user vocabulary
         await db.updateUserVocabularySRS(input.userVocabId, {
           ease_factor: Math.round(srsResult.ease_factor * 1000), // Store as integer
@@ -1278,8 +1281,18 @@ export const appRouter = router({
           last_reviewed_at: new Date(),
           correct_count: input.isCorrect ? userVocab.correct_count + 1 : userVocab.correct_count,
           incorrect_count: input.isCorrect ? userVocab.incorrect_count : userVocab.incorrect_count + 1,
-          status: srsResult.repetitions >= 5 ? "mastered" : "learning",
+          status: isNowMastered ? "mastered" : "learning",
         });
+
+        // Award points for correct review
+        if (input.isCorrect) {
+          await db.addPoints(ctx.user.id, 'wordReviewed');
+
+          // Bonus points for first time mastering a word
+          if (isNowMastered && !wasMastered) {
+            await db.addPoints(ctx.user.id, 'wordMastered');
+          }
+        }
 
         return { success: true, ...srsResult };
       }),

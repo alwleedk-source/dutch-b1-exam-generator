@@ -793,10 +793,12 @@ export async function updateUserStreak(user_id: number) {
 
   let newStreak = user.current_streak || 0;
   let newLongestStreak = user.longest_streak || 0;
+  let streakIncremented = false;
 
   if (!lastActivityDay) {
     // First activity ever
     newStreak = 1;
+    streakIncremented = true;
   } else {
     const daysDiff = Math.floor((today.getTime() - lastActivityDay.getTime()) / (1000 * 60 * 60 * 24));
 
@@ -806,9 +808,11 @@ export async function updateUserStreak(user_id: number) {
     } else if (daysDiff === 1) {
       // Consecutive day, increment streak
       newStreak = (user.current_streak || 0) + 1;
+      streakIncremented = true;
     } else {
       // Streak broken, reset to 1
       newStreak = 1;
+      streakIncremented = true;
     }
   }
 
@@ -827,6 +831,17 @@ export async function updateUserStreak(user_id: number) {
       updated_at: now
     })
     .where(eq(users.id, user_id));
+
+  // Award streak points
+  if (streakIncremented) {
+    // Daily streak points
+    await addPoints(user_id, 'dailyStreak');
+
+    // Weekly streak bonus (every 7 days)
+    if (newStreak > 0 && newStreak % 7 === 0) {
+      await addPoints(user_id, 'weekStreak');
+    }
+  }
 }
 
 export async function createUserVocabulary(userVocab: InsertUserVocabulary) {
