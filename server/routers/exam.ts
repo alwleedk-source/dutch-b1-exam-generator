@@ -125,6 +125,39 @@ export const examRouter = router({
             // Update user streak
             await db.updateUserStreak(ctx.user.id);
 
+            // Add gamification points
+            let pointsResult = await db.addPoints(ctx.user.id, "examComplete");
+
+            // Bonus points for high scores
+            if (score_percentage >= 100) {
+                await db.addPoints(ctx.user.id, "examScore100");
+            } else if (score_percentage >= 80) {
+                await db.addPoints(ctx.user.id, "examScore80Plus");
+            }
+
+            // Create level up notification if needed
+            if (pointsResult.levelUp && pointsResult.newLevel) {
+                try {
+                    const { createNotification } = await import("./notifications");
+                    const levelEmojis: Record<string, string> = {
+                        learner: "📚",
+                        advanced: "⭐",
+                        expert: "🏆",
+                        master: "👑",
+                    };
+                    await createNotification({
+                        userId: ctx.user.id,
+                        type: "level_up",
+                        title: `${levelEmojis[pointsResult.newLevel] || "🎉"} Level Up!`,
+                        message: `Congratulations! You've reached ${pointsResult.newLevel} level!`,
+                        actionUrl: "/progress",
+                        priority: "high",
+                    });
+                } catch (error) {
+                    console.error("[Gamification] Failed to create level up notification:", error);
+                }
+            }
+
             return {
                 success: true,
                 correct_answers: correctCount,
@@ -134,6 +167,10 @@ export const examRouter = router({
                 skillAnalysis,
                 performanceAnalysis,
                 recommendations,
+                pointsEarned: pointsResult.points,
+                totalPoints: pointsResult.newTotal,
+                levelUp: pointsResult.levelUp,
+                newLevel: pointsResult.newLevel,
             };
         }),
 

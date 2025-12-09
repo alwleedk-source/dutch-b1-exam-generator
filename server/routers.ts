@@ -924,6 +924,28 @@ export const appRouter = router({
       .query(async ({ input }) => {
         return await db.getLeaderboard(input.period, input.limit);
       }),
+
+    // Gamification endpoints
+    getMyPoints: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getUserPoints(ctx.user.id);
+    }),
+
+    addPoints: protectedProcedure
+      .input(z.object({
+        action: z.enum([
+          "examComplete",
+          "examScore80Plus",
+          "examScore100",
+          "wordLearned",
+          "wordReviewed",
+          "wordMastered",
+          "dailyStreak",
+          "weekStreak",
+        ]),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.addPoints(ctx.user.id, input.action);
+      }),
   }),
 
   // Vocabulary

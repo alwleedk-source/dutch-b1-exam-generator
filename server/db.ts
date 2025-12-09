@@ -170,6 +170,111 @@ export async function updateUserStats(
     .where(eq(users.id, user_id));
 }
 
+// ==================== GAMIFICATION ====================
+
+// Points configuration
+const POINTS_CONFIG = {
+  examComplete: 10,
+  examScore80Plus: 5,
+  examScore100: 10,
+  wordLearned: 2,
+  wordReviewed: 1,
+  wordMastered: 5,
+  dailyStreak: 3,
+  weekStreak: 20,
+};
+
+// Level thresholds
+const LEVELS = [
+  { name: "beginner", minPoints: 0, emoji: "🌱" },
+  { name: "learner", minPoints: 100, emoji: "📚" },
+  { name: "advanced", minPoints: 300, emoji: "⭐" },
+  { name: "expert", minPoints: 600, emoji: "🏆" },
+  { name: "master", minPoints: 1000, emoji: "👑" },
+];
+
+export function calculateLevel(points: number): { name: string; emoji: string; nextLevel: typeof LEVELS[0] | null; pointsToNext: number } {
+  let currentLevel = LEVELS[0];
+  let nextLevel: typeof LEVELS[0] | null = LEVELS[1];
+
+  for (let i = LEVELS.length - 1; i >= 0; i--) {
+    if (points >= LEVELS[i].minPoints) {
+      currentLevel = LEVELS[i];
+      nextLevel = LEVELS[i + 1] || null;
+      break;
+    }
+  }
+
+  const pointsToNext = nextLevel ? nextLevel.minPoints - points : 0;
+  return { ...currentLevel, nextLevel, pointsToNext };
+}
+
+export type PointAction =
+  | "examComplete"
+  | "examScore80Plus"
+  | "examScore100"
+  | "wordLearned"
+  | "wordReviewed"
+  | "wordMastered"
+  | "dailyStreak"
+  | "weekStreak";
+
+export async function addPoints(user_id: number, action: PointAction): Promise<{ points: number; newTotal: number; levelUp: boolean; newLevel: string | null }> {
+  const db = await getDb();
+  if (!db) return { points: 0, newTotal: 0, levelUp: false, newLevel: null };
+
+  const pointsToAdd = POINTS_CONFIG[action];
+
+  // Get current user data
+  const user = await getUserById(user_id);
+  if (!user) return { points: 0, newTotal: 0, levelUp: false, newLevel: null };
+
+  const currentPoints = user.total_points || 0;
+  const newTotal = currentPoints + pointsToAdd;
+
+  // Calculate levels
+  const oldLevel = calculateLevel(currentPoints);
+  const newLevelData = calculateLevel(newTotal);
+  const levelUp = newLevelData.name !== oldLevel.name;
+
+  // Update user
+  await db
+    .update(users)
+    .set({
+      total_points: newTotal,
+      current_level: newLevelData.name,
+      updated_at: new Date()
+    })
+    .where(eq(users.id, user_id));
+
+  return {
+    points: pointsToAdd,
+    newTotal,
+    levelUp,
+    newLevel: levelUp ? newLevelData.name : null,
+  };
+}
+
+export async function getUserPoints(user_id: number) {
+  const user = await getUserById(user_id);
+  if (!user) return null;
+
+  const levelData = calculateLevel(user.total_points || 0);
+  return {
+    totalPoints: user.total_points || 0,
+    currentLevel: levelData.name,
+    levelEmoji: levelData.emoji,
+    nextLevel: levelData.nextLevel?.name || null,
+    nextLevelEmoji: levelData.nextLevel?.emoji || null,
+    pointsToNext: levelData.pointsToNext,
+    progressPercent: levelData.nextLevel
+      ? Math.round(((user.total_points || 0) - (LEVELS.find(l => l.name === levelData.name)?.minPoints || 0)) /
+        (levelData.nextLevel.minPoints - (LEVELS.find(l => l.name === levelData.name)?.minPoints || 0)) * 100)
+      : 100,
+  };
+}
+
+
 export async function getAllUsers() {
   const db = await getDb();
   if (!db) return [];

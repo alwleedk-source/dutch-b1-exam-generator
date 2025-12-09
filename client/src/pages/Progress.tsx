@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress as ProgressBar } from "@/components/ui/progress";
 import { trpc } from "@/lib/trpc";
 import { AppHeader } from "@/components/AppHeader";
-import { TrendingUp, TrendingDown, CheckCircle, XCircle, Target, BookOpen } from "lucide-react";
+import { TrendingUp, TrendingDown, CheckCircle, XCircle, Target, BookOpen, Star, Trophy } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Progress() {
@@ -11,6 +11,7 @@ export default function Progress() {
   const { user } = useAuth();
   const { data: stats } = trpc.progress.getMyStats.useQuery(undefined, { enabled: !!user });
   const { data: detailedAnalysis } = trpc.progress.getDetailedAnalysis.useQuery(undefined, { enabled: !!user });
+  const { data: pointsData } = trpc.progress.getMyPoints.useQuery(undefined, { enabled: !!user });
 
   const skillCategories = [
     { key: "main_idea", label: "Hoofdgedachte (Main Idea)", icon: Target },
@@ -36,7 +37,36 @@ export default function Progress() {
       <AppHeader />
       <div className="max-w-7xl mx-auto p-4 sm:p-8">
         <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">{t.myProgress}</h1>
-        
+
+        {/* Points & Level Card */}
+        <Card className="mb-6 sm:mb-8 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-200 dark:border-purple-800">
+          <CardContent className="pt-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="text-4xl">{pointsData?.levelEmoji || "🌱"}</div>
+                <div>
+                  <p className="text-sm text-muted-foreground">{t.currentLevel || "Current Level"}</p>
+                  <p className="text-2xl font-bold capitalize">{pointsData?.currentLevel || "beginner"}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Star className="h-6 w-6 text-yellow-500" />
+                <span className="text-3xl font-bold">{pointsData?.totalPoints || 0}</span>
+                <span className="text-muted-foreground">{t.points || "points"}</span>
+              </div>
+            </div>
+            {pointsData?.nextLevel && (
+              <div className="mt-4">
+                <div className="flex justify-between text-sm mb-1">
+                  <span>{pointsData.currentLevel}</span>
+                  <span>{pointsData.nextLevelEmoji} {pointsData.nextLevel} ({pointsData.pointsToNext} {t.pointsToGo || "points to go"})</span>
+                </div>
+                <ProgressBar value={pointsData.progressPercent || 0} className="h-3" />
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <Card>

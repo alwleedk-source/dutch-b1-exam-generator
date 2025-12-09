@@ -24,6 +24,10 @@ export const users = pgTable("users", {
   longest_streak: integer("longest_streak").default(0).notNull(),
   last_activity_date: timestamp("last_activity_date"),
 
+  // Gamification - Points & Levels
+  total_points: integer("total_points").default(0).notNull(),
+  current_level: varchar("current_level", { length: 50 }).default("beginner").notNull(),
+
   // Forum ban status
   is_banned: boolean("is_banned").default(false).notNull(),
   banned_at: timestamp("banned_at"),

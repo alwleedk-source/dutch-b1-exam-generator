@@ -669,6 +669,17 @@ export interface Translations {
   onboardingStep4Desc: string;
   onboardingStep5Title: string;
   onboardingStep5Desc: string;
+
+  // Gamification
+  currentLevel: string;
+  points: string;
+  pointsToGo: string;
+  levelUp: string;
+  beginner: string;
+  learner: string;
+  advanced: string;
+  expert: string;
+  master: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -1325,6 +1336,17 @@ export const translations: Record<Language, Translations> = {
     allReasons: "Alle redenen",
     showRatingDefinition: "Toon definitie (Nederlands)",
     hideRatingDefinition: "Verberg definitie",
+
+    // Gamification
+    currentLevel: "Huidig niveau",
+    points: "punten",
+    pointsToGo: "punten te gaan",
+    levelUp: "Level omhoog!",
+    beginner: "Beginner",
+    learner: "Leerling",
+    advanced: "Gevorderd",
+    expert: "Expert",
+    master: "Meester",
   },
 
   ar: {
@@ -1978,6 +2000,17 @@ export const translations: Record<Language, Translations> = {
     allReasons: "جميع الأسباب",
     showRatingDefinition: "عرض التعريف (بالهولندية)",
     hideRatingDefinition: "إخفاء التعريف",
+
+    // Gamification
+    currentLevel: "المستوى الحالي",
+    points: "نقاط",
+    pointsToGo: "نقاط للوصول",
+    levelUp: "ارتقاء مستوى!",
+    beginner: "مبتدئ",
+    learner: "متعلم",
+    advanced: "متقدم",
+    expert: "خبير",
+    master: "محترف",
   },
 
   en: {
@@ -2632,6 +2665,17 @@ export const translations: Record<Language, Translations> = {
     allReasons: "All Reasons",
     showRatingDefinition: "Show definition (Dutch)",
     hideRatingDefinition: "Hide definition",
+
+    // Gamification
+    currentLevel: "Current Level",
+    points: "points",
+    pointsToGo: "points to go",
+    levelUp: "Level Up!",
+    beginner: "Beginner",
+    learner: "Learner",
+    advanced: "Advanced",
+    expert: "Expert",
+    master: "Master",
   },
 
   tr: {
@@ -3289,6 +3333,17 @@ export const translations: Record<Language, Translations> = {
     onboardingStep4Desc: "Kelimelerinizi bilgi kartları ve sınavlarla çalışın. Akıllı sistemimiz zor kelimeleri daha sık tekrarlar - böylece her şeyi daha iyi ve hızlı hatırlarsınız!",
     onboardingStep5Title: "👥 Birlikte Öğrenin = Daha İyi Öğrenin",
     onboardingStep5Desc: "Forumda soru sorun, ipuçlarını paylaşın ve başkalarından öğrenin!",
+
+    // Gamification
+    currentLevel: "Mevcut Seviye",
+    points: "puan",
+    pointsToGo: "puan kaldı",
+    levelUp: "Seviye Atladınız!",
+    beginner: "Başlangıç",
+    learner: "Öğrenci",
+    advanced: "İleri",
+    expert: "Uzman",
+    master: "Usta",
   },
 
 

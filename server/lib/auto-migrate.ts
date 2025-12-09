@@ -102,6 +102,15 @@ export async function autoMigrate() {
         ALTER TABLE "users" 
         ADD COLUMN IF NOT EXISTS "ban_reason" text;
       `);
+      // Gamification fields
+      await db.execute(sql`
+        ALTER TABLE "users" 
+        ADD COLUMN IF NOT EXISTS "total_points" integer DEFAULT 0 NOT NULL;
+      `);
+      await db.execute(sql`
+        ALTER TABLE "users" 
+        ADD COLUMN IF NOT EXISTS "current_level" varchar(50) DEFAULT 'beginner' NOT NULL;
+      `);
       console.log("[Auto-Migrate] ✅ users table columns ensured");
     } catch (error) {
       console.error("[Auto-Migrate] Error adding users columns:", error);

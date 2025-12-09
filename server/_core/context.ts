@@ -30,6 +30,8 @@ export async function createContext(
       current_streak: 0,
       longest_streak: 0,
       last_activity_date: null,
+      total_points: 0,
+      current_level: "beginner",
       is_banned: false,
       banned_at: null,
       banned_until: null,
