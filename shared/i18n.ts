@@ -657,6 +657,18 @@ export interface Translations {
   submitSuggestion: string;
   suggestionSubmitted: string;
   suggestionFailed: string;
+
+  // Onboarding Tour
+  onboardingStep1Title: string;
+  onboardingStep1Desc: string;
+  onboardingStep2Title: string;
+  onboardingStep2Desc: string;
+  onboardingStep3Title: string;
+  onboardingStep3Desc: string;
+  onboardingStep4Title: string;
+  onboardingStep4Desc: string;
+  onboardingStep5Title: string;
+  onboardingStep5Desc: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -1203,6 +1215,18 @@ export const translations: Record<Language, Translations> = {
     submitSuggestion: "Versturen",
     suggestionSubmitted: "Suggestie verstuurd!",
     suggestionFailed: "Versturen mislukt",
+
+    // Onboarding Tour
+    onboardingStep1Title: "Welkom bij StaatKlaar!",
+    onboardingStep1Desc: "Jouw platform voor de voorbereiding op het officiële B1 leesexamen Nederlands",
+    onboardingStep2Title: "Oefenexamens klaar voor gebruik",
+    onboardingStep2Desc: "Elke dag voegen we nieuwe teksten op B1-niveau toe om mee te oefenen",
+    onboardingStep3Title: "Bouw je woordenschat",
+    onboardingStep3Desc: "Voeg woorden toe vanuit teksten tijdens het lezen of direct uit het woordenboek, en oefen ermee!",
+    onboardingStep4Title: "Oefen op verschillende manieren",
+    onboardingStep4Desc: "Flashcards, snelle quizzen en slim gespreid herhalen",
+    onboardingStep5Title: "Communiceer met anderen",
+    onboardingStep5Desc: "Deel je ervaringen en stel vragen op het forum in je voorkeurstaal",
 
     // Admin Dashboard
     filterByStatus: "Filter op status",
@@ -1845,6 +1869,18 @@ export const translations: Record<Language, Translations> = {
     suggestionSubmitted: "تم إرسال الاقتراح!",
     suggestionFailed: "فشل الإرسال",
 
+    // Onboarding Tour
+    onboardingStep1Title: "مرحباً بك في StaatKlaar!",
+    onboardingStep1Desc: "منصتك للتحضير لامتحان القراءة الرسمي B1 الهولندي",
+    onboardingStep2Title: "اختبارات جاهزة للتدريب",
+    onboardingStep2Desc: "نضيف نصوص جديدة يومياً بمستوى B1 لتتدرب عليها",
+    onboardingStep3Title: "ابنِ قائمة مفرداتك",
+    onboardingStep3Desc: "أضف كلمات من النصوص أثناء القراءة أو من القاموس مباشرة، ثم تدرب عليها!",
+    onboardingStep4Title: "تدرب بطرق مختلفة",
+    onboardingStep4Desc: "بطاقات تعليمية، اختبارات سريعة، والتكرار المتباعد الذكي",
+    onboardingStep5Title: "تواصل مع الآخرين",
+    onboardingStep5Desc: "شارك تجربتك واسأل أسئلتك في المنتدى بلغتك المفضلة",
+
     // Admin Dashboard
     filterByStatus: "تصفية حسب الحالة",
     allStatus: "جميع الحالات",
@@ -2486,6 +2522,18 @@ export const translations: Record<Language, Translations> = {
     submitSuggestion: "Submit",
     suggestionSubmitted: "Suggestion submitted!",
     suggestionFailed: "Submission failed",
+
+    // Onboarding Tour
+    onboardingStep1Title: "Welcome to StaatKlaar!",
+    onboardingStep1Desc: "Your platform for preparing for the official Dutch B1 reading exam",
+    onboardingStep2Title: "Practice exams ready to use",
+    onboardingStep2Desc: "We add new B1-level texts daily for you to practice with",
+    onboardingStep3Title: "Build your vocabulary",
+    onboardingStep3Desc: "Add words from texts while reading or directly from the dictionary, then practice them!",
+    onboardingStep4Title: "Practice in different ways",
+    onboardingStep4Desc: "Flashcards, quick quizzes, and smart spaced repetition",
+    onboardingStep5Title: "Connect with others",
+    onboardingStep5Desc: "Share your experience and ask questions on the forum in your preferred language",
 
     // Admin Dashboard
     filterByStatus: "Filter by status",
@@ -3229,6 +3277,18 @@ export const translations: Record<Language, Translations> = {
     submitSuggestion: "Gönder",
     suggestionSubmitted: "Öneri gönderildi!",
     suggestionFailed: "Gönderim başarısız",
+
+    // Onboarding Tour
+    onboardingStep1Title: "StaatKlaar'a Hoş Geldiniz!",
+    onboardingStep1Desc: "Resmi Hollandaca B1 okuma sınavına hazırlanma platformunuz",
+    onboardingStep2Title: "Kullanıma hazır alıştırma sınavları",
+    onboardingStep2Desc: "Her gün pratik yapmanız için yeni B1 seviyesi metinler ekliyoruz",
+    onboardingStep3Title: "Kelime hazinenizi oluşturun",
+    onboardingStep3Desc: "Okurken metinlerden veya doğrudan sözlükten kelimeler ekleyin, sonra onlarla alıştırma yapın!",
+    onboardingStep4Title: "Farklı şekillerde alıştırma yapın",
+    onboardingStep4Desc: "Bilgi kartları, hızlı sınavlar ve akıllı aralıklı tekrar",
+    onboardingStep5Title: "Başkalarıyla iletişim kurun",
+    onboardingStep5Desc: "Deneyiminizi paylaşın ve tercih ettiğiniz dilde forumda sorular sorun",
   },
 
 

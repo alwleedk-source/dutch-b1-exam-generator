@@ -14,6 +14,7 @@ export const users = pgTable("users", {
 
   // User preferences
   preferred_language: varchar("preferred_language", { length: 50 }), // ar, en, tr, nl
+  has_seen_onboarding: boolean("has_seen_onboarding").default(false).notNull(),
 
   // Statistics
   total_exams_completed: integer("total_exams_completed").default(0).notNull(),

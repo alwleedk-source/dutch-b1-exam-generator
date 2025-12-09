@@ -67,6 +67,11 @@ export const appRouter = router({
         await db.updateUserPreferences(ctx.user.id, input.preferred_language);
         return { success: true };
       }),
+    completeOnboarding: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        await db.updateUserOnboarding(ctx.user.id, true);
+        return { success: true };
+      }),
   }),
 
   // Text management

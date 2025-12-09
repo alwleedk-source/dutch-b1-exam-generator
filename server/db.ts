@@ -140,6 +140,16 @@ export async function updateUserPreferences(user_id: number, preferred_language:
     .where(eq(users.id, user_id));
 }
 
+export async function updateUserOnboarding(user_id: number, has_seen_onboarding: boolean) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db
+    .update(users)
+    .set({ has_seen_onboarding, updated_at: new Date() })
+    .where(eq(users.id, user_id));
+}
+
 export async function updateUserStats(
   user_id: number,
   stats: {

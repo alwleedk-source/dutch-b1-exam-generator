@@ -37,6 +37,7 @@ const ForumUsers = lazy(() => import("./pages/forum/ForumUsers"));
 const ModerationLog = lazy(() => import("./pages/forum/ModerationLog"));
 const ModerationDashboard = lazy(() => import("./pages/forum/ModerationDashboard"));
 import LanguageSelector from "./components/LanguageSelector";
+import { OnboardingTour } from "./components/OnboardingTour";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { Loader2 } from "lucide-react";
@@ -54,35 +55,35 @@ function Router() {
   return (
     <Suspense fallback={<LoadingFallback />}>
       <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="/create-exam" component={CreateExam} />
-      <Route path="/exam/:id" component={TakeExam} />
-      <Route path="/exam/:id/results" component={ExamResults} />
-      <Route path="/exam/:id/review" component={ExamReview} />
-      <Route path="/progress" component={Progress} />
-      <Route path="/vocabulary" component={Vocabulary} />
-      <Route path="/vocabulary/simple" component={VocabularySimple} />
-      <Route path="/dictionary" component={Dictionary} />
-      <Route path="/admin" component={AdminDashboard} />
-      <Route path="/admin/settings" component={AdminSettings} />
-      <Route path="/leaderboard" component={Leaderboard} />
-      <Route path="/achievements" component={Achievements} />
-      <Route path="/study/:examId" component={StudyMode} />
-      <Route path="/review" component={ReviewPractice} />
-      <Route path="/my-exams" component={MyExams} />
-      <Route path="/public-exams" component={PublicExams} />
-      <Route path="/forum" component={ForumHome} />
-      <Route path="/forum/category/:id" component={ForumCategory} />
-      <Route path="/forum/topic/:id" component={ForumTopic} />
-      <Route path="/forum/new-topic" component={NewTopic} />
-      <Route path="/forum/reports" component={ForumReports} />
-      <Route path="/forum/moderator" component={ModeratorPanel} />
-      <Route path="/forum/users" component={ForumUsers} />
-      <Route path="/forum/moderation-log" component={ModerationLog} />
-      <Route path="/forum/moderation-dashboard" component={ModerationDashboard} />
-      <Route path="/404" component={NotFound} />
-      <Route component={NotFound} />
+        <Route path="/" component={Home} />
+        <Route path="/dashboard" component={Dashboard} />
+        <Route path="/create-exam" component={CreateExam} />
+        <Route path="/exam/:id" component={TakeExam} />
+        <Route path="/exam/:id/results" component={ExamResults} />
+        <Route path="/exam/:id/review" component={ExamReview} />
+        <Route path="/progress" component={Progress} />
+        <Route path="/vocabulary" component={Vocabulary} />
+        <Route path="/vocabulary/simple" component={VocabularySimple} />
+        <Route path="/dictionary" component={Dictionary} />
+        <Route path="/admin" component={AdminDashboard} />
+        <Route path="/admin/settings" component={AdminSettings} />
+        <Route path="/leaderboard" component={Leaderboard} />
+        <Route path="/achievements" component={Achievements} />
+        <Route path="/study/:examId" component={StudyMode} />
+        <Route path="/review" component={ReviewPractice} />
+        <Route path="/my-exams" component={MyExams} />
+        <Route path="/public-exams" component={PublicExams} />
+        <Route path="/forum" component={ForumHome} />
+        <Route path="/forum/category/:id" component={ForumCategory} />
+        <Route path="/forum/topic/:id" component={ForumTopic} />
+        <Route path="/forum/new-topic" component={NewTopic} />
+        <Route path="/forum/reports" component={ForumReports} />
+        <Route path="/forum/moderator" component={ModeratorPanel} />
+        <Route path="/forum/users" component={ForumUsers} />
+        <Route path="/forum/moderation-log" component={ModerationLog} />
+        <Route path="/forum/moderation-dashboard" component={ModerationDashboard} />
+        <Route path="/404" component={NotFound} />
+        <Route component={NotFound} />
       </Switch>
     </Suspense>
   );
@@ -91,7 +92,8 @@ function Router() {
 function App() {
   const { user } = useAuth();
   const [showLanguageSelector, setShowLanguageSelector] = useState(false);
-  
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
   useEffect(() => {
     // Check if user needs to select language
     const hasLanguage = user?.preferred_language || localStorage.getItem('preferredLanguage');
@@ -99,24 +101,42 @@ function App() {
       setShowLanguageSelector(true);
     }
   }, [user]);
-  
+
+  useEffect(() => {
+    // Show onboarding for logged-in users who haven't seen it yet
+    if (user && !showLanguageSelector) {
+      const hasSeenOnboarding = user.has_seen_onboarding || localStorage.getItem('has_seen_onboarding') === 'true';
+      if (!hasSeenOnboarding) {
+        setShowOnboarding(true);
+      }
+    }
+  }, [user, showLanguageSelector]);
+
   const handleLanguageSelected = (language: string) => {
     setShowLanguageSelector(false);
   };
-  
+
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+  };
+
   return (
     <ErrorBoundary>
       <HelmetProvider>
         <ThemeProvider defaultTheme="light" switchable>
           <LanguageProvider>
-          <TooltipProvider>
-            <Toaster />
-            <LanguageSelector 
-              open={showLanguageSelector} 
-              onLanguageSelected={handleLanguageSelected} 
-            />
-            <Router />
-          </TooltipProvider>
+            <TooltipProvider>
+              <Toaster />
+              <LanguageSelector
+                open={showLanguageSelector}
+                onLanguageSelected={handleLanguageSelected}
+              />
+              <OnboardingTour
+                open={showOnboarding}
+                onComplete={handleOnboardingComplete}
+              />
+              <Router />
+            </TooltipProvider>
           </LanguageProvider>
         </ThemeProvider>
       </HelmetProvider>
