@@ -79,7 +79,7 @@ async function startServer() {
   // Clean up old rate limit entries every 5 minutes
   setInterval(() => {
     const now = Date.now();
-    for (const [ip, record] of apiRequestCounts.entries()) {
+    for (const [ip, record] of Array.from(apiRequestCounts.entries())) {
       if (now > record.resetTime) {
         apiRequestCounts.delete(ip);
       }
@@ -118,7 +118,7 @@ async function startServer() {
       console.log(`[Session Debug] ${req.method} ${req.path}`);
       console.log(`[Session Debug] Session ID: ${req.sessionID || 'none'}`);
       console.log(`[Session Debug] Session exists: ${!!req.session}`);
-      console.log(`[Session Debug] User in session: ${!!req.session?.passport?.user}`);
+      console.log(`[Session Debug] User in session: ${!!(req.session as any)?.passport?.user}`);
       console.log(`[Session Debug] Cookies: ${JSON.stringify(req.cookies || {})}`);
     }
     next();
