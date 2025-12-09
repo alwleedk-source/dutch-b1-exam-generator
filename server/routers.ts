@@ -598,6 +598,66 @@ export const appRouter = router({
         return texts;
       }),
 
+    // Get texts with user completion status
+    listTextsWithUserStatus: protectedProcedure
+      .input(z.object({
+        reason: z.string().optional(),
+        filter: z.enum(['all', 'new', 'completed']).optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        // Get all approved texts
+        let texts = await db.getApprovedTexts();
+
+        // Filter by reason if provided
+        if (input?.reason && input.reason !== 'all') {
+          texts = await db.getTextsByReason(texts.map(t => t.id), input.reason);
+        }
+
+        // Get user's completed exams
+        const userExams = await db.getExamsByUser(ctx.user.id);
+        const completedByTextId = new Map<number, { bestScore: number; attempts: number; latestExamId: number }>();
+
+        userExams.forEach(exam => {
+          if (exam.status === 'completed' && exam.text_id) {
+            const existing = completedByTextId.get(exam.text_id);
+            if (!existing) {
+              completedByTextId.set(exam.text_id, {
+                bestScore: exam.score_percentage || 0,
+                attempts: 1,
+                latestExamId: exam.id,
+              });
+            } else {
+              existing.attempts++;
+              if ((exam.score_percentage || 0) > existing.bestScore) {
+                existing.bestScore = exam.score_percentage || 0;
+              }
+              existing.latestExamId = exam.id;
+            }
+          }
+        });
+
+        // Add user status to each text
+        const textsWithStatus = texts.map(text => {
+          const userStatus = completedByTextId.get(text.id);
+          return {
+            ...text,
+            userCompleted: !!userStatus,
+            userBestScore: userStatus?.bestScore || null,
+            userAttempts: userStatus?.attempts || 0,
+            userLatestExamId: userStatus?.latestExamId || null,
+          };
+        });
+
+        // Filter by completion status
+        if (input?.filter === 'new') {
+          return textsWithStatus.filter(t => !t.userCompleted);
+        } else if (input?.filter === 'completed') {
+          return textsWithStatus.filter(t => t.userCompleted);
+        }
+
+        return textsWithStatus;
+      }),
+
     getTextWithTranslation: publicProcedure
       .input(z.object({
         text_id: z.number(),

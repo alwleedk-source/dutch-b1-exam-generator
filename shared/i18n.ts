@@ -680,6 +680,16 @@ export interface Translations {
   advanced: string;
   expert: string;
   master: string;
+
+  // Exam Status
+  newForMe: string;
+  practiced: string;
+  bestScore: string;
+  tryAgain: string;
+  allTextsPracticed: string;
+  noCompletedYet: string;
+  checkBackLater: string;
+  startPracticing: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -1347,6 +1357,16 @@ export const translations: Record<Language, Translations> = {
     advanced: "Gevorderd",
     expert: "Expert",
     master: "Meester",
+
+    // Exam Status
+    newForMe: "Nieuw voor mij",
+    practiced: "Geoefend",
+    bestScore: "Beste score",
+    tryAgain: "Probeer opnieuw",
+    allTextsPracticed: "Je hebt alle teksten geoefend! 🎉",
+    noCompletedYet: "Je hebt nog geen teksten geoefend",
+    checkBackLater: "Kom later terug voor nieuwe teksten",
+    startPracticing: "Begin met oefenen",
   },
 
   ar: {
@@ -2011,6 +2031,16 @@ export const translations: Record<Language, Translations> = {
     advanced: "متقدم",
     expert: "خبير",
     master: "محترف",
+
+    // Exam Status
+    newForMe: "جديد لي",
+    practiced: "تدربت عليها",
+    bestScore: "أفضل نتيجة",
+    tryAgain: "أعد المحاولة",
+    allTextsPracticed: "لقد تدربت على جميع النصوص! 🎉",
+    noCompletedYet: "لم تتدرب على أي نص بعد",
+    checkBackLater: "تحقق لاحقاً لنصوص جديدة",
+    startPracticing: "ابدأ بالتدريب",
   },
 
   en: {
@@ -2676,6 +2706,16 @@ export const translations: Record<Language, Translations> = {
     advanced: "Advanced",
     expert: "Expert",
     master: "Master",
+
+    // Exam Status
+    newForMe: "New for me",
+    practiced: "Practiced",
+    bestScore: "Best score",
+    tryAgain: "Try again",
+    allTextsPracticed: "You've practiced all texts! 🎉",
+    noCompletedYet: "You haven't practiced any text yet",
+    checkBackLater: "Check back later for new texts",
+    startPracticing: "Start practicing",
   },
 
   tr: {
@@ -3344,6 +3384,16 @@ export const translations: Record<Language, Translations> = {
     advanced: "İleri",
     expert: "Uzman",
     master: "Usta",
+
+    // Exam Status
+    newForMe: "Benim için yeni",
+    practiced: "Pratik yaptım",
+    bestScore: "En iyi skor",
+    tryAgain: "Tekrar dene",
+    allTextsPracticed: "Tüm metinlerde pratik yaptınız! 🎉",
+    noCompletedYet: "Henüz hiçbir metinde pratik yapmadınız",
+    checkBackLater: "Yeni metinler için daha sonra kontrol edin",
+    startPracticing: "Pratik yapmaya başla",
   },
 
 
