@@ -24,6 +24,22 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // React core
+          'react-vendor': ['react', 'react-dom'],
+          // React Query + Router
+          'query-router': ['@tanstack/react-query', 'wouter'],
+          // UI components
+          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-tabs', '@radix-ui/react-tooltip'],
+          // Icons
+          'icons': ['lucide-react'],
+          // i18n (large translations file)
+          'i18n': ['@shared/i18n'],
+        },
+      },
+    },
   },
   server: {
     host: true,

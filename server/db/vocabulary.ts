@@ -45,7 +45,17 @@ export async function linkVocabularyToText(textId: number, vocabularyId: number)
     return result;
 }
 
+// Simple in-memory cache for vocabulary (5 minutes TTL)
+const vocabularyCache = new Map<number, { data: any[]; timestamp: number }>();
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
 export async function getVocabularyByTextId(text_id: number) {
+    // Check cache first
+    const cached = vocabularyCache.get(text_id);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+        return cached.data;
+    }
+
     const db = await getDb();
     if (!db) return [];
 
@@ -67,6 +77,9 @@ export async function getVocabularyByTextId(text_id: number) {
         .from(textVocabulary)
         .innerJoin(vocabulary, eq(textVocabulary.vocabulary_id, vocabulary.id))
         .where(eq(textVocabulary.text_id, text_id));
+
+    // Store in cache
+    vocabularyCache.set(text_id, { data: result, timestamp: Date.now() });
 
     return result;
 }
