@@ -96,7 +96,7 @@ export async function generateWithGeminiPro(options: GeminiGenerateOptions): Pro
   try {
     // Use gemini-2.5-pro for high-quality reasoning (exam questions)
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-pro-preview-06-05",
+      model: "gemini-2.5-pro",
       generationConfig: {
         temperature: options.temperature || 0.7,
         maxOutputTokens: options.maxOutputTokens || 8192,
