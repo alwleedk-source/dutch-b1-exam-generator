@@ -1759,6 +1759,100 @@ export const appRouter = router({
         const deletedCount = await db.deleteOldIncompleteExams(dateThreshold);
         return { success: true, deletedCount };
       }),
+
+    // Regenerate questions for a text using the new improved prompt
+    regenerateQuestionsForText: adminProcedure
+      .input(z.object({
+        text_id: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        const text = await db.getTextById(input.text_id);
+        if (!text) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Text not found" });
+        }
+
+        console.log(`[Admin] Regenerating questions for text ${input.text_id}...`);
+
+        // Generate new questions with the improved prompt
+        const gemini = await import("./lib/gemini");
+        const { calculateQuestionCount } = await import("./lib/questionCount");
+
+        const questionCount = calculateQuestionCount(text.dutch_text.length);
+        const examData = await gemini.generateExamQuestions(text.dutch_text, questionCount);
+
+        console.log(`[Admin] Generated ${examData.questions.length} new questions`);
+
+        // Update all existing exams for this text with new questions
+        const existingExams = await db.getExamsByTextId(input.text_id);
+        let updatedCount = 0;
+
+        for (const exam of existingExams) {
+          // Only update exams that haven't been completed
+          if (exam.status === 'in_progress') {
+            await db.updateExamQuestions(exam.id, JSON.stringify(examData.questions));
+            updatedCount++;
+          }
+        }
+
+        return {
+          success: true,
+          newQuestionCount: examData.questions.length,
+          updatedExamsCount: updatedCount,
+          totalExamsForText: existingExams.length,
+        };
+      }),
+
+    // Regenerate questions for ALL texts (bulk operation)
+    regenerateAllQuestions: adminProcedure
+      .mutation(async () => {
+        const allTexts = await db.getAllTexts();
+        const approvedTexts = allTexts.filter((t: any) => t.status === 'approved');
+
+        console.log(`[Admin] Starting bulk regeneration for ${approvedTexts.length} texts...`);
+
+        const gemini = await import("./lib/gemini");
+        const { calculateQuestionCount } = await import("./lib/questionCount");
+
+        let successCount = 0;
+        let failedCount = 0;
+        const results: { textId: number; success: boolean; questionCount?: number; error?: string }[] = [];
+
+        for (const text of approvedTexts) {
+          try {
+            const questionCount = calculateQuestionCount(text.dutch_text.length);
+            const examData = await gemini.generateExamQuestions(text.dutch_text, questionCount);
+
+            // Update in_progress exams for this text
+            const existingExams = await db.getExamsByTextId(text.id);
+            for (const exam of existingExams) {
+              if (exam.status === 'in_progress') {
+                await db.updateExamQuestions(exam.id, JSON.stringify(examData.questions));
+              }
+            }
+
+            successCount++;
+            results.push({ textId: text.id, success: true, questionCount: examData.questions.length });
+            console.log(`[Admin] ✅ Text ${text.id}: Generated ${examData.questions.length} questions`);
+          } catch (error) {
+            failedCount++;
+            results.push({ textId: text.id, success: false, error: String(error) });
+            console.error(`[Admin] ❌ Text ${text.id}: Failed - ${error}`);
+          }
+
+          // Small delay to avoid rate limiting
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+
+        console.log(`[Admin] Bulk regeneration complete: ${successCount} success, ${failedCount} failed`);
+
+        return {
+          success: true,
+          totalTexts: approvedTexts.length,
+          successCount,
+          failedCount,
+          results,
+        };
+      }),
   }),
 
   // User management

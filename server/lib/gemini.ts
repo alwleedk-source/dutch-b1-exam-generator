@@ -85,6 +85,68 @@ export async function generateWithGemini(options: GeminiGenerateOptions): Promis
 }
 
 /**
+ * Generate content using Gemini 2.5 Pro for high-quality reasoning tasks
+ * Used specifically for exam question generation where deep reasoning is needed
+ */
+export async function generateWithGeminiPro(options: GeminiGenerateOptions): Promise<string> {
+  if (!genAI) {
+    throw new Error("Gemini AI is not initialized. Please set GEMINI_API_KEY environment variable.");
+  }
+
+  try {
+    // Use gemini-2.5-pro for high-quality reasoning (exam questions)
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-pro-preview-06-05",
+      generationConfig: {
+        temperature: options.temperature || 0.7,
+        maxOutputTokens: options.maxOutputTokens || 8192,
+      },
+    });
+
+    // Build chat history
+    const history = options.messages.slice(0, -1).map(msg => ({
+      role: msg.role,
+      parts: [{ text: msg.parts }],
+    }));
+
+    // Get the last message (current prompt)
+    const lastMessage = options.messages[options.messages.length - 1];
+
+    // Start chat with history
+    const chat = model.startChat({
+      history,
+    });
+
+    // Add JSON format instruction if needed
+    let prompt = lastMessage.parts;
+    if (options.responseFormat === "json") {
+      prompt += "\n\nIMPORTANT: Respond ONLY with valid JSON. Do not include any markdown formatting, code blocks, or explanatory text. Just the raw JSON object.";
+    }
+
+    // Send message and get response
+    const result = await chat.sendMessage(prompt);
+    const response = result.response;
+    let text = response.text();
+
+    // Clean up JSON response if needed
+    if (options.responseFormat === "json") {
+      // Remove markdown code blocks if present
+      text = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+
+      // Fix common JSON issues from AI responses
+      text = text.replace(/,\s*]/g, ']');
+      text = text.replace(/,\s*}/g, '}');
+      text = text.replace(/,\s*,/g, ',');
+    }
+
+    return text;
+  } catch (error) {
+    console.error("[Gemini AI Pro] Error generating content:", error);
+    throw error;
+  }
+}
+
+/**
  * Clean, correct, and format any Dutch text using Gemini AI
  * Works for OCR text, pasted text, or manually typed text
  * Gemini analyzes the text and decides what needs to be fixed
@@ -284,153 +346,146 @@ Respond ALLEEN met de opgeschoonde tekst, zonder uitleg of markdown formatting.`
 
 /**
  * Generate exam questions from Dutch text (Staatsexamen NT2 style)
+ * Uses Gemini 2.5 Pro for high-quality reasoning and distractor generation
+ * Based on analysis of official NT2 Staatsexamen Lezen I 2023
  */
 export async function generateExamQuestions(dutchText: string, questionCount: number = 10) {
-  const response = await generateWithGemini({
+  const response = await generateWithGeminiPro({
     messages: [
       {
         role: "user",
-        parts: `Je bent een expert in het maken van Staatsexamen NT2 Lezen I (B1) vragen. Genereer ${questionCount} meerkeuzevragen op basis van de volgende Nederlandse tekst, volgens de officiële NT2 examennormen.
+        parts: `Je bent een expert examenmaker voor het Staatsexamen NT2 Lezen I (B1). Je taak is om ${questionCount} authentieke meerkeuzevragen te maken die PRECIES lijken op de officiële CvTE examens.
 
-Tekst:
+=== TEKST ===
 ${dutchText}
 
-=== OFFICIËLE NT2 LEZEN I - 5 KERNVAARDIGHEDEN ===
+=== DE 5 KERNVAARDIGHEDEN (gebruik EXACT deze skillType waarden) ===
 
-Elke vraag moet PRECIES één van deze 5 vaardigheden testen:
+Verdeel de ${questionCount} vragen WILLEKEURIG over deze types:
+- hoofdgedachte: Doel, thema, doelgroep van de tekst
+- zoeken: Specifieke informatie vinden
+- volgorde: Stappen, procedures, tijdsvolgorde
+- conclusie: Impliciete informatie, redenen, gevolgen
+- woordenschat: Betekenis van woorden in context
 
-1. **HOOFDGEDACHTE (Main Idea)** - 15-20% van de vragen
-   Wat het test: Begrip van het algemene doel, thema of hoofdboodschap
-   Voorbeeldvragen:
-   - "Wat is het doel van deze tekst?"
-   - "Voor wie is deze tekst bedoeld?"
-   - "Waar gaat de tekst over?"
-   - "Wat is de hoofdgedachte?"
-   Kenmerken:
-   - Vereist begrip van de tekst als geheel
-   - Niet over specifieke details
-   - Test globaal begrip
+**BELANGRIJK VOOR VOLGORDE VAN VRAGEN:**
+- Vragen over "Wat is het doel van deze tekst?" of algemene conclusies: ALTIJD in de LAATSTE 3 vragen
+- Andere vragen: willekeurige volgorde
 
-2. **ZOEKEN (Search/Scanning)** - 30-35% van de vragen
-   Wat het test: Vermogen om snel specifieke informatie te vinden
-   Voorbeeldvragen:
-   - "Hoeveel kost...?"
-   - "Wanneer begint...?"
-   - "Waar kun je meer informatie vinden?"
-   - "Wat is het telefoonnummer van...?"
-   - "Welke voorwaarde geldt?"
-   Kenmerken:
-   - Antwoord staat expliciet in de tekst
-   - Vereist scannen op zoekwoorden
-   - Test informatiezoekvaardigheden
+=== OFFICIËLE VRAAGFORMULERINGEN (gebruik deze!) ===
 
-3. **VOLGORDE (Sequence/Order)** - 10-15% van de vragen
-   Wat het test: Begrip van de volgorde van stappen, gebeurtenissen of procedures
-   Voorbeeldvragen:
-   - "In welke volgorde moet je...?"
-   - "Wat moet je eerst doen?"
-   - "Wat gebeurt er na...?"
-   - "Welke stap komt voor...?"
-   Kenmerken:
-   - Test logisch denken
-   - Vaak in instructieteksten
-   - Vereist begrip van procesverloop
+HOOFDGEDACHTE:
+- "Wat is het doel van deze tekst?"
+- "Voor wie is deze tekst bedoeld?"
+- "Wat wil de schrijver bereiken met deze tekst?"
 
-4. **CONCLUSIE (Inference/Conclusion)** - 20-25% van de vragen
-   Wat het test: Vermogen om conclusies te trekken en impliciete informatie te begrijpen
-   Voorbeeldvragen:
-   - "Wat kun je concluderen uit...?"
-   - "Waarom is ... belangrijk?"
-   - "Wat bedoelt de schrijver met...?"
-   - "Wat is de reden dat...?"
-   Kenmerken:
-   - Antwoord niet direct vermeld
-   - Vereist "tussen de regels lezen"
-   - Test kritisch denken
+ZOEKEN:
+- "In welk onderdeel kun je lezen [dat/wat/waarom]...?"
+- "Wat is waar over [onderwerp]?"
+- "Welke uitspraak klopt (niet)?"
+- "Hoeveel/Wanneer/Waar...?"
 
-5. **WOORDENSCHAT (Vocabulary in Context)** - 15-20% van de vragen
-   Wat het test: Begrip van woordbetekenissen op basis van context
-   Voorbeeldvragen:
-   - "Wat betekent het woord '...' in deze context?"
-   - "Welk woord heeft dezelfde betekenis als '...'?"
-   - "Wat wordt bedoeld met '...'?"
-   Kenmerken:
-   - Test contextueel begrip
-   - Niet over woordenboekdefinities
-   - Vereist begrip van hoe woorden in zinnen functioneren
+VOLGORDE:
+- "Wat moet je eerst doen voordat je...?"
+- "In welke volgorde gebeurt...?"
+- "Wat komt na...?"
 
-VERDELING VAN ${questionCount} VRAGEN:
-- Als ${questionCount} = 4-5: 1 Hoofdgedachte, 2 Zoeken, 1 Volgorde/Conclusie, 1 Woordenschat
-- Als ${questionCount} = 6-8: 1-2 Hoofdgedachte, 2-3 Zoeken, 1 Volgorde, 2 Conclusie, 1 Woordenschat
-- Als ${questionCount} = 9-12: 2 Hoofdgedachte, 3-4 Zoeken, 1-2 Volgorde, 2-3 Conclusie, 2 Woordenschat
-- Als ${questionCount} = 13-15: 2-3 Hoofdgedachte, 4-5 Zoeken, 2 Volgorde, 3-4 Conclusie, 2-3 Woordenschat
+CONCLUSIE:
+- "Wat kun je concluderen uit...?"
+- "Waarom [gebeurt iets] volgens de tekst?"
+- "Wat is de reden dat...?"
+- "Wat zegt/vindt [persoon] over...?"
 
-ZORG ERVOOR dat elke vraag EXACT één skillType heeft en volg de percentages!
+WOORDENSCHAT:
+- "Wat wordt bedoeld met '[woord]' in deze tekst?"
+- "Wat betekent '[woord]' in deze context?"
 
-2. VRAAGFORMULERING (gebruik officiële NT2 formuleringen):
-   - "Wat is...?", "Waarom...?", "Hoeveel...?"
-   - "Welke uitspraak klopt?"
-   - "Wat wordt er gezegd over...?"
-   - "Volgens de tekst..."
-   - Vragen moeten helder en ondubbelzinnig zijn
-   - Gebruik woorden uit de tekst zelf
+=== 10 TECHNIEKEN VOOR SLIMME DISTRACTORS (ZEER BELANGRIJK!) ===
 
-3. ANTWOORDOPTIES (4 opties per vraag: A, B, C, D):
-   - Eén correct antwoord: direct ondersteund door de tekst
-   - Drie plausibele distractors:
-     * Type 1: Gedeeltelijk correct maar onvolledig
-     * Type 2: Bevat informatie uit de tekst maar beantwoordt verkeerde vraag
-     * Type 3: Logisch maar niet vermeld in de tekst
-   - Alle opties moeten vergelijkbare lengte hebben
-   - Geen overduidelijk foute opties
-   - Geen patronen (bijv. altijd C correct)
-   - **BELANGRIJK: VARIEER DE POSITIE VAN HET CORRECTE ANTWOORD!**
-     * Zet het correcte antwoord NIET altijd op positie A (index 0)
-     * Verdeel correct antwoorden gelijkmatig over A, B, C, D
-     * Gebruik willekeurige posities: soms A, soms B, soms C, soms D
+Elke foute optie moet een van deze technieken gebruiken:
 
-4. MOEILIJKHEIDSGRAAD:
-   - Gemakkelijk (60%): Antwoord staat duidelijk in de tekst
-   - Middel (30%): Vereist begrip en verbinding van informatie
-   - Moeilijk (10%): Vereist kritisch denken en analyse
+1. INFORMATIE UIT VERKEERDE PLEK
+   Gebruik correcte informatie uit de tekst die een ANDERE vraag beantwoordt.
+   Voorbeeld: Als de vraag over kosten gaat, geef een optie met correcte tijdsinformatie.
 
-5. TEKSTDEKKING:
-   - Verdeel vragen gelijkmatig over de hele tekst
-   - Elke sectie/paragraaf moet getest worden
-   - Geen twee vragen over exact dezelfde informatie
+2. OMKERING VAN INFORMATIE  
+   Gebruik het tegenovergestelde van wat de tekst zegt.
+   Voorbeeld: Tekst zegt "grootste", optie zegt "kleinste".
 
-6. B1 NIVEAU:
-   - Gebruik vocabulaire passend bij B1
-   - Geen te complexe zinnen
-   - Bekende onderwerpen (werk, onderwijs, dagelijks leven)
+3. LOGISCHE MAAR NIET-GENOEMDE CONCLUSIE
+   Geef een optie die logisch LIJKT maar niet in de tekst staat.
+   
+4. GEDEELTELIJKE INFORMATIE
+   Geef slechts een deel van het juiste antwoord.
+   Voorbeeld: "€25 per maand" is correct, optie geeft "alleen kosten terugbetaald".
 
-7. OUTPUT FORMAAT:
-Respond in JSON format:
+5. VERKEERDE KOPPELING
+   Combineer twee correcte feiten op een verkeerde manier.
+
+6. HISTORISCHE VS HUIDIGE INFORMATIE
+   Gebruik informatie die vroeger gold maar nu niet meer.
+   Voorbeeld: "Vroeger was X, nu is Y" - gebruik X als distractor.
+
+7. VERKEERDE ATTRIBUTIE
+   Schrijf informatie toe aan de verkeerde persoon/instantie.
+
+8. ÉÉN WOORD VERSCHIL
+   Verander één cruciaal woord dat de betekenis verandert.
+   Voorbeeld: "alleen bij Ameda" vs "ook bij Ameda".
+
+9. NEGATIE VERWARRING
+   Bij NIET/GEEN vragen: gebruik opties die WEL in de tekst staan.
+
+10. TE ALGEMEEN OF TE SPECIFIEK
+    Maak de optie te breed of te nauw voor de vraag.
+
+=== REGELS VOOR ELKE VRAAG ===
+
+1. DISTRACTORS:
+   - Elke foute optie MOET een element bevatten dat in de tekst staat
+   - Het verschil tussen goed en fout mag maar 1-2 woorden zijn
+   - GEEN duidelijk foute opties
+   - Alle opties moeten ongeveer even lang zijn
+
+2. ANTWOORDOPTIES:
+   - 3 of 4 opties per vraag (zoals het echte examen)
+   - Varieer: soms 3 opties, soms 4 opties
+   - **WILLEKEURIGE VERDELING: Verdeel correcte antwoorden WILLEKEURIG over A, B, C, D**
+
+3. MOEILIJKHEID:
+   - easy (60%): Antwoord staat letterlijk in tekst
+   - medium (30%): Vereist verbinden van informatie
+   - hard (10%): Vereist inferentie en kritisch denken
+
+=== OUTPUT FORMAAT ===
+
+Respond in JSON:
 {
   "questions": [
     {
-      "question": "Vraag tekst in het Nederlands",
-      "options": ["Optie A", "Optie B", "Optie C", "Optie D"],
-      "correctAnswerIndex": 2,
+      "question": "Vraag in het Nederlands",
+      "options": ["Optie A", "Optie B", "Optie C"] of ["A", "B", "C", "D"],
+      "correctAnswerIndex": 0-3,
       "skillType": "hoofdgedachte" | "zoeken" | "volgorde" | "conclusie" | "woordenschat",
       "difficulty": "easy" | "medium" | "hard",
-      "explanation": "Waarom dit het correcte antwoord is",
-      "evidence": "De exacte zin uit de tekst die het antwoord bewijst"
+      "explanation": "Waarom het correcte antwoord juist is",
+      "evidence": "Exacte zin uit de tekst die het bewijst",
+      "distractorTechniques": ["techniek1 voor optie A", "techniek2 voor optie B", ...]
     }
   ]
 }
 
-ZORG ERVOOR:
-- Vragen testen begrip van de hele tekst
-- Elke vraag heeft PRECIES 4 opties
-- Antwoorden zijn duidelijk correct of incorrect
-- **VARIEER correctAnswerIndex tussen 0, 1, 2, 3 (verdeel gelijk over A, B, C, D)**
-- Volg de officiële NT2 Lezen I examennormen nauwkeurig`,
+=== KRITISCHE CONTROLES ===
+✓ Elke distractor gebruikt een van de 10 technieken
+✓ skillType is EXACT: hoofdgedachte, zoeken, volgorde, conclusie, of woordenschat
+✓ Varieer het aantal opties (3 of 4)
+✓ Verdeel correct antwoorden realistisch (niet altijd A!)
+✓ Elke vraag heeft evidence uit de tekst`,
       },
     ],
     responseFormat: "json",
-    maxOutputTokens: 8192, // Increased for large texts with many questions (13-15)
-    temperature: 0.8,
+    maxOutputTokens: 16384,
+    temperature: 0.75,
   });
 
   return JSON.parse(response);
@@ -613,52 +668,50 @@ Genereer een korte, beschrijvende titel (max 60 karakters) die het hoofdonderwer
 
 Genereer ${questionCount} meerkeuzevragen op basis van de OPGESCHOONDE tekst (Staatsexamen NT2 Lezen I B1 stijl).
 
-**NT2 LEZEN I - 5 KERNVAARDIGHEDEN:**
+**NT2 LEZEN I - 5 KERNVAARDIGHEDEN (gebruik EXACT deze skillType waarden):**
 
-Elke vraag moet PRECIES één van deze 5 vaardigheden testen:
+Verdeel de ${questionCount} vragen WILLEKEURIG over deze types:
+- hoofdgedachte: Doel, thema, doelgroep van de tekst
+- zoeken: Specifieke informatie vinden
+- volgorde: Stappen, procedures, tijdsvolgorde
+- conclusie: Impliciete informatie, redenen, gevolgen
+- woordenschat: Betekenis van woorden in context
 
-1. HOOFDGEDACHTE (15-20%): "Wat is het doel van de tekst?", "Voor wie is deze tekst?"
-2. ZOEKEN (30-35%): "Hoeveel...?", "Wanneer...?", "Waar kun je informatie vinden?"
-3. VOLGORDE (10-15%): "In welke volgorde...?", "Wat moet je eerst doen?"
-4. CONCLUSIE (20-25%): "Wat kun je concluderen...?", "Waarom is ... belangrijk?"
-5. WOORDENSCHAT (15-20%): "Wat betekent '...' in deze context?"
+**VOLGORDE VAN VRAGEN:**
+- Vragen over "Wat is het doel van deze tekst?" of algemene conclusies: ALTIJD in de LAATSTE 3 vragen
+- Andere vragen: willekeurige volgorde
 
-VERDELING VAN ${questionCount} VRAGEN:
-- 4-5 vragen: 1 Hoofdgedachte, 2 Zoeken, 1 Volgorde/Conclusie, 1 Woordenschat
-- 6-8 vragen: 1-2 Hoofdgedachte, 2-3 Zoeken, 1 Volgorde, 2 Conclusie, 1 Woordenschat
-- 9-12 vragen: 2 Hoofdgedachte, 3-4 Zoeken, 1-2 Volgorde, 2-3 Conclusie, 2 Woordenschat
-- 13-15 vragen: 2-3 Hoofdgedachte, 4-5 Zoeken, 2 Volgorde, 3-4 Conclusie, 2-3 Woordenschat
+**OFFICIËLE VRAAGFORMULERINGEN:**
+- HOOFDGEDACHTE: "Wat is het doel van deze tekst?", "Voor wie is deze tekst bedoeld?"
+- ZOEKEN: "In welk onderdeel kun je lezen...?", "Wat is waar over...?", "Hoeveel/Wanneer/Waar...?"
+- VOLGORDE: "Wat moet je eerst doen voordat je...?", "In welke volgorde...?"
+- CONCLUSIE: "Wat kun je concluderen uit...?", "Waarom [gebeurt iets] volgens de tekst?"
+- WOORDENSCHAT: "Wat wordt bedoeld met '[woord]' in deze tekst?"
 
-**VRAAGFORMULERING (gebruik officiële NT2 formuleringen):**
-- "Wat is...?", "Waarom...?", "Hoeveel...?"
-- "Welke uitspraak klopt?"
-- "Wat wordt er gezegd over...?"
-- "Volgens de tekst..."
-- Vragen moeten helder en ondubbelzinnig zijn
-- Gebruik woorden uit de tekst zelf
+**10 TECHNIEKEN VOOR SLIMME DISTRACTORS (ZEER BELANGRIJK!):**
 
-**ANTWOORDOPTIES (ALTIJD 4 opties: A, B, C, D):**
-- Eén correct antwoord: direct ondersteund door de tekst
-- Drie plausibele distractors:
-  * Type 1: Gedeeltelijk correct maar onvolledig
-  * Type 2: Bevat informatie uit de tekst maar beantwoordt verkeerde vraag
-  * Type 3: Logisch maar niet vermeld in de tekst
-- Alle opties moeten vergelijkbare lengte hebben
-- Geen overduidelijk foute opties
-- **BELANGRIJK: VARIEER DE POSITIE VAN HET CORRECTE ANTWOORD!**
-  * Zet het correcte antwoord NIET altijd op positie A (index 0)
-  * Verdeel correct antwoorden gelijkmatig over A, B, C, D
-  * Gebruik willekeurige posities: soms A, soms B, soms C, soms D
+Elke foute optie moet een van deze technieken gebruiken:
+1. INFORMATIE UIT VERKEERDE PLEK - correcte info die andere vraag beantwoordt
+2. OMKERING VAN INFORMATIE - tegenovergestelde van wat tekst zegt
+3. LOGISCHE MAAR NIET-GENOEMDE CONCLUSIE - lijkt logisch maar staat niet in tekst
+4. GEDEELTELIJKE INFORMATIE - slechts deel van juiste antwoord
+5. VERKEERDE KOPPELING - twee correcte feiten verkeerd gecombineerd
+6. HISTORISCHE VS HUIDIGE INFO - info die vroeger gold maar nu niet
+7. VERKEERDE ATTRIBUTIE - info aan verkeerde persoon toegeschreven
+8. ÉÉN WOORD VERSCHIL - cruciaal woord veranderd
+9. NEGATIE VERWARRING - bij NIET/GEEN vragen: opties die WEL in tekst staan
+10. TE ALGEMEEN/SPECIFIEK - optie te breed of te nauw voor vraag
+
+**REGELS:**
+- Elke distractor MOET element bevatten dat in tekst staat
+- Verschil tussen goed en fout: slechts 1-2 woorden
+- 3 of 4 opties per vraag (varieer!)
+- **WILLEKEURIGE VERDELING: Verdeel correcte antwoorden WILLEKEURIG over A, B, C, D**
 
 **MOEILIJKHEIDSGRAAD:**
-- Gemakkelijk (60%): Antwoord staat duidelijk in de tekst
-- Middel (30%): Vereist begrip en verbinding van informatie
-- Moeilijk (10%): Vereist kritisch denken en analyse
-
-**TEKSTDEKKING:**
-- Verdeel vragen gelijkmatig over de hele tekst
-- Test elke sectie/paragraaf
-- Geen twee vragen over exact dezelfde informatie
+- easy (60%): Antwoord staat letterlijk in tekst
+- medium (30%): Vereist verbinden van informatie
+- hard (10%): Vereist inferentie en kritisch denken
 
 === TAAK 4: WOORDENSCHAT EXTRAHEREN ===
 

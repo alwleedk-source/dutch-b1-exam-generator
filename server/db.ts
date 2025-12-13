@@ -616,8 +616,17 @@ export async function getExamsByTextId(text_id: number) {
   return await db
     .select()
     .from(exams)
-    .where(eq(exams.text_id, text_id))
-    .limit(1); // Only need one exam to get the questions
+    .where(eq(exams.text_id, text_id));
+}
+
+export async function updateExamQuestions(examId: number, questions: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db
+    .update(exams)
+    .set({ questions, updated_at: new Date() })
+    .where(eq(exams.id, examId));
 }
 
 export async function updateExam(

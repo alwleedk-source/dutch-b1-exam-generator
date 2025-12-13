@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Users, FileText, AlertCircle, CheckCircle, XCircle, Loader2, Search, Trash2, Eye,
-  BookOpen, TrendingUp, Activity, UserCog, Filter, X, Settings, MessageSquare
+  BookOpen, TrendingUp, Activity, UserCog, Filter, X, Settings, MessageSquare, RefreshCw
 } from "lucide-react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -150,6 +150,16 @@ export default function AdminDashboard() {
     },
     onError: (error) => {
       toast.error("Failed to cleanup exams: " + error.message);
+    },
+  });
+
+  const regenerateQuestionsMutation = trpc.admin.regenerateQuestionsForText.useMutation({
+    onSuccess: (data) => {
+      toast.success(`✅ Generated ${data.newQuestionCount} new questions!`);
+      refetchTexts();
+    },
+    onError: (error) => {
+      toast.error("Failed to regenerate questions: " + error.message);
     },
   });
 
@@ -466,6 +476,19 @@ export default function AdminDashboard() {
                                 onClick={() => setTextToView(text.id)}
                               >
                                 <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                title="Regenerate questions with new AI prompt"
+                                disabled={regenerateQuestionsMutation.isPending}
+                                onClick={() => {
+                                  if (confirm(`🔄 Regenerate questions for "${text.title || 'this text'}"?\n\nThis will use Gemini 2.5 Pro with smart distractor techniques.`)) {
+                                    regenerateQuestionsMutation.mutate({ text_id: text.id });
+                                  }
+                                }}
+                              >
+                                <RefreshCw className={`h-4 w-4 text-blue-600 ${regenerateQuestionsMutation.isPending ? 'animate-spin' : ''}`} />
                               </Button>
                               <Button
                                 size="sm"
