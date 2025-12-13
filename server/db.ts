@@ -629,6 +629,16 @@ export async function updateExamQuestions(examId: number, questions: string) {
     .where(eq(exams.id, examId));
 }
 
+export async function markTextAsRegenerated(textId: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db
+    .update(texts)
+    .set({ questions_regenerated_at: new Date(), updated_at: new Date() })
+    .where(eq(texts.id, textId));
+}
+
 export async function updateExam(
   examId: number,
   updates: {

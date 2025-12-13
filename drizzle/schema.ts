@@ -82,6 +82,9 @@ export const texts = pgTable("texts", {
   moderation_note: text("moderation_note"),
   moderated_at: timestamp("moderated_at"),
 
+  // Question regeneration tracking
+  questions_regenerated_at: timestamp("questions_regenerated_at"),
+
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({

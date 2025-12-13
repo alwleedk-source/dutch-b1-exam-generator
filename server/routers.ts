@@ -1794,6 +1794,9 @@ export const appRouter = router({
           }
         }
 
+        // Mark the text as regenerated for UI tracking
+        await db.markTextAsRegenerated(input.text_id);
+
         return {
           success: true,
           newQuestionCount: examData.questions.length,

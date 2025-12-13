@@ -448,7 +448,17 @@ export default function AdminDashboard() {
                         >
                           <TableCell className="font-mono text-sm">{text.id}</TableCell>
                           <TableCell className="max-w-xs truncate font-medium">
-                            {text.title || `Text #${text.id}`}
+                            <span className="flex items-center gap-1">
+                              {text.title || `Text #${text.id}`}
+                              {text.questions_regenerated_at && (
+                                <span
+                                  title={`Questions updated: ${new Date(text.questions_regenerated_at).toLocaleString()}`}
+                                  className="text-yellow-500 text-xs"
+                                >
+                                  ✨
+                                </span>
+                              )}
+                            </span>
                           </TableCell>
                           <TableCell className="text-sm">
                             {text.user_name || text.user_email || `User #${text.created_by}`}
