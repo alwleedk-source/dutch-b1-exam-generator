@@ -1558,6 +1558,7 @@ export async function getTextsFiltered(options: {
       estimated_reading_minutes: texts.estimated_reading_minutes,
       created_at: texts.created_at,
       created_by: texts.created_by,
+      questions_regenerated_at: texts.questions_regenerated_at,
       user_name: users.name,
       user_email: users.email,
     })
