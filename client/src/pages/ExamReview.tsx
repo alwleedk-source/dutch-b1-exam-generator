@@ -12,7 +12,7 @@ import { getTrapInfo, detectTrapType, type SupportedLanguage, type TrapType } fr
 
 
 export default function ExamReview() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { user } = useAuth();
   const params = useParams();
   const examId = parseInt(params.id || "0");
@@ -33,7 +33,7 @@ export default function ExamReview() {
   };
 
   // Get user's language for translations
-  const userLanguage: SupportedLanguage = (t.languageCode as SupportedLanguage) || 'en';
+  const userLanguage: SupportedLanguage = language as SupportedLanguage;
 
   const { data: exam, isLoading, error } = trpc.exam.getExamDetails.useQuery({ examId });
 

@@ -27,7 +27,7 @@ import { getExamTips, type SupportedLanguage } from "@/lib/trapTranslations";
 
 export default function TakeExam() {
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { theme, toggleTheme } = useTheme();
   const params = useParams();
   const [, setLocation] = useLocation();
@@ -258,7 +258,7 @@ export default function TakeExam() {
                       </DialogTitle>
                     </DialogHeader>
                     <div className="space-y-3 mt-4">
-                      {getExamTips((t.languageCode as SupportedLanguage) || 'en').map((tip, index) => (
+                      {getExamTips(language as SupportedLanguage).map((tip, index) => (
                         <div
                           key={index}
                           className="p-3 rounded-lg bg-muted/50 text-sm leading-relaxed"
