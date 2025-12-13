@@ -3,16 +3,37 @@ import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { BookOpen, CheckCircle, XCircle, AlertCircle, Home } from "lucide-react";
+import { BookOpen, CheckCircle, XCircle, AlertCircle, Home, ChevronDown, ChevronUp, Lightbulb, Target } from "lucide-react";
 import { Link, useParams } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useState } from "react";
+import { getTrapInfo, detectTrapType, type SupportedLanguage, type TrapType } from "@/lib/trapTranslations";
+
 
 export default function ExamReview() {
   const { t } = useLanguage();
   const { user } = useAuth();
   const params = useParams();
   const examId = parseInt(params.id || "0");
+
+  // Track which question trap analysis sections are expanded
+  const [expandedQuestions, setExpandedQuestions] = useState<Set<number>>(new Set());
+
+  const toggleQuestionExpanded = (index: number) => {
+    setExpandedQuestions(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return newSet;
+    });
+  };
+
+  // Get user's language for translations
+  const userLanguage: SupportedLanguage = (t.languageCode as SupportedLanguage) || 'en';
 
   const { data: exam, isLoading, error } = trpc.exam.getExamDetails.useQuery({ examId });
 
@@ -194,6 +215,100 @@ export default function ExamReview() {
                         </AlertDescription>
                       </Alert>
                     )}
+
+                    {/* Trap Analysis - Only for wrong answers */}
+                    {!isCorrect && (q.distractorAnalysis || q.distractorTechniques) && (() => {
+                      // Try to detect which trap the user fell into
+                      const userOptionIndex = userAnswer ? userAnswer.charCodeAt(0) - 65 : -1;
+                      const optionKey = `optie${userOptionIndex}`;
+                      const analysisText = q.distractorAnalysis?.[optionKey] || '';
+                      const detectedTrap = detectTrapType(analysisText);
+
+                      if (!detectedTrap && !analysisText) return null;
+
+                      const trapInfo = detectedTrap ? getTrapInfo(detectedTrap, userLanguage) : null;
+                      const isExpanded = expandedQuestions.has(index);
+
+                      return (
+                        <div className="mb-4">
+                          <button
+                            onClick={() => toggleQuestionExpanded(index)}
+                            className="w-full p-3 rounded-lg bg-orange-500/10 border border-orange-500/30 hover:bg-orange-500/15 transition-colors"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Target className="h-4 w-4 text-orange-500" />
+                                <span className="text-sm font-medium text-orange-700 dark:text-orange-400">
+                                  {trapInfo?.icon} {t.trapAnalysis || "Why did you choose this?"}
+                                </span>
+                              </div>
+                              {isExpanded ? (
+                                <ChevronUp className="h-4 w-4 text-orange-500" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4 text-orange-500" />
+                              )}
+                            </div>
+                          </button>
+
+                          {isExpanded && (
+                            <div className="mt-2 p-4 rounded-lg bg-orange-500/5 border border-orange-500/20 space-y-3">
+                              {/* Trap Type */}
+                              {trapInfo && (
+                                <div>
+                                  <p className="text-xs font-semibold text-orange-700 dark:text-orange-400 mb-1">
+                                    {t.trapType || "Trap type"}:
+                                  </p>
+                                  <p className="text-sm font-medium">
+                                    {trapInfo.icon} {trapInfo.name}
+                                  </p>
+                                </div>
+                              )}
+
+                              {/* Description */}
+                              {trapInfo && (
+                                <div>
+                                  <p className="text-xs font-semibold text-orange-700 dark:text-orange-400 mb-1">
+                                    {t.whatHappened || "What happened"}:
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {trapInfo.description}
+                                  </p>
+                                </div>
+                              )}
+
+                              {/* Original Analysis if available */}
+                              {analysisText && (
+                                <div>
+                                  <p className="text-xs font-semibold text-orange-700 dark:text-orange-400 mb-1">
+                                    {t.analysis || "Analysis"}:
+                                  </p>
+                                  <p className="text-sm text-muted-foreground italic">
+                                    {analysisText}
+                                  </p>
+                                </div>
+                              )}
+
+                              {/* Tip */}
+                              {trapInfo && (
+                                <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                                  <div className="flex items-start gap-2">
+                                    <Lightbulb className="h-4 w-4 text-yellow-500 flex-shrink-0 mt-0.5" />
+                                    <div>
+                                      <p className="text-xs font-semibold text-yellow-700 dark:text-yellow-400 mb-1">
+                                        {t.tip || "Tip"}:
+                                      </p>
+                                      <p className="text-sm">
+                                        {trapInfo.tip}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
 
                     {/* Explanation */}
                     {q.explanation && (

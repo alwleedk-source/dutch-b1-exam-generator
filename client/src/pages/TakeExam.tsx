@@ -8,7 +8,7 @@ import { trpc } from "@/lib/trpc";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Clock, FileText, Printer, Home, X, BookOpen, ZoomIn, ZoomOut, Moon, Sun } from "lucide-react";
+import { Clock, FileText, Printer, Home, X, BookOpen, ZoomIn, ZoomOut, Moon, Sun, Lightbulb } from "lucide-react";
 import { Link } from "wouter";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import InteractiveText from "@/components/InteractiveText";
@@ -16,6 +16,14 @@ import ExamModeSelector from "@/components/ExamModeSelector";
 import ExamTimer from "@/components/ExamTimer";
 import { QuestionNavigator } from "@/components/QuestionNavigator";
 import { useTheme } from "@/contexts/ThemeContext";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { getExamTips, type SupportedLanguage } from "@/lib/trapTranslations";
 
 export default function TakeExam() {
   const { user } = useAuth();
@@ -229,6 +237,38 @@ export default function TakeExam() {
               {/* Actions */}
               <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                 <LanguageSwitcher />
+                {/* Tips Button */}
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 gap-1"
+                      title="Exam Tips"
+                    >
+                      <Lightbulb className="h-4 w-4 text-yellow-500" />
+                      <span className="hidden sm:inline text-xs">Tips</span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <Lightbulb className="h-5 w-5 text-yellow-500" />
+                        {t.examTips || 'Exam Tips'}
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-3 mt-4">
+                      {getExamTips((t.languageCode as SupportedLanguage) || 'en').map((tip, index) => (
+                        <div
+                          key={index}
+                          className="p-3 rounded-lg bg-muted/50 text-sm leading-relaxed"
+                        >
+                          {tip}
+                        </div>
+                      ))}
+                    </div>
+                  </DialogContent>
+                </Dialog>
                 {/* Font Size Controls */}
                 <div className="hidden sm:flex items-center gap-0.5 border rounded-md">
                   <Button
