@@ -348,139 +348,230 @@ Respond ALLEEN met de opgeschoonde tekst, zonder uitleg of markdown formatting.`
  * Generate exam questions from Dutch text (Staatsexamen NT2 style)
  * Uses Gemini 2.5 Pro for high-quality reasoning and distractor generation
  * Based on analysis of official NT2 Staatsexamen Lezen I 2023
+ * Enhanced with professional exam psychology from Cambridge/ETS research
  */
 export async function generateExamQuestions(dutchText: string, questionCount: number = 10) {
   const response = await generateWithGeminiPro({
     messages: [
       {
         role: "user",
-        parts: `Je bent een expert examenmaker voor het Staatsexamen NT2 Lezen I (B1). Je taak is om ${questionCount} authentieke meerkeuzevragen te maken die PRECIES lijken op de officiële CvTE examens.
+        parts: `# PROFESSIONELE EXAMENMAKER - STAATSEXAMEN NT2 LEZEN I (B1)
 
-=== TEKST ===
+Je bent een senior examenontwikkelaar bij het CvTE (College voor Toetsen en Examens) met 15+ jaar ervaring. Je maakt ${questionCount} meerkeuzevragen die ONONDERSCHEIDBAAR zijn van echte Staatsexamen vragen.
+
+## TEKST VOOR ANALYSE
 ${dutchText}
 
-=== DE 5 KERNVAARDIGHEDEN (gebruik EXACT deze skillType waarden) ===
+---
 
-Verdeel de ${questionCount} vragen WILLEKEURIG over deze types:
-- hoofdgedachte: Doel, thema, doelgroep van de tekst
-- zoeken: Specifieke informatie vinden
-- volgorde: Stappen, procedures, tijdsvolgorde
-- conclusie: Impliciete informatie, redenen, gevolgen
-- woordenschat: Betekenis van woorden in context
+# DEEL 1: PSYCHOLOGIE VAN EXAMENONTWERP
 
-**BELANGRIJK VOOR VOLGORDE VAN VRAGEN:**
-- Vragen over "Wat is het doel van deze tekst?" of algemene conclusies: ALTIJD in de LAATSTE 3 vragen
-- Andere vragen: willekeurige volgorde
+## 1.1 HOE STUDENTEN FOUTEN MAKEN (Cognitieve Valkuilen)
 
-=== OFFICIËLE VRAAGFORMULERINGEN (gebruik deze!) ===
+Bij het ontwerpen van distractors, DENK als een student die:
+- Snel leest en details over het hoofd ziet
+- Woorden in context verkeerd interpreteert
+- Aannames maakt die niet in de tekst staan
+- Informatie van verschillende alinea's verkeerd combineert
+- Hoofdidee verwart met ondersteunende details
+- Negaties (niet/geen) over het hoofd ziet
 
-HOOFDGEDACHTE:
-- "Wat is het doel van deze tekst?"
-- "Voor wie is deze tekst bedoeld?"
-- "Wat wil de schrijver bereiken met deze tekst?"
+## 1.2 DE GOUDEN REGEL VAN DISTRACTORS
 
-ZOEKEN:
-- "In welk onderdeel kun je lezen [dat/wat/waarom]...?"
+Een PERFECTE distractor:
+✓ Gebruikt woorden die LETTERLIJK in de tekst staan
+✓ Is grammaticaal correct en past bij de vraag
+✓ Klinkt logisch voor iemand die de tekst niet goed leest
+✓ Benut een typische student-fout
+✓ Verschilt slechts 1-2 cruciale elementen van het juiste antwoord
+
+---
+
+# DEEL 2: 15 PROFESSIONELE DISTRACTOR-TECHNIEKEN
+
+Gebruik MINSTENS 3 verschillende technieken per vraag:
+
+### CATEGORIE A: TEKSTUELE MANIPULATIE
+
+1. **VERKEERDE ALINEA**
+   Student leest antwoord in alinea 2, maar vraag gaat over alinea 4.
+   → Gebruik correcte informatie uit de VERKEERDE tekstlocatie.
+
+2. **OMKERING VAN BETEKENIS**
+   Tekst: "De kosten worden NIET vergoed"
+   → Distractor: "De kosten worden vergoed"
+
+3. **GEDEELTELIJKE WAARHEID**
+   Juiste antwoord: "€25 per maand inclusief verzekering"
+   → Distractor: "€25 per maand" (mist cruciaal detail)
+
+4. **VERKEERDE KOPPELING**
+   Tekst noemt: (A) Jan werkt bij bank, (B) Prijs is €50
+   → Distractor combineert: "Jan betaalde €50"
+
+5. **TEMPORELE VERWARRING**
+   Tekst: "Vroeger was het gratis, nu kost het €10"
+   → Distractor: "Het is gratis" (verouderde informatie)
+
+### CATEGORIE B: LOGISCHE VALKUILEN
+
+6. **SCHIJNBAAR LOGISCHE CONCLUSIE**
+   Iets dat LOGISCH lijkt maar NIET in de tekst staat.
+   → Benut de neiging van studenten om te assumeren.
+
+7. **TE BREED / TE SMAL**
+   Vraag over "voordelen voor studenten"
+   → Distractor te breed: "voordelen voor iedereen"
+   → Distractor te smal: "voordelen voor eerstejaars studenten"
+
+8. **OORZAAK-GEVOLG OMKERING**
+   Tekst: "Door de regen bleef hij thuis"
+   → Distractor: "Hij bleef thuis, dus het regende"
+
+### CATEGORIE C: TAALKUNDIGE TRUCS
+
+9. **ÉÉN WOORD VERSCHIL**
+   "alleen bij Ameda" vs "ook bij Ameda"
+   "moet" vs "mag"
+   "alle" vs "sommige"
+
+10. **SYNONIEM VERWARRING**
+    Gebruik een woord dat LIJKT op een woord in de tekst.
+    Tekst: "verhogen" → Distractor met: "verlagen"
+
+11. **NEGATIE VERWARRING**
+    Bij "Welke uitspraak klopt NIET?"
+    → Alle opties behalve één zijn WEL waar volgens tekst.
+
+### CATEGORIE D: INHOUDELIJKE MISLEIDING
+
+12. **VERKEERDE ATTRIBUTIE**
+    Tekst: "De gemeente besloot..."
+    → Distractor: "De rijksoverheid besloot..."
+
+13. **DETAIL VS HOOFDIDEE**
+    Vraag over hoofdidee → Distractor is ondersteunend detail
+    Vraag over detail → Distractor is te algemeen
+
+14. **UITZONDERING ALS REGEL**
+    Tekst: "In de meeste gevallen... behalve bij..."
+    → Distractor presenteert de uitzondering als regel.
+
+15. **IMPLICIETE VS EXPLICIETE INFORMATIE**
+    Student moet informatie AFLEIDEN, niet letterlijk lezen.
+    → Distractor is alleen juist als je oppervlakkig leest.
+
+---
+
+# DEEL 3: VRAAGTYPEN EN VOLGORDE
+
+## 3.1 DE 5 VAARDIGHEDEN (skillType exact zo schrijven!)
+
+| skillType | Percentage | Positie in examen |
+|-----------|------------|-------------------|
+| zoeken | 40% | Eerste helft |
+| woordenschat | 20% | Verspreid |
+| volgorde | 15% | Midden |
+| conclusie | 15% | Tweede helft |
+| hoofdgedachte | 10% | LAATSTE 2 vragen |
+
+## 3.2 OFFICIËLE VRAAGFORMULERINGEN
+
+### ZOEKEN (specifieke informatie vinden):
+- "In welk onderdeel kun je lezen dat...?"
 - "Wat is waar over [onderwerp]?"
 - "Welke uitspraak klopt (niet)?"
 - "Hoeveel/Wanneer/Waar...?"
 
-VOLGORDE:
-- "Wat moet je eerst doen voordat je...?"
-- "In welke volgorde gebeurt...?"
-- "Wat komt na...?"
+### WOORDENSCHAT (betekenis in context):
+- "Wat wordt bedoeld met '[woord]' in deze tekst?"
+- "Wat betekent '[uitdrukking]' hier?"
 
-CONCLUSIE:
+### VOLGORDE (stappen/procedures):
+- "Wat moet je eerst doen voordat je...?"
+- "In welke volgorde...?"
+
+### CONCLUSIE (impliciete informatie):
 - "Wat kun je concluderen uit...?"
 - "Waarom [gebeurt iets] volgens de tekst?"
 - "Wat is de reden dat...?"
-- "Wat zegt/vindt [persoon] over...?"
 
-WOORDENSCHAT:
-- "Wat wordt bedoeld met '[woord]' in deze tekst?"
-- "Wat betekent '[woord]' in deze context?"
+### HOOFDGEDACHTE (doel/thema):
+- "Wat is het doel van deze tekst?"
+- "Voor wie is deze tekst bedoeld?"
+- "Wat wil de schrijver bereiken?"
 
-=== 10 TECHNIEKEN VOOR SLIMME DISTRACTORS (ZEER BELANGRIJK!) ===
+---
 
-Elke foute optie moet een van deze technieken gebruiken:
+# DEEL 4: MOEILIJKHEIDSGRADEN
 
-1. INFORMATIE UIT VERKEERDE PLEK
-   Gebruik correcte informatie uit de tekst die een ANDERE vraag beantwoordt.
-   Voorbeeld: Als de vraag over kosten gaat, geef een optie met correcte tijdsinformatie.
+## EASY (50% van vragen)
+- Antwoord staat LETTERLIJK in één zin
+- Geen interpretatie nodig
+- Distractors: verkeerde alinea, temporele verwarring
 
-2. OMKERING VAN INFORMATIE  
-   Gebruik het tegenovergestelde van wat de tekst zegt.
-   Voorbeeld: Tekst zegt "grootste", optie zegt "kleinste".
+## MEDIUM (35% van vragen)
+- Moet 2-3 zinnen combineren
+- Lichte parafrasering nodig
+- Distractors: gedeeltelijke waarheid, verkeerde koppeling
 
-3. LOGISCHE MAAR NIET-GENOEMDE CONCLUSIE
-   Geef een optie die logisch LIJKT maar niet in de tekst staat.
-   
-4. GEDEELTELIJKE INFORMATIE
-   Geef slechts een deel van het juiste antwoord.
-   Voorbeeld: "€25 per maand" is correct, optie geeft "alleen kosten terugbetaald".
+## HARD (15% van vragen)
+- Vereist INFERENTIE (conclusie trekken)
+- Informatie staat impliciet in tekst
+- Distractors: schijnbaar logische conclusie, te breed/te smal
 
-5. VERKEERDE KOPPELING
-   Combineer twee correcte feiten op een verkeerde manier.
+---
 
-6. HISTORISCHE VS HUIDIGE INFORMATIE
-   Gebruik informatie die vroeger gold maar nu niet meer.
-   Voorbeeld: "Vroeger was X, nu is Y" - gebruik X als distractor.
+# DEEL 5: KWALITEITSCONTROLE
 
-7. VERKEERDE ATTRIBUTIE
-   Schrijf informatie toe aan de verkeerde persoon/instantie.
+Voor ELKE vraag, controleer:
 
-8. ÉÉN WOORD VERSCHIL
-   Verander één cruciaal woord dat de betekenis verandert.
-   Voorbeeld: "alleen bij Ameda" vs "ook bij Ameda".
+□ Heeft elk antwoordoptie ongeveer dezelfde lengte?
+□ Is er grammaticale consistentie tussen vraag en opties?
+□ Bevat elke distractor een element uit de tekst?
+□ Is het verschil tussen goed en fout subtiel (1-2 woorden)?
+□ Zijn de opties wederzijds exclusief?
+□ Is er PRECIES één correct antwoord?
+□ Vermijd ik "alle" / "geen van bovenstaande"?
+□ Is het correcte antwoord WILLEKEURIG verdeeld (niet altijd A)?
 
-9. NEGATIE VERWARRING
-   Bij NIET/GEEN vragen: gebruik opties die WEL in de tekst staan.
+---
 
-10. TE ALGEMEEN OF TE SPECIFIEK
-    Maak de optie te breed of te nauw voor de vraag.
+# DEEL 6: OUTPUT FORMAAT
 
-=== REGELS VOOR ELKE VRAAG ===
+Genereer EXACT ${questionCount} vragen in JSON:
 
-1. DISTRACTORS:
-   - Elke foute optie MOET een element bevatten dat in de tekst staat
-   - Het verschil tussen goed en fout mag maar 1-2 woorden zijn
-   - GEEN duidelijk foute opties
-   - Alle opties moeten ongeveer even lang zijn
-
-2. ANTWOORDOPTIES:
-   - 3 of 4 opties per vraag (zoals het echte examen)
-   - Varieer: soms 3 opties, soms 4 opties
-   - **WILLEKEURIGE VERDELING: Verdeel correcte antwoorden WILLEKEURIG over A, B, C, D**
-
-3. MOEILIJKHEID:
-   - easy (60%): Antwoord staat letterlijk in tekst
-   - medium (30%): Vereist verbinden van informatie
-   - hard (10%): Vereist inferentie en kritisch denken
-
-=== OUTPUT FORMAAT ===
-
-Respond in JSON:
 {
   "questions": [
     {
       "question": "Vraag in het Nederlands",
-      "options": ["Optie A", "Optie B", "Optie C"] of ["A", "B", "C", "D"],
+      "options": ["A", "B", "C"] of ["A", "B", "C", "D"],
       "correctAnswerIndex": 0-3,
-      "skillType": "hoofdgedachte" | "zoeken" | "volgorde" | "conclusie" | "woordenschat",
-      "difficulty": "easy" | "medium" | "hard",
-      "explanation": "Waarom het correcte antwoord juist is",
-      "evidence": "Exacte zin uit de tekst die het bewijst",
-      "distractorTechniques": ["techniek1 voor optie A", "techniek2 voor optie B", ...]
+      "skillType": "zoeken|woordenschat|volgorde|conclusie|hoofdgedachte",
+      "difficulty": "easy|medium|hard",
+      "explanation": "Waarom het correcte antwoord juist is (citeer tekstbewijs)",
+      "evidence": "Exacte zin(nen) uit de tekst",
+      "distractorAnalysis": {
+        "optie0": "Waarom fout: [techniek gebruikt + waarom student dit zou kiezen]",
+        "optie1": "Waarom fout: [techniek gebruikt + waarom student dit zou kiezen]",
+        "optie2": "Waarom correct / Waarom fout: [uitleg]"
+      },
+      "cognitiveLevel": "herkenning|begrip|toepassing|analyse"
     }
   ]
 }
 
-=== KRITISCHE CONTROLES ===
-✓ Elke distractor gebruikt een van de 10 technieken
-✓ skillType is EXACT: hoofdgedachte, zoeken, volgorde, conclusie, of woordenschat
-✓ Varieer het aantal opties (3 of 4)
-✓ Verdeel correct antwoorden realistisch (niet altijd A!)
-✓ Elke vraag heeft evidence uit de tekst`,
+---
+
+# DEEL 7: LAATSTE INSTRUCTIES
+
+1. **DENK als een echte student** - Welke fouten zou een B1-student maken?
+2. **GEEN obvious foute opties** - Elke optie moet verleidelijk zijn
+3. **VARIEER technieken** - Niet steeds dezelfde distractor-strategie
+4. **CITEER de tekst** - Evidence moet exact uit de tekst komen
+5. **RANDOMISEER antwoorden** - Correct antwoord: ~25% A, ~25% B, ~25% C, ~25% D
+
+Begin nu met het maken van ${questionCount} professionele examenvragen.`,
       },
     ],
     responseFormat: "json",
