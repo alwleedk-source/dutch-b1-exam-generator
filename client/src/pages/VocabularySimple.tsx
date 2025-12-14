@@ -2,7 +2,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { 
+import {
   Loader2, Volume2, Trash2, Search, ArrowLeft
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
@@ -26,7 +26,7 @@ export default function VocabularySimple() {
   const { user } = useAuth();
   const [playingId, setPlayingId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   // Get user's preferred language
   const preferredLanguage = user?.preferred_language || localStorage.getItem('preferredLanguage') || 'en';
 
@@ -68,7 +68,7 @@ export default function VocabularySimple() {
       audio.play();
       audio.onended = () => setPlayingId(null);
     } else {
-      generateAudioMutation.mutate({ vocabId: word.id, word: word.word });
+      generateAudioMutation.mutate({ vocabId: word.vocabularyId || word.vocabulary_id, word: word.word });
     }
   };
 
@@ -137,7 +137,7 @@ export default function VocabularySimple() {
               </Link>
               <h2 className="text-2xl sm:text-3xl font-bold">{t.simpleReview || "Simple Review"}</h2>
             </div>
-            
+
             {/* Search */}
             <div className="relative mb-4">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />

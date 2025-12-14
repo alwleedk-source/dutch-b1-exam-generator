@@ -349,6 +349,12 @@ export interface Translations {
   notAnswered: string;
   explanation: string;
   evidenceFromText: string;
+  trapAnalysis?: string;
+  trapType?: string;
+  whatHappened?: string;
+  analysis?: string;
+  tip?: string;
+  examTips?: string;
 
   // Progress page
   noProgressYet: string;

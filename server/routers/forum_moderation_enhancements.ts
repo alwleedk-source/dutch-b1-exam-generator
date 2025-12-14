@@ -3,8 +3,15 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "../db";
 
-const database = await getDb();
-import { 
+// Removed top-level await
+async function getDatabase() {
+  const db = await getDb();
+  if (!db) {
+    throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database connection failed" });
+  }
+  return db;
+}
+import {
   forumWarnings,
   forumModeratorNotes,
   forumReports,
@@ -18,17 +25,18 @@ import { eq, desc, and, sql, gte, count } from "drizzle-orm";
 
 // Moderator or Admin procedure
 const moderatorProcedure = protectedProcedure.use(async ({ ctx, next }) => {
+  const database = await getDatabase();
   // Check if user is admin or moderator
   const isModerator = await database
     .select()
     .from(forumModerators)
     .where(eq(forumModerators.user_id, ctx.user.id))
     .limit(1);
-  
+
   if (ctx.user.role !== "admin" && isModerator.length === 0) {
     throw new TRPCError({ code: "FORBIDDEN", message: "Moderator access required" });
   }
-  
+
   return next({ ctx });
 });
 
@@ -43,7 +51,8 @@ export const forumModerationEnhancementsRouter = router({
       postId: z.number().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      // Add warning
+      const database = await getDatabase();
+      // Add warnings
       await database.insert(forumWarnings).values({
         user_id: input.userId,
         moderator_id: ctx.user.id,
@@ -52,7 +61,7 @@ export const forumModerationEnhancementsRouter = router({
         topic_id: input.topicId,
         post_id: input.postId,
       });
-      
+
       // Log moderation action
       await database.insert(forumModerationActions).values({
         action_type: "warn",
@@ -62,14 +71,15 @@ export const forumModerationEnhancementsRouter = router({
         topic_id: input.topicId,
         post_id: input.postId,
       });
-      
+
       return { success: true };
     }),
-  
+
   // Get user warnings
   getUserWarnings: moderatorProcedure
     .input(z.object({ userId: z.number() }))
     .query(async ({ input }) => {
+      const database = await getDatabase();
       const warnings = await database
         .select({
           id: forumWarnings.id,
@@ -82,10 +92,10 @@ export const forumModerationEnhancementsRouter = router({
         .leftJoin(users, eq(forumWarnings.moderator_id, users.id))
         .where(eq(forumWarnings.user_id, input.userId))
         .orderBy(desc(forumWarnings.created_at));
-      
+
       return warnings;
     }),
-  
+
   // Add moderator note
   addModeratorNote: moderatorProcedure
     .input(z.object({
@@ -93,19 +103,21 @@ export const forumModerationEnhancementsRouter = router({
       note: z.string().min(5),
     }))
     .mutation(async ({ ctx, input }) => {
+      const database = await getDatabase();
       await database.insert(forumModeratorNotes).values({
         user_id: input.userId,
         moderator_id: ctx.user.id,
         note: input.note,
       });
-      
+
       return { success: true };
     }),
-  
+
   // Get moderator notes for user
   getModeratorNotes: moderatorProcedure
     .input(z.object({ userId: z.number() }))
     .query(async ({ input }) => {
+      const database = await getDatabase();
       const notes = await database
         .select({
           id: forumModeratorNotes.id,
@@ -117,20 +129,21 @@ export const forumModerationEnhancementsRouter = router({
         .leftJoin(users, eq(forumModeratorNotes.moderator_id, users.id))
         .where(eq(forumModeratorNotes.user_id, input.userId))
         .orderBy(desc(forumModeratorNotes.created_at));
-      
+
       return notes;
     }),
-  
+
   // Get moderation statistics
   getModerationStats: moderatorProcedure
     .input(z.object({
       period: z.enum(["day", "week", "month", "all"]).default("week"),
     }))
     .query(async ({ input }) => {
+      const database = await getDatabase();
       // Calculate date range
       let dateFilter;
       const now = new Date();
-      
+
       switch (input.period) {
         case "day":
           dateFilter = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -144,13 +157,13 @@ export const forumModerationEnhancementsRouter = router({
         default:
           dateFilter = new Date(0); // All time
       }
-      
+
       // Get pending reports count
       const [pendingReports] = await database
         .select({ count: sql<number>`count(*)::int` })
         .from(forumReports)
         .where(eq(forumReports.status, "pending"));
-      
+
       // Get resolved reports count (in period)
       const [resolvedReports] = await database
         .select({ count: sql<number>`count(*)::int` })
@@ -161,13 +174,13 @@ export const forumModerationEnhancementsRouter = router({
             gte(forumReports.resolved_at!, dateFilter)
           )
         );
-      
+
       // Get total reports (in period)
       const [totalReports] = await database
         .select({ count: sql<number>`count(*)::int` })
         .from(forumReports)
         .where(gte(forumReports.created_at, dateFilter));
-      
+
       // Get reports by reason
       const reportsByReason = await database
         .select({
@@ -178,7 +191,7 @@ export const forumModerationEnhancementsRouter = router({
         .where(gte(forumReports.created_at, dateFilter))
         .groupBy(forumReports.reason)
         .orderBy(desc(sql`count(*)`));
-      
+
       // Get most reported users
       const mostReportedUsers = await database
         .select({
@@ -198,7 +211,7 @@ export const forumModerationEnhancementsRouter = router({
         .groupBy(forumTopics.user_id, users.name)
         .orderBy(desc(sql`count(*)`))
         .limit(10);
-      
+
       // Get moderator activity
       const moderatorActivity = await database
         .select({
@@ -211,7 +224,7 @@ export const forumModerationEnhancementsRouter = router({
         .where(gte(forumModerationActions.created_at, dateFilter))
         .groupBy(forumModerationActions.moderator_id, users.name)
         .orderBy(desc(sql`count(*)`));
-      
+
       // Get actions by type
       const actionsByType = await database
         .select({
@@ -222,7 +235,7 @@ export const forumModerationEnhancementsRouter = router({
         .where(gte(forumModerationActions.created_at, dateFilter))
         .groupBy(forumModerationActions.action_type)
         .orderBy(desc(sql`count(*)`));
-      
+
       return {
         pendingReports: pendingReports.count,
         resolvedReports: resolvedReports.count,
@@ -233,7 +246,7 @@ export const forumModerationEnhancementsRouter = router({
         actionsByType,
       };
     }),
-  
+
   // Quick action: Delete content and ban user
   deleteAndBan: moderatorProcedure
     .input(z.object({
@@ -244,13 +257,14 @@ export const forumModerationEnhancementsRouter = router({
       banDuration: z.enum(["1day", "1week", "1month", "permanent"]),
     }))
     .mutation(async ({ ctx, input }) => {
+      const database = await getDatabase();
       // Delete content
       if (input.topicId) {
         await database.delete(forumTopics).where(eq(forumTopics.id, input.topicId));
       } else if (input.postId) {
         await database.delete(forumPosts).where(eq(forumPosts.id, input.postId));
       }
-      
+
       // Ban user
       let bannedUntil = null;
       if (input.banDuration !== "permanent") {
@@ -261,7 +275,7 @@ export const forumModerationEnhancementsRouter = router({
         }[input.banDuration];
         bannedUntil = new Date(Date.now() + duration * 24 * 60 * 60 * 1000);
       }
-      
+
       await database
         .update(users)
         .set({
@@ -272,7 +286,7 @@ export const forumModerationEnhancementsRouter = router({
           banned_until: bannedUntil,
         })
         .where(eq(users.id, input.userId));
-      
+
       // Log actions
       await database.insert(forumModerationActions).values([
         {
@@ -291,10 +305,10 @@ export const forumModerationEnhancementsRouter = router({
           ban_duration: input.banDuration,
         },
       ]);
-      
+
       return { success: true };
     }),
-  
+
   // Quick action: Hide content and warn user
   hideAndWarn: moderatorProcedure
     .input(z.object({
@@ -305,6 +319,7 @@ export const forumModerationEnhancementsRouter = router({
       severity: z.enum(["low", "medium", "high"]),
     }))
     .mutation(async ({ ctx, input }) => {
+      const database = await getDatabase();
       // Hide content
       if (input.topicId) {
         await database
@@ -317,7 +332,7 @@ export const forumModerationEnhancementsRouter = router({
           .set({ is_hidden: true })
           .where(eq(forumPosts.id, input.postId));
       }
-      
+
       // Add warning
       await database.insert(forumWarnings).values({
         user_id: input.userId,
@@ -327,7 +342,7 @@ export const forumModerationEnhancementsRouter = router({
         topic_id: input.topicId,
         post_id: input.postId,
       });
-      
+
       // Log actions
       await database.insert(forumModerationActions).values([
         {
@@ -345,7 +360,7 @@ export const forumModerationEnhancementsRouter = router({
           reason: input.warnReason,
         },
       ]);
-      
+
       return { success: true };
     }),
 });

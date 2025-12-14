@@ -10,22 +10,22 @@ let ttsClient: TextToSpeechClient | null = null;
 function getTTSClient() {
   if (!ttsClient) {
     try {
-      let credentials;
-      
+      let credentials: any;
+
       // Priority 1: Base64-encoded credentials (recommended for Coolify/Docker)
       if (process.env.GOOGLE_TTS_CREDENTIALS_BASE64) {
         try {
           const decoded = Buffer.from(process.env.GOOGLE_TTS_CREDENTIALS_BASE64, 'base64').toString('utf-8');
           credentials = JSON.parse(decoded);
           console.log('[TTS] Successfully decoded GOOGLE_TTS_CREDENTIALS_BASE64');
-          
+
           // Validate required fields
           const required = ['type', 'project_id', 'private_key', 'client_email'];
           const missing = required.filter(field => !credentials[field]);
           if (missing.length > 0) {
             throw new Error(`Missing required fields in credentials: ${missing.join(', ')}`);
           }
-          
+
         } catch (decodeError: any) {
           console.error('[TTS] Failed to decode GOOGLE_TTS_CREDENTIALS_BASE64:', decodeError.message);
           throw new Error(`Invalid GOOGLE_TTS_CREDENTIALS_BASE64: ${decodeError.message}`);
@@ -36,14 +36,14 @@ function getTTSClient() {
         try {
           credentials = JSON.parse(process.env.GOOGLE_TTS_CREDENTIALS);
           console.log('[TTS] Successfully parsed GOOGLE_TTS_CREDENTIALS');
-          
+
           // Validate required fields
           const required = ['type', 'project_id', 'private_key', 'client_email'];
           const missing = required.filter(field => !credentials[field]);
           if (missing.length > 0) {
             throw new Error(`Missing required fields in credentials: ${missing.join(', ')}`);
           }
-          
+
         } catch (parseError: any) {
           console.error('[TTS] Failed to parse GOOGLE_TTS_CREDENTIALS:', parseError.message);
           console.error('[TTS] First 100 chars:', process.env.GOOGLE_TTS_CREDENTIALS.substring(0, 100));
@@ -111,7 +111,7 @@ export async function generateSpeech(options: TTSOptions): Promise<{ audioUrl: s
     voiceName, // Will be randomly selected if not provided
     audioEncoding = 'MP3',
   } = options;
-  
+
   // Use random voice if not specified
   const selectedVoice = voiceName || getRandomDutchVoice();
 
@@ -167,7 +167,7 @@ export async function generateSpeech(options: TTSOptions): Promise<{ audioUrl: s
     // Upload to R2
     const audioBuffer = Buffer.from(response.audioContent as Uint8Array);
     const contentType = audioEncoding === 'MP3' ? 'audio/mpeg' : audioEncoding === 'OGG_OPUS' ? 'audio/ogg' : 'audio/wav';
-    
+
     console.log(`[TTS] Uploading to R2: ${filename} (${audioBuffer.length} bytes)`);
     const audioUrl = await uploadToR2(filename, audioBuffer, contentType);
 
@@ -227,10 +227,10 @@ async function generateSpeechWithRetry(
       console.error(`[TTS] Attempt ${attempt} failed:`, error.message);
 
       // Don't retry for certain errors (permanent failures)
-      if (error.message?.includes('credentials') || 
-          error.message?.includes('Invalid') ||
-          error.message?.includes('empty') ||
-          error.message?.includes('too long')) {
+      if (error.message?.includes('credentials') ||
+        error.message?.includes('Invalid') ||
+        error.message?.includes('empty') ||
+        error.message?.includes('too long')) {
         console.log(`[TTS] Not retrying due to permanent error type`);
         throw error;
       }

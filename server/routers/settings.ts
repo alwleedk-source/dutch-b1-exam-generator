@@ -3,7 +3,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "../db";
 
-const database = await getDb();
+// Removed top-level await
 import { systemSettings, users } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 
@@ -23,27 +23,33 @@ export const settingsRouter = router({
   getSetting: protectedProcedure
     .input(z.object({ key: z.string() }))
     .query(async ({ input }) => {
+      const database = await getDb();
+      if (!database) return null;
+
       const setting = await database
         .select()
         .from(systemSettings)
         .where(eq(systemSettings.key, input.key))
         .limit(1);
-      
+
       if (setting.length === 0) {
         return null;
       }
-      
+
       return setting[0];
     }),
-  
+
   // Get all settings (admin only)
   getAllSettings: adminProcedure.query(async () => {
+    const database = await getDb();
+    if (!database) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database error" });
+
     return await database
       .select()
       .from(systemSettings)
       .orderBy(systemSettings.key);
   }),
-  
+
   // Update or create a setting (admin only)
   updateSetting: adminProcedure
     .input(z.object({
@@ -52,13 +58,16 @@ export const settingsRouter = router({
       description: z.string().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
+      const database = await getDb();
+      if (!database) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database error" });
+
       // Check if setting exists
       const existing = await database
         .select()
         .from(systemSettings)
         .where(eq(systemSettings.key, input.key))
         .limit(1);
-      
+
       if (existing.length > 0) {
         // Update existing
         await database
@@ -79,24 +88,27 @@ export const settingsRouter = router({
           updated_by: ctx.user.id,
         });
       }
-      
+
       return { success: true };
     }),
-  
+
   // Toggle exam creation (admin only)
   toggleExamCreation: adminProcedure
     .input(z.object({ enabled: z.boolean() }))
     .mutation(async ({ ctx, input }) => {
+      const database = await getDb();
+      if (!database) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database error" });
+
       const key = "exam_creation_enabled";
       const value = input.enabled ? "true" : "false";
-      
+
       // Check if setting exists
       const existing = await database
         .select()
         .from(systemSettings)
         .where(eq(systemSettings.key, key))
         .limit(1);
-      
+
       if (existing.length > 0) {
         // Update
         await database
@@ -116,23 +128,26 @@ export const settingsRouter = router({
           updated_by: ctx.user.id,
         });
       }
-      
+
       return { success: true, enabled: input.enabled };
     }),
-  
+
   // Check if exam creation is enabled (public)
   isExamCreationEnabled: protectedProcedure.query(async () => {
+    const database = await getDb();
+    if (!database) return { enabled: true }; // Default if DB fails
+
     const setting = await database
       .select()
       .from(systemSettings)
       .where(eq(systemSettings.key, "exam_creation_enabled"))
       .limit(1);
-    
+
     // Default to true if not set
     if (setting.length === 0) {
       return { enabled: true };
     }
-    
+
     return { enabled: setting[0].value === "true" };
   }),
 });

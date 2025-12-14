@@ -2,11 +2,12 @@ import { protectedProcedure, router } from "../_core/trpc";
 import { z } from "zod";
 import { getDb } from "../db";
 
-const database = await getDb();
-import { 
+// Removed top-level await
+import {
   notifications,
   users,
-  exams
+  exams,
+  texts
 } from "../../drizzle/schema";
 import { eq, desc, and, sql, inArray, gte } from "drizzle-orm";
 
@@ -38,6 +39,12 @@ export async function createNotification({
   fromUserId?: number;
   priority?: 'low' | 'normal' | 'high' | 'urgent';
 }) {
+  const database = await getDb();
+  if (!database) {
+    console.warn("[Notifications] Database not available for createNotification");
+    return;
+  }
+
   await database.insert(notifications).values({
     user_id: userId,
     type,
@@ -59,6 +66,9 @@ export async function createNotification({
  */
 async function checkAndCreateDailyNotifications(userId: number) {
   try {
+    const database = await getDb();
+    if (!database) return;
+
     // Check if we already checked today
     const lastCheck = await database
       .select({ created_at: notifications.created_at })
@@ -71,15 +81,15 @@ async function checkAndCreateDailyNotifications(userId: number) {
       )
       .orderBy(desc(notifications.created_at))
       .limit(1);
-    
+
     const now = new Date();
     const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    
+
     // If checked in last 24 hours, skip
     if (lastCheck.length > 0 && lastCheck[0].created_at > twentyFourHoursAgo) {
       return;
     }
-    
+
     // Create marker to prevent duplicate checks
     await database.insert(notifications).values({
       user_id: userId,
@@ -87,13 +97,13 @@ async function checkAndCreateDailyNotifications(userId: number) {
       title: 'Daily check',
       is_read: true, // Hidden notification
     });
-    
+
     // Check for new public texts in last 24 hours
     await checkNewPublicTexts(userId, twentyFourHoursAgo);
-    
+
     // Check for level progression
     await checkLevelProgression(userId);
-    
+
   } catch (error) {
     console.error('[Daily Notifications] Error:', error);
   }
@@ -103,18 +113,21 @@ async function checkAndCreateDailyNotifications(userId: number) {
  * Check for new public texts and create notification
  */
 async function checkNewPublicTexts(userId: number, since: Date) {
+  const database = await getDb();
+  if (!database) return;
+
   const newTexts = await database
     .select({ count: sql<number>`count(*)` })
-    .from(exams)
+    .from(texts)
     .where(
       and(
-        eq(exams.is_public, true),
-        gte(exams.created_at, since)
+        eq(texts.status, 'approved'),
+        gte(texts.created_at, since)
       )
     );
-  
+
   const count = newTexts[0]?.count || 0;
-  
+
   if (count > 0) {
     await createNotification({
       userId,
@@ -132,9 +145,13 @@ async function checkNewPublicTexts(userId: number, since: Date) {
  */
 async function checkLevelProgression(userId: number) {
   // Get user's exam history
+  const database = await getDb();
+  if (!database) return;
+
+  // Get user's exam history
   const userExams = await database
     .select({
-      score: exams.score,
+      score: exams.score_percentage,
       total_questions: exams.total_questions,
       created_at: exams.created_at,
     })
@@ -142,36 +159,38 @@ async function checkLevelProgression(userId: number) {
     .where(
       and(
         eq(exams.user_id, userId),
-        sql`${exams.score} IS NOT NULL`,
+        sql`${exams.score_percentage} IS NOT NULL`,
         sql`${exams.total_questions} > 0`
       )
     )
     .orderBy(desc(exams.created_at))
     .limit(20);
-  
+
   // Need at least 10 exams
   if (userExams.length < 10) {
     return;
   }
-  
+
   // Calculate current level from last 5 exams
   const recentExams = userExams.slice(0, 5);
   const recentAvg = recentExams.reduce((sum, exam) => {
-    const percentage = (exam.score / exam.total_questions) * 100;
+    const score = exam.score || 0;
+    const percentage = (score / exam.total_questions) * 100;
     return sum + percentage;
   }, 0) / recentExams.length;
-  
+
   // Calculate previous level from exams 6-10
   const previousExams = userExams.slice(5, 10);
   if (previousExams.length < 5) {
     return;
   }
-  
+
   const previousAvg = previousExams.reduce((sum, exam) => {
-    const percentage = (exam.score / exam.total_questions) * 100;
+    const score = exam.score || 0;
+    const percentage = (score / exam.total_questions) * 100;
     return sum + percentage;
   }, 0) / previousExams.length;
-  
+
   // Determine levels (65% is official B1 passing threshold)
   const getCurrentLevel = (avg: number) => {
     if (avg >= 90) return 'B1+';
@@ -180,10 +199,10 @@ async function checkLevelProgression(userId: number) {
     if (avg >= 65) return 'B1.1';
     return 'A2';
   };
-  
+
   const currentLevel = getCurrentLevel(recentAvg);
   const previousLevel = getCurrentLevel(previousAvg);
-  
+
   // Check if level improved
   if (currentLevel !== previousLevel && recentAvg > previousAvg) {
     // Check if we already notified about this level
@@ -194,11 +213,11 @@ async function checkLevelProgression(userId: number) {
         and(
           eq(notifications.user_id, userId),
           eq(notifications.type, 'level_progression'),
-          sql`${notifications.message} LIKE '%${currentLevel}%'`
+          sql`${notifications.message} LIKE ${`%${currentLevel}%`}`
         )
       )
       .limit(1);
-    
+
     if (existingNotification.length === 0) {
       await createNotification({
         userId,
@@ -220,6 +239,12 @@ export const notificationsRouter = router({
   getNotifications: protectedProcedure.query(async ({ ctx }) => {
     // Background checks (run once per day per user)
     await checkAndCreateDailyNotifications(ctx.user.id);
+
+    const database = await getDb();
+    if (!database) {
+      throw new Error("Database not available");
+    }
+
     const allNotifications = await database
       .select({
         id: notifications.id,
@@ -251,12 +276,18 @@ export const notificationsRouter = router({
 
     // Group similar notifications
     const grouped = groupNotifications(allNotifications);
-    
+
     return grouped;
   }),
 
   // Get unread count
   getUnreadCount: protectedProcedure.query(async ({ ctx }) => {
+    const database = await getDb();
+    if (!database) {
+      // Return 0 if db not available instead of crashing
+      return { count: 0 };
+    }
+
     const result = await database
       .select({ count: sql<number>`count(*)` })
       .from(notifications)
@@ -266,7 +297,7 @@ export const notificationsRouter = router({
           eq(notifications.is_read, false)
         )
       );
-    
+
     return { count: Number(result[0]?.count || 0) };
   }),
 
@@ -274,6 +305,11 @@ export const notificationsRouter = router({
   markNotificationRead: protectedProcedure
     .input(z.object({ notificationId: z.number() }))
     .mutation(async ({ ctx, input }) => {
+      const database = await getDb();
+      if (!database) {
+        throw new Error("Database not available");
+      }
+
       await database
         .update(notifications)
         .set({ is_read: true, read_at: new Date() })
@@ -283,16 +319,21 @@ export const notificationsRouter = router({
             eq(notifications.user_id, ctx.user.id)
           )
         );
-      
+
       return { success: true };
     }),
-  
+
   // Mark multiple notifications as read (for grouped notifications)
   markNotificationsRead: protectedProcedure
     .input(z.object({ notificationIds: z.array(z.number()) }))
     .mutation(async ({ ctx, input }) => {
       if (input.notificationIds.length === 0) return { success: true };
-      
+
+      const database = await getDb();
+      if (!database) {
+        throw new Error("Database not available");
+      }
+
       await database
         .update(notifications)
         .set({ is_read: true, read_at: new Date() })
@@ -302,18 +343,23 @@ export const notificationsRouter = router({
             eq(notifications.user_id, ctx.user.id)
           )
         );
-      
+
       return { success: true };
     }),
-  
+
   // Mark all notifications as read
   markAllNotificationsRead: protectedProcedure
     .mutation(async ({ ctx }) => {
+      const database = await getDb();
+      if (!database) {
+        throw new Error("Database not available");
+      }
+
       await database
         .update(notifications)
         .set({ is_read: true, read_at: new Date() })
         .where(eq(notifications.user_id, ctx.user.id));
-      
+
       return { success: true };
     }),
 });
@@ -366,7 +412,7 @@ function groupNotifications(notifications: any[]) {
       const firstItem = items[0];
       const allRead = items.every(item => item.is_read);
       const notificationIds = items.map(item => item.id);
-      
+
       grouped.push({
         id: firstItem.id, // Use first ID for reference
         type: firstItem.type,
@@ -418,7 +464,7 @@ function getGroupedMessage(type: string, items: any[]): string {
     .filter(item => item.from_user_name)
     .map(item => item.from_user_name)
     .slice(0, 3);
-  
+
   if (names.length > 0) {
     const nameList = names.join(', ');
     const others = items.length - names.length;
@@ -427,7 +473,7 @@ function getGroupedMessage(type: string, items: any[]): string {
     }
     return nameList;
   }
-  
+
   return '';
 }
 

@@ -64,7 +64,7 @@ export async function autoMigrate() {
 
       // Check if table is empty
       const count = await db.execute(sql`SELECT COUNT(*) as count FROM b1_dictionary`);
-      const wordCount = parseInt(count[0]?.count || '0');
+      const wordCount = parseInt(String(count[0]?.count || '0'));
 
       if (wordCount === 0) {
         console.log("[Auto-Migrate] Dictionary table is empty, importing data...");

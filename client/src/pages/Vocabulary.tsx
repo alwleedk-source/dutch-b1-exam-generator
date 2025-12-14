@@ -4,8 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
-import { 
-  Loader2, Volume2, Star, CheckCircle, BookOpen, 
+import {
+  Loader2, Volume2, Star, CheckCircle, BookOpen,
   Search, Filter, ArrowUpDown, Grid3x3, List,
   Play, Trophy, Trash2, Archive, ArchiveRestore, Award, Eye, ChevronDown, ChevronUp
 } from "lucide-react";
@@ -43,7 +43,7 @@ export default function Vocabulary() {
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [reviewWordId, setReviewWordId] = useState<number | undefined>();
   const [expandedDefinitions, setExpandedDefinitions] = useState<Set<number>>(new Set());
-  
+
   // Get user's preferred language
   const preferredLanguage = user?.preferred_language || localStorage.getItem('preferredLanguage') || 'en';
 
@@ -115,7 +115,7 @@ export default function Vocabulary() {
       audio.play();
       audio.onended = () => setPlayingId(null);
     } else {
-      generateAudioMutation.mutate({ vocabId: word.id, word: word.word });
+      generateAudioMutation.mutate({ vocabId: word.vocabularyId || word.vocabulary_id, word: word.word });
     }
   };
 
@@ -176,12 +176,12 @@ export default function Vocabulary() {
     // Apply status filter
     switch (filterMode) {
       case 'learning':
-        filtered = filtered.filter(word => 
+        filtered = filtered.filter(word =>
           word.status !== 'archived' && (word.status === 'learning' || getMasteryPercentage(word) < 80)
         );
         break;
       case 'mastered':
-        filtered = filtered.filter(word => 
+        filtered = filtered.filter(word =>
           word.status !== 'archived' && (word.status === 'mastered' || getMasteryPercentage(word) >= 80)
         );
         break;
@@ -207,7 +207,7 @@ export default function Vocabulary() {
         filtered.sort((a, b) => getMasteryPercentage(b) - getMasteryPercentage(a));
         break;
       case 'date':
-        filtered.sort((a, b) => 
+        filtered.sort((a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
         break;
@@ -226,7 +226,7 @@ export default function Vocabulary() {
   // Calculate statistics
   const stats = useMemo(() => {
     if (!vocabulary) return { total: 0, mastered: 0, learning: 0, due: 0 };
-    
+
     return {
       total: vocabulary.length,
       mastered: vocabulary.filter(w => getMasteryPercentage(w) >= 80).length,
@@ -256,7 +256,7 @@ export default function Vocabulary() {
           {/* Header with Stats */}
           <div className="mb-6 sm:mb-8 animate-fade-in">
             <h2 className="text-2xl sm:text-3xl font-bold mb-4 px-2 sm:px-0">{t.yourVocabulary}</h2>
-            
+
             {/* Statistics Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
               <Card>
@@ -423,7 +423,7 @@ export default function Vocabulary() {
                         <div className="flex-1 min-w-0">
                           <h3 className="text-xl sm:text-2xl font-bold mb-1 break-words">{word.word}</h3>
                           <p className="text-muted-foreground text-sm sm:text-base break-words">{translation}</p>
-                          
+
                           {/* Definition (collapsible) */}
                           {word.definition && (
                             <div className="mt-2">
@@ -466,7 +466,7 @@ export default function Vocabulary() {
           ) : (
             // GRID/LIST MODE - Full featured
             <div className={
-              viewMode === 'grid' 
+              viewMode === 'grid'
                 ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
                 : "grid gap-3"
             }>
@@ -477,11 +477,10 @@ export default function Vocabulary() {
                 const isExpanded = expandedDefinitions.has(word.id);
 
                 return (
-                  <Card 
-                    key={word.id} 
-                    className={`hover:border-primary/50 transition-all ${
-                      isWordDue ? 'border-orange-500/50 shadow-orange-100' : ''
-                    }`}
+                  <Card
+                    key={word.id}
+                    className={`hover:border-primary/50 transition-all ${isWordDue ? 'border-orange-500/50 shadow-orange-100' : ''
+                      }`}
                   >
                     <CardContent className="p-3 sm:p-4">
                       {/* Header */}
@@ -499,7 +498,7 @@ export default function Vocabulary() {
                             )}
                           </div>
                           <p className="text-muted-foreground text-sm break-words">{translation}</p>
-                          
+
                           {/* Definition (collapsible) */}
                           {word.definition && (
                             <div className="mt-2">
@@ -541,8 +540,8 @@ export default function Vocabulary() {
                           <span className="text-xs text-muted-foreground">{t.masteryLevel}</span>
                           <span className="text-xs font-medium">{masteryPercentage}%</span>
                         </div>
-                        <Progress 
-                          value={masteryPercentage} 
+                        <Progress
+                          value={masteryPercentage}
                           className="h-2"
                         />
                       </div>
@@ -571,8 +570,8 @@ export default function Vocabulary() {
                       <div className="space-y-2">
                         {/* Practice Button */}
                         {word.status !== 'archived' && (
-                          <Button 
-                            className="w-full" 
+                          <Button
+                            className="w-full"
                             size="sm"
                             variant={isWordDue ? "default" : "outline"}
                             onClick={() => {
