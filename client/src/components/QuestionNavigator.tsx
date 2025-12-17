@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Check, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface QuestionNavigatorProps {
   totalQuestions: number;
@@ -17,6 +18,7 @@ export function QuestionNavigator({
   onQuestionClick,
   onBackToText,
 }: QuestionNavigatorProps) {
+  const { t } = useLanguage();
   const answeredCount = Object.keys(answers).length;
 
   return (
@@ -32,7 +34,7 @@ export function QuestionNavigator({
             title="Scroll back to the Dutch text"
           >
             <FileText className="w-3.5 h-3.5" />
-            <span>النص</span>
+            <span>{t.text}</span>
           </button>
 
           {/* Progress indicator */}

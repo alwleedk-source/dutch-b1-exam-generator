@@ -78,6 +78,7 @@ export interface Translations {
   examHistory: string;
   allExams: string;
   readText: string;
+  text: string;
   attempts: string;
   added: string;
   yourResult: string;
@@ -776,6 +777,7 @@ export const translations: Record<Language, Translations> = {
     examHistory: "Examengeschiedenis",
     allExams: "Alle Examens",
     readText: "Tekst Lezen",
+    text: "Tekst",
     attempts: "pogingen",
     added: "Toegevoegd",
     yourResult: "Jouw Resultaat",
@@ -1454,6 +1456,7 @@ export const translations: Record<Language, Translations> = {
     examHistory: "سجل الامتحانات",
     allExams: "جميع الامتحانات",
     readText: "قراءة النص",
+    text: "النص",
     attempts: "محاولات",
     added: "أضيف",
     yourResult: "نتيجتك",
@@ -2130,6 +2133,7 @@ export const translations: Record<Language, Translations> = {
     examHistory: "Exam History",
     allExams: "All Exams",
     readText: "Read Text",
+    text: "Text",
     attempts: "attempts",
     added: "Added",
     yourResult: "Your Result",
@@ -2807,6 +2811,7 @@ export const translations: Record<Language, Translations> = {
     examHistory: "Sınav Geçmişi",
     allExams: "Tüm Sınavlar",
     readText: "Metni Oku",
+    text: "Metin",
     attempts: "deneme",
     added: "Eklendi",
     yourResult: "Sonucunuz",
