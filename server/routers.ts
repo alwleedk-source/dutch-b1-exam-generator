@@ -1540,6 +1540,13 @@ export const appRouter = router({
           other: "مشكلة أخرى"
         };
 
+        const reasonLabelsEn: Record<string, string> = {
+          text_error: "Text Error",
+          question_error: "Question Error",
+          answer_error: "Answer Error",
+          other: "Other Issue"
+        };
+
         await db.createReport({
           text_id: exam.text_id,
           reported_by: ctx.user.id,
@@ -1547,6 +1554,27 @@ export const appRouter = router({
           content_issue_type: "other",
           details: `امتحان #${input.exam_id}: ${reasonLabels[input.reason]}${input.details ? ` - ${input.details}` : ""}`,
         });
+
+        // Send notification to all admin users
+        try {
+          const allUsers = await db.getAllUsers();
+          const adminUsers = allUsers.filter((u: any) => u.role === 'admin');
+          const { createNotification } = await import("./routers/notifications");
+
+          for (const admin of adminUsers) {
+            await createNotification({
+              userId: admin.id,
+              type: 'new_report',
+              title: `📋 New Report: ${reasonLabelsEn[input.reason]}`,
+              message: `Exam #${input.exam_id}: ${input.details?.substring(0, 100) || 'No details'}`,
+              actionUrl: `/admin`,
+              priority: 'high',
+              fromUserId: ctx.user.id,
+            });
+          }
+        } catch (error) {
+          console.error('[Notification] Failed to send report notification:', error);
+        }
 
         return { success: true };
       }),

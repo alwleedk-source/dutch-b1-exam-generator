@@ -48,6 +48,7 @@ export default function AdminDashboard() {
   const { data: recentActivity } = trpc.admin.getRecentActivity.useQuery({ limit: 10 }, { enabled: !!user && user.role === 'admin' });
   const { data: allUsers, refetch: refetchUsers } = trpc.admin.getAllUsers.useQuery(undefined, { enabled: !!user && user.role === 'admin' });
   const { data: topicSuggestions, refetch: refetchSuggestions } = trpc.admin.getTopicSuggestions.useQuery(undefined, { enabled: !!user && user.role === 'admin' });
+  const { data: pendingReports, refetch: refetchReports } = trpc.admin.getPendingReports.useQuery(undefined, { enabled: !!user && user.role === 'admin' });
   const { data: allExams, refetch: refetchExams } = trpc.admin.getAllExams.useQuery(
     { search: examSearch },
     { enabled: !!user && user.role === 'admin' }
@@ -163,6 +164,16 @@ export default function AdminDashboard() {
     },
   });
 
+  const resolveReportMutation = trpc.admin.resolveReport.useMutation({
+    onSuccess: () => {
+      toast.success("Report resolved");
+      refetchReports();
+    },
+    onError: (error) => {
+      toast.error("Failed to resolve report: " + error.message);
+    },
+  });
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-bg">
@@ -213,7 +224,7 @@ export default function AdminDashboard() {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="overview">
                 <Activity className="h-4 w-4 mr-2" />
                 Overview
@@ -224,15 +235,19 @@ export default function AdminDashboard() {
               </TabsTrigger>
               <TabsTrigger value="exams">
                 <BookOpen className="h-4 w-4 mr-2" />
-                Exam Results ({allExams?.length || 0})
+                Exams ({allExams?.length || 0})
               </TabsTrigger>
               <TabsTrigger value="users">
                 <Users className="h-4 w-4 mr-2" />
                 Users ({allUsers?.length || 0})
               </TabsTrigger>
+              <TabsTrigger value="reports">
+                <AlertCircle className="h-4 w-4 mr-2" />
+                Reports
+              </TabsTrigger>
               <TabsTrigger value="suggestions">
                 <MessageSquare className="h-4 w-4 mr-2" />
-                Suggestions ({topicSuggestions?.length || 0})
+                Suggestions
               </TabsTrigger>
             </TabsList>
 
@@ -731,6 +746,103 @@ export default function AdminDashboard() {
                           </TableCell>
                         </TableRow>
                       ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Reports Tab */}
+            <TabsContent value="reports" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>Problem Reports</CardTitle>
+                      <CardDescription>
+                        Review and resolve user-submitted problem reports for texts, questions, and answers
+                      </CardDescription>
+                    </div>
+                    <Badge variant={pendingReports && pendingReports.length > 0 ? "destructive" : "secondary"}>
+                      {pendingReports?.length || 0} pending
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>ID</TableHead>
+                        <TableHead>Text</TableHead>
+                        <TableHead>Reported By</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Details</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {pendingReports?.map((report: any) => (
+                        <TableRow key={report.id}>
+                          <TableCell className="font-mono text-sm">{report.id}</TableCell>
+                          <TableCell className="max-w-xs truncate">
+                            {report.text_title || `Text #${report.text_id}`}
+                          </TableCell>
+                          <TableCell className="text-sm">
+                            {report.reporter_name || report.reporter_email || `User #${report.reported_by}`}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">
+                              {report.report_type === 'content_issue' ? '📝 Content' : '📊 Level'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="max-w-xs truncate text-sm">
+                            {report.details || '—'}
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {new Date(report.created_at).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={report.status === 'pending' ? 'secondary' : report.status === 'resolved' ? 'default' : 'outline'}>
+                              {report.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setTextToView(report.text_id)}
+                                title="View Text"
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              {report.status === 'pending' && (
+                                <Button
+                                  size="sm"
+                                  variant="default"
+                                  onClick={() => resolveReportMutation.mutate({
+                                    reportId: report.id,
+                                    status: 'resolved'
+                                  })}
+                                  disabled={resolveReportMutation.isPending}
+                                  title="Mark as Resolved"
+                                >
+                                  <CheckCircle className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                      {(!pendingReports || pendingReports.length === 0) && (
+                        <TableRow>
+                          <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                            ✅ No pending reports! All issues have been resolved.
+                          </TableCell>
+                        </TableRow>
+                      )}
                     </TableBody>
                   </Table>
                 </CardContent>
