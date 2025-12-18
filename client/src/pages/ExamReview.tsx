@@ -333,7 +333,7 @@ export default function ExamReview() {
                     {/* Question Metadata */}
                     <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                       <span className="px-2 py-1 rounded bg-muted">
-                        {q.questionType || 'Unknown'}
+                        {q.skillType || q.questionType || 'Unknown'}
                       </span>
                       <span className="px-2 py-1 rounded bg-muted capitalize">
                         {q.difficulty || 'medium'}

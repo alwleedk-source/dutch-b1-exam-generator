@@ -6,6 +6,8 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { HelmetProvider } from "react-helmet-async";
+import { useState, useEffect, lazy, Suspense } from "react";
+import { Loader2 } from "lucide-react";
 // Eager load critical pages
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
@@ -39,8 +41,6 @@ const ModerationDashboard = lazy(() => import("./pages/forum/ModerationDashboard
 import LanguageSelector from "./components/LanguageSelector";
 import { OnboardingTour } from "./components/OnboardingTour";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { useState, useEffect, lazy, Suspense } from "react";
-import { Loader2 } from "lucide-react";
 
 // Loading fallback component
 function LoadingFallback() {
