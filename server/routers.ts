@@ -1519,11 +1519,11 @@ export const appRouter = router({
         return await db.getReportsByTextId(input.text_id);
       }),
 
-    // Report exam (for inappropriate content, spam, etc.)
+    // Report exam (for errors in text, questions, or answers)
     createReportForExam: protectedProcedure
       .input(z.object({
         exam_id: z.number(),
-        reason: z.enum(["inappropriate_content", "spam", "cheating", "other"]),
+        reason: z.enum(["text_error", "question_error", "answer_error", "other"]),
         details: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
@@ -1533,12 +1533,19 @@ export const appRouter = router({
           throw new TRPCError({ code: "NOT_FOUND", message: "Exam not found" });
         }
 
+        const reasonLabels: Record<string, string> = {
+          text_error: "خطأ في النص",
+          question_error: "خطأ في السؤال",
+          answer_error: "خطأ في الإجابة",
+          other: "مشكلة أخرى"
+        };
+
         await db.createReport({
           text_id: exam.text_id,
           reported_by: ctx.user.id,
           report_type: "content_issue",
-          content_issue_type: input.reason === "inappropriate_content" ? "inappropriate" : "other",
-          details: `Exam #${input.exam_id}: ${input.reason}${input.details ? ` - ${input.details}` : ""}`,
+          content_issue_type: "other",
+          details: `امتحان #${input.exam_id}: ${reasonLabels[input.reason]}${input.details ? ` - ${input.details}` : ""}`,
         });
 
         return { success: true };

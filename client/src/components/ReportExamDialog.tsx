@@ -15,6 +15,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AlertTriangle, Loader2 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ReportExamDialogProps {
   examId: number;
@@ -22,25 +23,28 @@ interface ReportExamDialogProps {
 }
 
 export function ReportExamDialog({ examId, trigger }: ReportExamDialogProps) {
+  const { t, language } = useLanguage();
   const [open, setOpen] = useState(false);
-  const [reason, setReason] = useState<"inappropriate_content" | "spam" | "cheating" | "other">("inappropriate_content");
+  const [reason, setReason] = useState<"text_error" | "question_error" | "answer_error" | "other">("text_error");
   const [details, setDetails] = useState("");
+
+  const isRTL = language === "ar";
 
   const reportMutation = trpc.report.createReportForExam.useMutation({
     onSuccess: () => {
-      toast.success("Report submitted successfully. Our team will review it.");
+      toast.success(t.reportSentSuccess);
       setOpen(false);
       setDetails("");
-      setReason("inappropriate_content");
+      setReason("text_error");
     },
     onError: (error) => {
-      toast.error("Failed to submit report: " + error.message);
+      toast.error(t.reportSendFailed + ": " + error.message);
     },
   });
 
   const handleSubmit = () => {
     if (!details.trim()) {
-      toast.error("Please provide details about the issue");
+      toast.error(t.pleaseWriteDetails);
       return;
     }
 
@@ -57,70 +61,71 @@ export function ReportExamDialog({ examId, trigger }: ReportExamDialogProps) {
         {trigger || (
           <Button variant="outline" size="sm">
             <AlertTriangle className="h-4 w-4 mr-2" />
-            Report
+            {t.reportProblem}
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Report Exam</DialogTitle>
+          <DialogTitle>{t.reportProblem}</DialogTitle>
           <DialogDescription>
-            Help us maintain quality by reporting inappropriate or problematic content.
+            {t.reportProblemDesc}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label>Reason for reporting</Label>
+            <Label>{t.problemType}</Label>
             <RadioGroup value={reason} onValueChange={(value: any) => setReason(value)}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="inappropriate_content" id="inappropriate" />
-                <Label htmlFor="inappropriate" className="font-normal cursor-pointer">
-                  Inappropriate or offensive content
+              <div className={`flex items-center ${isRTL ? 'space-x-2 space-x-reverse' : 'space-x-2'}`}>
+                <RadioGroupItem value="text_error" id="text_error" />
+                <Label htmlFor="text_error" className="font-normal cursor-pointer">
+                  {t.textError}
                 </Label>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="spam" id="spam" />
-                <Label htmlFor="spam" className="font-normal cursor-pointer">
-                  Spam or misleading content
+              <div className={`flex items-center ${isRTL ? 'space-x-2 space-x-reverse' : 'space-x-2'}`}>
+                <RadioGroupItem value="question_error" id="question_error" />
+                <Label htmlFor="question_error" className="font-normal cursor-pointer">
+                  {t.questionError}
                 </Label>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="cheating" id="cheating" />
-                <Label htmlFor="cheating" className="font-normal cursor-pointer">
-                  Suspected cheating or manipulation
+              <div className={`flex items-center ${isRTL ? 'space-x-2 space-x-reverse' : 'space-x-2'}`}>
+                <RadioGroupItem value="answer_error" id="answer_error" />
+                <Label htmlFor="answer_error" className="font-normal cursor-pointer">
+                  {t.answerError}
                 </Label>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className={`flex items-center ${isRTL ? 'space-x-2 space-x-reverse' : 'space-x-2'}`}>
                 <RadioGroupItem value="other" id="other" />
                 <Label htmlFor="other" className="font-normal cursor-pointer">
-                  Other issue
+                  {t.somethingElse}
                 </Label>
               </div>
             </RadioGroup>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="details">Additional Details</Label>
+            <Label htmlFor="details">{t.problemDetails}</Label>
             <Textarea
               id="details"
-              placeholder="Please provide more information about the issue..."
+              placeholder={t.writeProblemDetails}
               value={details}
               onChange={(e) => setDetails(e.target.value)}
               rows={4}
+              dir={isRTL ? "rtl" : "ltr"}
             />
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="gap-2">
           <Button variant="outline" onClick={() => setOpen(false)} disabled={reportMutation.isPending}>
-            Cancel
+            {t.cancel}
           </Button>
           <Button onClick={handleSubmit} disabled={reportMutation.isPending}>
             {reportMutation.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Submitting...
+                {t.sending}
               </>
             ) : (
-              "Submit Report"
+              t.sendReport
             )}
           </Button>
         </DialogFooter>

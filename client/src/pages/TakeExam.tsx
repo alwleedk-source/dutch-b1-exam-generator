@@ -8,7 +8,8 @@ import { trpc } from "@/lib/trpc";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Clock, FileText, Printer, Home, X, BookOpen, ZoomIn, ZoomOut, Moon, Sun, Lightbulb } from "lucide-react";
+import { Clock, FileText, Printer, Home, X, BookOpen, ZoomIn, ZoomOut, Moon, Sun, Lightbulb, Flag } from "lucide-react";
+import { ReportExamDialog } from "@/components/ReportExamDialog";
 import { Link } from "wouter";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import InteractiveText from "@/components/InteractiveText";
@@ -303,6 +304,16 @@ export default function TakeExam() {
                 >
                   {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                 </Button>
+                {/* Report Button */}
+                <ReportExamDialog
+                  examId={examId!}
+                  trigger={
+                    <Button variant="ghost" size="sm" className="h-8 gap-1 text-orange-500 hover:text-orange-600" title="Report Issue">
+                      <Flag className="h-4 w-4" />
+                      <span className="hidden sm:inline text-xs">Report</span>
+                    </Button>
+                  }
+                />
                 <Button
                   variant="ghost"
                   size="sm"

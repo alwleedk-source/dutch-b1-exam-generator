@@ -571,6 +571,20 @@ export interface Translations {
   otherIssue: string;
   additionalDetails: string;
   provideMoreInfo: string;
+  reportProblem: string;
+  reportProblemDesc: string;
+  problemType: string;
+  textError: string;
+  questionError: string;
+  answerError: string;
+  somethingElse: string;
+  problemDetails: string;
+  writeProblemDetails: string;
+  sendReport: string;
+  sending: string;
+  reportSentSuccess: string;
+  reportSendFailed: string;
+  pleaseWriteDetails: string;
 
   // Rating Dialog
   shareThoughts: string;
@@ -1274,6 +1288,20 @@ export const translations: Record<Language, Translations> = {
     otherIssue: "Ander probleem",
     additionalDetails: "Aanvullende details",
     provideMoreInfo: "Geef meer informatie over het probleem...",
+    reportProblem: "Probleem Melden",
+    reportProblemDesc: "Help ons de kwaliteit te verbeteren door fouten te melden.",
+    problemType: "Type probleem",
+    textError: "Fout in de tekst",
+    questionError: "Fout in de vraag",
+    answerError: "Fout in het antwoord",
+    somethingElse: "Iets anders",
+    problemDetails: "Details van het probleem",
+    writeProblemDetails: "Beschrijf het probleem dat je hebt gevonden...",
+    sendReport: "Melding Verzenden",
+    sending: "Verzenden...",
+    reportSentSuccess: "Melding succesvol verzonden. We zullen het beoordelen.",
+    reportSendFailed: "Melding verzenden mislukt",
+    pleaseWriteDetails: "Geef details over het probleem",
 
     // Rating Dialog
     shareThoughts: "Deel je gedachten over dit examen...",
@@ -1951,6 +1979,20 @@ export const translations: Record<Language, Translations> = {
     otherIssue: "مشكلة أخرى",
     additionalDetails: "تفاصيل إضافية",
     provideMoreInfo: "يرجى تقديم المزيد من المعلومات حول المشكلة...",
+    reportProblem: "الإبلاغ عن مشكلة",
+    reportProblemDesc: "ساعدنا في تحسين جودة المحتوى بالإبلاغ عن أي أخطاء تجدها.",
+    problemType: "نوع المشكلة",
+    textError: "خطأ في النص",
+    questionError: "خطأ في السؤال",
+    answerError: "خطأ في الإجابة الصحيحة",
+    somethingElse: "شيء آخر",
+    problemDetails: "تفاصيل المشكلة",
+    writeProblemDetails: "اكتب تفاصيل المشكلة التي وجدتها...",
+    sendReport: "إرسال البلاغ",
+    sending: "جاري الإرسال...",
+    reportSentSuccess: "تم إرسال البلاغ بنجاح. سيتم مراجعته قريباً.",
+    reportSendFailed: "فشل إرسال البلاغ",
+    pleaseWriteDetails: "الرجاء كتابة تفاصيل المشكلة",
 
     // Rating Dialog
     shareThoughts: "شارك رأيك حول هذا الامتحان...",
@@ -2629,6 +2671,20 @@ export const translations: Record<Language, Translations> = {
     otherIssue: "Other issue",
     additionalDetails: "Additional details",
     provideMoreInfo: "Please provide more information about the issue...",
+    reportProblem: "Report a Problem",
+    reportProblemDesc: "Help us improve quality by reporting any errors you find.",
+    problemType: "Problem Type",
+    textError: "Error in text",
+    questionError: "Error in question",
+    answerError: "Error in correct answer",
+    somethingElse: "Something else",
+    problemDetails: "Problem Details",
+    writeProblemDetails: "Describe the problem you found...",
+    sendReport: "Send Report",
+    sending: "Sending...",
+    reportSentSuccess: "Report sent successfully. We will review it soon.",
+    reportSendFailed: "Failed to send report",
+    pleaseWriteDetails: "Please provide problem details",
 
     // Rating Dialog
     shareThoughts: "Share your thoughts about this exam...",
@@ -3292,6 +3348,20 @@ export const translations: Record<Language, Translations> = {
     otherIssue: "Diğer sorun",
     additionalDetails: "Ek detaylar",
     provideMoreInfo: "Lütfen sorun hakkında daha fazla bilgi verin...",
+    reportProblem: "Sorun Bildir",
+    reportProblemDesc: "Bulduğunuz hataları bildirerek kaliteyi iyileştirmemize yardımcı olun.",
+    problemType: "Sorun Türü",
+    textError: "Metinde hata",
+    questionError: "Soruda hata",
+    answerError: "Doğru cevapta hata",
+    somethingElse: "Başka bir şey",
+    problemDetails: "Sorun Detayları",
+    writeProblemDetails: "Bulduğunuz sorunu açıklayın...",
+    sendReport: "Rapor Gönder",
+    sending: "Gönderiliyor...",
+    reportSentSuccess: "Rapor başarıyla gönderildi. Yakında inceleyeceğiz.",
+    reportSendFailed: "Rapor gönderilemedi",
+    pleaseWriteDetails: "Lütfen sorun detaylarını yazın",
 
     // Rating Dialog
     shareThoughts: "Bu sınav hakkındaki düşüncelerinizi paylaşın...",

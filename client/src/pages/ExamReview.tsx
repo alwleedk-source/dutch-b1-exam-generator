@@ -3,7 +3,8 @@ import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { BookOpen, CheckCircle, XCircle, AlertCircle, Home, ChevronDown, ChevronUp, Lightbulb, Target } from "lucide-react";
+import { BookOpen, CheckCircle, XCircle, AlertCircle, Home, ChevronDown, ChevronUp, Lightbulb, Target, Flag } from "lucide-react";
+import { ReportExamDialog } from "@/components/ReportExamDialog";
 import { Link, useParams } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -140,6 +141,16 @@ export default function ExamReview() {
                       <span className="text-sm sm:text-base font-semibold">{exam.total_questions - (exam.correct_answers ?? 0)} {t.incorrect}</span>
                     </div>
                   </div>
+                  {/* Report Button */}
+                  <ReportExamDialog
+                    examId={examId}
+                    trigger={
+                      <Button variant="outline" size="sm" className="text-orange-500 border-orange-500 hover:bg-orange-50 hover:text-orange-600">
+                        <Flag className="h-4 w-4 mr-2" />
+                        Report Issue
+                      </Button>
+                    }
+                  />
                 </div>
               </div>
             </CardContent>
