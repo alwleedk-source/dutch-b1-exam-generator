@@ -917,8 +917,8 @@ export const translations: Record<Language, Translations> = {
     // Features - Detailed
     feature5Title: "Staatsexamen-stijl Vragen",
     feature5Desc: "Oefen met vragen die exact hetzelfde formaat hebben als het officiële staatsexamen",
-    feature6Title: "Onbeperkte Oefenteksten",
-    feature6Desc: "Voeg je eigen Nederlandse teksten toe (tot 10.100 tekens) en genereer direct examens",
+    feature6Title: "Echte Examenvragen",
+    feature6Desc: "Oefen met teksten en vragen uit echte Staatsexamens en populaire examenonderwerpen",
     feature7Title: "Gedetailleerde Uitleg",
     feature7Desc: "Krijg uitgebreide uitleg bij elk antwoord om je begrip te verbeteren",
     feature8Title: "B1 Woordenboek & Vertaling",
@@ -939,12 +939,12 @@ export const translations: Record<Language, Translations> = {
     benefit6Desc: "Bouw je B1 woordenschat op met spaced repetition systeem en persoonlijk woordenboek",
 
     // How it works - Detailed steps
-    step1Title: "Voeg Nederlandse Tekst Toe",
-    step1Desc: "Plak, upload of scan elke Nederlandse tekst op B1-niveau (2.000-10.100 tekens)",
-    step2Title: "AI Genereert Vragen",
-    step2Desc: "Ons systeem maakt automatisch begripsvragen in staatsexamen-stijl",
-    step3Title: "Doe het Examen",
-    step3Desc: "Beantwoord de vragen en krijg direct feedback met gedetailleerde uitleg",
+    step1Title: "Kies een Oefentekst",
+    step1Desc: "Blader door onze collectie van echte Staatsexamen-teksten en populaire examenonderwerpen",
+    step2Title: "Start het Examen",
+    step2Desc: "Beantwoord vragen in dezelfde stijl als het officiële Staatsexamen NT2",
+    step3Title: "Krijg Direct Feedback",
+    step3Desc: "Zie direct of je antwoord goed is met gedetailleerde uitleg en tips",
     step4Title: "Leer en Verbeter",
     step4Desc: "Bekijk je resultaten, leer nieuwe woorden en volg je voortgang in de tijd",
 
@@ -1610,8 +1610,8 @@ export const translations: Record<Language, Translations> = {
     // Features - Detailed
     feature5Title: "أسئلة بنفس نمط Staatsexamen",
     feature5Desc: "تدرّب على أسئلة بنفس الصيغة التي تأتي في الامتحان الرسمي",
-    feature6Title: "نصوص تدريب غير محدودة",
-    feature6Desc: "أضف نصوصك الهولندية الخاصة (حتى 10,100 حرف) واحصل على امتحانات فورية",
+    feature6Title: "أسئلة امتحانات حقيقية",
+    feature6Desc: "تدرّب على نصوص وأسئلة من امتحانات Staatsexamen الحقيقية ومواضيع الامتحانات الشائعة",
     feature7Title: "شرح تفصيلي",
     feature7Desc: "احصل على شرح مفصّل لكل إجابة لتحسين فهمك",
     feature8Title: "قاموس B1 والترجمة",
@@ -1632,12 +1632,12 @@ export const translations: Record<Language, Translations> = {
     benefit6Desc: "ابنِ مفرداتك لمستوى B1 مع نظام التكرار المتباعد وقاموسك الشخصي",
 
     // How it works - Detailed steps
-    step1Title: "أضف نصاً هولندياً",
-    step1Desc: "الصق أو ارفع أو امسح أي نص هولندي بمستوى B1 (2,000-10,100 حرف)",
-    step2Title: "الذكاء الاصطناعي يولد الأسئلة",
-    step2Desc: "نظامنا ينشئ تلقائياً أسئلة فهم بنمط Staatsexamen",
-    step3Title: "قم بحل الامتحان",
-    step3Desc: "أجب على الأسئلة واحصل على ملاحظات فورية مع شرح مفصّل",
+    step1Title: "اختر نص التدريب",
+    step1Desc: "تصفح مجموعتنا من نصوص Staatsexamen الحقيقية ومواضيع الامتحانات الشائعة",
+    step2Title: "ابدأ الامتحان",
+    step2Desc: "أجب على الأسئلة بنفس أسلوب امتحان Staatsexamen NT2 الرسمي",
+    step3Title: "احصل على ملاحظات فورية",
+    step3Desc: "شاهد فوراً إذا كانت إجابتك صحيحة مع شرح مفصّل ونصائح",
     step4Title: "تعلّم وتحسّن",
     step4Desc: "اطلع على نتائجك، تعلّم كلمات جديدة وتابع تقدّمك بمرور الوقت",
 
@@ -2301,8 +2301,8 @@ export const translations: Record<Language, Translations> = {
     // Features - Detailed
     feature5Title: "Staatsexamen-Style Questions",
     feature5Desc: "Practice with questions that match the exact format of the official staatsexamen",
-    feature6Title: "Unlimited Practice Texts",
-    feature6Desc: "Add your own Dutch texts (up to 10,100 characters) and generate instant exams",
+    feature6Title: "Real Exam Questions",
+    feature6Desc: "Practice with texts and questions from real Staatsexamens and popular exam topics",
     feature7Title: "Detailed Explanations",
     feature7Desc: "Get comprehensive explanations for each answer to improve your understanding",
     feature8Title: "B1 Dictionary & Translation",
@@ -2323,12 +2323,12 @@ export const translations: Record<Language, Translations> = {
     benefit6Desc: "Build your B1 vocabulary with spaced repetition system and personal dictionary",
 
     // How it works - Detailed steps
-    step1Title: "Add Dutch Text",
-    step1Desc: "Paste, upload, or scan any Dutch text at B1 level (2,000-10,100 characters)",
-    step2Title: "AI Generates Questions",
-    step2Desc: "Our system automatically creates comprehension questions in staatsexamen style",
-    step3Title: "Take the Exam",
-    step3Desc: "Answer the questions and get instant feedback with detailed explanations",
+    step1Title: "Choose a Practice Text",
+    step1Desc: "Browse our collection of real Staatsexamen texts and popular exam topics",
+    step2Title: "Start the Exam",
+    step2Desc: "Answer questions in the same style as the official Staatsexamen NT2",
+    step3Title: "Get Instant Feedback",
+    step3Desc: "See immediately if your answer is correct with detailed explanations and tips",
     step4Title: "Learn and Improve",
     step4Desc: "Review your results, learn new words, and track your progress over time",
 
@@ -2993,8 +2993,8 @@ export const translations: Record<Language, Translations> = {
     // Features - Detailed
     feature5Title: "Staatsexamen Tarzı Sorular",
     feature5Desc: "Resmi staatsexamen ile aynı formatta sorularla pratik yapın",
-    feature6Title: "Sınırsız Alıştırma Metinleri",
-    feature6Desc: "Kendi Hollandaca metinlerinizi ekleyin (10.100 karaktere kadar) ve anında sınavlar oluşturun",
+    feature6Title: "Gerçek Sınav Soruları",
+    feature6Desc: "Gerçek Staatsexamen metinleri ve popüler sınav konularıyla pratik yapın",
     feature7Title: "Ayrıntılı Açıklamalar",
     feature7Desc: "Anlayışınızı geliştirmek için her yanıt için kapsamlı açıklamalar alın",
     feature8Title: "B1 Sözlük & Çeviri",
@@ -3015,12 +3015,12 @@ export const translations: Record<Language, Translations> = {
     benefit6Desc: "Aralıklı tekrar sistemi ve kişisel sözlük ile B1 kelime bilginizi geliştirin",
 
     // How it works - Detailed steps
-    step1Title: "Hollandaca Metin Ekle",
-    step1Desc: "B1 seviyesinde herhangi bir Hollandaca metni yapıştırın, yükleyin veya tarayın (2.000-10.100 karakter)",
-    step2Title: "Yapay Zeka Sorular Oluşturur",
-    step2Desc: "Sistemimiz otomatik olarak staatsexamen tarzında anlaşılma soruları oluşturur",
-    step3Title: "Sınavı Çöz",
-    step3Desc: "Soruları yanıtlayın ve ayrıntılı açıklamalarla anında geri bildirim alın",
+    step1Title: "Alıştırma Metni Seçin",
+    step1Desc: "Gerçek Staatsexamen metinleri ve popüler sınav konularından oluşan koleksiyonumuza göz atın",
+    step2Title: "Sınavı Başlatın",
+    step2Desc: "Resmi Staatsexamen NT2 ile aynı tarzda soruları cevaplayın",
+    step3Title: "Anında Geri Bildirim Alın",
+    step3Desc: "Cevabınızın doğru olup olmadığını ayrıntılı açıklamalar ve ipuçlarıyla hemen görün",
     step4Title: "Öğren ve Geliş",
     step4Desc: "Sonuçlarınızı inceleyin, yeni kelimeler öğrenin ve zaman içinde ilerlemenizi takip edin",
 

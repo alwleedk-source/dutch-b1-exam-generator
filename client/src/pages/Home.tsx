@@ -151,7 +151,7 @@ export default function Home() {
                   </span>
                   <span className="trust-badge">
                     <Zap className="h-3 w-3 text-yellow-600" />
-                    <span>AI-Powered</span>
+                    <span>Echte Examens</span>
                   </span>
                   <span className="trust-badge">
                     <Users className="h-3 w-3 text-blue-600" />
@@ -198,8 +198,8 @@ export default function Home() {
                     <div className="text-sm text-muted-foreground">{t.levelFocus}</div>
                   </div>
                   <div className="text-center lg:text-left">
-                    <div className="text-3xl sm:text-4xl font-bold gradient-text animate-count">AI</div>
-                    <div className="text-sm text-muted-foreground">{t.aiPowered}</div>
+                    <div className="text-3xl sm:text-4xl font-bold gradient-text animate-count">50+</div>
+                    <div className="text-sm text-muted-foreground">Oefenteksten</div>
                   </div>
                 </div>
               </div>
@@ -237,22 +237,22 @@ export default function Home() {
                             onClick={() => handleAnswerClick(index)}
                             disabled={showResult}
                             className={`w-full p-3 text-left rounded-lg border-2 transition-all duration-300 ${showResult
-                                ? index === demoQuestion.correctAnswer
-                                  ? "border-green-500 bg-green-50 dark:bg-green-950"
-                                  : selectedAnswer === index
-                                    ? "border-red-500 bg-red-50 dark:bg-red-950"
-                                    : "border-border"
+                              ? index === demoQuestion.correctAnswer
+                                ? "border-green-500 bg-green-50 dark:bg-green-950"
                                 : selectedAnswer === index
-                                  ? "border-primary bg-primary/5"
-                                  : "border-border hover:border-primary/50 hover:bg-muted/50"
+                                  ? "border-red-500 bg-red-50 dark:bg-red-950"
+                                  : "border-border"
+                              : selectedAnswer === index
+                                ? "border-primary bg-primary/5"
+                                : "border-border hover:border-primary/50 hover:bg-muted/50"
                               }`}
                           >
                             <div className="flex items-center gap-3">
                               <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-bold ${showResult && index === demoQuestion.correctAnswer
-                                  ? "border-green-500 bg-green-500 text-white"
-                                  : showResult && selectedAnswer === index
-                                    ? "border-red-500 bg-red-500 text-white"
-                                    : "border-current"
+                                ? "border-green-500 bg-green-500 text-white"
+                                : showResult && selectedAnswer === index
+                                  ? "border-red-500 bg-red-500 text-white"
+                                  : "border-current"
                                 }`}>
                                 {showResult && index === demoQuestion.correctAnswer ? (
                                   <Check className="h-4 w-4" />
@@ -270,8 +270,8 @@ export default function Home() {
                     {/* Result */}
                     {showResult && (
                       <div className={`p-4 rounded-lg animate-scale-in ${selectedAnswer === demoQuestion.correctAnswer
-                          ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
-                          : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300"
+                        ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
+                        : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300"
                         }`}>
                         <div className="flex items-center gap-2 font-medium">
                           {selectedAnswer === demoQuestion.correctAnswer ? (
