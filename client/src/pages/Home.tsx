@@ -7,7 +7,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import {
   BookOpen, Brain, Globe, TrendingUp, Sparkles, Zap, Target, Award,
   CheckCircle, FileText, MessageSquare, Languages, Play,
-  GraduationCap, Trophy, Clock, Users, Star, ArrowRight, Check
+  GraduationCap, Clock, Users, Star, Check, ArrowRight
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -17,15 +17,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Link, useLocation } from "wouter";
 import { Language } from "@shared/i18n";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { SEO } from "@/components/SEO";
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
   const { language, setLanguage, t } = useLanguage();
   const [, setLocation] = useLocation();
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [showResult, setShowResult] = useState(false);
 
   // Redirect authenticated users to dashboard
   useEffect(() => {
@@ -40,24 +38,6 @@ export default function Home() {
     { code: "en", name: "English", flag: "🇬🇧" },
     { code: "tr", name: "Türkçe", flag: "🇹🇷" },
   ];
-
-  // Demo question for interactive preview
-  const demoQuestion = {
-    text: "De bibliotheek is elke dag open van 9 uur 's ochtends tot 9 uur 's avonds. Op zondag is de bibliotheek gesloten.",
-    question: "Wanneer is de bibliotheek gesloten?",
-    options: [
-      "Op maandag",
-      "Op zondag",
-      "Van 9 tot 21 uur",
-      "Nooit"
-    ],
-    correctAnswer: 1
-  };
-
-  const handleAnswerClick = (index: number) => {
-    setSelectedAnswer(index);
-    setShowResult(true);
-  };
 
   return (
     <>
@@ -204,99 +184,59 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Right: Interactive Demo */}
+              {/* Right: Volunteer Initiative Card */}
               <div className="relative animate-slide-up">
                 <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-3xl blur-2xl" />
                 <Card className="relative preview-card border-primary/20 shadow-2xl">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <Badge variant="outline" className="gap-1">
-                        <GraduationCap className="h-3 w-3" />
-                        B1 Niveau
-                      </Badge>
-                      <Badge variant="secondary" className="gap-1">
-                        <Target className="h-3 w-3" />
-                        Demo
-                      </Badge>
+                  <CardHeader className="pb-3 text-center">
+                    <div className="flex justify-center mb-4">
+                      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                        <GraduationCap className="h-10 w-10 text-white" />
+                      </div>
                     </div>
-                    <CardTitle className="text-lg mt-3">Probeer het nu! 👇</CardTitle>
+                    <CardTitle className="text-2xl">🤝 {language === "ar" ? "مبادرة تطوعية" : language === "tr" ? "Gönüllü Girişim" : language === "en" ? "Volunteer Initiative" : "Vrijwilligersinitiatief"}</CardTitle>
+                    <CardDescription className="text-base mt-2">
+                      {language === "ar"
+                        ? "مشروع مجاني لمساعدة المهاجرين في اجتياز امتحان الاندماج الهولندي"
+                        : language === "tr"
+                          ? "Göçmenlerin Hollanda entegrasyon sınavını geçmelerine yardımcı olmak için ücretsiz bir proje"
+                          : language === "en"
+                            ? "A free project to help immigrants pass the Dutch integration exam"
+                            : "Een gratis project om immigranten te helpen slagen voor het Nederlandse inburgeringsexamen"
+                      }
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {/* Demo Text */}
-                    <div className="p-4 bg-muted/50 rounded-lg border text-sm leading-relaxed">
-                      {demoQuestion.text}
-                    </div>
-
-                    {/* Demo Question */}
-                    <div className="space-y-3">
-                      <p className="font-medium">{demoQuestion.question}</p>
-                      <div className="space-y-2">
-                        {demoQuestion.options.map((option, index) => (
-                          <button
-                            key={index}
-                            onClick={() => handleAnswerClick(index)}
-                            disabled={showResult}
-                            className={`w-full p-3 text-left rounded-lg border-2 transition-all duration-300 ${showResult
-                              ? index === demoQuestion.correctAnswer
-                                ? "border-green-500 bg-green-50 dark:bg-green-950"
-                                : selectedAnswer === index
-                                  ? "border-red-500 bg-red-50 dark:bg-red-950"
-                                  : "border-border"
-                              : selectedAnswer === index
-                                ? "border-primary bg-primary/5"
-                                : "border-border hover:border-primary/50 hover:bg-muted/50"
-                              }`}
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-bold ${showResult && index === demoQuestion.correctAnswer
-                                ? "border-green-500 bg-green-500 text-white"
-                                : showResult && selectedAnswer === index
-                                  ? "border-red-500 bg-red-500 text-white"
-                                  : "border-current"
-                                }`}>
-                                {showResult && index === demoQuestion.correctAnswer ? (
-                                  <Check className="h-4 w-4" />
-                                ) : (
-                                  String.fromCharCode(65 + index)
-                                )}
-                              </div>
-                              <span>{option}</span>
-                            </div>
-                          </button>
-                        ))}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-center p-4 bg-muted/50 rounded-xl">
+                        <div className="text-2xl font-bold text-primary">100%</div>
+                        <div className="text-xs text-muted-foreground">{language === "ar" ? "مجاني" : language === "tr" ? "Ücretsiz" : language === "en" ? "Free" : "Gratis"}</div>
+                      </div>
+                      <div className="text-center p-4 bg-muted/50 rounded-xl">
+                        <div className="text-2xl font-bold text-secondary">50+</div>
+                        <div className="text-xs text-muted-foreground">{language === "ar" ? "نص تدريبي" : language === "tr" ? "Alıştırma Metni" : language === "en" ? "Practice Texts" : "Oefenteksten"}</div>
                       </div>
                     </div>
 
-                    {/* Result */}
-                    {showResult && (
-                      <div className={`p-4 rounded-lg animate-scale-in ${selectedAnswer === demoQuestion.correctAnswer
-                        ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
-                        : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300"
-                        }`}>
-                        <div className="flex items-center gap-2 font-medium">
-                          {selectedAnswer === demoQuestion.correctAnswer ? (
-                            <>
-                              <Trophy className="h-5 w-5" />
-                              <span>Goed gedaan! 🎉</span>
-                            </>
-                          ) : (
-                            <>
-                              <Target className="h-5 w-5" />
-                              <span>Bijna! Het juiste antwoord is B.</span>
-                            </>
-                          )}
+                    <div className="space-y-2">
+                      {[
+                        { icon: CheckCircle, text: language === "ar" ? "أسئلة من امتحانات حقيقية" : language === "tr" ? "Gerçek sınav soruları" : language === "en" ? "Real exam questions" : "Echte examenvragen" },
+                        { icon: CheckCircle, text: language === "ar" ? "شرح مفصل لكل إجابة" : language === "tr" ? "Her yanıt için ayrıntılı açıklama" : language === "en" ? "Detailed explanation for each answer" : "Gedetailleerde uitleg per antwoord" },
+                        { icon: CheckCircle, text: language === "ar" ? "تتبع تقدمك" : language === "tr" ? "İlerlemenizi takip edin" : language === "en" ? "Track your progress" : "Volg je voortgang" },
+                      ].map((item, index) => (
+                        <div key={index} className="flex items-center gap-2 text-sm">
+                          <item.icon className="h-4 w-4 text-green-500 flex-shrink-0" />
+                          <span>{item.text}</span>
                         </div>
-                        <p className="text-sm mt-2 opacity-80">
-                          Meld je aan om meer te oefenen en je voortgang te volgen!
-                        </p>
-                        <a href={getLoginUrl()} className="inline-block mt-3">
-                          <Button size="sm" className="gap-1">
-                            <ArrowRight className="h-4 w-4" />
-                            Start Nu
-                          </Button>
-                        </a>
-                      </div>
-                    )}
+                      ))}
+                    </div>
+
+                    <a href={getLoginUrl()} className="block mt-4">
+                      <Button className="w-full gap-2 shadow-glow">
+                        <Play className="h-4 w-4" />
+                        {t.startLearningNow}
+                      </Button>
+                    </a>
                   </CardContent>
                 </Card>
               </div>
