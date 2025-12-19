@@ -234,7 +234,7 @@ export default function Home() {
                     <a href={getLoginUrl()} className="block mt-4">
                       <Button className="w-full gap-2 shadow-glow">
                         <Play className="h-4 w-4" />
-                        {t.startLearningNow}
+                        {t.getStarted}
                       </Button>
                     </a>
                   </CardContent>
@@ -448,7 +448,7 @@ export default function Home() {
               <a href={getLoginUrl()} className="inline-block">
                 <Button size="lg" className="gap-2 shadow-glow text-lg py-6 px-8">
                   <Sparkles className="h-5 w-5" />
-                  {t.startLearningNow}
+                  {t.getStarted}
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </a>
