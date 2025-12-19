@@ -276,6 +276,166 @@
     animation: scaleIn 0.3s ease-out;
   }
 
+  /* Floating animation for landing page elements */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-float-delayed {
+    animation: float 3s ease-in-out infinite;
+    animation-delay: 1s;
+  }
+
+  .animate-float-slow {
+    animation: float 4s ease-in-out infinite;
+  }
+
+  /* Pulse glow effect */
+  @keyframes pulseGlow {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(var(--primary), 0.3);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(var(--primary), 0.6);
+    }
+  }
+
+  .animate-pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+
+  /* Gradient shift animation */
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradientShift 3s ease infinite;
+  }
+
+  /* Counter animation */
+  @keyframes countUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-count {
+    animation: countUp 0.5s ease-out forwards;
+  }
+
+  /* Sparkle effect */
+  @keyframes sparkle {
+    0%, 100% {
+      opacity: 0;
+      transform: scale(0);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-sparkle {
+    animation: sparkle 1.5s ease-in-out infinite;
+  }
+
+  /* Shadow glow for buttons */
+  .shadow-glow {
+    box-shadow: 0 4px 14px 0 rgba(var(--primary), 0.39);
+    transition: all 0.3s ease;
+  }
+
+  .shadow-glow:hover {
+    box-shadow: 0 6px 20px rgba(var(--primary), 0.50);
+    transform: translateY(-2px);
+  }
+
+  /* Hero gradient background */
+  .hero-gradient {
+    background: linear-gradient(135deg, 
+      rgba(var(--primary), 0.1) 0%, 
+      rgba(var(--background), 1) 25%,
+      rgba(var(--background), 1) 75%,
+      rgba(var(--secondary), 0.1) 100%);
+  }
+
+  /* Animated border */
+  @keyframes borderGlow {
+    0%, 100% {
+      border-color: rgba(var(--primary), 0.3);
+    }
+    50% {
+      border-color: rgba(var(--primary), 0.8);
+    }
+  }
+
+  .animate-border-glow {
+    animation: borderGlow 2s ease-in-out infinite;
+  }
+
+  /* Interactive preview card */
+  .preview-card {
+    @apply relative overflow-hidden rounded-2xl border-2 transition-all duration-300;
+    background: linear-gradient(145deg, var(--card) 0%, var(--muted) 100%);
+  }
+
+  .preview-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Feature card enhanced */
+  .feature-card-enhanced {
+    @apply relative overflow-hidden transition-all duration-300;
+  }
+
+  .feature-card-enhanced::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+
+  .feature-card-enhanced:hover::before {
+    transform: scaleX(1);
+  }
+
+  /* Trust badge */
+  .trust-badge {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium;
+    background: linear-gradient(135deg, rgba(var(--primary), 0.1), rgba(var(--secondary), 0.1));
+    border: 1px solid rgba(var(--primary), 0.2);
+  }
+
   /* Flashcard 3D Flip Animation */
   .flashcard-container {
     perspective: 1000px;
