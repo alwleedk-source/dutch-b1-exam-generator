@@ -91,22 +91,22 @@ export function OnboardingTour({ open, onComplete }: OnboardingTourProps) {
     return (
         <Dialog open={open} onOpenChange={() => { }}>
             <DialogContent
-                className="sm:max-w-md"
+                className="max-w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto mx-2"
                 onPointerDownOutside={(e) => e.preventDefault()}
                 onEscapeKeyDown={(e) => e.preventDefault()}
             >
                 <DialogHeader className="text-center">
-                    <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Icon className="h-8 w-8 text-primary" />
+                    <div className="mx-auto mb-3 sm:mb-4 w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Icon className="h-7 w-7 sm:h-8 sm:w-8 text-primary" />
                     </div>
-                    <DialogTitle className="text-xl">{currentStepData.title}</DialogTitle>
-                    <DialogDescription className="text-base mt-2">
+                    <DialogTitle className="text-lg sm:text-xl">{currentStepData.title}</DialogTitle>
+                    <DialogDescription className="text-sm sm:text-base mt-2 px-2">
                         {currentStepData.description}
                     </DialogDescription>
                 </DialogHeader>
 
                 {/* Progress dots */}
-                <div className="flex justify-center gap-2 py-4">
+                <div className="flex justify-center gap-1.5 sm:gap-2 py-3 sm:py-4">
                     {steps.map((_, index) => (
                         <div
                             key={index}
@@ -120,22 +120,22 @@ export function OnboardingTour({ open, onComplete }: OnboardingTourProps) {
                     ))}
                 </div>
 
-                <DialogFooter className={`flex ${isRTL ? "flex-row-reverse" : "flex-row"} gap-2 sm:justify-between`}>
-                    <div className="flex gap-2">
+                <DialogFooter className={`flex flex-col-reverse sm:flex-row gap-2 sm:justify-between ${isRTL ? "sm:flex-row-reverse" : ""}`}>
+                    <div className="flex gap-2 justify-center sm:justify-start">
                         {currentStep > 0 && (
-                            <Button variant="outline" onClick={handlePrevious}>
+                            <Button variant="outline" onClick={handlePrevious} className="flex-1 sm:flex-none">
                                 {t.previous || "السابق"}
                             </Button>
                         )}
                         {currentStep === 0 && (
-                            <Button variant="ghost" onClick={handleSkip}>
+                            <Button variant="ghost" onClick={handleSkip} className="flex-1 sm:flex-none">
                                 {t.skip || "تخطي"}
                             </Button>
                         )}
                     </div>
-                    <Button onClick={handleNext}>
+                    <Button onClick={handleNext} className="w-full sm:w-auto">
                         {currentStep === TOTAL_STEPS - 1
-                            ? t.startLearningNow || "ابدأ الآن! 🚀"
+                            ? t.getStarted || "ابدأ الآن! 🚀"
                             : t.next || "التالي"}
                     </Button>
                 </DialogFooter>
