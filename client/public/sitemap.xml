@@ -4,20 +4,20 @@
   
   <!-- Homepage -->
   <url>
-    <loc>https://staatklaar.app/</loc>
+    <loc>https://staatsklaar.nl/</loc>
     <lastmod>2024-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="nl" href="https://staatklaar.app/?lang=nl" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://staatklaar.app/?lang=ar" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://staatklaar.app/?lang=en" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://staatklaar.app/?lang=tr" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://staatklaar.app/" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://staatsklaar.nl/?lang=nl" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://staatsklaar.nl/?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://staatsklaar.nl/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://staatsklaar.nl/?lang=tr" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://staatsklaar.nl/" />
   </url>
 
   <!-- Dashboard -->
   <url>
-    <loc>https://staatklaar.app/dashboard</loc>
+    <loc>https://staatsklaar.nl/dashboard</loc>
     <lastmod>2024-11-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
@@ -25,7 +25,7 @@
 
   <!-- Create Exam -->
   <url>
-    <loc>https://staatklaar.app/create-exam</loc>
+    <loc>https://staatsklaar.nl/create-exam</loc>
     <lastmod>2024-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -33,7 +33,7 @@
 
   <!-- Public Exams -->
   <url>
-    <loc>https://staatklaar.app/public-exams</loc>
+    <loc>https://staatsklaar.nl/public-exams</loc>
     <lastmod>2024-11-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
@@ -41,7 +41,7 @@
 
   <!-- My Exams -->
   <url>
-    <loc>https://staatklaar.app/my-exams</loc>
+    <loc>https://staatsklaar.nl/my-exams</loc>
     <lastmod>2024-11-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -49,7 +49,7 @@
 
   <!-- Progress -->
   <url>
-    <loc>https://staatklaar.app/progress</loc>
+    <loc>https://staatsklaar.nl/progress</loc>
     <lastmod>2024-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -57,7 +57,7 @@
 
   <!-- Vocabulary -->
   <url>
-    <loc>https://staatklaar.app/vocabulary</loc>
+    <loc>https://staatsklaar.nl/vocabulary</loc>
     <lastmod>2024-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -65,7 +65,7 @@
 
   <!-- Dictionary -->
   <url>
-    <loc>https://staatklaar.app/dictionary</loc>
+    <loc>https://staatsklaar.nl/dictionary</loc>
     <lastmod>2024-11-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -73,7 +73,7 @@
 
   <!-- Forum -->
   <url>
-    <loc>https://staatklaar.app/forum</loc>
+    <loc>https://staatsklaar.nl/forum</loc>
     <lastmod>2024-11-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -81,7 +81,7 @@
 
   <!-- Leaderboard -->
   <url>
-    <loc>https://staatklaar.app/leaderboard</loc>
+    <loc>https://staatsklaar.nl/leaderboard</loc>
     <lastmod>2024-11-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
@@ -89,7 +89,7 @@
 
   <!-- Achievements -->
   <url>
-    <loc>https://staatklaar.app/achievements</loc>
+    <loc>https://staatsklaar.nl/achievements</loc>
     <lastmod>2024-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>

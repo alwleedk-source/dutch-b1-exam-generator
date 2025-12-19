@@ -1262,7 +1262,7 @@ export const translations: Record<Language, Translations> = {
     suggestionFailed: "Versturen mislukt",
 
     // Onboarding Tour
-    onboardingStep1Title: "Welkom bij StaatKlaar! 🎉",
+    onboardingStep1Title: "Welkom bij StaatsKlaar! 🎉",
     onboardingStep1Desc: "Je persoonlijke coach voor het Staatsexamen NT2 B1 Lezen. Wij helpen je stap voor stap naar je inburgeringsdiploma!",
     onboardingStep2Title: "📚 Dagelijks Nieuwe Oefenteksten",
     onboardingStep2Desc: "Elke dag voegen we echte B1-teksten toe - net zoals op het echte examen. Kies een tekst, lees hem en beantwoord de vragen. Zo simpel is het!",
@@ -1953,7 +1953,7 @@ export const translations: Record<Language, Translations> = {
     suggestionFailed: "فشل الإرسال",
 
     // Onboarding Tour
-    onboardingStep1Title: "مرحباً بك في StaatKlaar! 🎉",
+    onboardingStep1Title: "مرحباً بك في StaatsKlaar! 🎉",
     onboardingStep1Desc: "مدربك الشخصي لاجتياز امتحان القراءة B1 الهولندي. سنساعدك خطوة بخطوة للحصول على شهادة الاندماج!",
     onboardingStep2Title: "📚 نصوص تدريبية جديدة يومياً",
     onboardingStep2Desc: "نضيف كل يوم نصوص حقيقية بمستوى B1 - تماماً مثل الامتحان الفعلي. اختر نصاً، اقرأه، وأجب على الأسئلة. بهذه البساطة!",
@@ -2645,7 +2645,7 @@ export const translations: Record<Language, Translations> = {
     suggestionFailed: "Submission failed",
 
     // Onboarding Tour
-    onboardingStep1Title: "Welcome to StaatKlaar! 🎉",
+    onboardingStep1Title: "Welcome to StaatsKlaar! 🎉",
     onboardingStep1Desc: "Your personal coach for the Dutch NT2 B1 Reading Exam. We'll help you step by step towards your integration certificate!",
     onboardingStep2Title: "📚 New Practice Texts Daily",
     onboardingStep2Desc: "Every day we add real B1-level texts - just like the actual exam. Choose a text, read it, and answer the questions. It's that simple!",
@@ -3452,7 +3452,7 @@ export const translations: Record<Language, Translations> = {
     suggestionFailed: "Gönderim başarısız",
 
     // Onboarding Tour
-    onboardingStep1Title: "StaatKlaar'a Hoş Geldiniz! 🎉",
+    onboardingStep1Title: "StaatsKlaar'a Hoş Geldiniz! 🎉",
     onboardingStep1Desc: "Hollanda NT2 B1 Okuma Sınavı için kişisel koçunuz. Entegrasyon sertifikanıza adım adım ulaşmanıza yardımcı olacağız!",
     onboardingStep2Title: "📚 Her Gün Yeni Alıştırma Metinleri",
     onboardingStep2Desc: "Her gün gerçek B1 seviyesinde metinler ekliyoruz - tıpkı gerçek sınav gibi. Bir metin seçin, okuyun ve soruları cevaplayın. Bu kadar basit!",

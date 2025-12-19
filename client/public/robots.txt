@@ -1,4 +1,4 @@
-# robots.txt for StaatKlaar
+# robots.txt for StaatsKlaar
 # Allow all search engines to index the site
 
 User-agent: *
@@ -10,7 +10,7 @@ Disallow: /api/
 Disallow: /auth/
 
 # Sitemap location
-Sitemap: https://staatklaar.app/sitemap.xml
+Sitemap: https://staatsklaar.nl/sitemap.xml
 
 # Crawl delay (optional, helps prevent server overload)
 Crawl-delay: 1

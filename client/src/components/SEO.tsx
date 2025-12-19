@@ -21,13 +21,13 @@ export function SEO({
   const { language, t } = useLanguage();
 
   // Default values based on language
-  const defaultTitle = "StaatKlaar - Dutch B1 Staatsexamen Preparation | Practice Reading Comprehension";
+  const defaultTitle = "StaatsKlaar - Dutch B1 Staatsexamen Preparation | Practice Reading Comprehension";
   const defaultDescription =
     "Master Dutch reading comprehension for the B1 Staatsexamen. Practice with AI-generated questions, get instant feedback, and track your progress. Available in Nederlands, العربية, English, and Türkçe.";
   const defaultKeywords =
     "Dutch B1, Staatsexamen, NT2, Dutch exam, reading comprehension, Dutch practice, integration exam, inburgeringsexamen, Nederlands leren, Dutch learning, B1 niveau";
-  const defaultImage = "https://staatklaar.app/og-image.png";
-  const defaultUrl = "https://staatklaar.app";
+  const defaultImage = "https://staatsklaar.nl/og-image.png";
+  const defaultUrl = "https://staatsklaar.nl";
 
   const finalTitle = title || defaultTitle;
   const finalDescription = description || defaultDescription;
@@ -46,7 +46,7 @@ export function SEO({
       <meta name="title" content={finalTitle} />
       <meta name="description" content={finalDescription} />
       <meta name="keywords" content={finalKeywords} />
-      <meta name="author" content="StaatKlaar" />
+      <meta name="author" content="StaatsKlaar" />
       <meta name="robots" content="index, follow" />
       <meta name="language" content={langCode} />
       <meta name="revisit-after" content="7 days" />
@@ -60,7 +60,7 @@ export function SEO({
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta property="og:locale" content={langCode === "ar" ? "ar_SA" : langCode === "tr" ? "tr_TR" : langCode === "nl" ? "nl_NL" : "en_US"} />
-      <meta property="og:site_name" content="StaatKlaar" />
+      <meta property="og:site_name" content="StaatsKlaar" />
 
       {/* Twitter */}
       <meta property="twitter:card" content="summary_large_image" />
@@ -78,9 +78,9 @@ export function SEO({
         {JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Organization",
-          name: "StaatKlaar",
-          url: "https://staatklaar.app",
-          logo: "https://staatklaar.app/logo.png",
+          name: "StaatsKlaar",
+          url: "https://staatsklaar.nl",
+          logo: "https://staatsklaar.nl/logo.png",
           description: finalDescription,
           sameAs: [],
         })}
@@ -91,8 +91,8 @@ export function SEO({
         {JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebApplication",
-          name: "StaatKlaar",
-          url: "https://staatklaar.app",
+          name: "StaatsKlaar",
+          url: "https://staatsklaar.nl",
           applicationCategory: "EducationalApplication",
           operatingSystem: "Any",
           offers: {
@@ -122,8 +122,8 @@ export function SEO({
           description: "Comprehensive Dutch B1 reading comprehension practice for the Staatsexamen",
           provider: {
             "@type": "Organization",
-            name: "StaatKlaar",
-            url: "https://staatklaar.app",
+            name: "StaatsKlaar",
+            url: "https://staatsklaar.nl",
           },
           educationalLevel: "B1",
           inLanguage: "nl",
@@ -144,26 +144,26 @@ export function SEO({
           mainEntity: [
             {
               "@type": "Question",
-              name: "What is StaatKlaar?",
+              name: "What is StaatsKlaar?",
               acceptedAnswer: {
                 "@type": "Answer",
-                text: "StaatKlaar is an online platform for practicing Dutch B1 reading comprehension for the Staatsexamen. It uses AI to generate practice questions and provides instant feedback.",
+                text: "StaatsKlaar is an online platform for practicing Dutch B1 reading comprehension for the Staatsexamen. It uses AI to generate practice questions and provides instant feedback.",
               },
             },
             {
               "@type": "Question",
-              name: "Is StaatKlaar free?",
+              name: "Is StaatsKlaar free?",
               acceptedAnswer: {
                 "@type": "Answer",
-                text: "Yes, StaatKlaar is completely free to use. Create an account and start practicing immediately.",
+                text: "Yes, StaatsKlaar is completely free to use. Create an account and start practicing immediately.",
               },
             },
             {
               "@type": "Question",
-              name: "What languages does StaatKlaar support?",
+              name: "What languages does StaatsKlaar support?",
               acceptedAnswer: {
                 "@type": "Answer",
-                text: "StaatKlaar supports Nederlands, العربية (Arabic), English, and Türkçe (Turkish) for the interface, while all exam content is in Dutch.",
+                text: "StaatsKlaar supports Nederlands, العربية (Arabic), English, and Türkçe (Turkish) for the interface, while all exam content is in Dutch.",
               },
             },
             {

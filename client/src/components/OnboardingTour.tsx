@@ -60,7 +60,7 @@ export function OnboardingTour({ open, onComplete }: OnboardingTourProps) {
     const steps = [
         {
             icon: GraduationCap,
-            title: t.onboardingStep1Title || "مرحباً بك في StaatKlaar!",
+            title: t.onboardingStep1Title || "مرحباً بك في StaatsKlaar!",
             description: t.onboardingStep1Desc || "منصتك للتحضير لامتحان القراءة الرسمي B1 الهولندي",
         },
         {
@@ -111,10 +111,10 @@ export function OnboardingTour({ open, onComplete }: OnboardingTourProps) {
                         <div
                             key={index}
                             className={`w-2 h-2 rounded-full transition-all ${index === currentStep
-                                    ? "bg-primary w-4"
-                                    : index < currentStep
-                                        ? "bg-primary/50"
-                                        : "bg-muted"
+                                ? "bg-primary w-4"
+                                : index < currentStep
+                                    ? "bg-primary/50"
+                                    : "bg-muted"
                                 }`}
                         />
                     ))}
